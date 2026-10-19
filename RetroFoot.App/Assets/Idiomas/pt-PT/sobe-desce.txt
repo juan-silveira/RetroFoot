@@ -1,0 +1,3 @@
+# Sobem e descem por divisao (Regras.SobemDescemEscolhido; TelaConfiguracoes) (pt-PT). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Entre as divisões e do Distrital para a 4ª divisão (por sorteio). Fica gravado no jogo novo e não muda depois. No máximo 4 e menos de metade da divisão.	Entre as divisões e do Distrital para a 4.ª divisão (por sorteio). Fica gravado no jogo novo e não muda depois. No máximo 4 e menos de metade da divisão.

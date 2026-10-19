@@ -1,0 +1,5 @@
+Clássica	Classic
+Atual	Current
+Realístico	Realistic
+Clássica (98.003)	Classic (98.003)
+Como o clássico: as telas no formato de 800x600.	Like the classic: screens in the 800x600 format.

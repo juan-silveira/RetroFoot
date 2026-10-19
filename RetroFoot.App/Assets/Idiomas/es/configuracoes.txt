@@ -1,0 +1,86 @@
+# As Configuracoes (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+# --- TelaConfiguracoes ---
+Configurações	Configuración
+Salvar	Guardar
+Resumo	Resumen
+"Não consegui gravar: "	"No se pudo guardar: "
+# secoes
+Jogo	Juego
+Regras	Reglas
+Aparência	Apariencia
+Versão e equipas	Versión y equipos
+Cartões, patrocínios, estrangeiros	Tarjetas, patrocinios, extranjeros
+Visual e formato	Aspecto y formato
+Recursos do jogo	Funciones del juego
+# Jogo
+A versão do jogo e o tamanho das divisões.	La versión del juego y el tamaño de las divisiones.
+Versão do jogo	Versión del juego
+Versão	Versión
+versão Clássica	versión Clásica
+versão Atual	versión Actual
+Nota e Risco de lesão, a tática 5-0-5, até 30 jogadores, desempate por vitórias e as regras que você escolher.	Nota y Riesgo de lesión, la táctica 5-0-5, hasta 30 jugadores, desempate por victorias y las reglas que elijas.
+Equipas por divisão	Equipos por división
+Equipas por divisão:	Equipos por división:
+(só na versão Atual)	(solo en la versión Actual)
+Equipas	Equipos
+8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 equipos como en el clásico: 14 jornadas; el juego nuevo necesita al menos {0} equipos en los países elegidos.
+{0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos	{0} equipos: {1} jornadas; el juego nuevo necesita al menos {2} equipos en los países elegidos
+{0} equipas por divisão ({1} rodadas)	{0} equipos por división ({1} jornadas)
+{0} por divisão · {1} rodadas	{0} por división · {1} jornadas
+As mudanças valem da próxima vez que um jogo for aberto; o visual e o formato da tela, na hora.	Los cambios valen la próxima vez que se abra una partida; el aspecto y el formato de pantalla, al momento.
+Valem para o próximo jogo novo; o visual e o formato da tela, na hora. Um jogo gravado mantém o número de equipas com que começou.	Valen para el próximo juego nuevo; el aspecto y el formato de pantalla, al momento. Una partida guardada mantiene el número de equipos con que empezó.
+Jogo em curso	Partida en curso
+"Jogo em curso: "	"Partida en curso: "
+O jogo em curso mantém as regras com que foi aberto.	La partida en curso mantiene las reglas con que se abrió.
+O número de equipas vem do jogo gravado e não muda. O que você mudar aqui vale da próxima vez que um jogo for aberto.	El número de equipos viene de la partida guardada y no cambia. Lo que cambies aquí vale la próxima vez que se abra una partida.
+# Regras
+O que vale dentro do jogo.	Lo que vale dentro del juego.
+Na versão Clássica as regras são as de 1998	En la versión Clásica las reglas son las de 1998
+Na versão Clássica as regras são as de 1998: só cartões vermelhos e sem patrocínios.	En la versión Clásica las reglas son las de 1998: solo tarjetas rojas y sin patrocinios.
+Cartões amarelos e patrocínios só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Las tarjetas amarillas y los patrocinios solo existen en la versión Actual. La elección queda guardada para cuando uses la Modificada.
+Usar a versão Atual	Usar la versión Actual
+Adições	Añadidos
+Cartões amarelos	Tarjetas amarillas
+Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no clássico.	Tres amarillas acumuladas suspenden un partido. Desactivadas: solo rojas, como en el clásico.
+Cartões amarelos (três suspendem por um jogo)	Tarjetas amarillas (tres suspenden un partido)
+Patrocínios	Patrocinios
+Propostas e contratos de patrocínio master ao longo da temporada.	Ofertas y contratos de patrocinador principal a lo largo de la temporada.
+Patrocínios (propostas de patrocínio master)	Patrocinios (ofertas de patrocinador principal)
+Cartões	Tarjetas
+Amarelos e vermelhos	Amarillas y rojas
+Só vermelhos	Solo rojas
+cartões amarelos ligados	tarjetas amarillas activadas
+só cartões vermelhos	solo tarjetas rojas
+patrocínios ligados	patrocinios activados
+patrocínios desligados	patrocinios desactivados
+Ligados	Activados
+Desligados	Desactivados
+Jogadores estrangeiros	Jugadores extranjeros
+Estrangeiros	Extranjeros
+Liberado	Libre
+Até 5 por equipa; a Lei Bosman e os países de língua portuguesa não contam.	Hasta 5 por equipo; la Ley Bosman y los países de lengua portuguesa no cuentan.
+Sem limite: todos os países entram na lista da Lei Bosman.	Sin límite: todos los países entran en la lista de la Ley Bosman.
+Realístico: até 5 por equipa (Bosman e lusófonos não contam)	Realista: hasta 5 por equipo (Bosman y lusófonos no cuentan)
+Liberado: sem limite de estrangeiros	Libre: sin límite de extranjeros
+Desempate na classificação	Desempate en la clasificación
+Pontos, vitórias, saldo de golos e golos marcados.	Puntos, victorias, diferencia de goles y goles marcados.
+Pontos, saldo de golos e golos marcados (como no clássico).	Puntos, diferencia de goles y goles marcados (como en el clásico).
+# Aparencia
+Como as telas são desenhadas. Muda na hora, mesmo com um jogo aberto.	Cómo se dibujan las pantallas. Cambia al momento, incluso con una partida abierta.
+Visual	Aspecto
+Tema verde e amarelo, cartões e os logos das equipas e das ligas.	Tema verde y amarillo, tarjetas y los escudos de los equipos y las ligas.
+Moderno: tema escuro, cartões e logos	Moderno: tema oscuro, tarjetas y escudos
+Formato da tela	Formato de pantalla
+Como o clássico: as telas no formato de 800x600.	Como el original: las pantallas en formato 800x600.
+Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.	Ventana ancha: la jornada con las divisiones lado a lado y las pantallas aprovechando el ancho.
+4:3: como o clássico (800x600)	4:3: como el clásico (800x600)
+16:9: janela larga, as telas aproveitam a largura	16:9: ventana ancha, las pantallas aprovechan el ancho
+O visual e o formato mudam na hora, mesmo com um jogo aberto.	El aspecto y el formato cambian al momento, incluso con una partida abierta.
+# Idioma
+Os textos do jogo.	Los textos del juego.
+Idioma do jogo	Idioma del juego
+Os textos do jogo clássico.	Los textos del juego clásico (portugués).
+Os textos adaptados para o Brasil.	Los textos adaptados para Brasil.
+Os textos traduzidos para inglês.	Los textos traducidos al inglés.
+Os textos traduzidos para espanhol.	Los textos traducidos al español.

@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "VENDAS.EFT",
+  "name": "ESTRELAS DE VENDAS NOVAS",
+  "shortName": "VENDAS NOVAS",
+  "country": "POR",
+  "level": 1,
+  "textColor": "#000000",
+  "backgroundColor": "#C0C0C0",
+  "coach": "Luís Perdigão",
+  "players": [
+    { "name": "Carlos Ribeiro", "position": "G", "country": "POR" },
+    { "name": "Barbosa", "position": "D", "country": "POR" },
+    { "name": "Nicha", "position": "D", "country": "POR" },
+    { "name": "Paulo Sérgio", "position": "D", "country": "POR" },
+    { "name": "Sérgo Caria", "position": "D", "country": "POR" },
+    { "name": "Zé Carlos", "position": "D", "country": "POR" },
+    { "name": "Albasani", "position": "M", "country": "ALB" },
+    { "name": "Cipriano", "position": "M", "country": "POR" },
+    { "name": "Jesualdo", "position": "M", "country": "POR" },
+    { "name": "Magalhães", "position": "M", "country": "POR" },
+    { "name": "Nandinho", "position": "M", "country": "POR" },
+    { "name": "Fadista", "position": "A", "country": "POR" },
+    { "name": "Vieira", "position": "A", "country": "POR" },
+    { "name": "Álvaro", "position": "A", "country": "POR" }
+  ]
+}

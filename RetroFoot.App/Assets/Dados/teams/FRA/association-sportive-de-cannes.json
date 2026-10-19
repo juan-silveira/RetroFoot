@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CANNES.EFT",
+  "name": "ASSOCIATION SPORTIVE DE CANNES",
+  "shortName": "CANNES",
+  "country": "FRA",
+  "level": 12,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Francis Borelli",
+  "players": [
+    { "name": "Gregory Wimbée", "position": "G", "country": "FRA" },
+    { "name": "Sébastien Chabbert", "position": "G", "country": "FRA" },
+    { "name": "Brian Jensen", "position": "D", "country": "DIN" },
+    { "name": "Gilles Hampartzumian", "position": "D", "country": "FRA" },
+    { "name": "Jonathan Zebina", "position": "D", "country": "FRA" },
+    { "name": "Kwami Hodouto", "position": "D", "country": "FRA" },
+    { "name": "Walter Kogler", "position": "D", "country": "AUT" },
+    { "name": "Yannick Fischer", "position": "D", "country": "FRA" },
+    { "name": "Yao Senaya", "position": "D", "country": "TOG" },
+    { "name": "Adel Bouttoba", "position": "M", "country": "FRA" },
+    { "name": "Cédric Daury", "position": "M", "country": "FRA" },
+    { "name": "Jeanmichel Capoue", "position": "M", "country": "FRA" },
+    { "name": "Komlan Assignon", "position": "M", "country": "TOG" },
+    { "name": "Michael Marsiglia", "position": "M", "country": "FRA" },
+    { "name": "Sébastien Chabuad", "position": "M", "country": "FRA" },
+    { "name": "Cédric Mouret", "position": "A", "country": "FRA" },
+    { "name": "Laurent Leroy", "position": "A", "country": "FRA" },
+    { "name": "Leeroy Echteld", "position": "A", "country": "HOL" },
+    { "name": "Victor Konwlo", "position": "A", "country": "FRA" }
+  ]
+}

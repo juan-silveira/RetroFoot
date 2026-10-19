@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "WAGEREM.EFT",
+  "name": "KSV WAREGEM",
+  "shortName": "KSV WAREGEM",
+  "country": "BEL",
+  "level": 6,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Jean-Pierre Van Nede",
+  "players": [
+    { "name": "Franky Vandendries", "position": "G", "country": "BEL" },
+    { "name": "Bart Mauroo", "position": "D", "country": "BEL" },
+    { "name": "Dirk Vanderbeken", "position": "D", "country": "BEL" },
+    { "name": "Frank Bosmans", "position": "D", "country": "BEL" },
+    { "name": "Ken Verheyen", "position": "D", "country": "BEL" },
+    { "name": "Marc Schaessens", "position": "D", "country": "BEL" },
+    { "name": "Marino Blancke", "position": "D", "country": "BEL" },
+    { "name": "Onya Paschal", "position": "D", "country": "BEL" },
+    { "name": "Eddy Syx", "position": "M", "country": "BEL" },
+    { "name": "Fangio Buyse", "position": "M", "country": "BEL" },
+    { "name": "Gunther Hofmans", "position": "M", "country": "BEL" },
+    { "name": "Jude Vandelannoite", "position": "M", "country": "BEL" },
+    { "name": "Michael De Meyst", "position": "M", "country": "BEL" },
+    { "name": "Rik Claeys", "position": "M", "country": "BEL" },
+    { "name": "Rony Van Geneugden", "position": "M", "country": "BEL" },
+    { "name": "Sebastien De Mersman", "position": "M", "country": "BEL" },
+    { "name": "Benedict Akuwegbu", "position": "A", "country": "NIG" },
+    { "name": "David Bossuyt", "position": "A", "country": "BEL" },
+    { "name": "Fode Camara", "position": "A", "country": "GNE" }
+  ]
+}

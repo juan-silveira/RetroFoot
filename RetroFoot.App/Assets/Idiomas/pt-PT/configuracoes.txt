@@ -1,0 +1,29 @@
+# As Configuracoes (pt-PT). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+# --- TelaConfiguracoes ---
+Salvar	Gravar
+"Não consegui gravar: "	"Não foi possível gravar: "
+# secoes
+Registro	Registo
+# Jogo
+Nota e Risco de lesão, a tática 5-0-5, até 30 jogadores, desempate por vitórias e as regras que você escolher.	Nota e Risco de lesão, a táctica 5-0-5, até 30 jogadores, desempate por vitórias e as regras que escolher.
+8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 equipas como no clássico: 14 jornadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.
+{0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos	{0} equipas: {1} jornadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos
+{0} equipas por divisão ({1} rodadas)	{0} equipas por divisão ({1} jornadas)
+{0} por divisão · {1} rodadas	{0} por divisão · {1} jornadas
+As mudanças valem da próxima vez que um jogo for aberto; o visual e o formato da tela, na hora.	As mudanças valem da próxima vez que um jogo for aberto; o visual e o formato do ecrã, na hora.
+Valem para o próximo jogo novo; o visual e o formato da tela, na hora. Um jogo gravado mantém o número de equipas com que começou.	Valem para o próximo jogo novo; o visual e o formato do ecrã, na hora. Um jogo gravado mantém o número de equipas com que começou.
+O número de equipas vem do jogo gravado e não muda. O que você mudar aqui vale da próxima vez que um jogo for aberto.	O número de equipas vem do jogo gravado e não muda. O que mudar aqui vale da próxima vez que um jogo for aberto.
+# Regras
+Cartões amarelos e patrocínios só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Cartões amarelos e patrocínios só existem na versão Modificada. A escolha fica guardada para quando usar a Modificada.
+Propostas e contratos de patrocínio master ao longo da temporada.	Propostas e contratos de patrocinador principal ao longo da época.
+Patrocínios (propostas de patrocínio master)	Patrocínios (propostas de patrocinador principal)
+Pontos, vitórias, saldo de golos e golos marcados.	Pontos, vitórias, diferença de golos e golos marcados.
+Pontos, saldo de golos e golos marcados (como no clássico).	Pontos, diferença de golos e golos marcados (como no clássico).
+# Aparencia
+Como as telas são desenhadas. Muda na hora, mesmo com um jogo aberto.	Como os ecrãs são desenhados. Muda na hora, mesmo com um jogo aberto.
+Formato da tela	Formato do ecrã
+Como o clássico: as telas no formato de 800x600.	Como o original: os ecrãs no formato de 800x600.
+Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.	Janela larga: a jornada com as divisões lado a lado e os ecrãs a aproveitar a largura.
+16:9: janela larga, as telas aproveitam a largura	16:9: janela larga, os ecrãs aproveitam a largura
+# Idioma

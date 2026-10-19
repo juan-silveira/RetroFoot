@@ -1,0 +1,4 @@
+# O elenco: menu do botao direito, selos do estado (es). Formato: chave<TAB>traducao.
+Ver ficha	Ver ficha
+Pendurado	Apercibido
+Pendurado: mais um amarelo e fica suspenso	Apercibido: una amarilla más y queda sancionado

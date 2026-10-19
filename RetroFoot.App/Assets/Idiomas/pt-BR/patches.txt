@@ -1,0 +1,80 @@
+# Ferramenta Patches do hub (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+ e mais {0}	 e mais {0}
+1 bandeira	1 bandeira
+1 equipa	1 time
+1 logo	1 escudo
+A aplicar o patch...	Aplicando o patch...
+A reverter o patch...	Revertendo o patch...
+Abrir pasta	Abrir pasta
+Aplicado	Aplicado
+Aplicado em {0}.	Aplicado em {0}.
+Aplicar	Aplicar
+Aplicar "{0}" na pasta de dados? Os arquivos substituídos ficam guardados para reverter.	Aplicar "{0}" na pasta de dados? Os arquivos substituídos ficam guardados para reverter.
+Aplicar patch	Aplicar patch
+Aplicar um patch guarda os arquivos que ele substitui: pode revertê-lo quando quiser e voltar às equipas originais.	Aplicar um patch guarda os arquivos que ele substitui: você pode revertê-lo quando quiser e voltar aos times originais.
+Arquivos mudados depois do patch foram guardados em:\n{0}	Arquivos alterados depois do patch foram salvos em:\n{0}
+Atualizar	Atualizar
+Autor: {0}	Autor: {0}
+Bandeiras	Bandeiras
+Biblioteca de patches	Biblioteca de patches
+Conflito com o patch aplicado "{1}" ({0} em comum). Este patch passa por cima; para reverter "{1}" será preciso reverter este antes.	Conflito com o patch aplicado "{1}" ({0} em comum). Este patch passa por cima; para reverter "{1}" será preciso reverter este antes.
+Copie o .zip para a pasta patches:\n{0}	Copie o .zip para a pasta patches:\n{0}
+Equipas de países que não estão na lista de países: {0}.	Times de países que não estão na lista de países: {0}.
+Grupos	Grupos
+Ignorados	Ignorados
+Importar patch (.zip)	Importar patch (.zip)
+Lei Bosman / PLOP ({0})	Lei Bosman / PLOP ({0})
+Logos	Escudos
+Nada para aplicar	Nada para aplicar
+Nenhum patch na biblioteca	Nenhum patch na biblioteca
+Não consegui ler este zip: {0}	Não consegui ler este zip: {0}
+Não foi possível reverter: {0}	Não foi possível reverter: {0}
+O .zip deste patch já não está na biblioteca, mas o patch continua aplicado e pode ser revertido.	O .zip deste patch já não está na biblioteca, mas o patch continua aplicado e pode ser revertido.
+O .zip saiu da biblioteca	O .zip saiu da biblioteca
+O patch continua aplicado e pode ser revertido depois.	O patch continua aplicado e pode ser revertido depois.
+O patch não foi aplicado (nada mudou): {0}	O patch não foi aplicado (nada mudou): {0}
+Passa por cima do patch "{1}" ({0} em comum).	Passa por cima do patch "{1}" ({0} em comum).
+Patch (.zip)	Patch (.zip)
+Patch do RetroFoot	Patch do RetroFoot
+Patches	Patches
+Patrocinadores	Patrocinadores
+Países	Países
+Países das equipas	Países dos times
+Remover	Remover
+Remover da biblioteca	Remover da biblioteca
+Reverta antes "{0}" (aplicado depois e mexe nos mesmos arquivos).	Reverta antes "{0}" (aplicado depois e altera os mesmos arquivos).
+Reverter	Reverter
+Reverter patch	Reverter patch
+Tirar "{0}" da biblioteca? O .zip é apagado da pasta patches.	Tirar "{0}" da biblioteca? O .zip é apagado da pasta patches.
+Vale para os jogos novos; os jogos gravados continuam como estavam.	Vale para os jogos novos; os jogos salvos continuam como estavam.
+Versão {0}	Versão {0}
+Voltar a pasta de dados a como estava antes de "{0}"?	Voltar a pasta de dados a como estava antes de "{0}"?
+Zip com erro	Zip com erro
+a lista de países (countries.tsv)	a lista de países (countries.tsv)
+a lista de árbitros (referees.tsv)	a lista de árbitros (referees.tsv)
+o .zip não está na biblioteca	o .zip não está na biblioteca
+o patch já está aplicado	o patch já está aplicado
+o patch não está aplicado	o patch não está aplicado
+outro patch aplicado depois mexe nos mesmos arquivos	outro patch aplicado depois altera os mesmos arquivos
+patrocinadores	patrocinadores
+países	países
+{0} ({1} novas, {2} substituídas)	{0} ({1} novos, {2} substituídos)
+{0} arquivos (programas, imagens...)	{0} arquivos (programas, imagens...)
+{0} arquivos com problema ficaram de fora:	{0} arquivos com problema ficaram de fora:
+{0} bandeiras	{0} bandeiras
+{0} equipas	{0} times
+{0} equipas que o patch não traz saem do jogo (voltam ao reverter).	{0} times que o patch não traz saem do jogo (voltam ao reverter).
+{0} equipas saíram (voltam ao reverter).	{0} times saíram (voltam ao reverter).
+{0} logos	{0} escudos
+{0}: não tem nada que o RetroFoot use (equipas, países, árbitros, bandeiras, logos).	{0}: não tem nada que o RetroFoot use (times, países, árbitros, bandeiras, escudos).
+Árbitros	Árbitros
+árbitros	árbitros
+Cancelar	Cancelar
+Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de times e escudos exportado pelo Editor de Times.
+Patch clássico (.EFT)	Patch clássico (.EFT)
+Substituir todas as equipas (como trocar a pasta EQUIPAS inteira)	Substituir todos os times (como trocar a pasta EQUIPAS inteira)
+Também pode arrastar os .zip para aqui ou copiá-los para a pasta patches.	Você também pode arrastar os .zip para cá ou copiá-los para a pasta patches.
+1 arquivo (programa, imagem...)	1 arquivo (programa, imagem...)
+Patch aplicado. Equipas: {0}; outros arquivos: {1}.	Patch aplicado. Times: {0}; outros arquivos: {1}.
+Patch revertido. Arquivos repostos: {0}; apagados: {1}.	Patch revertido. Arquivos restaurados: {0}; apagados: {1}.

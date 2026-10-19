@@ -1,0 +1,11 @@
+bin/
+obj/
+*.user
+dist/
+
+# saves (.e98) do jogo classico: so locais, para os testes e as demos
+*.e98
+*.E98
+
+# pastas de saves desta maquina para os testes (RetroFoot.Motor.Testes/Dados.cs)
+saves-locais.txt

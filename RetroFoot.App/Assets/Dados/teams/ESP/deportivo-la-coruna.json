@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "LACORUNA.EFT",
+  "name": "DEPORTIVO LA CORUÑA",
+  "shortName": "DEPORTIVO LA CORUÑA",
+  "country": "ESP",
+  "level": 13,
+  "textColor": "#0000FF",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Manuel José",
+  "players": [
+    { "name": "Jacques Songo'o", "position": "G", "country": "CAM" },
+    { "name": "Nuno", "position": "G", "country": "POR" },
+    { "name": "Armando", "position": "D", "country": "ESP" },
+    { "name": "Hélder Rodrigues", "position": "D", "country": "POR" },
+    { "name": "Jerome Bonissel", "position": "D", "country": "FRA" },
+    { "name": "Luís Ramis", "position": "D", "country": "ESP" },
+    { "name": "Nando", "position": "D", "country": "ESP" },
+    { "name": "Nourredine Naybet", "position": "D", "country": "MAR" },
+    { "name": "Paco", "position": "D", "country": "ESP" },
+    { "name": "Alfredo", "position": "M", "country": "ESP" },
+    { "name": "Corentin Martins", "position": "M", "country": "FRA" },
+    { "name": "Djalminha", "position": "M", "country": "BRA" },
+    { "name": "Donato", "position": "M", "country": "ESP" },
+    { "name": "Flávio Conceição", "position": "M", "country": "BRA" },
+    { "name": "Hadry", "position": "M", "country": "MAR" },
+    { "name": "Fran", "position": "A", "country": "ESP" },
+    { "name": "José Deus", "position": "A", "country": "ESP" },
+    { "name": "Luiz Goulart", "position": "A", "country": "ESP" },
+    { "name": "Manjarín", "position": "A", "country": "ESP" }
+  ]
+}

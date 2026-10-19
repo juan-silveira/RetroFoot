@@ -1,0 +1,31 @@
+# Hub do RetroFoot e pasta de dados (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Comece um jogo novo ou continue um jogo gravado.	Start a new game or continue a saved one.
+Editor de Equipas	Team Editor
+Crie e edite equipas, jogadores e cores	Create and edit teams, players and colours
+Editor de Save	Save Editor
+Altere dinheiro, jogadores e equipas de um jogo gravado	Change money, players and teams in a saved game
+Scout	Scout
+Procure os melhores jogadores	Find the best players
+Patches	Patches
+Aplique patches de equipas e países	Apply team and country patches
+Árbitros	Referees
+Edite a lista de árbitros	Edit the referee list
+Idioma, visual, formato e regras do jogo	Language, look, screen format and game rules
+Versão e créditos	Version and credits
+Fecha o RetroFoot	Closes RetroFoot
+Pasta de dados (equipas, logos, saves, patches):	Data folder (teams, logos, saves, patches):
+Arquivos clássicos convertidos: {0} equipas	Classic files converted: {0} teams
+Abrir pasta de dados	Open data folder
+Pasta de dados	Data folder
+Não consegui abrir a pasta. Ela fica em:\n{0}	Could not open the folder. It is at:\n{0}
+Em breve	Coming soon
+Esta ferramenta ainda está a ser feita. Enquanto isso, os arquivos podem ser editados na pasta de dados.	This tool is still being built. Meanwhile, the files can be edited in the data folder.
+Dados	Data
+Equipas, logos, saves e patches numa pasta que você abre no gestor de arquivos.	Teams, logos, saves and patches in a folder you open in your file manager.
+teams (equipas em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos clássicos (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.	teams (teams in JSON, one folder per country), logos, saves, patches, flags, sponsors, country-groups, countries.tsv and referees.tsv. Classic files (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) dropped there are converted on the next new game.
+Não achei os dados do jogo (countries.tsv, teams...) em {0}.	Could not find the game data (countries.tsv, teams...) in {0}.
+Esc: volta ao menu.	Esc: back to the menu.
+Equipas, logos, saves e patches	Teams, logos, saves and patches
+
+Sair do RetroFoot?	Quit RetroFoot?

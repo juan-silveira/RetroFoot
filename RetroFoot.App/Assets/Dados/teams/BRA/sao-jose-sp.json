@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SAOJO_BR.EFT",
+  "name": "SÃO JOSÉ-SP",
+  "shortName": "SÃO JOSÉ",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#0000FF",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Admir Mello",
+  "players": [
+    { "name": "Maurício", "position": "G", "country": "BRA" },
+    { "name": "Fernando", "position": "D", "country": "BRA" },
+    { "name": "Garrinchinha", "position": "D", "country": "BRA" },
+    { "name": "Gelázio", "position": "D", "country": "BRA" },
+    { "name": "Lélis", "position": "D", "country": "BRA" },
+    { "name": "Ramalho", "position": "D", "country": "BRA" },
+    { "name": "Adil", "position": "M", "country": "BRA" },
+    { "name": "Cannigia", "position": "M", "country": "BRA" },
+    { "name": "Eric", "position": "M", "country": "BRA" },
+    { "name": "Wágner", "position": "M", "country": "BRA" },
+    { "name": "Zé Renato", "position": "M", "country": "BRA" },
+    { "name": "Beto", "position": "A", "country": "BRA" },
+    { "name": "Marco Aurélio", "position": "A", "country": "BRA" },
+    { "name": "Piá", "position": "A", "country": "BRA" }
+  ]
+}

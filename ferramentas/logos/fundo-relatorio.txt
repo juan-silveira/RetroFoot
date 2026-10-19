@@ -1,0 +1,41 @@
+# ferramentas/logos/fundo.py --aplicar: 886 logos
+# 881 ja com a borda transparente (nada a fazer)
+
+## fundo opaco quase branco tirado (0)
+(nenhum)
+
+## para rever a mao, nao mexidos (5)
+belgium_challenger-pro-league.png	borda opaca variada (50% na cor (21, 0, 42))
+denmark_1st-division.png	borda opaca de uma cor que nao e branca (25, 25, 25)
+denmark_2nd-division.png	borda opaca de uma cor que nao e branca (3, 138, 47)
+ecuador_delfin.png	borda opaca de uma cor que nao e branca (48, 88, 166)
+portugal_liga-3.png	borda opaca de uma cor que nao e branca (60, 35, 101)
+
+## com o circulo claro por tras no visual Moderno (Escudos.Escuro; escuros demais para o fundo escuro) (27)
+belgium_belgian-cup.png
+brazil_brazilian-serie-d.png
+brazil_maringa.png
+brazil_volta-redonda.png
+canada_vancouver-fc.png
+denmark_danish-cup.png
+denmark_danish-super-liga.png
+denmark_randers.png
+england_derby-county.png
+england_english-premier-league.png
+england_tottenham.png
+france_aubagne.png
+france_fc-metz.png
+france_ligue-1.png
+france_ligue-2.png
+georgia_dinamo-tbilisi.png
+italy_juventus.png
+japan_j-league.png
+mexico_liga-premier-a.png
+netherlands_eredivisie.png
+netherlands_nac-breda.png
+portugal_primeira-liga.png
+saudi-arabia_al-jabalain.png
+scotland_scottish-premiership.png
+south-africa_orlando-pirates.png
+spain_copa-del-rey.png
+switzerland_swiss-challenge-league.png

@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CORINTHI.EFT",
+  "name": "CORINTHIANS",
+  "shortName": "CORINTHIANS",
+  "country": "BRA",
+  "level": 14,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Wanderley Luxemburgo",
+  "players": [
+    { "name": "Mauricio", "position": "G", "country": "BRA" },
+    { "name": "Ronaldo", "position": "G", "country": "BRA" },
+    { "name": "André", "position": "D", "country": "BRA" },
+    { "name": "Antonio Carlos", "position": "D", "country": "BRA" },
+    { "name": "Fábio Augusto", "position": "D", "country": "BRA" },
+    { "name": "Rodrigo", "position": "D", "country": "BRA" },
+    { "name": "Sangaletti", "position": "D", "country": "BRA" },
+    { "name": "Edinan", "position": "M", "country": "BRA" },
+    { "name": "Eilson", "position": "M", "country": "BRA" },
+    { "name": "Fernando Diniz", "position": "M", "country": "BRA" },
+    { "name": "Renaldo", "position": "M", "country": "BRA" },
+    { "name": "Rincón", "position": "M", "country": "COL" },
+    { "name": "Tiba", "position": "M", "country": "BRA" },
+    { "name": "Donizete", "position": "A", "country": "BRA" },
+    { "name": "Mirandinha", "position": "A", "country": "BRA" },
+    { "name": "Neto", "position": "A", "country": "BRA" }
+  ]
+}

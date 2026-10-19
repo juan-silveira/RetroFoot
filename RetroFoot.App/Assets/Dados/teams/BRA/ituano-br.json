@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ITUAN_BR.EFT",
+  "name": "ITUANO-BR",
+  "shortName": "ITUANO",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#000000",
+  "backgroundColor": "#FF0000",
+  "coach": "Heron Ferreira",
+  "players": [
+    { "name": "Vinicius", "position": "G", "country": "BRA" },
+    { "name": "Émerson", "position": "G", "country": "BRA" },
+    { "name": "Alexandre", "position": "D", "country": "BRA" },
+    { "name": "Augusto", "position": "D", "country": "BRA" },
+    { "name": "Batata", "position": "D", "country": "BRA" },
+    { "name": "Gil Baiano", "position": "D", "country": "BRA" },
+    { "name": "Vitor", "position": "D", "country": "BRA" },
+    { "name": "Alemão", "position": "M", "country": "BRA" },
+    { "name": "Raudnei", "position": "M", "country": "BRA" },
+    { "name": "Renan", "position": "M", "country": "BRA" },
+    { "name": "Ronaldo Alfredo", "position": "M", "country": "BRA" },
+    { "name": "Zé Do Carmo", "position": "M", "country": "BRA" },
+    { "name": "Bruno", "position": "A", "country": "BRA" },
+    { "name": "Leto", "position": "A", "country": "BRA" },
+    { "name": "Tiba", "position": "A", "country": "BRA" }
+  ]
+}

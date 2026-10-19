@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MANNING.EFT",
+  "name": "MANNING RANGERS",
+  "shortName": "MANNING RANGERS",
+  "country": "AFS",
+  "level": 5,
+  "textColor": "#0000FF",
+  "backgroundColor": "#FFFF00",
+  "coach": "Gordon Igesund",
+  "players": [
+    { "name": "Grant Johnson", "position": "G", "country": "AFS" },
+    { "name": "Pewou Bestman", "position": "G", "country": "LBE" },
+    { "name": "Bradley Muir", "position": "D", "country": "AFS" },
+    { "name": "Dan Malesela", "position": "D", "country": "AFS" },
+    { "name": "Innocent Chikoya", "position": "D", "country": "ZBW" },
+    { "name": "Mark Davies", "position": "D", "country": "AFS" },
+    { "name": "Robert Kalaka", "position": "D", "country": "AFS" },
+    { "name": "Clinton Larsen", "position": "M", "country": "AFS" },
+    { "name": "Glenton Makau", "position": "M", "country": "AFS" },
+    { "name": "Joe Mlaba", "position": "M", "country": "AFS" },
+    { "name": "Marcus Mphafudi", "position": "M", "country": "AFS" },
+    { "name": "Solomuzi Ndimande", "position": "M", "country": "AFS" },
+    { "name": "Warren Du Pont", "position": "M", "country": "AFS" },
+    { "name": "Craig Hepburn", "position": "A", "country": "ZBW" },
+    { "name": "Friday Roberts", "position": "A", "country": "LBE" },
+    { "name": "George Koumantarakis", "position": "A", "country": "AFS" },
+    { "name": "Owen Nzimande", "position": "A", "country": "AFS" },
+    { "name": "Simon Makhubela", "position": "A", "country": "AFS" }
+  ]
+}

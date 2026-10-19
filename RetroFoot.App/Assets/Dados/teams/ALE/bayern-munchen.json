@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BAYERN.EFT",
+  "name": "BAYERN MÜNCHEN",
+  "shortName": "BAYERN MÜNCHEN",
+  "country": "ALE",
+  "level": 16,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Franz Beckenbauer",
+  "players": [
+    { "name": "Raimond Aumann", "position": "G", "country": "ALE" },
+    { "name": "Hans Pflüger", "position": "D", "country": "ALE" },
+    { "name": "Helm. Winklhofer", "position": "D", "country": "ALE" },
+    { "name": "Jorginho Campos", "position": "D", "country": "BRA" },
+    { "name": "Kl. Augenthaler", "position": "D", "country": "ALE" },
+    { "name": "Roland Grahammer", "position": "D", "country": "ALE" },
+    { "name": "Thomas Helmer", "position": "D", "country": "ALE" },
+    { "name": "Hans Dorfner", "position": "M", "country": "ALE" },
+    { "name": "Lothar Matthaus", "position": "M", "country": "ALE" },
+    { "name": "Manfred Schwabl", "position": "M", "country": "ALE" },
+    { "name": "Thomas Strunz", "position": "M", "country": "ALE" },
+    { "name": "Adolfo Valencia", "position": "A", "country": "COL" },
+    { "name": "Alan McInally", "position": "A", "country": "ESC" },
+    { "name": "Rad.Mihailovic", "position": "A", "country": "BUL" },
+    { "name": "Roland Wolfarth", "position": "A", "country": "ALE" }
+  ]
+}

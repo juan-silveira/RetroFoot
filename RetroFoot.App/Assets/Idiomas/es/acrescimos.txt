@@ -1,0 +1,10 @@
+# Os acrescimos (Regras.Acrescimos; TelaConfiguracoes) (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Acréscimos	Tiempo añadido
+De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no clássico.	De 1 a 5 minutos al final del 1.er tiempo y de 1 a 10 al final del 2.º, con goles, tarjetas y lesiones (45'+2'). Desactivado: como en el clásico.
+Acréscimos (1 a 5 minutos no 1º tempo, 1 a 10 no 2º)	Tiempo añadido (1 a 5 minutos en el 1.er tiempo, 1 a 10 en el 2.º)
+Cartões amarelos, patrocínios e acréscimos só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Las tarjetas amarillas, los patrocinios y el tiempo añadido solo existen en la versión Actual. La elección queda guardada para cuando uses la Modificada.
+Na versão Clássica as regras são as de 1998: só cartões vermelhos, sem patrocínios nem acréscimos.	En la versión Clásica las reglas son las de 1998: solo tarjetas rojas, sin patrocinios ni tiempo añadido.
+acréscimos ligados	tiempo añadido activado
+acréscimos desligados	tiempo añadido desactivado
+acréscimos	tiempo añadido

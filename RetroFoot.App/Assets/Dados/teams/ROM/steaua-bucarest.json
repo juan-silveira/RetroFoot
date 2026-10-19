@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "STEAUA.EFT",
+  "name": "STEAUA BUCAREST",
+  "shortName": "STEAUA BUCAREST",
+  "country": "ROM",
+  "level": 7,
+  "textColor": "#000080",
+  "backgroundColor": "#FF0000",
+  "coach": "Emereich Jenei",
+  "players": [
+    { "name": "Silviu Lung", "position": "G", "country": "ROM" },
+    { "name": "Bumbescu", "position": "D", "country": "ROM" },
+    { "name": "Gavrila Balint", "position": "D", "country": "ROM" },
+    { "name": "Iosif Rotariu", "position": "D", "country": "ROM" },
+    { "name": "Mirea Rednic", "position": "D", "country": "ROM" },
+    { "name": "Stefan Iovan", "position": "D", "country": "ROM" },
+    { "name": "Dorin Mateut", "position": "M", "country": "ROM" },
+    { "name": "Gheorghe Popescu", "position": "M", "country": "ROM" },
+    { "name": "Ioan Sabau", "position": "M", "country": "ROM" },
+    { "name": "Iorgulescu", "position": "M", "country": "ROM" },
+    { "name": "Gheorghe Ceausila", "position": "A", "country": "ROM" },
+    { "name": "Marius Lacatus", "position": "A", "country": "ROM" },
+    { "name": "Rodion Camataru", "position": "A", "country": "ROM" },
+    { "name": "Stefan Stoica", "position": "A", "country": "ROM" }
+  ]
+}

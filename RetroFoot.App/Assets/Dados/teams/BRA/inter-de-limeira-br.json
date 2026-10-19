@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "INTER_BR.EFT",
+  "name": "INTER DE LIMEIRA-BR",
+  "shortName": "INTER DE LIMEIRA",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#008000",
+  "backgroundColor": "#00FF00",
+  "coach": " ",
+  "players": [
+    { "name": "Ricardo", "position": "G", "country": "BRA" },
+    { "name": "Edinan", "position": "D", "country": "BRA" },
+    { "name": "Edinho", "position": "D", "country": "BRA" },
+    { "name": "Hélio", "position": "D", "country": "BRA" },
+    { "name": "Ica", "position": "D", "country": "BRA" },
+    { "name": "Paulão", "position": "D", "country": "BRA" },
+    { "name": "Sérgio", "position": "D", "country": "BRA" },
+    { "name": "Beto", "position": "M", "country": "BRA" },
+    { "name": "Elito", "position": "M", "country": "BRA" },
+    { "name": "Emílio", "position": "M", "country": "BRA" },
+    { "name": "Marcelo", "position": "M", "country": "BRA" },
+    { "name": "Rogerinho", "position": "M", "country": "BRA" },
+    { "name": "Émerson", "position": "M", "country": "BRA" },
+    { "name": "Marcelo C", "position": "A", "country": "BRA" },
+    { "name": "Paulinho", "position": "A", "country": "BRA" }
+  ]
+}

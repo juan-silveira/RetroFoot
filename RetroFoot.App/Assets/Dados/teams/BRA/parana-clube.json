@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PARANA.EFT",
+  "name": "PARANA CLUBE",
+  "shortName": "PARANA",
+  "country": "BRA",
+  "level": 9,
+  "textColor": "#000080",
+  "backgroundColor": "#FF0000",
+  "coach": "Cláudio Duarte",
+  "players": [
+    { "name": "Neneca", "position": "G", "country": "BRA" },
+    { "name": "Régis", "position": "G", "country": "BRA" },
+    { "name": "Ageu", "position": "D", "country": "BRA" },
+    { "name": "Denílson", "position": "D", "country": "BRA" },
+    { "name": "Ednelson", "position": "D", "country": "BRA" },
+    { "name": "Eleomar", "position": "D", "country": "BRA" },
+    { "name": "Lamônica", "position": "D", "country": "BRA" },
+    { "name": "André Luís", "position": "M", "country": "BRA" },
+    { "name": "Bira", "position": "M", "country": "BRA" },
+    { "name": "Celsinho", "position": "M", "country": "BRA" },
+    { "name": "Osmar", "position": "M", "country": "BRA" },
+    { "name": "Reginaldo", "position": "M", "country": "BRA" },
+    { "name": "Sidnei", "position": "M", "country": "BRA" },
+    { "name": "Caio Jr", "position": "A", "country": "BRA" },
+    { "name": "Gauchinho", "position": "A", "country": "BRA" },
+    { "name": "Rafael", "position": "A", "country": "BRA" }
+  ]
+}

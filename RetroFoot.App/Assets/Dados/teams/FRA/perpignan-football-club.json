@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PERPIGNA.EFT",
+  "name": "PERPIGNAN FOOTBALL CLUB",
+  "shortName": "PERPIGNAN",
+  "country": "FRA",
+  "level": 9,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Jean-Laffon",
+  "players": [
+    { "name": "David Marraud", "position": "G", "country": "FRA" },
+    { "name": "Jeanpascal Singla", "position": "G", "country": "FRA" },
+    { "name": "Bernard Vives", "position": "D", "country": "FRA" },
+    { "name": "Farid Zitouni", "position": "D", "country": "FRA" },
+    { "name": "Hippolyte Dangbeto", "position": "D", "country": "FRA" },
+    { "name": "Jeanfrancis Soucass", "position": "D", "country": "FRA" },
+    { "name": "Olivier Combes", "position": "D", "country": "FRA" },
+    { "name": "Xavier Feucht", "position": "D", "country": "FRA" },
+    { "name": "Yann Danielou", "position": "D", "country": "FRA" },
+    { "name": "Fabien Parra", "position": "M", "country": "FRA" },
+    { "name": "Jeanclaude Durand", "position": "M", "country": "FRA" },
+    { "name": "Jeanluc Escayol", "position": "M", "country": "FRA" },
+    { "name": "Pascal Despeyroux", "position": "M", "country": "FRA" },
+    { "name": "Pascal Monbrun", "position": "M", "country": "FRA" },
+    { "name": "Patrice Eyraud", "position": "M", "country": "FRA" },
+    { "name": "Paul Foissier", "position": "M", "country": "FRA" },
+    { "name": "Phillipe Mazzuchetti", "position": "M", "country": "FRA" },
+    { "name": "Phillippe Chanlot", "position": "A", "country": "FRA" },
+    { "name": "Stephane Crucet", "position": "A", "country": "FRA" }
+  ]
+}

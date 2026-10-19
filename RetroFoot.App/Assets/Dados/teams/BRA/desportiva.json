@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "DESPORTI.EFT",
+  "name": "DESPORTIVA",
+  "shortName": "DESPORTIVA",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Arnaldo Transpadini",
+  "players": [
+    { "name": "Guilherme", "position": "G", "country": "BRA" },
+    { "name": "Luís Carlos", "position": "G", "country": "BRA" },
+    { "name": "Cláudio Gomes", "position": "D", "country": "BRA" },
+    { "name": "João", "position": "D", "country": "BRA" },
+    { "name": "Paulo Renato", "position": "D", "country": "BRA" },
+    { "name": "Rossato", "position": "D", "country": "BRA" },
+    { "name": "Valmir", "position": "D", "country": "BRA" },
+    { "name": "Beto", "position": "M", "country": "BRA" },
+    { "name": "Botelho", "position": "M", "country": "BRA" },
+    { "name": "Geovani", "position": "M", "country": "BRA" },
+    { "name": "Rodrigo", "position": "M", "country": "BRA" },
+    { "name": "Vitor", "position": "M", "country": "BRA" },
+    { "name": "Mauro", "position": "A", "country": "BRA" },
+    { "name": "Ricardo", "position": "A", "country": "BRA" },
+    { "name": "Robson", "position": "A", "country": "BRA" },
+    { "name": "Tico Mineiro", "position": "A", "country": "BRA" }
+  ]
+}

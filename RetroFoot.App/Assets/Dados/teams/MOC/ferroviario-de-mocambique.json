@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FERRO.EFT",
+  "name": "FERROVIÁRIO DE MOÇAMBIQUE",
+  "shortName": "FERROVIÁRIO",
+  "country": "MOC",
+  "level": 5,
+  "textColor": "#00FFFF",
+  "backgroundColor": "#000000",
+  "coach": "António Salvado",
+  "players": [
+    { "name": "Luisinho", "position": "G", "country": "MOC" },
+    { "name": "Arnaldo", "position": "D", "country": "MOC" },
+    { "name": "Arrão", "position": "D", "country": "MOC" },
+    { "name": "Luís Parruque", "position": "D", "country": "MOC" },
+    { "name": "Mavo", "position": "D", "country": "MOC" },
+    { "name": "Paute", "position": "D", "country": "MOC" },
+    { "name": "Vino", "position": "D", "country": "MOC" },
+    { "name": "António", "position": "M", "country": "MOC" },
+    { "name": "Paulito I", "position": "M", "country": "MOC" },
+    { "name": "Pinto Barros", "position": "M", "country": "MOC" },
+    { "name": "Tomás", "position": "M", "country": "MOC" },
+    { "name": "Eugénio", "position": "A", "country": "MOC" },
+    { "name": "Fumo", "position": "A", "country": "MOC" },
+    { "name": "Paulito II", "position": "A", "country": "MOC" }
+  ]
+}

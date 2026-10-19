@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ATLET_MG.EFT",
+  "name": "C ATLETICO MG",
+  "shortName": "ATLETICO MG",
+  "country": "BRA",
+  "level": 10,
+  "textColor": "#FFFF00",
+  "backgroundColor": "#000000",
+  "coach": "Émerson Leão",
+  "players": [
+    { "name": "Paulo César", "position": "G", "country": "BRA" },
+    { "name": "Taffarel", "position": "G", "country": "BRA" },
+    { "name": "Bruno", "position": "D", "country": "BRA" },
+    { "name": "Dedê", "position": "D", "country": "BRA" },
+    { "name": "Neguetti", "position": "D", "country": "BRA" },
+    { "name": "Sandro Barbosa", "position": "D", "country": "BRA" },
+    { "name": "Sandro Blum", "position": "D", "country": "BRA" },
+    { "name": "Cairo", "position": "M", "country": "BRA" },
+    { "name": "Doriva", "position": "M", "country": "BRA" },
+    { "name": "Edgar", "position": "M", "country": "BRA" },
+    { "name": "Jorginho", "position": "M", "country": "BRA" },
+    { "name": "Marques", "position": "M", "country": "BRA" },
+    { "name": "Almir", "position": "A", "country": "BRA" },
+    { "name": "Hernani", "position": "A", "country": "BRA" },
+    { "name": "Leandro", "position": "A", "country": "BRA" },
+    { "name": "Marques", "position": "A", "country": "BRA" },
+    { "name": "Valdir", "position": "A", "country": "BRA" }
+  ]
+}

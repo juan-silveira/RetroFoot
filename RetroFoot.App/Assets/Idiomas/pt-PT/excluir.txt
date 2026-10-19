@@ -1,0 +1,3 @@
+Excluir	Apagar
+Excluir jogo	Apagar jogo
+Excluir o jogo gravado "{0}"? O arquivo vai para a pasta excluidos, dentro da pasta dos jogos.	Apagar o jogo gravado "{0}"? O ficheiro vai para a pasta excluidos, dentro da pasta dos jogos.

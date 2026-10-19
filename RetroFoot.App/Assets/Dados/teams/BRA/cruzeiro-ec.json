@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CRUZEIRO.EFT",
+  "name": "CRUZEIRO EC",
+  "shortName": "CRUZEIRO",
+  "country": "BRA",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000080",
+  "coach": " ",
+  "players": [
+    { "name": "Dida", "position": "G", "country": "BRA" },
+    { "name": "Willam Andem", "position": "G", "country": "CAM" },
+    { "name": "Gélson", "position": "D", "country": "BRA" },
+    { "name": "Léo", "position": "D", "country": "BRA" },
+    { "name": "Marcos Teixeira", "position": "D", "country": "BRA" },
+    { "name": "Odair", "position": "D", "country": "BRA" },
+    { "name": "Vitor", "position": "D", "country": "BRA" },
+    { "name": "Donizete Amorim", "position": "M", "country": "BRA" },
+    { "name": "Fabinho", "position": "M", "country": "BRA" },
+    { "name": "Palacios", "position": "M", "country": "BRA" },
+    { "name": "Ricardinho", "position": "M", "country": "BRA" },
+    { "name": "Tico", "position": "M", "country": "BRA" },
+    { "name": "Cleisom", "position": "A", "country": "BRA" },
+    { "name": "Geovanni", "position": "A", "country": "BRA" },
+    { "name": "Marcelo", "position": "A", "country": "BRA" },
+    { "name": "Reinaldo", "position": "A", "country": "BRA" }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "TUBARAO.EFT",
+  "name": "TUBARÃO F.C",
+  "shortName": "TUBARÃO",
+  "country": "BRA",
+  "level": 5,
+  "textColor": "#0000FF",
+  "backgroundColor": "#000000",
+  "coach": "Arnaldo Lira",
+  "players": [
+    { "name": "Marque", "position": "G", "country": "BRA" },
+    { "name": "Maurício", "position": "G", "country": "BRA" },
+    { "name": "Miguel", "position": "G", "country": "BRA" },
+    { "name": "Adelmo", "position": "D", "country": "BRA" },
+    { "name": "Claudecir", "position": "D", "country": "BRA" },
+    { "name": "Cássio", "position": "D", "country": "BRA" },
+    { "name": "Luiz Carlos", "position": "D", "country": "BRA" },
+    { "name": "Rangel", "position": "D", "country": "BRA" },
+    { "name": "Rocha", "position": "D", "country": "BRA" },
+    { "name": "Charles", "position": "M", "country": "BRA" },
+    { "name": "Eduardo", "position": "M", "country": "BRA" },
+    { "name": "Rejane", "position": "M", "country": "BRA" },
+    { "name": "Sandro Gomes", "position": "M", "country": "BRA" },
+    { "name": "Roberto Carlos", "position": "A", "country": "BRA" },
+    { "name": "Rogério", "position": "A", "country": "BRA" }
+  ]
+}

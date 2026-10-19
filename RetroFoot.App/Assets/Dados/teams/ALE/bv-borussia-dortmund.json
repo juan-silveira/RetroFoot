@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "DORTMUND.EFT",
+  "name": "BV BORUSSIA DORTMUND",
+  "shortName": "BORUSSIA DORTMUND",
+  "country": "ALE",
+  "level": 18,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFF00",
+  "coach": "Névio Scala",
+  "players": [
+    { "name": "De Beer", "position": "G", "country": "ALE" },
+    { "name": "Stefan Klos", "position": "G", "country": "ALE" },
+    { "name": "Feiersinger", "position": "D", "country": "AUT" },
+    { "name": "Klutz Reinhard", "position": "D", "country": "ALE" },
+    { "name": "Martin Kree", "position": "D", "country": "ALE" },
+    { "name": "Mathias Sammer", "position": "D", "country": "ALE" },
+    { "name": "Paul Lambert", "position": "D", "country": "ESC" },
+    { "name": "Stefan Reuter", "position": "D", "country": "ALE" },
+    { "name": "Yurgen Kohler", "position": "D", "country": "ALE" },
+    { "name": "Freund", "position": "M", "country": "ALE" },
+    { "name": "Jorg Heinrich", "position": "M", "country": "ALE" },
+    { "name": "Lars Ricken", "position": "M", "country": "ALE" },
+    { "name": "Rene Tretschok", "position": "M", "country": "ALE" },
+    { "name": "Steffen Zorc", "position": "M", "country": "ALE" },
+    { "name": "Andreias Moller", "position": "A", "country": "ALE" },
+    { "name": "Chapuisat", "position": "A", "country": "SUI" },
+    { "name": "Hieko Herrlich", "position": "A", "country": "ALE" },
+    { "name": "Kirovski", "position": "A", "country": "RUS" }
+  ]
+}

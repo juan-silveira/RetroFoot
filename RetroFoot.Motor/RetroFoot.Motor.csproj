@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- O motor do jogo: C# puro, sem tela. Por enquanto so o leitor de saves do launcher
+       (o mesmo arquivo, sem copia). -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="RetroFoot.Motor.Testes" />
+  </ItemGroup>
+</Project>

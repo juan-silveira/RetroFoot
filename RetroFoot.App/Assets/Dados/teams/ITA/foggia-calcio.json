@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FOGGIA.EFT",
+  "name": "FOGGIA CALCIO",
+  "shortName": "FOGGIA",
+  "country": "ITA",
+  "level": 11,
+  "textColor": "#000000",
+  "backgroundColor": "#FF0000",
+  "coach": "Pasquale Casillo",
+  "players": [
+    { "name": "Flavio Roma", "position": "G", "country": "ITA" },
+    { "name": "Paolo Toccafondi", "position": "G", "country": "ITA" },
+    { "name": "Aniello Parisi", "position": "D", "country": "ITA" },
+    { "name": "Dajo Oshadogan", "position": "D", "country": "ITA" },
+    { "name": "Gionata Bruni", "position": "D", "country": "ITA" },
+    { "name": "Paolo Bianco", "position": "D", "country": "ITA" },
+    { "name": "Paolo Cozzi", "position": "D", "country": "ITA" },
+    { "name": "Salvatore Monaco", "position": "D", "country": "ITA" },
+    { "name": "David Di Michele", "position": "M", "country": "ITA" },
+    { "name": "Federico Bettoni", "position": "M", "country": "ITA" },
+    { "name": "Jonas Axeldahl", "position": "M", "country": "SUE" },
+    { "name": "Lennart Bak", "position": "M", "country": "DIN" },
+    { "name": "Luciano Volturno", "position": "M", "country": "ITA" },
+    { "name": "Michele De Feudis", "position": "M", "country": "ITA" },
+    { "name": "Peter Artner", "position": "M", "country": "AUT" },
+    { "name": "Valeriano Fiorin", "position": "M", "country": "ITA" },
+    { "name": "Dragan Vukoja", "position": "A", "country": "JUG" },
+    { "name": "Federico Lunardon", "position": "A", "country": "ITA" },
+    { "name": "Vincenzo Chianese", "position": "A", "country": "ITA" }
+  ]
+}

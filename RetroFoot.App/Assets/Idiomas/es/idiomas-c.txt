@@ -1,0 +1,226 @@
+# Mercado, plantilla, listas, dinero, estadio, patrocinio y fin de temporada (es).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+# --- Jogador ---
+Goleiro	Portero
+Defensor	Defensa
+Meia	Centrocampista
+Atacante	Delantero
+Fair play	Juego limpio
+Fair Play	Juego limpio
+Cordeirinho	Corderito
+Cavalheiro	Caballero
+Caneleiro	Pegón
+Caceteiro	Matón
+Sarrafeiro	Leñero
+comportamento:FP	JL
+comportamento:Cav	Cab
+comportamento:Can	Peg
+comportamento:Cac	Mat
+comportamento:Sar	Leñ
+Time	Equipo
+Time...	Equipo...
+Jogador	Jugador
+Posição	Posición
+Força	Fuerza
+Nacionalidade	Nacionalidad
+Comportamento	Comportamiento
+Nota	Nota
+Risco de lesão	Riesgo de lesión
+Gols na Temporada	Goles temporada
+Gols	Goles
+Jogos	Partidos
+Cartões amarelos	Tarjetas amarillas
+Cartões vermelhos	Tarjetas rojas
+Amarelos	Amarillas
+Vermelhos	Rojas
+Lesões	Lesiones
+Histórico	Historial
+HISTÓRICO	HISTORIAL
+Suspenso por 1 jogo	Sancionado 1 partido
+Suspenso por {0} jogos	Sancionado {0} partidos
+Lesionado por 1 jogo	Lesionado 1 partido
+Lesionado por {0} jogos	Lesionado {0} partidos
+Salário pretendido	Sueldo pedido
+Salário pretendido:	Sueldo pedido:
+Preço base	Precio de salida
+Preço	Precio
+Nome	Nombre
+
+# --- Leilao e venda ---
+Venda de jogador por leilão	Subasta de jugador
+Oferta (milhares de{0})	Oferta (miles de{0})
+"Dinheiro em caixa: "	"Dinero en caja: "
+Dinheiro em caixa	Dinero en caja
+Não houve ofertas	No hubo ofertas
+Vendido ao {0} por {1}	Vendido al {0} por {1}
+Vender	Vender
+Preço de venda\n(milhares de {0})	Precio de venta\n(miles de {0})
+Não pode vender mais jogadores	No puedes vender más jugadores
+Este jogador já está vendido	Este jugador ya está vendido
+Este jogador só pode ser vendido na próxima temporada	Este jugador solo se puede vender la próxima temporada
+Só pode tentar vender este jogador novamente no próximo jogo	Solo puedes volver a intentar venderlo en el próximo partido
+Não pode vender mais goleiros	No puedes vender más porteros
+Não pode vender mais jogadores de campo	No puedes vender más jugadores de campo
+OK	Aceptar
+Cancelar	Cancelar
+Fechar	Cerrar
+Sim	Sí
+Não	No
+
+# --- Salario ---
+Renovar contrato	Renovar contrato
+Novo salário:	Nuevo sueldo:
+Propor	Proponer
+Atualização de Salário	Subida de sueldo
+"{0} pede que lhe seja aumentado o salário para {1}."	"{0} pide que le suban el sueldo a {1}."
+Se não aceitar o aumento, o jogador será posto à venda em leilão.	Si no aceptas la subida, el jugador saldrá a subasta.
+Aceita o aumento?	¿Aceptas la subida?
+Uma vez que este jogador não pode ser vendido, tem de aceitar o aumento.	Como este jugador no se puede vender, tienes que aceptar la subida.
+Nem pensar! Exijo {0}!	¡Ni hablar! ¡Exijo {0}!
+
+# --- Procura e observados ---
+Lista de Jogadores	Lista de jugadores
+Procurar	Buscar
+Comprar	Comprar
+Qualquer	Cualquiera
+{0} ou mais	{0} o más
+Até {0}	Hasta {0}
+" {0} a {1}"	" {0} a {1}"
+" Até {0}"	" Hasta {0}"
+" De {0} até {1}"	" De {0} a {1}"
+" Mais de {0}"	" Más de {0}"
+Não mostrar os jogadores do meu time	Ocultar los jugadores de mi equipo
+Nota   RL	Nota   RL
+Só estão listados os primeiros 50 jogadores encontrados	Solo se muestran los 50 primeros jugadores encontrados
+Jogadores sob observação	Jugadores en observación
+Só pode ter {0} jogadores sob observação	Solo puedes observar {0} jugadores
+Limpar	Limpiar
+Remover	Quitar
+
+# --- Plantel ---
+Balanço	Balance
+Calendário	Calendario
+Empréstimo	Préstamo
+Observado	Observar
+Lista	Lista
+Distrital	Regional
+
+# --- Listas ---
+"  a. p."	"  prór."
+"  v. pen."	"  g. pen."
+"  d. pen."	"  p. pen."
+local:C	L
+local:F	V
+Artilheiros de todos os tempos	Máximos goleadores históricos
+Artilheiros desta temporada	Máximos goleadores de la temporada
+Últimos vencedores do campeonato e da copa	Últimos campeones de liga y copa
+Últimas transferências	Últimos traspasos
+Campeonato	Liga
+Copa	Copa
+DOBRADINHA	DOBLETE
+2º lugar	2º puesto
+3º lugar	3º puesto
+Jogadores adquiridos	Fichajes
+"Contratado pelo "	"Contratado por el "
+Despedido	Destituido
+VENCEDOR DO CAMPEONATO	CAMPEÓN DE LIGA
+VENCEDOR DA COPA	CAMPEÓN DE COPA
+"Entrada no "	"Llegada al "
+"Rebaixado para o "	"Descendido con el "
+"Promovido para o "	"Ascendido con el "
+Demissões de Técnicos	Destituciones de entrenadores
+" foi demitido do "	" fue destituido por el "
+"Para o seu lugar foi contratado "	"Para su puesto fue contratado "
+"Troca com "	"Cambio con "
+Ranking de Treinadores	Ranking de entrenadores
+férias	vacaciones
+
+# --- Balanco ---
+Temporada	Temporada
+Receitas	Ingresos
+Bilheteria	Taquilla
+Jogadores vendidos	Jugadores vendidos
+Prêmios	Primas
+Gastos	Gastos
+Salários	Sueldos
+Jogadores comprados	Jugadores comprados
+Arquibancadas	Gradas
+Juros	Intereses
+Receita total	Total ingresos
+Gasto total	Total gastos
+Saldo	Saldo
+Receita × gasto	Ingresos × gastos
+Balanço financeiro	Balance financiero
+
+# --- Emprestimo ---
+Empréstimos	Préstamos
+Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo realizado	Los intereses del préstamo son el 5% de la deuda por cada partido jugado
+Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo realizado.	Los intereses del préstamo son el 5% de la deuda por cada partido jugado.
+O montante em dívida poderá ser reduzido sempre que o desejar, ou aumentado, se tal lhe for permitido.	Puedes reducir la deuda cuando quieras, o aumentarla, si te lo permiten.
+O montante máximo a emprestar está condicionado pela confiança que o banco tem em si, neste momento.	El préstamo máximo depende de la confianza que el banco tiene ahora en ti.
+Capital em dívida	Deuda
+Juro a pagar	Intereses a pagar
+Juro por jogo	Interés por partido
+−  Pagar {0}	−  Pagar {0}
++  Pedir {0}	+  Pedir {0}
+"Limite do banco: "	"Límite del banco: "
+
+# --- Estadio ---
+Estádio	Estadio
+Construir	Construir
+Pedir empréstimo	Pedir préstamo
+Construir mais 5000 lugares	Construir 5000 asientos más
+{0} lugares	{0} asientos
+"Preço de uma arquibancada com\n5000 lugares: "	"Precio de una grada de\n5000 asientos: "
+As novas arquibancadas só estarão disponíveis no próximo jogo	Las nuevas gradas estarán listas en el próximo partido
+Capacidade	Aforo
+Nova arquibancada (5000 lugares)	Nueva grada (5000 asientos)
+{0} de 24 arquibancadas	{0} de 24 gradas
+
+# --- Patrocinio ---
+Patrocínio	Patrocinio
+Proposta de patrocínio	Oferta de patrocinio
+Renovação de patrocinador master	Renovación del patrocinador principal
+Patrocínio no uniforme	Patrocinio en la equipación
+Patrocinador master	Patrocinador principal
+Valor	Valor
+Duração	Duración
+Multa pela troca	Multa por cambiar
+" por jogo"	" por partido"
+" por temporada"	" por temporada"
+" jogo"	" partido"
+" jogos"	" partidos"
+" temporada"	" temporada"
+" temporadas"	" temporadas"
+Para estampar a marca no uniforme. Aceita?	Para poner su marca en la equipación. ¿Aceptas?
+Para renovar o contrato de patrocinador master. Aceita?	Para renovar el contrato de patrocinador principal. ¿Aceptas?
+Para ser o patrocinador master do seu time. Aceita?	Para ser el patrocinador principal de tu equipo. ¿Aceptas?
+Recusar	Rechazar
+Aceitar	Aceptar
+
+# --- Fim de temporada ---
+Fim de Temporada	Fin de temporada
+Temporada {0}	Temporada {0}
+Vencedor do campeonato	Campeón de liga
+Vencedor da copa	Campeón de copa
+Campeão	Campeón
+Treinador	Entrenador
+"Treinador: "	"Entrenador: "
+Artilheiro	Máximo goleador
+Artilheiro ({0} gols)	Máximo goleador ({0} goles)
+{0} gols	{0} goles
+1 gol	1 gol
+{0}ª copa	{0}ª copa
+{0}ª vitória no campeonato	{0}ª liga ganada
+"Prêmio: "	"Premio: "
+Fecha sozinha em {0} s	Se cierra en {0} s
+Continuar	Continuar
+{0}ª Divisão	{0}ª División
+▲ subiu	▲ asciende
+▼ desceu	▼ desciende
+subiu	asciende
+desceu	desciende
+Nenhuma equipa mudou de divisão.	Ningún equipo cambió de división.
+Subidas e descidas	Ascensos y descensos
+As equipas que mudam de divisão	Los equipos que cambian de división

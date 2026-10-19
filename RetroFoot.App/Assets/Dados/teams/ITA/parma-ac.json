@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PARMA.EFT",
+  "name": "PARMA AC",
+  "shortName": "PARMA AC",
+  "country": "ITA",
+  "level": 14,
+  "textColor": "#000080",
+  "backgroundColor": "#FFFF00",
+  "coach": "Marcelo Lippi",
+  "players": [
+    { "name": "Ballotta", "position": "G", "country": "ITA" },
+    { "name": "Bucci", "position": "G", "country": "ITA" },
+    { "name": "Apolloni", "position": "D", "country": "ITA" },
+    { "name": "Benarrivo", "position": "D", "country": "ITA" },
+    { "name": "Colacone", "position": "D", "country": "ITA" },
+    { "name": "Di Chiara", "position": "D", "country": "ITA" },
+    { "name": "Minotti", "position": "D", "country": "ITA" },
+    { "name": "Pin", "position": "D", "country": "ITA" },
+    { "name": "Thuram", "position": "D", "country": "FRA" },
+    { "name": "Dino Baggio", "position": "M", "country": "ITA" },
+    { "name": "Enzo Scifo", "position": "M", "country": "BEL" },
+    { "name": "Massimo Crippa", "position": "M", "country": "ITA" },
+    { "name": "Matrecano", "position": "M", "country": "ITA" },
+    { "name": "Zoratto", "position": "M", "country": "ITA" },
+    { "name": "Alexandro Melli", "position": "A", "country": "ITA" },
+    { "name": "Enrico Chiesa", "position": "A", "country": "ITA" },
+    { "name": "Paulo Nunes", "position": "A", "country": "BRA" },
+    { "name": "Thomas Brolin", "position": "A", "country": "SUE" }
+  ]
+}

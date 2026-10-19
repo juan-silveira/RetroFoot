@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "HAMBURG.EFT",
+  "name": "HAMBURGER SV",
+  "shortName": "HAMBURGER SV",
+  "country": "ALE",
+  "level": 10,
+  "textColor": "#800080",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Miguel Muñoz",
+  "players": [
+    { "name": "Ulrich Stein", "position": "G", "country": "ALE" },
+    { "name": "Boeve", "position": "D", "country": "ALE" },
+    { "name": "Ditmar Jacobs", "position": "D", "country": "ALE" },
+    { "name": "Felix Magath", "position": "D", "country": "ALE" },
+    { "name": "Holger Fach", "position": "D", "country": "ALE" },
+    { "name": "Roberto Sensini", "position": "D", "country": "ARG" },
+    { "name": "Karl Algower", "position": "M", "country": "ALE" },
+    { "name": "Matthias Herget", "position": "M", "country": "ALE" },
+    { "name": "Thomas Allofs", "position": "M", "country": "ALE" },
+    { "name": "Uwe Bein", "position": "M", "country": "ALE" },
+    { "name": "Wolfgang Rolff", "position": "M", "country": "ALE" },
+    { "name": "Gerard Plessers", "position": "A", "country": "ALE" },
+    { "name": "Luis Muller", "position": "A", "country": "BRA" },
+    { "name": "Yurgen Klinsmann", "position": "A", "country": "ALE" }
+  ]
+}

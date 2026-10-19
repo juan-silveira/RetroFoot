@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "EVERTON.EFT",
+  "name": "EVERTON",
+  "shortName": "EVERTON",
+  "country": "ING",
+  "level": 11,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000080",
+  "coach": "Joe Royle",
+  "players": [
+    { "name": "Neville Southall", "position": "G", "country": "WAL" },
+    { "name": "Paul Gerrard", "position": "G", "country": "ING" },
+    { "name": "Craig Short", "position": "D", "country": "ING" },
+    { "name": "Dave Watson", "position": "D", "country": "ING" },
+    { "name": "David Unsworth", "position": "D", "country": "ING" },
+    { "name": "Earl Barrett", "position": "D", "country": "ING" },
+    { "name": "Graham Allen", "position": "D", "country": "ING" },
+    { "name": "Marc Hottinger", "position": "D", "country": "SUI" },
+    { "name": "Matt Jackson", "position": "D", "country": "ING" },
+    { "name": "Anders Limpar", "position": "M", "country": "SUE" },
+    { "name": "Andy Hinchcliffe", "position": "M", "country": "ING" },
+    { "name": "Gary Speed", "position": "M", "country": "WAL" },
+    { "name": "Joe Parkinson", "position": "M", "country": "ING" },
+    { "name": "Vinny Samways", "position": "M", "country": "ING" },
+    { "name": "Duncan Fergunson", "position": "A", "country": "ESC" },
+    { "name": "Graham Stuart", "position": "A", "country": "ING" },
+    { "name": "John Hills", "position": "A", "country": "ING" },
+    { "name": "Michael Branch", "position": "A", "country": "ING" },
+    { "name": "Paul Rideout", "position": "A", "country": "ING" }
+  ]
+}

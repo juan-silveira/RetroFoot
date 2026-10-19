@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "UNSJOAO.EFT",
+  "name": "UNIÃO DE SÃO JOÃO",
+  "shortName": "UNIAO S. JOÃO",
+  "country": "BRA",
+  "level": 2,
+  "textColor": "#008000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Jair Picerni",
+  "players": [
+    { "name": "Adinam", "position": "G", "country": "BRA" },
+    { "name": "Marcelo Bezerra", "position": "G", "country": "BRA" },
+    { "name": "Augusto", "position": "D", "country": "BRA" },
+    { "name": "Batista", "position": "D", "country": "BRA" },
+    { "name": "Biju", "position": "D", "country": "BRA" },
+    { "name": "Lico", "position": "D", "country": "BRA" },
+    { "name": "Renato Carioca", "position": "D", "country": "BRA" },
+    { "name": "Cândido", "position": "M", "country": "BRA" },
+    { "name": "Edu Lima", "position": "M", "country": "BRA" },
+    { "name": "Everaldo", "position": "M", "country": "BRA" },
+    { "name": "Macalé", "position": "M", "country": "BRA" },
+    { "name": "Paulo", "position": "M", "country": "BRA" },
+    { "name": "João Paulo", "position": "A", "country": "BRA" },
+    { "name": "Mauro", "position": "A", "country": "BRA" },
+    { "name": "Preta", "position": "A", "country": "BRA" },
+    { "name": "Zé Afonso", "position": "A", "country": "BRA" }
+  ]
+}

@@ -1,0 +1,7 @@
+# RetroFoot (pt-PT): o nome novo, o Sobre, o visual Clássico. Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Para que o registro tenha efeito, você terá de reiniciar o jogo.	Para que o registo tenha efeito, terá de reiniciar o jogo.
+O registro libera todas as possibilidades do jogo.	O registo liberta todas as possibilidades do jogo.
+O jogo só suporta {0} times. Alguns dos times dos países selecionados não farão parte deste jogo.	O jogo só suporta {0} equipas. Algumas das equipas dos países seleccionados não farão parte deste jogo.
+Os recursos da cópia registrada.	Os recursos da cópia registada.
+Por padrão, o jogo como em 1998: as adições ficam desligadas até você ligar aqui.	Por omissão, o jogo como em 1998: as adições ficam desligadas até as ligar aqui.

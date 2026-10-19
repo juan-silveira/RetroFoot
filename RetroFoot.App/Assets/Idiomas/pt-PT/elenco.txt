@@ -1,0 +1,4 @@
+# O elenco: menu do botao direito, selos do estado (pt-PT). Formato: chave<TAB>traducao.
+Ver ficha	Ver ficha
+Pendurado	Em risco
+Pendurado: mais um amarelo e fica suspenso	Em risco: mais um amarelo e fica castigado

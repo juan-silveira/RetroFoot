@@ -1,0 +1,36 @@
+# Ferramenta Árbitros do hub (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Procurar nome	Buscar nombre
+Todos	Todos
+Só os ativos	Solo los activos
+Só os desativados	Solo los desactivados
+Ativo (usado nos jogos novos)	Activo (se usa en las partidas nuevas)
+Liga	Liga
+Clássico (1998)	Clásico (1998)
+Patch	Parche
+Seu	Tuyo
+Ativo	Activo
+Origem	Origen
+Árbitro	Árbitro
+Novo	Nuevo
+Os jogos novos usam os árbitros ativos. Se escolher só um país no jogo novo, ficam só os desse país.	Las partidas nuevas usan los árbitros activos. Si eliges un solo país en la partida nueva, quedan solo los de ese país.
+Repor a lista do jogo	Restaurar la lista del juego
+Ativo: clique para desativar	Activo: haz clic para desactivar
+Desativado: clique para ativar	Desactivado: haz clic para activar
+(sem nome)	(sin nombre)
+Não consegui ler {0}: {1}	No pude leer {0}: {1}
+Arquivo: {0}	Archivo: {0}
+Ainda sem lista: a do jogo entra ao repor.	Todavía no hay lista: al restaurar entra la del juego.
+Todos os países ({0})	Todos los países ({0})
+{0} árbitros ativos em {1} países · {2} desativados · Delete remove · clique na marca para ativar ou desativar	{0} árbitros activos en {1} países · {2} desactivados · Supr quita · haz clic en la marca para activar o desactivar
+Sem nome: não é gravado.	Sin nombre: no se guarda.
+Letras fora do Latin-1 perdem o acento no jogo.	Las letras fuera de Latin-1 pierden el acento en el juego.
+O jogo usa só as primeiras 40 letras.	El juego solo usa las primeras 40 letras.
+O país {0} não está em countries.tsv.	El país {0} no está en countries.tsv.
+Por gravar...	Guardando...
+Gravado em {0} (o anterior fica em .bak).	Guardado en {0} (el anterior queda en .bak).
+Não consegui gravar: {0}	No pude guardar: {0}
+Repor a lista de árbitros que vem com o jogo? A sua lista atual fica guardada em {0}.bak.	¿Restaurar la lista de árbitros que viene con el juego? Tu lista actual queda guardada en {0}.bak.
+Repor	Restaurar
+Não consegui repor: {0}	No pude restaurar: {0}
+Lista do jogo reposta ({0} árbitros ativos).	Lista del juego restaurada ({0} árbitros activos).

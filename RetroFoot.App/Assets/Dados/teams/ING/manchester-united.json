@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MANCHEST.EFT",
+  "name": "MANCHESTER UNITED",
+  "shortName": "MANCHESTER UNITED",
+  "country": "ING",
+  "level": 18,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Alex Fergunson",
+  "players": [
+    { "name": "Kevin Pilkington", "position": "G", "country": "ING" },
+    { "name": "Peter Schemichel", "position": "G", "country": "DIN" },
+    { "name": "Chris Casper", "position": "D", "country": "ING" },
+    { "name": "David May", "position": "D", "country": "ING" },
+    { "name": "Denis Irwin", "position": "D", "country": "IRL" },
+    { "name": "Gary Neville", "position": "D", "country": "ING" },
+    { "name": "Gary Pallister", "position": "D", "country": "ING" },
+    { "name": "Phil Neville", "position": "D", "country": "ING" },
+    { "name": "Ronny Johnsen", "position": "D", "country": "NOR" },
+    { "name": "Brian McClair", "position": "M", "country": "ING" },
+    { "name": "David Beckham", "position": "M", "country": "ING" },
+    { "name": "Jordi Cruyff", "position": "M", "country": "HOL" },
+    { "name": "Nicky Butt", "position": "M", "country": "ING" },
+    { "name": "Roy Keane", "position": "M", "country": "IRL" },
+    { "name": "Andy Cole", "position": "A", "country": "ING" },
+    { "name": "Ole Gunnar Solskjaer", "position": "A", "country": "NOR" },
+    { "name": "Paul Scholes", "position": "A", "country": "ING" },
+    { "name": "Ryan Giggs", "position": "A", "country": "ING" },
+    { "name": "Teddy Sheringham", "position": "A", "country": "ING" }
+  ]
+}

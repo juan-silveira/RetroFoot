@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "W_BREMEN.EFT",
+  "name": "SV WERDER BREMEN ",
+  "shortName": "WERDER BREMEN ",
+  "country": "ALE",
+  "level": 11,
+  "textColor": "#000000",
+  "backgroundColor": "#00FF00",
+  "coach": "Otto Rehhagel",
+  "players": [
+    { "name": "Raimond Illgner", "position": "G", "country": "ALE" },
+    { "name": "Reck Gundelach", "position": "G", "country": "ALE" },
+    { "name": "Basler", "position": "D", "country": "ALE" },
+    { "name": "Beiersdorfer", "position": "D", "country": "ALE" },
+    { "name": "Borowka", "position": "D", "country": "ALE" },
+    { "name": "Bratseth", "position": "D", "country": "ALE" },
+    { "name": "Hinterberger", "position": "D", "country": "ALE" },
+    { "name": "Eilts", "position": "M", "country": "ALE" },
+    { "name": "Gunner Hermann", "position": "M", "country": "ALE" },
+    { "name": "Herzog", "position": "M", "country": "ALE" },
+    { "name": "Hobsch", "position": "M", "country": "ALE" },
+    { "name": "P.Littbarski", "position": "M", "country": "ALE" },
+    { "name": "Ralf Falkenmaier", "position": "M", "country": "ALE" },
+    { "name": "Frank Mill", "position": "A", "country": "ALE" },
+    { "name": "Heinz Grundel", "position": "A", "country": "ALE" },
+    { "name": "Neubarth", "position": "A", "country": "ALE" },
+    { "name": "Rufer", "position": "A", "country": "ALE" }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MACCABI.EFT",
+  "name": "MACCABI HAIFA",
+  "shortName": "MACCABI HAIFA",
+  "country": "ISR",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#008000",
+  "coach": "Gyora Shpigel",
+  "players": [
+    { "name": "Boni Ginzburg", "position": "G", "country": "ISR" },
+    { "name": "Nir Davidovich", "position": "G", "country": "ISR" },
+    { "name": "Adoram Keisi", "position": "D", "country": "ISR" },
+    { "name": "Alon Harazi", "position": "D", "country": "ISR" },
+    { "name": "Arik Benado", "position": "D", "country": "ISR" },
+    { "name": "Avishai Jano", "position": "D", "country": "ISR" },
+    { "name": "Marco Balbul", "position": "D", "country": "ISR" },
+    { "name": "Moshe Glam", "position": "D", "country": "ISR" },
+    { "name": "Sergei Balanchuk", "position": "D", "country": "UCR" },
+    { "name": "Haim Silvas", "position": "M", "country": "ISR" },
+    { "name": "Ofir Kopel", "position": "M", "country": "ISR" },
+    { "name": "Reuven Atar", "position": "M", "country": "ISR" },
+    { "name": "Roni Levi", "position": "M", "country": "ISR" },
+    { "name": "Vasili Novochotsky", "position": "M", "country": "POL" },
+    { "name": "Amir Turgeman", "position": "A", "country": "ISR" },
+    { "name": "Hezi Shirazi", "position": "A", "country": "ISR" },
+    { "name": "Idan Shum", "position": "A", "country": "ISR" },
+    { "name": "Kobi Ganon", "position": "A", "country": "ISR" }
+  ]
+}

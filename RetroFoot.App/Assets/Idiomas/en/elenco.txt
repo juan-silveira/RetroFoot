@@ -1,0 +1,4 @@
+# O elenco: menu do botao direito, selos do estado (en). Formato: chave<TAB>traducao.
+Ver ficha	View profile
+Pendurado	One booking from a ban
+Pendurado: mais um amarelo e fica suspenso	One more yellow card and he is suspended

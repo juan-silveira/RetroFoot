@@ -1,0 +1,20 @@
+# Ferramenta Patches do hub (pt-PT). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+1 logo	1 logótipo
+Aplicar "{0}" na pasta de dados? Os arquivos substituídos ficam guardados para reverter.	Aplicar "{0}" na pasta de dados? Os ficheiros substituídos ficam guardados para reverter.
+Aplicar um patch guarda os arquivos que ele substitui: pode revertê-lo quando quiser e voltar às equipas originais.	Aplicar um patch guarda os ficheiros que ele substitui: pode revertê-lo quando quiser e voltar às equipas originais.
+Arquivos mudados depois do patch foram guardados em:\n{0}	Os ficheiros alterados depois do patch foram guardados em:\n{0}
+Conflito com o patch aplicado "{1}" ({0} em comum). Este patch passa por cima; para reverter "{1}" será preciso reverter este antes.	Conflito com o patch aplicado "{1}" ({0} em comum). Este patch sobrepõe-se; para reverter "{1}" será preciso reverter este primeiro.
+Logos	Logótipos
+Não consegui ler este zip: {0}	Não foi possível ler este zip: {0}
+Passa por cima do patch "{1}" ({0} em comum).	Sobrepõe-se ao patch "{1}" ({0} em comum).
+Reverta antes "{0}" (aplicado depois e mexe nos mesmos arquivos).	Reverta primeiro "{0}" (aplicado depois e altera os mesmos ficheiros).
+outro patch aplicado depois mexe nos mesmos arquivos	outro patch aplicado depois altera os mesmos ficheiros
+{0} arquivos (programas, imagens...)	{0} ficheiros (programas, imagens...)
+{0} arquivos com problema ficaram de fora:	{0} ficheiros com problemas ficaram de fora:
+{0} logos	{0} logótipos
+{0}: não tem nada que o RetroFoot use (equipas, países, árbitros, bandeiras, logos).	{0}: não tem nada que o RetroFoot use (equipas, países, árbitros, bandeiras, logótipos).
+Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logótipos exportado pelo Editor de Equipas.
+1 arquivo (programa, imagem...)	1 ficheiro (programa, imagem...)
+Patch aplicado. Equipas: {0}; outros arquivos: {1}.	Patch aplicado. Equipas: {0}; outros ficheiros: {1}.
+Patch revertido. Arquivos repostos: {0}; apagados: {1}.	Patch revertido. Ficheiros repostos: {0}; apagados: {1}.

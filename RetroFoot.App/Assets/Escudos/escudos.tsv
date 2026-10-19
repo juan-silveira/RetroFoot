@@ -1,0 +1,921 @@
+# gerado por tools/escudos/gerar.py (launcher): pais, nome normalizado, arquivo ("-" = sem logo)
+AFS	AMAZULU	south-africa_amazulu-fc.png
+AFS	CAPE TOWN SPURS	-
+AFS	MANNING RANGERS	-
+AFS	MOROKA SWALLOWS	-
+AFS	ORLANDO PIRATES	south-africa_orlando-pirates.png
+AFS	QWA QWA STARS	-
+ALE	BAYER LEVERKUSEN	germany_bayer-leverkusen.png
+ALE	BAYERN MUNCHEN	germany_bayern-munchen.png
+ALE	BORUSSIA DORTMUND	germany_borussia-dortmund.png
+ALE	BV BORUSSIA DORTMUND	germany_borussia-dortmund.png
+ALE	FUSSBALL CLUB KAISERSLAUTERN	germany_fc-kaiserslautern.png
+ALE	FUSSBALL CLUB SCHALKE 04	germany_schalke-04.png
+ALE	HAMBURGER SV	germany_hamburger-sv.png
+ALE	KAISERSLAUTERN	germany_fc-kaiserslautern.png
+ALE	SCHALKE 04	germany_schalke-04.png
+ALE	SV WERDER BREMEN	germany_werder-bremen.png
+ALE	WERDER BREMEN	germany_werder-bremen.png
+ARG	COLO COLO	chile_colo-colo.png
+AUT	ADMIRA WACKER	austria_admira.png
+AUT	FC TIROL	austria_tirol.png
+AUT	FK AUTRIA MEMPHIS	austria_austria-wien.png
+AUT	MEMPHIS	austria_austria-wien.png
+AUT	RAPID DE VIENA	austria_rapid-vienna.png
+AUT	SALZBURG	austria_salzburg.png
+AUT	SK RAPID WIEN	austria_rapid-vienna.png
+AUT	SK STABIL FENSTER STURM GRAZ	austria_sturm-graz.png
+AUT	SPORT VEREIN WUSTENROT SALZBURG	austria_salzburg.png
+AUT	STURM GRAZ	austria_sturm-graz.png
+AUT	TIROL	austria_tirol.png
+BEL	ANDERLECHT	belgium_anderlecht.png
+BEL	EENDRACHT AALST	-
+BEL	FC MALINES	belgium_mechelen.png
+BEL	GERMINAL EKERE	-
+BEL	KONINKLIJKE FOOTBALL CLUB GERMINAL EKERE	-
+BEL	KONINKLIJKE LIERSE SPORTKRING	belgium_lierse.png
+BEL	KSV WAREGEM	-
+BEL	LIERSE	belgium_lierse.png
+BEL	MALINES	belgium_mechelen.png
+BEL	MOLENBEEK	belgium_rwd-molenbeek.png
+BEL	RACING WHITE DARING MOLENBEEK	belgium_rwd-molenbeek.png
+BEL	RSC ANDERLECHT	belgium_anderlecht.png
+BEL	ST LIEGE	belgium_standard-liege.png
+BEL	STANDARD LIEGE	belgium_standard-liege.png
+BRA	4 DE JULHO	brazil_4-de-julho.png
+BRA	4 DE JULHO ESPORTE CLUBE PI	brazil_4-de-julho-pi.png
+BRA	A CHAPECOENSE F SC	brazil_chapecoense.png
+BRA	AA ALTOS PI	brazil_altos.png
+BRA	AA APARECIDENSE GO	brazil_aparecidense.png
+BRA	AA CALDENSE MG	brazil_caldense.png
+BRA	AA PONTE PRETA SP	brazil_ponte-preta.png
+BRA	AA PORTUGUESA RJ	brazil_portuguesa-rj.png
+BRA	ABC	brazil_abc.png
+BRA	ABC FUTEBOL CLUBE RN	brazil_abc.png
+BRA	AC GOIANIENSE GO	brazil_atletico-goianiense.png
+BRA	AD CABOFRIENSE RJ	brazil_cabofriense.png
+BRA	AD CONFIANCA SE	brazil_confianca.png
+BRA	AD SAO CAETANO SP	brazil_sao-caetano.png
+BRA	AFOGADOS	brazil_afogados.png
+BRA	AGUA SANTA	brazil_agua-santa.png
+BRA	AIMORE	brazil_aimore.png
+BRA	ALTOS	brazil_altos.png
+BRA	AMERICA	-
+BRA	AMERICA CARIOCA	brazil_america-rj.png
+BRA	AMERICA FOOTBALL CLUB RJ	brazil_america-rj.png
+BRA	AMERICA FUTEBOL CLUBE MG	brazil_america-mineiro.png
+BRA	AMERICA MG	brazil_america-mineiro.png
+BRA	AMERICA MINEIRO	brazil_america-mineiro.png
+BRA	AMERICA RJ	brazil_america-rj.png
+BRA	AMERICA RN	brazil_america-rn.png
+BRA	AMERICANO	-
+BRA	AMERICANO FUTEBOL CLUBE	-
+BRA	AMERICANO FUTEBOL CLUBE RJ	brazil_americano-rj.png
+BRA	AMERICANO RJ	brazil_americano-rj.png
+BRA	AMERICANO SP	-
+BRA	APARECIDENSE	brazil_aparecidense.png
+BRA	ARACATUBA	brazil_aracatuba.png
+BRA	ARACATUBA BR	brazil_aracatuba.png
+BRA	ASSOCIACAO ATLETICA PONTE PRETA	brazil_ponte-preta.png
+BRA	ASSOCIACAO ATLETICA PORTUGUESA	-
+BRA	ASSOCIACAO DESPORTIVA SAO CAETANO	brazil_sao-caetano.png
+BRA	ASSOCIACAO PORTUGUESA DE DESPORTOS	brazil_portuguesa.png
+BRA	ATHLETIC CLUB	brazil_athletic.png
+BRA	ATHLETIC CLUB MG	brazil_athletic.png
+BRA	ATHLETICO PR	brazil_athletico-paranaense.png
+BRA	ATLETICO CE	brazil_atletico-cearense.png
+BRA	ATLETICO GO	brazil_atletico-goianiense.png
+BRA	ATLETICO MG	brazil_atletico-mineiro.png
+BRA	ATLETICO MINEIRO	brazil_atletico-mineiro.png
+BRA	ATLETICO MONTE AZUL	-
+BRA	ATLETICO PARANAENSE	brazil_athletico-paranaense.png
+BRA	ATLETICO PR	brazil_athletico-paranaense.png
+BRA	AUDAX RIO	brazil_audax-rio.png
+BRA	AUDAX RIO DE JANEIRO EC RJ	-
+BRA	AVAI	brazil_avai.png
+BRA	AVAI FUTEBOL CLUBE	brazil_avai.png
+BRA	AVAI FUTEBOL CLUBE SC	brazil_avai.png
+BRA	BAHIA	brazil_bahia.png
+BRA	BANGU	brazil_bangu.png
+BRA	BANGU ATLETICO CLUBE RJ	brazil_bangu.png
+BRA	BANGU FUTEBOL CLUBE	brazil_bangu.png
+BRA	BARBALHA CE	brazil_barbalha-c.png
+BRA	BARCELONA BA	brazil_barcelona-ba.png
+BRA	BARCELONA DE ILHEUS FC	-
+BRA	BARRA	brazil_barra.png
+BRA	BARRA FUTEBOL CLUBE SC	brazil_barra.png
+BRA	BLUMENAU	brazil_blumenau.png
+BRA	BLUMENAU F C	brazil_blumenau.png
+BRA	BOA ESPORTE	brazil_boa-esporte.png
+BRA	BOA ESPORTE CLUBE MG	brazil_boa-esporte.png
+BRA	BOAVISTA RJ	brazil_boavista-rj.png
+BRA	BOAVISTA SPORT CLUBE RJ	brazil_boavista-rj.png
+BRA	BOTAFOGO	brazil_botafogo.png
+BRA	BOTAFOGO DE FUTEBOL E REGATAS	brazil_botafogo.png
+BRA	BOTAFOGO FR	brazil_botafogo.png
+BRA	BOTAFOGO FR RJ	brazil_botafogo.png
+BRA	BOTAFOGO FUTEBOL CLUBE PB	brazil_botafogo-pb.png
+BRA	BOTAFOGO FUTEBOL CLUBE SP	brazil_botafogo-sp.png
+BRA	BOTAFOGO PB	brazil_botafogo-pb.png
+BRA	BOTAFOGO SP	brazil_botafogo-sp.png
+BRA	BRAGANTINO	brazil_rb-bragantino.png
+BRA	BRAGANTINO PA	brazil_bragantino-pa.png
+BRA	BRASIL PELOTAS	brazil_brasil-de-pelotas.png
+BRA	BRASILIENSE	brazil_brasiliense.png
+BRA	BRASILIENSE FUTEBOL CLUBE TAGUATINGA	brazil_brasiliense.png
+BRA	BRUSQUE	brazil_brusque.png
+BRA	BRUSQUE FUTEBOL CLUBE	brazil_brusque.png
+BRA	BRUSQUE FUTEBOL CLUBE SC	brazil_brusque.png
+BRA	C ATLETICO MG	brazil_atletico-mineiro.png
+BRA	C ATLETICO PR	brazil_athletico-paranaense.png
+BRA	CA METROPOLITANO SC	brazil_metropolitano.png
+BRA	CA PATROCINENSE MG	brazil_patrocinense.png
+BRA	CA TUBARAO	brazil_tubarao.png
+BRA	CABOFRIENSE	brazil_cabofriense.png
+BRA	CALDENSE	brazil_caldense.png
+BRA	CAMBORIU	brazil_camboriu.png
+BRA	CAMBORIU FUTEBOL CLUBE SC	brazil_camboriu-sc.png
+BRA	CAPITAL CF	brazil_capital-cf.png
+BRA	CAPITAL DF	brazil_capital-cf.png
+BRA	CAPITAL FC	-
+BRA	CAPITAL TO	brazil_capital-to.png
+BRA	CARMOLANDENSE	-
+BRA	CASTANHAL	brazil_castanhal.png
+BRA	CAXIAS	brazil_caxias.png
+BRA	CEARA	brazil_ceara.png
+BRA	CEARA SPORTING CLUB	brazil_ceara.png
+BRA	CEARA SPORTING CLUB CE	brazil_ceara.png
+BRA	CENTRO SPORTIVO ALAGOANO AL	brazil_csa.png
+BRA	CHAPECOENSE	brazil_chapecoense.png
+BRA	CLUB ATHLETICO PARANAENSE PR	brazil_athletico-paranaense.png
+BRA	CLUBE ATLETICO MINEIRO	brazil_atletico-mineiro.png
+BRA	CLUBE ATLETICO MINEIRO MG	brazil_atletico-mineiro.png
+BRA	CLUBE ATLETICO PARANAENSE	brazil_athletico-paranaense.png
+BRA	CLUBE ATLETICO TUBARAO SC	-
+BRA	CLUBE DE REGATAS BRASIL AL	brazil_crb.png
+BRA	CLUBE DE REGATAS FLAMENGO	brazil_flamengo.png
+BRA	CLUBE DE REGATAS VASCO DA GAMA	brazil_vasco-da-gama.png
+BRA	CLUBE DO REMO PA	brazil_clube-do-remo.png
+BRA	CLUBE ESPORTIVO AIMORE RS	brazil_aimore-rs.png
+BRA	CLUBE NAUTICO CAPIBARIBE	brazil_nautico.png
+BRA	CLUBE NAUTICO CAPIBARIBE PE	brazil_nautico.png
+BRA	CN MARCILIO DIAS SC	brazil_marcilio-dias.png
+BRA	COIMBRA MG	brazil_coimbra.png
+BRA	COIMBRA SPORTS MG	brazil_coimbra.png
+BRA	CONCORDIA	brazil_concordia.png
+BRA	CONCORDIA AC SC	brazil_concordia-sc.png
+BRA	CONFIANCA SE	brazil_confianca.png
+BRA	CORINTHIANS	brazil_corinthians.png
+BRA	CORITIBA	brazil_coritiba.png
+BRA	CORITIBA FBC	brazil_coritiba.png
+BRA	CORITIBA FOOT BALL CLUB	brazil_coritiba.png
+BRA	CORITIBA FOOT BALL CLUB PR	brazil_coritiba.png
+BRA	CORITIBA FOOTBALL CLUB	brazil_coritiba.png
+BRA	CR FLAMENGO	brazil_flamengo.png
+BRA	CR FLAMENGO RJ	brazil_flamengo.png
+BRA	CR VASCO DA GAMA RJ	brazil_vasco-da-gama.png
+BRA	CRB	brazil_crb.png
+BRA	CRICIUMA	brazil_criciuma.png
+BRA	CRICIUMA EC	brazil_criciuma.png
+BRA	CRICIUMA ESPORTE CLUBE	brazil_criciuma.png
+BRA	CRICIUMA ESPORTE CLUBE SC	brazil_criciuma.png
+BRA	CRUZEIRO	brazil_cruzeiro.png
+BRA	CRUZEIRO EC	brazil_cruzeiro.png
+BRA	CRUZEIRO ESPORTE CLUBE	brazil_cruzeiro.png
+BRA	CRUZEIRO ESPORTE CLUBE MG	brazil_cruzeiro.png
+BRA	CSA	brazil_csa.png
+BRA	CUIABA	brazil_cuiaba.png
+BRA	CUIABA ESPORTE CLUBE MT	brazil_cuiaba.png
+BRA	DEMOCRATA FC	-
+BRA	DEMOCRATA GV	brazil_democrata-gv.png
+BRA	DEMOCRATA SL	brazil_democrata-sl.png
+BRA	DESPORTIVA	-
+BRA	E C A C	-
+BRA	EC BAHIA	brazil_bahia.png
+BRA	EC JUVENTUDE	brazil_juventude.png
+BRA	EC NOVO HAMBURGO RS	brazil_novo-hamburgo.png
+BRA	EC SANTO ANDRE SP	brazil_santo-andre.png
+BRA	EC VITORIA	brazil_vitoria.png
+BRA	ESPORTE CLUBE AGUA SANTA SP	brazil_agua-santa.png
+BRA	ESPORTE CLUBE AMIGOS DO CHACRINHA	-
+BRA	ESPORTE CLUBE BAHIA	brazil_bahia.png
+BRA	ESPORTE CLUBE BAHIA BA	brazil_bahia.png
+BRA	ESPORTE CLUBE DEMOCRATA MG	brazil_democrata-gv.png
+BRA	ESPORTE CLUBE JACUIPENSE BA	brazil_jacuipense.png
+BRA	ESPORTE CLUBE JUVENTUDE	brazil_juventude.png
+BRA	ESPORTE CLUBE JUVENTUDE RS	brazil_juventude.png
+BRA	ESPORTE CLUBE MAMORE	brazil_mamore.png
+BRA	ESPORTE CLUBE PELOTAS	brazil_pelotas.png
+BRA	ESPORTE CLUBE PELOTAS RS	brazil_pelotas.png
+BRA	ESPORTE CLUBE SAO BENTO SP	brazil_sao-bento.png
+BRA	ESPORTE CLUBE SAO JOSE RS	brazil_sao-jose-rs.png
+BRA	ESPORTE CLUBE VITORIA BA	brazil_vitoria.png
+BRA	ESPORTE CLUBE VITORIA DA BAHIA	brazil_vitoria.png
+BRA	ESPORTIVO BG	brazil_esportivo-bento-goncalves.png
+BRA	ETTI JUNDIAI	-
+BRA	ETTI JUNDIAI FUTEBOL LIMITADA	-
+BRA	FC ATLETICO CEARENSE CE	brazil_atletico-cearense.png
+BRA	FERROVIARIA FUTEBOL S A SP	brazil_ferroviaria.png
+BRA	FERROVIARIA SP	brazil_ferroviaria.png
+BRA	FERROVIARIO AC CE	brazil_ferroviario-ce.png
+BRA	FERROVIARIO CE	brazil_ferroviario-ce.png
+BRA	FIGUEIRENSE	brazil_figueirense.png
+BRA	FIGUEIRENSE F C	brazil_figueirense.png
+BRA	FIGUEIRENSE FUTEBOL CLUBE	brazil_figueirense.png
+BRA	FIGUEIRENSE FUTEBOL CLUBE SC	brazil_figueirense.png
+BRA	FLAMENGO	brazil_flamengo.png
+BRA	FLORESTA	brazil_floresta.png
+BRA	FLORESTA ESPORTE CLUBE CE	brazil_floresta.png
+BRA	FLUMINENSE	brazil_fluminense.png
+BRA	FLUMINENSE FC	brazil_fluminense.png
+BRA	FLUMINENSE FOOT BALL CLUB	brazil_fluminense.png
+BRA	FLUMINENSE FOOTBALL CLUB RJ	brazil_fluminense.png
+BRA	FLUMINENSE FUTEBOL CLUBE	brazil_fluminense.png
+BRA	FORTALEZA	brazil_fortaleza.png
+BRA	FORTALEZA ESPORTE CLUBE	brazil_fortaleza.png
+BRA	FORTALEZA ESPORTE CLUBE CE	brazil_fortaleza.png
+BRA	FREDERIQUENSE	-
+BRA	GE JUVENTUS SC	brazil_juventus-sc.png
+BRA	GOIAS	brazil_goias.png
+BRA	GOIAS EC	brazil_goias.png
+BRA	GOIAS ESPORTE CLUBE	brazil_goias.png
+BRA	GOIAS ESPORTE CLUBE GO	brazil_goias.png
+BRA	GREMIO	brazil_gremio.png
+BRA	GREMIO ATLETICO SAMPAIO	brazil_gremio-atletico-sampaio.png
+BRA	GREMIO ESPORTIVO BRASIL RS	brazil_brasil-de-pelotas.png
+BRA	GREMIO FBPA RS	brazil_gremio.png
+BRA	GREMIO FOOT BALL PORTO ALEGRENSE	brazil_gremio.png
+BRA	GREMIO FOOTBALL PORTO ALEGRENSE	brazil_gremio.png
+BRA	GREMIO FPA	brazil_gremio.png
+BRA	GREMIO NOVORIZONTINO SP	brazil_novorizontino.png
+BRA	GUARANI	brazil_guarani.png
+BRA	GUARANI FC	brazil_guarani.png
+BRA	GUARANI FUTEBOL CLUBE	brazil_guarani.png
+BRA	GUARANI FUTEBOL CLUBE SP	brazil_guarani.png
+BRA	HERCILIO LUZ	brazil_hercilio-luz.png
+BRA	HERCILIO LUZ FC SC	brazil_hercilio-luz.png
+BRA	IMPERATRIZ MA	brazil_imperatriz.png
+BRA	INDEPENDENCIA	brazil_independencia-ac.png
+BRA	INDEPENDENCIA FC	brazil_independencia-ac.png
+BRA	INDEPENDENTE AP	brazil_independente-ap.png
+BRA	INTER DE LIMEIRA	brazil_inter-de-limeira.png
+BRA	INTER DE LIMEIRA BR	brazil_inter-de-limeira.png
+BRA	INTER LIMEIRA	brazil_inter-de-limeira.png
+BRA	INTERNACIONAL	brazil_internacional.png
+BRA	INTERNACIONAL PORTOALEGRE	brazil_internacional.png
+BRA	ITABIRITO	brazil_itabirito.png
+BRA	ITABIRITO FC	brazil_itabirito.png
+BRA	ITUANO	brazil_ituano.png
+BRA	ITUANO BR	brazil_ituano.png
+BRA	ITUANO FUTEBOL CLUBE	brazil_ituano.png
+BRA	ITUANO FUTEBOL CLUBE SP	brazil_ituano.png
+BRA	JACUIPENSE	brazil_jacuipense.png
+BRA	JI PARANA	brazil_ji-parana.png
+BRA	JOINVILE	-
+BRA	JOINVILE FUTEBOL CLUBE	-
+BRA	JOINVILLE	brazil_joinville.png
+BRA	JOINVILLE ESPORTE CLUBE SC	brazil_joinville.png
+BRA	JUVENTUDE	brazil_juventude.png
+BRA	JUVENTUS BR	brazil_juventus-da-mooca.png
+BRA	JUVENTUS SC	brazil_juventus-sc.png
+BRA	LONDRINA	brazil_londrina.png
+BRA	LONDRINA EC	brazil_londrina.png
+BRA	LONDRINA ESPORTE CLUBE	brazil_londrina.png
+BRA	LONDRINA ESPORTE CLUBE PR	brazil_londrina.png
+BRA	LUSA	brazil_portuguesa.png
+BRA	LUSA SANTISTA	-
+BRA	MACAE	brazil_macae.png
+BRA	MACAE ECF RJ	brazil_macae.png
+BRA	MADUREIRA	brazil_madureira.png
+BRA	MADUREIRA ESPORTE CLUBE RJ	brazil_madureira.png
+BRA	MALUTROM	-
+BRA	MAMORE	brazil_mamore.png
+BRA	MANAUARA	brazil_manauara.png
+BRA	MANAUARA EC	brazil_manauara.png
+BRA	MANAUS	brazil_manaus.png
+BRA	MANAUS FUTEBOL CLUBE AM	brazil_manaus.png
+BRA	MARACANA	brazil_maracana.png
+BRA	MARACANA EC	brazil_maracana.png
+BRA	MARCILIO DIAS	brazil_marcilio-dias.png
+BRA	MARILIA	brazil_marilia.png
+BRA	MARILIA ATLETICO CLUBE	brazil_marilia.png
+BRA	MATONENSE	brazil_matonense.png
+BRA	MATONENSE BR	brazil_matonense.png
+BRA	METROPOLITANO	brazil_metropolitano.png
+BRA	MIRASSOL	brazil_mirassol.png
+BRA	MIRASSOL FUTEBOL CLUBE SP	brazil_mirassol.png
+BRA	MIXTO	brazil_mixto.png
+BRA	MIXTO EC	brazil_mixto.png
+BRA	MOGI MIRIM	brazil_mogi-mirim.png
+BRA	MOGI MIRIM BR	brazil_mogi-mirim.png
+BRA	MONTE AZUL	brazil_monte-azul.png
+BRA	MOTO CLUB	brazil_moto-club.png
+BRA	NAUTICO	brazil_nautico.png
+BRA	NOVA IGUACU	brazil_nova-iguacu.png
+BRA	NOVA IGUACU FC RJ	brazil_nova-iguacu.png
+BRA	NOVO HAMBURGO	brazil_novo-hamburgo.png
+BRA	NOVORIZONTINO	brazil_novorizontino.png
+BRA	OESTE	brazil_oeste.png
+BRA	OESTE FUTEBOL CLUBE SP	brazil_oeste.png
+BRA	OP FERROVIARIO	brazil_operario-ferroviario.png
+BRA	OPERARIO FERROVIARIO EC PR	brazil_operario-ferroviario.png
+BRA	PALMEIRAS	brazil_palmeiras.png
+BRA	PALMEIRAS 1951	brazil_palmeiras.png
+BRA	PALMEIRAS 1952	brazil_palmeiras.png
+BRA	PALMEIRAS 1953	brazil_palmeiras.png
+BRA	PALMEIRAS 1954	brazil_palmeiras.png
+BRA	PALMEIRAS 1955	brazil_palmeiras.png
+BRA	PALMEIRAS 1956	brazil_palmeiras.png
+BRA	PALMEIRAS 1957	brazil_palmeiras.png
+BRA	PALMEIRAS 1958	brazil_palmeiras.png
+BRA	PALMEIRAS 1959	brazil_palmeiras.png
+BRA	PALMEIRAS 1960	brazil_palmeiras.png
+BRA	PALMEIRAS 1961	brazil_palmeiras.png
+BRA	PALMEIRAS 1962	brazil_palmeiras.png
+BRA	PALMEIRAS 1963	brazil_palmeiras.png
+BRA	PALMEIRAS 1964	brazil_palmeiras.png
+BRA	PALMEIRAS 1965	brazil_palmeiras.png
+BRA	PALMEIRAS 1966	brazil_palmeiras.png
+BRA	PALMEIRAS 1967	brazil_palmeiras.png
+BRA	PALMEIRAS 1968	brazil_palmeiras.png
+BRA	PALMEIRAS 1969	brazil_palmeiras.png
+BRA	PALMEIRAS 1970	brazil_palmeiras.png
+BRA	PALMEIRAS 1971	brazil_palmeiras.png
+BRA	PALMEIRAS 1972	brazil_palmeiras.png
+BRA	PALMEIRAS 1973	brazil_palmeiras.png
+BRA	PALMEIRAS 1974	brazil_palmeiras.png
+BRA	PALMEIRAS 1975	brazil_palmeiras.png
+BRA	PALMEIRAS 1976	brazil_palmeiras.png
+BRA	PALMEIRAS 1977	brazil_palmeiras.png
+BRA	PALMEIRAS 1978	brazil_palmeiras.png
+BRA	PALMEIRAS 1979	brazil_palmeiras.png
+BRA	PALMEIRAS 1980	brazil_palmeiras.png
+BRA	PALMEIRAS 1981	brazil_palmeiras.png
+BRA	PALMEIRAS 1982	brazil_palmeiras.png
+BRA	PALMEIRAS 1983	brazil_palmeiras.png
+BRA	PALMEIRAS 1984	brazil_palmeiras.png
+BRA	PALMEIRAS 1985	brazil_palmeiras.png
+BRA	PALMEIRAS 1986	brazil_palmeiras.png
+BRA	PALMEIRAS 1987	brazil_palmeiras.png
+BRA	PALMEIRAS 1988	brazil_palmeiras.png
+BRA	PALMEIRAS 1989	brazil_palmeiras.png
+BRA	PALMEIRAS 1990	brazil_palmeiras.png
+BRA	PALMEIRAS 1991	brazil_palmeiras.png
+BRA	PALMEIRAS 1992	brazil_palmeiras.png
+BRA	PALMEIRAS 1993	brazil_palmeiras.png
+BRA	PALMEIRAS 1994	brazil_palmeiras.png
+BRA	PALMEIRAS 1995	brazil_palmeiras.png
+BRA	PALMEIRAS 1996	brazil_palmeiras.png
+BRA	PALMEIRAS 1997	brazil_palmeiras.png
+BRA	PALMEIRAS 1998	brazil_palmeiras.png
+BRA	PALMEIRAS 1999	brazil_palmeiras.png
+BRA	PALMEIRAS 2000	brazil_palmeiras.png
+BRA	PALMEIRAS 2001	brazil_palmeiras.png
+BRA	PALMEIRAS 2002	brazil_palmeiras.png
+BRA	PALMEIRAS 2003	brazil_palmeiras.png
+BRA	PALMEIRAS 2004	brazil_palmeiras.png
+BRA	PALMEIRAS 2005	brazil_palmeiras.png
+BRA	PALMEIRAS 2006	brazil_palmeiras.png
+BRA	PALMEIRAS 2007	brazil_palmeiras.png
+BRA	PALMEIRAS 2008	brazil_palmeiras.png
+BRA	PALMEIRAS 2009	brazil_palmeiras.png
+BRA	PALMEIRAS 2010	brazil_palmeiras.png
+BRA	PALMEIRAS 2011	brazil_palmeiras.png
+BRA	PALMEIRAS 2012	brazil_palmeiras.png
+BRA	PALMEIRAS 2013	brazil_palmeiras.png
+BRA	PALMEIRAS 2014	brazil_palmeiras.png
+BRA	PALMEIRAS 2015	brazil_palmeiras.png
+BRA	PALMEIRAS 2016	brazil_palmeiras.png
+BRA	PALMEIRAS 2017	brazil_palmeiras.png
+BRA	PALMEIRAS 2018	brazil_palmeiras.png
+BRA	PALMEIRAS 2019	brazil_palmeiras.png
+BRA	PALMEIRAS 2020	brazil_palmeiras.png
+BRA	PALMEIRAS 2021	brazil_palmeiras.png
+BRA	PALMEIRAS 2022	brazil_palmeiras.png
+BRA	PALMEIRAS 2023	brazil_palmeiras.png
+BRA	PALMEIRAS 2024	brazil_palmeiras.png
+BRA	PARANA	brazil_parana-clube.png
+BRA	PARANA CLUBE	brazil_parana-clube.png
+BRA	PARANA CLUBE PR	brazil_parana-clube.png
+BRA	PARANA FUTEBOL CLUBE	brazil_parana-clube.png
+BRA	PATROCINENSE	brazil_patrocinense.png
+BRA	PAYSANDU	brazil_paysandu.png
+BRA	PAYSANDU SPORT CLUBE PA	brazil_paysandu.png
+BRA	PELOTAS	brazil_pelotas.png
+BRA	PENEDENSE	brazil_penedense.png
+BRA	PIRACICABA	brazil_xv-de-piracicaba.png
+BRA	PONTE PRETA	brazil_ponte-preta.png
+BRA	PORTO VITORIA	brazil_porto-vitoria.png
+BRA	PORTO VITORIA FC	brazil_porto-vitoria.png
+BRA	PORTUGUESA	brazil_portuguesa.png
+BRA	PORTUGUESA DE DESPORTOS	brazil_portuguesa.png
+BRA	PORTUGUESA RJ	brazil_portuguesa-rj.png
+BRA	PORTUGUESA SANTISTA	brazil_portuguesa-santista.png
+BRA	PORTUGUESA SANTISTA BR	-
+BRA	POUSO ALEGRE	brazil_pouso-alegre.png
+BRA	POUSO ALEGRE FC MG	brazil_pouso-alegre.png
+BRA	RED BULL BRAGANTINO	brazil_rb-bragantino.png
+BRA	RED BULL BRAGANTINO SP	brazil_rb-bragantino.png
+BRA	REMO	brazil_clube-do-remo.png
+BRA	RESENDE	brazil_resende.png
+BRA	RESENDE FUTEBOL CLUBE RJ	brazil_resende.png
+BRA	RIO BRANCO	-
+BRA	RIO BRANCO BR	brazil_rio-branco-sp.png
+BRA	RIO BRANCO PR	brazil_rio-branco-pr.png
+BRA	S IMPERATRIZ D MA	brazil_imperatriz.png
+BRA	SAMPAIO CORREA	brazil_sampaio-correa.png
+BRA	SAMPAIO CORREA FC MA	brazil_sampaio-correa.png
+BRA	SAMPAIO CORREA FE RJ	brazil_sampaio-correa-rj.png
+BRA	SAMPAIO CORREA RJ	brazil_sampaio-correa-rj.png
+BRA	SANTA CATARINA	brazil_santa-catarina.png
+BRA	SANTA CATARINA CLUBE	brazil_santa-catarina.png
+BRA	SANTA CRUZ	brazil_santa-cruz.png
+BRA	SANTA CRUZ FC	-
+BRA	SANTA CRUZ FUTEBOL CLUBE	brazil_santa-cruz.png
+BRA	SANTA CRUZ FUTEBOL CLUBE PE	brazil_santa-cruz.png
+BRA	SANTA CRUZ RN	brazil_santa-cruz-rn.png
+BRA	SANTO ANDRE	brazil_santo-andre.png
+BRA	SANTOS	brazil_santos.png
+BRA	SANTOS FC	brazil_santos.png
+BRA	SANTOS FUTEBOL CLUBE	brazil_santos.png
+BRA	SANTOS FUTEBOL CLUBE SP	brazil_santos.png
+BRA	SAO BENTO	-
+BRA	SAO BERNARDO FC	brazil_sao-bernardo.png
+BRA	SAO BERNARDO FC SP	brazil_sao-bernardo.png
+BRA	SAO CAETANO	brazil_sao-caetano.png
+BRA	SAO JOSE	-
+BRA	SAO JOSE EC	brazil_sao-jose-ec.png
+BRA	SAO JOSE SP	brazil_sao-jose-ec.png
+BRA	SAO PAULO	brazil_sao-paulo.png
+BRA	SAO PAULO FC	brazil_sao-paulo.png
+BRA	SAO PAULO FUTEBOL CLUBE	brazil_sao-paulo.png
+BRA	SAO PAULO FUTEBOL CLUBE SP	brazil_sao-paulo.png
+BRA	SC CORINTHIANS PAULISTA SP	brazil_corinthians.png
+BRA	SC PALMEIRAS	brazil_palmeiras.png
+BRA	SC PENEDENSE	brazil_penedense.png
+BRA	SD SERRA FC	-
+BRA	SE PALMEIRAS SP	brazil_palmeiras.png
+BRA	SER CAXIAS DO SUL RS	brazil_caxias.png
+BRA	SERRA ES	brazil_serra-es.png
+BRA	SOCIEDADE ESPORTIVA MALUTROM	-
+BRA	SOCIEDADE ESPORTIVA PALMEIRAS	brazil_palmeiras.png
+BRA	SOUSA PB	brazil_sousa-pb.png
+BRA	SPORT	brazil_sport-recife.png
+BRA	SPORT CLUB CORINTHIANS PAULISTA	brazil_corinthians.png
+BRA	SPORT CLUB DO RECIFE	brazil_sport-recife.png
+BRA	SPORT CLUB DO RECIFE PE	brazil_sport-recife.png
+BRA	SPORT CLUB INTERNACIONAL	brazil_internacional.png
+BRA	SPORT CLUB INTERNACIONAL RS	brazil_internacional.png
+BRA	SPORT CLUB RECIFE	brazil_sport-recife.png
+BRA	SPORT CLUBE CORINTHIANS PAULISTA	brazil_corinthians.png
+BRA	SPORT RECIFE	brazil_sport-recife.png
+BRA	TOMBENSE	brazil_tombense.png
+BRA	TOMBENSE FUTEBOL CLUBE MG	brazil_tombense.png
+BRA	TREZE FC	brazil_treze.png
+BRA	TREZE FUTEBOL CLUBE PB	brazil_treze.png
+BRA	TUBARAO	brazil_tubarao.png
+BRA	TUBARAO F C	brazil_tubarao.png
+BRA	TUBARAO FUTEBOL CLUBE	brazil_tubarao.png
+BRA	U RONDONOPOLIS	brazil_uniao-rondonopolis.png
+BRA	UA CARMOLANDENSE	-
+BRA	UBERLANDIA	brazil_uberlandia.png
+BRA	UBERLANDIA ESPORTE CLUBE MG	brazil_uberlandia.png
+BRA	UNIAO AGRICOLA BARBARENSE FUTEBOL CLUBE	-
+BRA	UNIAO BARBARENSE	brazil_uniao-barbarense.png
+BRA	UNIAO DE SAO JOAO	brazil_uniao-sao-joao.png
+BRA	UNIAO FREDERIQUENSE F RS	brazil_uniao-frederiquense.png
+BRA	UNIAO S JOAO	brazil_uniao-sao-joao.png
+BRA	URT	brazil_urt.png
+BRA	URT MG	brazil_urt.png
+BRA	VASCO DA GAMA	brazil_vasco-da-gama.png
+BRA	VILA NOVA	brazil_vila-nova.png
+BRA	VILA NOVA FUTEBOL CLUBE GO	brazil_vila-nova.png
+BRA	VILLA NOVA	brazil_villa-nova-mg.png
+BRA	VILLA NOVA AC MG	brazil_villa-nova-mg.png
+BRA	VITORIA	brazil_vitoria.png
+BRA	VITORIA BA	brazil_vitoria.png
+BRA	VOLTA REDONDA	brazil_volta-redonda.png
+BRA	VOLTA REDONDA FC RJ	brazil_volta-redonda.png
+BRA	XV PIRACICABA	brazil_xv-de-piracicaba.png
+BRA	YPIRANGA	brazil_ypiranga.png
+BRA	YPIRANGA FUTEBOL CLUBE RS	brazil_ypiranga.png
+BUL	VITOCHA SOFIA	bulgaria_levski.png
+CHP	AEK LARNACA	cyprus_aek-larnaca.png
+CHP	ATHLITIKI ENOSIS KITION	cyprus_aek-larnaca.png
+CRO	HAJDUK SPLIT	croatia_hajduk-split.png
+CRO	PARTIZAN BELGRADO	serbia_partizan.png
+CRO	SEGESTA	croatia_hnk-segesta-sisak.png
+DIN	BK COPENHAGEN	denmark_copenhagen.png
+DIN	COPENHAGEN	denmark_copenhagen.png
+EGT	AL AHLY	egypt_al-ahly.png
+EGT	ZAMALEK	egypt_zamalek.png
+ESC	ABERDEEN	scotland_aberdeen.png
+ESC	CELTIC	scotland_celtic.png
+ESC	DUNDEE	-
+ESC	DUNDEE UNITED	scotland_dundee-united.png
+ESC	GLASGOW RANGERS FC	scotland_rangers.png
+ESC	GLASGOW RANGERS FOOTBALL CLUB	scotland_rangers.png
+ESC	HEART OF MIDLOTHIAN	scotland_hearts.png
+ESC	MIDLOTHIAN	scotland_hearts.png
+ESC	MOTHERWELL	scotland_motherwell.png
+ESC	RAITH ROVERS	scotland_raith.png
+ESC	RAITH ROVERS FOOTBALL CLUB	scotland_raith.png
+ESC	SAINT JOHNSTONE	scotland_st-johnstone.png
+ESC	ST JOHNSTONE	scotland_st-johnstone.png
+ESP	ALBACETE	spain_albacete.png
+ESP	ALBACETE BALOMPIE	spain_albacete.png
+ESP	ATHLETIC BILBAO	spain_athletic-club.png
+ESP	ATHLETIC CLUB	spain_athletic-club.png
+ESP	ATLETICO BILBAO	spain_athletic-club.png
+ESP	ATLETICO DE MADRID	spain_atletico-madrid.png
+ESP	BARCELONA	spain_barcelona.png
+ESP	BETIS	spain_real-betis.png
+ESP	BETIS DE SEVILHA	spain_real-betis.png
+ESP	CELTA DE VIGO	spain_celta.png
+ESP	CLUB ATLETICO DE MADRID S A D	spain_atletico-madrid.png
+ESP	CLUB ATLETICO OSASUNA	spain_osasuna.png
+ESP	CLUBE DESPORTIVO TENERIFE	spain_tenerife.png
+ESP	COMPOSTELA	spain_sd-compostela.png
+ESP	DEPORTIVO LA CORUNA	spain_deportivo-la-coruna.png
+ESP	ESPANOL DE BARCELONA	spain_espanyol.png
+ESP	ESPANYOL	spain_espanyol.png
+ESP	FUTBOL CLUB BARCELONA	spain_barcelona.png
+ESP	FUTEBOL CLUBE BARCELONA	spain_barcelona.png
+ESP	GETAFE	spain_getafe.png
+ESP	GETAFE CLUB FUTBOL	spain_getafe.png
+ESP	LEVANTE	spain_levante.png
+ESP	LEVANTE UNION DEPORTIVA	spain_levante.png
+ESP	MALAGA	spain_malaga.png
+ESP	MALAGA CLUB DE FUTBOL	spain_malaga.png
+ESP	MALLORCA	spain_mallorca.png
+ESP	MERIDA	-
+ESP	MERIDA CP	-
+ESP	OSASUNA	spain_osasuna.png
+ESP	OVIEDO	spain_oviedo.png
+ESP	RACING SANTANDER	spain_racing.png
+ESP	REAL BETIS BALOMPIE	spain_real-betis.png
+ESP	REAL CLUB CELTA DE VIGO	spain_celta.png
+ESP	REAL CLUB DEPORTIVO DE LA CORUNA	spain_deportivo-la-coruna.png
+ESP	REAL CLUB DEPORTIVO ESPANYOL	spain_espanyol.png
+ESP	REAL CLUB DEPORTIVO MALLORCA	spain_mallorca.png
+ESP	REAL CLUBE DESPORTIVO ESPANYOL	spain_espanyol.png
+ESP	REAL CLUBE DESPORTIVO MALLORCA	spain_mallorca.png
+ESP	REAL MADRID	spain_real-madrid.png
+ESP	REAL MADRID CLUB FUTBOL	spain_real-madrid.png
+ESP	REAL OVIEDO	spain_oviedo.png
+ESP	REAL RACING CLUB	spain_racing.png
+ESP	REAL SOCIEDAD	spain_real-sociedad.png
+ESP	REAL SOCIEDAD DE FUTBOL	spain_real-sociedad.png
+ESP	REAL SOCIEDAD SS	spain_real-sociedad.png
+ESP	REAL VALLADOLID	spain_valladolid.png
+ESP	REAL ZARAGOZA	spain_zaragoza.png
+ESP	SALAMANCA	-
+ESP	SARAGOCA	spain_zaragoza.png
+ESP	SEVILLA	spain_sevilla.png
+ESP	SEVILLA FUTBOL CLUB	spain_sevilla.png
+ESP	SPORTING GIJON	spain_sporting-gijon.png
+ESP	TENERIFE	spain_tenerife.png
+ESP	UNIAO DESPORTIVA SALAMANCA	-
+ESP	VALENCIA	spain_valencia.png
+ESP	VALENCIA CLUB DE FUTBOL	spain_valencia.png
+ESP	VALENCIA CLUBE FUTEBOL	spain_valencia.png
+ESP	VALLADOLID	spain_valladolid.png
+ESP	VILLARREAL	spain_villarreal.png
+ESP	VILLARREAL CLUB FUTBOL	spain_villarreal.png
+ESP	ZARAGOZA	spain_zaragoza.png
+FRA	ASSOCIATION DE LA JEUNESSE AUXERRE	france_auxerre.png
+FRA	ASSOCIATION SPORTIVE DE CANNES	france_as-cannes.png
+FRA	ASSOCIATION SPORTIVE DE MONACO	france_as-monaco.png
+FRA	AUXERRE	france_auxerre.png
+FRA	BASTIA	france_bastia.png
+FRA	BORDEAUX	france_bordeaux.png
+FRA	CAEN	france_stade-malherbe-caen.png
+FRA	CANNES	france_as-cannes.png
+FRA	CHARLEVILLE	-
+FRA	CHATEAUROUX	france_chateauroux.png
+FRA	EN AVANT GUINGAMP	france_guingamp.png
+FRA	FOOTBALL CLUB DE METZ	france_fc-metz.png
+FRA	FOOTBALL CLUB DE NANTES	france_nantes.png
+FRA	FOOTBALL CLUB DES GIRONDINS BORDEAUX	france_bordeaux.png
+FRA	GUINGAMP	france_guingamp.png
+FRA	LA BERRICHONNE DE CHATEAUROUX	france_chateauroux.png
+FRA	LE HAVRE	france_le-havre-ac.png
+FRA	LE HAVRE ATHLETIC CLUB	france_le-havre-ac.png
+FRA	LENS	france_rc-lens.png
+FRA	LYON	france_lyon.png
+FRA	METZ	france_fc-metz.png
+FRA	MONACO	france_as-monaco.png
+FRA	MONTPELLIER	france_montpellier.png
+FRA	MONTPELLIER HERAULT SPORTS CLUB	france_montpellier.png
+FRA	NANTES	france_nantes.png
+FRA	OLIMPIQUE MARSELHA	france_marseille.png
+FRA	OLYMPIQUE DE CHARLEVILLE MEZIERES	-
+FRA	OLYMPIQUE LYONNAIS	france_lyon.png
+FRA	PARIS SAINT GERMAIN	france_paris-saint-germain.png
+FRA	PERPIGNAN	-
+FRA	PERPIGNAN FOOTBALL CLUB	-
+FRA	RACING CLUB DE LENS	france_rc-lens.png
+FRA	RACING CLUB DE STRASBOURG	france_rc-strasbourg-alsace.png
+FRA	RENNES	france_rennes.png
+FRA	SPORTING CLUB DE BASTIA	france_bastia.png
+FRA	STADE RENNAIS FOOTBALL CLUB	france_rennes.png
+FRA	STRASBOURG	france_rc-strasbourg-alsace.png
+FRA	TOULOUSE	france_toulouse.png
+FRA	TOULOUSE FOOTBALL CLUB	france_toulouse.png
+GRE	OLYMPIAKOS	greece_olympiacos.png
+GRE	PANATHINAIKOS	greece_panathinaikos.png
+HOL	AJAX	netherlands_ajax.png
+HOL	FEYENOORD	netherlands_feyenoord.png
+HOL	FOOTBALL CLUB TWENTE 65	netherlands_twente.png
+HOL	PSV EINDHOVEN	netherlands_psv.png
+HOL	SPORTCLUB FEYENOORD ROTTERDAM	netherlands_feyenoord.png
+HOL	TWENTE	netherlands_twente.png
+HUN	FERENCVAROS	hungary_ferencvaros.png
+HUN	HONVED	hungary_honved.png
+ING	ARSENAL	england_arsenal.png
+ING	ASTON VILLA	england_aston-villa.png
+ING	BARNSLEY	england_barnsley.png
+ING	BARNSLEY FC	england_barnsley.png
+ING	BIRMINGHAM	england_birmingham.png
+ING	BIRMINGHAM CITY	england_birmingham.png
+ING	BLACKBURN ROVERS	england_blackburn-rovers.png
+ING	BOLTON	england_bolton.png
+ING	BOLTON WANDERERS FOOTBALL CLUB	england_bolton.png
+ING	BRADFORD	england_bradford.png
+ING	BRADFORD CITY AMATEUR FOOTBALL	england_bradford.png
+ING	BRENTFORD	england_brentford.png
+ING	BURY FC	england_bury.png
+ING	BURY FOOTBALL CLUB	england_bury.png
+ING	CHELSEA	england_chelsea.png
+ING	COVENTRY	england_coventry-city.png
+ING	COVENTRY CITY	england_coventry-city.png
+ING	CREWE	england_crewe.png
+ING	CREWE ALEXANDRA FOOTBALL CLUB	england_crewe.png
+ING	CRYSTAL PALACE	england_crystal-palace.png
+ING	DERBY COUNTY	england_derby-county.png
+ING	DERBY COUNTY FOOTBALL CLUB	england_derby-county.png
+ING	EVERTON	england_everton.png
+ING	HUDDERSFIELD	england_huddersfield.png
+ING	HUDDERSFIELD TOWN FOOTBALL CLUB	england_huddersfield.png
+ING	IPSWICH	england_ipswich.png
+ING	IPSWICH TOWN	england_ipswich.png
+ING	LEEDS	england_leeds-united.png
+ING	LEEDS UNITED	england_leeds-united.png
+ING	LEICESTER	england_leicester.png
+ING	LEICESTER CITY	england_leicester.png
+ING	LIVERPOOL FC	england_liverpool.png
+ING	MANCHERTER CITY	england_manchester-city.png
+ING	MANCHESTER UNITED	england_manchester-united.png
+ING	MIDDLESBROUGH	england_middlesbrough.png
+ING	NEWCASTLE	england_newcastle.png
+ING	NEWCASTLE UNITED	england_newcastle.png
+ING	NORWICH	england_norwich-city.png
+ING	NORWICH CITY FOOTBALL CLUB	england_norwich-city.png
+ING	NOTTINGHAM	england_nottingham-forest.png
+ING	NOTTINGHAM FOREST	england_nottingham-forest.png
+ING	OXFORD	england_oxford-united.png
+ING	OXFORD UNITED FOOTBALL CLUB	england_oxford-united.png
+ING	PORT VALE	england_port-vale.png
+ING	PORT VALE FOOTBALL CLUB	england_port-vale.png
+ING	PORTSMOUTH	england_portsmouth.png
+ING	PORTSMOUTH FOOTBALL CLUB	england_portsmouth.png
+ING	Q P R	england_queens-park-rangers.png
+ING	QUEENS PARK RANGERS	england_queens-park-rangers.png
+ING	READING	england_reading.png
+ING	READING FOOTBALL CLUB	england_reading.png
+ING	SHEFFIELD	-
+ING	SHEFFIELD UNITED FOOTBALL CLUB	england_sheffield-united.png
+ING	SHEFFIELD WEDNESDAY	england_sheffield-wednesday.png
+ING	SOUTHAMPTON	england_southampton.png
+ING	STOCKPORT	england_stockport-county.png
+ING	STOCKPORT COUNTY	england_stockport-county.png
+ING	STOKE CITY	england_stoke-city.png
+ING	STOKE CITY FOOTBALL CLUB	england_stoke-city.png
+ING	SUNDERLAND	england_sunderland.png
+ING	SWINDON TOWN	england_swindon-town.png
+ING	SWINDON TOWN FOOTBALL CLUB	england_swindon-town.png
+ING	TOTTENHAM	england_tottenham.png
+ING	TOTTENHAM HOTSPUR	england_tottenham.png
+ING	TRANMERE	england_tranmere.png
+ING	TRANMERE ROVERS FOOTBALL CLUB	england_tranmere.png
+ING	WB ALBION	england_west-bromwich-albion.png
+ING	WEST BROMWICH ALBION FOOTBALL CLUB	england_west-bromwich-albion.png
+ING	WEST HAM	england_west-ham.png
+ING	WEST HAM UNITED	england_west-ham.png
+ING	WIMBLEDON	-
+ING	WOLVERHAMPTON	england_wolves.png
+ING	WOLVERHAMPTON WANDERERS FOOTBALL CLUB	england_wolves.png
+IRL	BOHEMIANS	republic-of-ireland_bohemian.png
+IRL	CORK CITY	republic-of-ireland_cork-city.png
+IRL	DERRY CITY	republic-of-ireland_derry-city.png
+IRL	DROGHEDA	republic-of-ireland_drogheda-united.png
+IRL	DROGHEDA UNITED	republic-of-ireland_drogheda-united.png
+IRL	DUNDALK	republic-of-ireland_dundalk.png
+ISR	BEITAR	israel_beitar-jerusalem.png
+ISR	BEITAR DE JERUSALEM	israel_beitar-jerusalem.png
+ISR	MACCABI HAIFA	israel_maccabi-haifa.png
+ITA	AC MILAN	italy_milan.png
+ITA	ASSOCIAZIONE CALCIO CHIEVO	italy_chievo.png
+ITA	ASSOCIAZIONE CALCIO CHIEVO VERONA	italy_chievo.png
+ITA	ASSOCIAZIONE CALCIO PERUGIA	italy_perugia.png
+ITA	ASSOCIAZIONE CALCIO REGGIANA	italy_reggiana.png
+ITA	ASSOCIAZIONE CALCIO VENEZIA	italy_venezia.png
+ITA	ASSOCIAZIONE SPORTIVA BARI	italy_bari.png
+ITA	ASSOCIAZIONE SPORTIVA FIDELIS ANDRIA	italy_fidelis-andria.png
+ITA	ASSOCIAZIONE SPORTIVA LUCCHESE LIBERTAS	italy_lucchese-1905.png
+ITA	ASSOCIAZIONE SPORTIVA ROMA	italy_roma.png
+ITA	ASSOCIAZONE CALCIO FLORENTIA FIORENTINA	italy_fiorentina.png
+ITA	ASSOCIAZONE CALCIO MILAN	italy_milan.png
+ITA	ASSOCIAZONE CALCIO PARMA	italy_parma.png
+ITA	ASSOCIAZONE CALCIO SIENA	italy_siena.png
+ITA	ASSOCIAZONE SPORTIVA LIVORNO CALCIO	italy_livorno.png
+ITA	ASSOCIAZONE SPORTIVA ROMA CALCIO	italy_roma.png
+ITA	ATALANTA	italy_atalanta.png
+ITA	ATALANTA BERGAMASCA CALCIO	italy_atalanta.png
+ITA	BARI	italy_bari.png
+ITA	BOLOGNA	italy_bologna.png
+ITA	BOLOGNA FOOTBALL CLUB	italy_bologna.png
+ITA	BOLOGNA FOOTBALL CLUB 1909	italy_bologna.png
+ITA	BRESCIA	italy_brescia.png
+ITA	BRESCIA CALCIO	italy_brescia.png
+ITA	CAGLIARI	italy_cagliari.png
+ITA	CAGLIARI CALCIO	italy_cagliari.png
+ITA	CASTEL DI SANGRO	-
+ITA	CHIETI	italy_chieti-fc-1922.png
+ITA	CHIETI CALCIO	italy_chieti-fc-1922.png
+ITA	CHIEVO	italy_chievo.png
+ITA	COSENZA	italy_cosenza.png
+ITA	COSENZA CALCIO 1914	italy_cosenza.png
+ITA	EMPOLI	italy_empoli.png
+ITA	EMPOLI FOOTBALL CLUB	italy_empoli.png
+ITA	FIDELIS ANDRIA	italy_fidelis-andria.png
+ITA	FIORENTINA	italy_fiorentina.png
+ITA	FOGGIA	italy_foggia.png
+ITA	FOGGIA CALCIO	italy_foggia.png
+ITA	FOOTBALL CLUB INTERNAZIONALE MILANO	italy_inter.png
+ITA	FOOTBALL CLUB MESSINA	italy_acr-messina.png
+ITA	GENOA	italy_genoa.png
+ITA	GENOA 1893	italy_genoa.png
+ITA	GENOA CRICKET AND FOOTBALL CLUB	italy_genoa.png
+ITA	INTER MILAN	italy_inter.png
+ITA	INTERNAZIONALLE	italy_inter.png
+ITA	JUVENTUS	italy_juventus.png
+ITA	LAZIO	italy_lazio.png
+ITA	LECCE	italy_lecce.png
+ITA	LIVORNO	italy_livorno.png
+ITA	LUCCHESE	italy_lucchese-1905.png
+ITA	MESSINA	italy_acr-messina.png
+ITA	MILAN	italy_milan.png
+ITA	MONZA	italy_monza.png
+ITA	MONZA CALCIO	italy_monza.png
+ITA	NAPOLES	italy_napoli.png
+ITA	PADOVA	italy_padova.png
+ITA	PADOVA CALCIO	italy_padova.png
+ITA	PALERMO	italy_palermo.png
+ITA	PARMA	italy_parma.png
+ITA	PARMA AC	italy_parma.png
+ITA	PERUGIA	italy_perugia.png
+ITA	PESCARA	italy_pescara.png
+ITA	PESCARA CALCIO	italy_pescara.png
+ITA	PIACENZA	italy_piacenza.png
+ITA	PIACENZA FOOTBALL CLUB	italy_piacenza.png
+ITA	RAVENNA	italy_ravenna.png
+ITA	REGGIANA	italy_reggiana.png
+ITA	REGGINA	italy_reggina.png
+ITA	REGGINA CALCIO	italy_reggina.png
+ITA	ROMA	italy_roma.png
+ITA	SALERNITANA	italy_salernitana.png
+ITA	SALERNITANA SPORT	italy_salernitana.png
+ITA	SAMPDORIA	italy_sampdoria.png
+ITA	SAVOIA	italy_savoia-1908.png
+ITA	SAVOIA 1908 ASSOCIAZIONE CALCIO	italy_savoia-1908.png
+ITA	SIENA	italy_siena.png
+ITA	SOCIETA SPORTIVA LAZIO	italy_lazio.png
+ITA	TORINO	italy_torino.png
+ITA	TORINO CALCIO	italy_torino.png
+ITA	TREVISO	italy_treviso.png
+ITA	UDINESE	italy_udinese.png
+ITA	UDINESE CALCIO	italy_udinese.png
+ITA	UNIONE CALCIO SAMPDORIA	italy_sampdoria.png
+ITA	UNIONE SPORTIVA LECCE	italy_lecce.png
+ITA	UNIONE SPORTIVA PALERMO	italy_palermo.png
+ITA	UNIONE SPORTIVA RAVENNA	italy_ravenna.png
+ITA	VENEZIA	italy_venezia.png
+ITA	VERONA	italy_verona.png
+ITA	VERONA FOOTBALL CLUB	italy_verona.png
+ITA	VICENZA	italy_vicenza.png
+ITA	VICENZA CALCIO	italy_vicenza.png
+LET	SKONTO RIGA	-
+MLT	RABAT AJAX FC	-
+MOC	FERROVIARIO	-
+MOC	FERROVIARIO DE MOCAMBIQUE	-
+NOR	ROSENBORG	norway_rosenborg.png
+NOR	ROSENBORG BK	norway_rosenborg.png
+PER	FUTBOL CLUB MELGAR	peru_melgar.png
+PER	MELGAR	peru_melgar.png
+PER	SPORTING CRISTAL	peru_sporting-cristal.png
+POL	GORNIK	poland_gornik-zabrze.png
+POL	LEGIA	poland_legia-warszawa.png
+POL	LEGIA WARSZAWA	poland_legia-warszawa.png
+POL	SEKCIA PILKI NOZNEJ WIDZEW LODZ	poland_widzew.png
+POL	WIDZEW LODZ	poland_widzew.png
+POR	A C VISEU	portugal_academico-de-viseu.png
+POR	ACADEMICA	portugal_academica-de-coimbra.png
+POR	ALCANENENSE	-
+POR	ALVERCA	portugal_alverca.png
+POR	AMORA	portugal_amora.png
+POR	AMORA FUTEBOL CLUBE	portugal_amora.png
+POR	ANADIA	portugal_anadia.png
+POR	ANADIA FUTEBOL CLUBE	portugal_anadia.png
+POR	ASSOCIACAO ACADEMICA DE COIMBRA	portugal_academica-de-coimbra.png
+POR	ATLETICO CLUBE ALCANENENSE	-
+POR	AVES	portugal_cd-aves.png
+POR	BEIRA MAR	portugal_beira-mar.png
+POR	BELENENSES	portugal_os-belenenses.png
+POR	BENFICA	portugal_benfica.png
+POR	BOAVISTA FC	portugal_boavista.png
+POR	BOAVISTA FUTEBOL CLUBE	portugal_boavista.png
+POR	BRAGA	portugal_sc-braga.png
+POR	CAMPOMAIORENSE	-
+POR	CASTELO DE VIDE	-
+POR	CHAVES	portugal_chaves.png
+POR	CLUB DESPORTIVO FEIRENSE	portugal_feirense.png
+POR	CLUBE ACADEMICO DE FUTEBOL DE VISEU	portugal_academico-de-viseu.png
+POR	CLUBE DE FUTEBOL ESTRELA DA AMADORA	portugal_estrela-da-amadora.png
+POR	CLUBE DE FUTEBOL OS BELENENSES	portugal_os-belenenses.png
+POR	CLUBE DE FUTEBOL UNIAO	-
+POR	CLUBE DE FUTEBOL UNIAO DE LAMAS	portugal_uniao-de-lamas.png
+POR	CLUBE DESPORTIVO DAS AVES	portugal_cd-aves.png
+POR	CLUBE DESPORTIVO DE BEJA	-
+POR	CLUBE DESPORTIVO MONTIJO	-
+POR	CLUBE SPORT MARITIMO	portugal_maritimo.png
+POR	DESPORTIVO DE BEJA	-
+POR	ESPINHO	portugal_sc-espinho.png
+POR	ESTORIL	portugal_estoril.png
+POR	ESTRELA DA AMADORA	portugal_estrela-da-amadora.png
+POR	ESTRELAS DE VENDAS NOVAS	-
+POR	FARENSE	portugal_farense.png
+POR	FEIRENSE	portugal_feirense.png
+POR	FELGUEIRAS	portugal_felgueiras.png
+POR	FUTEBO CLUBE TIRSENSE	portugal_tirsense.png
+POR	FUTEBOL CLUBE DE ALVERCA	portugal_alverca.png
+POR	FUTEBOL CLUBE DO PORTO	portugal_fc-porto.png
+POR	FUTEBOL CLUBE FELGUEIRAS	portugal_felgueiras.png
+POR	FUTEBOL CLUBE PACOS DE FERREIRA	portugal_pacos-ferreira.png
+POR	FUTEBOL CLUBE PENAFIEL	portugal_penafiel.png
+POR	GIL VICENTE FC	portugal_gil-vicente.png
+POR	GIL VICENTE FUTEBOL CLUBE	portugal_gil-vicente.png
+POR	GRUPO DESPORTIVO DE CHAVES	portugal_chaves.png
+POR	GRUPO DESPORTIVO ESTORIL PRAIA	portugal_estoril.png
+POR	GRUPO DESPORTIVO SAMORA CORREIA	portugal_samora-correia.png
+POR	GUIMARAES	portugal_vitoria-de-guimaraes.png
+POR	LECA FC	portugal_leca.png
+POR	LECA FUTEBOL CLUBE	portugal_leca.png
+POR	LEIRIA	portugal_leiria.png
+POR	MARITIMO	portugal_maritimo.png
+POR	MASSAMA	portugal_real-sc.png
+POR	MONTIJO	-
+POR	MOREIRENSE	portugal_moreirense.png
+POR	MOREIRENSE FUTEBOL CLUBE	portugal_moreirense.png
+POR	PACOS DE FERREIRA	portugal_pacos-ferreira.png
+POR	PAREDES	portugal_paredes.png
+POR	PENAFIEL	portugal_penafiel.png
+POR	PORTO	portugal_fc-porto.png
+POR	QUIMIGAL	-
+POR	REAL MASSAMA	portugal_real-sc.png
+POR	RIO AVE	portugal_rio-ave.png
+POR	RIO AVE FUTEBOL CLUBE	portugal_rio-ave.png
+POR	SALGUEIROS	portugal_salgueiros.png
+POR	SAMORA CORREIA	portugal_samora-correia.png
+POR	SETUBAL	portugal_vitoria-de-setubal.png
+POR	SP COVILHA	portugal_covilha.png
+POR	SPORT CLUBE BEIRA MAR	portugal_beira-mar.png
+POR	SPORT LISBOA E BENFICA	portugal_benfica.png
+POR	SPORTING CLUBE CAMPOMAIORENSE	-
+POR	SPORTING CLUBE DA COVILHA	portugal_covilha.png
+POR	SPORTING CLUBE DE BRAGA	portugal_sc-braga.png
+POR	SPORTING CLUBE DE ESPINHO	portugal_sc-espinho.png
+POR	SPORTING CLUBE DE PORTUGAL	portugal_sporting-cp.png
+POR	SPORTING CLUBE FARENSE	portugal_farense.png
+POR	SPORTING CP	portugal_sporting-cp.png
+POR	TIRSENSE	portugal_tirsense.png
+POR	UNIAO DA MADEIRA	-
+POR	UNIAO DE LAMAS	portugal_uniao-de-lamas.png
+POR	UNIAO DESPORTIVA DE LEIRIA	portugal_leiria.png
+POR	VARZIM	portugal_varzim.png
+POR	VARZIM SPORT CLUB	portugal_varzim.png
+POR	VENDAS NOVAS	-
+POR	VITORIA FUTEBOL CLUBE DE SETUBAL	portugal_vitoria-de-setubal.png
+POR	VITORIA SPORT CLUBE	portugal_vitoria-de-guimaraes.png
+RCH	SPARTA PRAGA	czech-republic_sparta-praha.png
+ROM	STEAUA BUCAREST	romania_fcsb.png
+SIN	TAMPINES	singapore_tampines-rovers.png
+SIN	TAMPINES ROVERS FOOTBALL CLUB	singapore_tampines-rovers.png
+SUE	IFK GOTEMBURGO	sweden_goteborg.png
+SUI	FC ST GALLEN	switzerland_st-gallen.png
+SUI	ST GALLEN	switzerland_st-gallen.png
+TUR	BURSASPOR	turkey_bursaspor.png
+TUR	GALATASARAY	turkey_galatasaray.png
+TUR	GALATASARAY SPOR KULUBU	turkey_galatasaray.png
+UCR	DINAMO KIEV	ukraine_dynamo-kyiv.png
+VTM	HOA BINH	-

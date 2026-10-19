@@ -1,0 +1,7 @@
+# Linha do tempo dos detalhes do jogo (es): substituicoes e penaltis sem gol. Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Pênalti defendido por {0}	Penalti parado por {0}
+Pênalti na trave	Penalti al poste
+Pênalti no travessão	Penalti al larguero
+Pênalti para fora	Penalti fuera
+Pênalti por cima	Penalti por encima del larguero

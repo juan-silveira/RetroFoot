@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "Ceara.eft",
+  "name": "CEARÁ SPORTING CLUB",
+  "shortName": "CEARÁ",
+  "country": "BRA",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Dimas Filgueiras",
+  "players": [
+    { "name": "Jefferson", "position": "G", "country": "BRA" },
+    { "name": "William", "position": "G", "country": "BRA" },
+    { "name": "Augusto", "position": "D", "country": "BRA" },
+    { "name": "Aírton", "position": "D", "country": "BRA" },
+    { "name": "Canjerê", "position": "D", "country": "BRA" },
+    { "name": "Luciano Mineiro", "position": "D", "country": "BRA" },
+    { "name": "Marcelo Letti", "position": "D", "country": "BRA" },
+    { "name": "Bechara", "position": "M", "country": "BRA" },
+    { "name": "Dema", "position": "M", "country": "BRA" },
+    { "name": "Edson Vieira", "position": "M", "country": "BRA" },
+    { "name": "Gilmar Serafim", "position": "M", "country": "BRA" },
+    { "name": "Mario Cesar", "position": "M", "country": "BRA" },
+    { "name": "Ciro", "position": "A", "country": "BRA" },
+    { "name": "Robson", "position": "A", "country": "BRA" },
+    { "name": "Stênio", "position": "A", "country": "BRA" }
+  ]
+}

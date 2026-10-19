@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "GLASGOW.EFT",
+  "name": "GLASGOW RANGERS FOOTBALL CLUB",
+  "shortName": "GLASGOW RANGERS FC",
+  "country": "ESC",
+  "level": 11,
+  "textColor": "#00FFFF",
+  "backgroundColor": "#0000FF",
+  "coach": "Walter Smith",
+  "players": [
+    { "name": "Andy Goram", "position": "G", "country": "ESC" },
+    { "name": "Patrick Bonner", "position": "G", "country": "IRL" },
+    { "name": "Chris Morris", "position": "D", "country": "IRL" },
+    { "name": "Davie McPherson", "position": "D", "country": "ESC" },
+    { "name": "Gary Stevens", "position": "D", "country": "ING" },
+    { "name": "Maurice Malpas", "position": "D", "country": "ESC" },
+    { "name": "Richard Gough", "position": "D", "country": "ESC" },
+    { "name": "Terry Butcher", "position": "D", "country": "ING" },
+    { "name": "Ian Ferguson", "position": "M", "country": "ESC" },
+    { "name": "Jim Bett", "position": "M", "country": "ESC" },
+    { "name": "Paul McStay", "position": "M", "country": "ESC" },
+    { "name": "Roy Aitken", "position": "M", "country": "ESC" },
+    { "name": "Ally McCoist", "position": "A", "country": "ESC" },
+    { "name": "Maurice Johnston", "position": "A", "country": "ESC" }
+  ]
+}

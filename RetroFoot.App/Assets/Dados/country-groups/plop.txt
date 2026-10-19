@@ -1,0 +1,11 @@
+# RetroFoot: Portuguese-speaking countries (PLOP; same rule as the Bosman list)
+# one 3-letter country code per line (countries.tsv)
+POR
+BRA
+ANG
+MOC
+CAV
+STP
+GBI
+GNE
+TIM

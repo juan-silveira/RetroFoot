@@ -1,0 +1,181 @@
+# Editor de Equipas (RetroFoot.App/FerramentaEditorEquipas.cs, EditorEquipasEscudo.cs) (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Procurar equipa…	Buscar equipo…
+Nova	Nuevo
+Apagar	Borrar
+Importar…	Importar…
+Exportar…	Exportar…
+Logos das ligas…	Logos de las ligas…
+(sem nome)	(sin nombre)
+nível {0} · {1} jog.	nivel {0} · {1} jug.
+O jogo não aceita esta equipa assim (abra para ver porquê)	El juego no acepta este equipo así (ábrelo para ver por qué)
+Todos os países	Todos los países
+{0} equipas	{0} equipos
+{0} arquivos com erro	{0} archivos con errores
+Há alterações não gravadas nesta equipa. Descartá-las?	Este equipo tiene cambios sin guardar. ¿Descartarlos?
+Escolha uma equipa na lista ou crie uma nova.	Elige un equipo de la lista o crea uno nuevo.
+As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato clássico .EFT.	Los equipos están en la carpeta de datos (teams/<país>/<equipo>.json). El juego los usa tal cual; "Exportar .EFT" guarda un equipo en el formato clásico .EFT.
+Jogadores ({0})	Jugadores ({0})
+Escudo	Escudo
+nova	nuevo
+Desfazer	Deshacer
+Pronta para o jogo	Listo para jugar
+{0} problemas	{0} problemas
+por gravar	sin guardar
+(não existe em countries.tsv)	(no existe en countries.tsv)
+1 = mais fraca, 20 = mais forte; as maiores começam nas divisões de cima	1 = el más débil, 20 = el más fuerte; los más altos empiezan en las divisiones de arriba
+Letra	Letra
+Fundo	Fondo
+Nome completo	Nombre completo
+Nome abreviado	Nombre corto
+País	País
+Nível	Nivel
+Cores	Colores
+(escolhido ao gravar)	(se elige al guardar)
+Exportar .EFT…	Exportar .EFT…
+Arquivo	Archivo
+Situação para o jogo	Estado para el juego
+Jogadores: {0} (de {1} a {2})	Jugadores: {0} (de {1} a {2})
+Guarda-redes: {0} (mín. 1) · Campo: {1} (mín. {2})	Porteros: {0} (mín. 1) · Campo: {1} (mín. {2})
+Estrangeiros: sem limite (todos na Lei Bosman)	Extranjeros: sin límite (todos en la Ley Bosman)
+Estrangeiros: {0} de {1} (Lei Bosman e PLOP não contam)	Extranjeros: {0} de {1} (Ley Bosman y PLOP no cuentan)
+As 16 cores clássicas:	Los 16 colores clásicos:
+Código:	Código:
+Pos.	Pos.
+Estrangeiro	Extranjero
+{0} jogadores · {1} GR · {2} estrangeiros	{0} jugadores · {1} POR · {2} extranjeros
+Adicionar	Añadir
+Editar	Editar
+Não (Bosman)	No (Bosman)
+Não (PLOP)	No (PLOP)
+Nacional.	Nacional.
+Não conta como estrangeiro: os dois países estão na Lei Bosman.	No cuenta como extranjero: los dos países están en la Ley Bosman.
+Não conta como estrangeiro: os dois países são de língua portuguesa (PLOP).	No cuenta como extranjero: los dos países son de lengua portuguesa (PLOP).
+Estrangeiro: conta no limite de {0} por equipa.	Extranjero: cuenta en el límite de {0} por equipo.
+O jogo tira estes valores do nome (e da posição):	El juego saca estos valores del nombre (y de la posición):
+Escolha o país do jogador.	Elige el país del jugador.
+Novo jogador	Nuevo jugador
+Editar jogador	Editar jugador
+NOVA EQUIPA	NUEVO EQUIPO
+NOVA	NUEVO
+O jogo não aceita a equipa assim:	El juego no acepta el equipo así:
+Já há outra equipa com este nome neste país. Gravar mesmo assim?	Ya hay otro equipo con este nombre en este país. ¿Guardar igualmente?
+Erro ao gravar:	Error al guardar:
+Apagar a equipa {0}? O arquivo vai para a pasta backup.	¿Borrar el equipo {0}? El archivo va a la carpeta backup.
+Erro ao apagar:	Error al borrar:
+O formato .EFT não aceita a equipa assim:	El formato .EFT no acepta el equipo así:
+Exportar .EFT	Exportar .EFT
+Equipa no formato .EFT	Equipo en formato .EFT
+Equipa exportada no formato .EFT:	Equipo exportado en formato .EFT:
+Para a usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.	Para usarlo en el juego clásico, copia el archivo a su carpeta EQUIPAS.
+Só esta equipa: {0}	Solo este equipo: {0}
+As equipas de {0} ({1})	Los equipos de {0} ({1})
+Todas as equipas ({0})	Todos los equipos ({0})
+Equipas de {0}	Equipos de {0}
+Minhas equipas	Mis equipos
+Incluir também os .EFT (formato clássico)	Incluir también los .EFT (formato clásico)
+Incluir os logos das ligas desses países	Incluir los logos de las ligas de esos países
+Um patch (.zip) com as equipas em JSON e os logos delas, para aplicar noutro RetroFoot (ferramenta Patches ou Importar).	Un parche (.zip) con los equipos en JSON y sus logos, para aplicar en otro RetroFoot (herramienta Parches o Importar).
+Nome do patch	Nombre del parche
+Exportar patch	Exportar parche
+Patch do RetroFoot	Parche de RetroFoot
+Patch gravado: {0} equipas, {1} logos.	Parche guardado: {0} equipos, {1} logos.
+Gravar em patches/	Guardar en patches/
+Gravar como…	Guardar como…
+Exportar patch de equipas	Exportar parche de equipos
+Aplica um patch na pasta de dados: as equipas (JSON ou .EFT) e os logos dele. Uma equipa com o mesmo arquivo .EFT é substituída.	Aplica un parche en la carpeta de datos: sus equipos (JSON o .EFT) y logos. Un equipo con el mismo archivo .EFT se sustituye.
+Biblioteca (pasta patches/):	Biblioteca (carpeta patches/):
+(vazia)	(vacía)
+{0} equipas importadas	{0} equipos importados
+{0} logos	{0} logos
+Erros:	Errores:
+Erro ao importar:	Error al importar:
+Aplicar	Aplicar
+Escolher arquivo…	Elegir archivo…
+Importar patch	Importar parche
+Patch (.zip) ou equipa (.EFT, .json)	Parche (.zip) o equipo (.EFT, .json)
+Importar patch de equipas	Importar parche de equipos
+Qualquer imagem PNG, JPG, WEBP, SVG ou BMP. O ideal: quadrada ou quase, fundo transparente, pelo menos 128 px. O RetroFoot corta as sobras, pode tirar um fundo de cor única e centra o escudo num quadrado de 256 px, como os do jogo.	Cualquier imagen PNG, JPG, WEBP, SVG o BMP. Lo ideal: cuadrada o casi, fondo transparente, al menos 128 px. RetroFoot recorta los bordes, puede quitar un fondo de un solo color y centra el escudo en un cuadrado de 256 px, como los del juego.
+Arraste uma imagem para aqui	Arrastra una imagen aquí
+Escudo de {0}	Escudo de {0}
+(vai para a pasta logos/ ao Gravar)	(va a la carpeta logos/ al Guardar)
+Escolher imagem…	Elegir imagen…
+Da pasta de dados…	De la carpeta de datos…
+Uma imagem copiada para a pasta logos/ da pasta de dados	Una imagen copiada en la carpeta logos/ de la carpeta de datos
+Da coleção…	De la colección…
+Automático	Automático
+O logo que o jogo acha sozinho pelo país e nome (ou o escudo nas cores)	El logo que el juego encuentra solo por país y nombre (o el escudo con los colores)
+Sem escudo	Sin escudo
+Cores do escudo	Colores del escudo
+Imagem nova, adaptada	Imagen nueva, adaptada
+Da coleção do jogo: {0}	De la colección del juego: {0}
+Sem escudo: o jogo desenha o escudo nas cores	Sin escudo: el juego dibuja el escudo con los colores
+Automático: da coleção do jogo	Automático: de la colección del juego
+Automático: sem logo (o jogo desenha o escudo nas cores)	Automático: sin logo (el juego dibuja el escudo con los colores)
+Sem escudo (escolhido)	Sin escudo (elegido)
+Escolhido: logos/{0}	Elegido: logos/{0}
+Da pasta logos/: {0}	De la carpeta logos/: {0}
+Imagens	Imágenes
+Copie a imagem para a pasta logos/ da pasta de dados e escolha-a aqui:	Copia la imagen en la carpeta logos/ de la carpeta de datos y elígela aquí:
+Atualizar	Actualizar
+A pasta logos/ não tem imagens (PNG, JPG, WEBP, SVG ou BMP).	La carpeta logos/ no tiene imágenes (PNG, JPG, WEBP, SVG o BMP).
+Imagens da pasta de dados	Imágenes de la carpeta de datos
+Original	Original
+No padrão do jogo	En el estándar del juego
+{0}x{0} px, PNG transparente	{0}x{0} px, PNG transparente
+Esta imagem não serve:	Esta imagen no sirve:
+Imagem adaptada	Imagen adaptada
+Tirar o fundo de cor única (#{0})	Quitar el fondo de un solo color (#{0})
+O fundo já é transparente.	El fondo ya es transparente.
+Usar este escudo	Usar este escudo
+Outra imagem…	Otra imagen…
+Visual Moderno	Visual Moderno
+Outra equipa	Otro equipo
+Visual Clássico	Visual Clásico
+O visual Clássico não mostra logos: valem as cores da equipa.	El visual Clásico no muestra logos: valen los colores del equipo.
+Visual Moderno (a Classificação e a tela da equipa)	Visual Moderno (la Clasificación y la pantalla del equipo)
+O visual Clássico não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	El visual Clásico no muestra logos. El logo de la liga aparece cuando todos los equipos del juego son del mismo país.
+Procurar na coleção…	Buscar en la colección…
+Só de {0}	Solo de {0}
+{0} logos (mostrando {1}; procure pelo nome)	{0} logos (se muestran {1}; busca por nombre)
+Coleção de escudos do jogo	Colección de escudos del juego
+Escolha as cores da equipa (letra sobre fundo), tiradas das 16 cores do jogo que mais aparecem no escudo:	Elige los colores del equipo (letra sobre fondo), sacados de los 16 colores del juego que más aparecen en el escudo:
+Os logos das divisões e da taça aparecem no visual Moderno quando todas as equipas do jogo são deste país. Mudanças gravadas na hora.	Los logos de las divisiones y de la copa aparecen en el visual Moderno cuando todos los equipos del juego son de este país. Los cambios se guardan al momento.
+Sem logo (escolhido)	Sin logo (elegido)
+Automático: sem logo	Automático: sin logo
+Imagem…	Imagen…
+Coleção…	Colección…
+Sem logo	Sin logo
+Logos das ligas	Logos de las ligas
+O arquivo não existe.	El archivo no existe.
+Não é uma imagem que o RetroFoot consiga abrir. Use PNG, JPG, WEBP, SVG ou BMP.	No es una imagen que RetroFoot pueda abrir. Usa PNG, JPG, WEBP, SVG o BMP.
+A imagem é grande demais ({0}x{1} px).	La imagen es demasiado grande ({0}x{1} px).
+Não consegui abrir a imagem: {0}	No se pudo abrir la imagen: {0}
+O SVG não tem nada para desenhar.	El SVG no tiene nada que dibujar.
+Não está definido o nome da equipa	No está definido el nombre del equipo
+O nome é comprido demais (completo até {0} letras, abreviado até {1})	El nombre es demasiado largo (completo hasta {0} letras, corto hasta {1})
+Não está definido o país da equipa	No está definido el país del equipo
+Não está definido o nível da equipa	No está definido el nivel del equipo
+Não tem jogadores suficientes (mínimo {0})	No tiene suficientes jugadores (mínimo {0})
+Tem demasiados jogadores (máximo {0})	Tiene demasiados jugadores (máximo {0})
+Não tem guarda-redes	No tiene portero
+Não tem jogadores de campo suficientes (mínimo {0})	No tiene suficientes jugadores de campo (mínimo {0})
+Tem demasiados jogadores estrangeiros (máximo {0})	Tiene demasiados jugadores extranjeros (máximo {0})
+Não está definido o treinador	No está definido el entrenador
+Nomes de jogadores inválidos: {0}	Nombres de jugadores no válidos: {0}
+Escreva o nome.	Escribe el nombre.
+O nome tem mais de {0} letras.	El nombre tiene más de {0} letras.
+Use só letras (com ou sem acento), espaço, ponto, hífen ou apóstrofo.	Usa solo letras (con o sin tilde), espacio, punto, guion o apóstrofo.
+A imagem está vazia.	La imagen está vacía.
+A imagem não tem nada além do fundo.	La imagen no tiene nada más que el fondo.
+A imagem é pequena demais ({0}x{1} px). Use uma com pelo menos {2} px.	La imagen es demasiado pequeña ({0}x{1} px). Usa una de al menos {2} px.
+A imagem é comprida demais ({0}x{1} px): um escudo precisa ser quadrado ou quase.	La imagen es demasiado alargada ({0}x{1} px): un escudo debe ser cuadrado o casi.
+A imagem é pequena ({0}x{1} px): vai ficar desfocada. O ideal é pelo menos {2} px.	La imagen es pequeña ({0}x{1} px): se verá borrosa. Lo ideal es al menos {2} px.
+A imagem não é quadrada: o escudo vai ficar estreito.	La imagen no es cuadrada: el escudo quedará estrecho.
+O fundo ficou: o escudo vai aparecer num quadrado de cor.	El fondo se mantuvo: el escudo aparecerá en un cuadrado de color.
+A imagem não tem fundo transparente: o escudo vai aparecer num quadrado. Prefira um PNG ou SVG com fundo transparente.	La imagen no tiene fondo transparente: el escudo aparecerá en un cuadrado. Mejor un PNG o SVG con fondo transparente.
+1ª Divisão	Primera División
+2ª Divisão	Segunda División
+3ª Divisão	Tercera División
+4ª Divisão	Cuarta División
+Crie e edite equipas, jogadores, cores e escudos	Crea y edita equipos, jugadores, colores y escudos

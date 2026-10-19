@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "JUVEN_BR.EFT",
+  "name": "JUVENTUS-BR",
+  "shortName": "JUVENTUS-BR",
+  "country": "BRA",
+  "level": 2,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#800000",
+  "coach": "Écio Pasca",
+  "players": [
+    { "name": "Carlos", "position": "G", "country": "BRA" },
+    { "name": "Williams", "position": "G", "country": "BRA" },
+    { "name": "Dias", "position": "D", "country": "BRA" },
+    { "name": "Esquerdinha", "position": "D", "country": "BRA" },
+    { "name": "Japinha", "position": "D", "country": "BRA" },
+    { "name": "Marcello", "position": "D", "country": "BRA" },
+    { "name": "Sérgio", "position": "D", "country": "BRA" },
+    { "name": "Baiano", "position": "M", "country": "BRA" },
+    { "name": "Luizão", "position": "M", "country": "BRA" },
+    { "name": "Márcio Griggio", "position": "M", "country": "BRA" },
+    { "name": "Róbson Ponte", "position": "M", "country": "BRA" },
+    { "name": "Joel", "position": "A", "country": "BRA" },
+    { "name": "Mauro", "position": "A", "country": "BRA" },
+    { "name": "Róbson Paulo", "position": "A", "country": "BRA" }
+  ]
+}

@@ -1,0 +1,31 @@
+# Os termos gerais e as posicoes (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+# --- As letras das posicoes (Idioma.Posicao; o original: G D M A) ---
+posicao:A	F
+# --- Posicoes ---
+Guarda-redes	Goalkeeper
+Defesa	Defender
+Médio	Midfielder
+Avançado	Forward
+# --- Termos gerais (docs/glossario-idiomas.md) ---
+Equipa	Team
+Equipas	Teams
+Jornada	Round
+Época	Season
+Golos	Goals
+Taça	Cup
+Treinador	Manager
+Plantel	Squad
+Leilão	Auction
+Classificação	Standings
+Empréstimo	Loan
+Estádio	Stadium
+Bancadas	Stands
+Distrital	Regional League
+Nota	Rating
+Risco de lesão	Injury risk
+Sim	Yes
+Não	No
+Cancelar	Cancel
+Fechar	Close
+Jogar	Play

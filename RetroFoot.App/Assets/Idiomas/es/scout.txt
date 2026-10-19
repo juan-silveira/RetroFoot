@@ -1,0 +1,63 @@
+# Ferramenta Scout do hub (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Estrang.	Extranj.
+Pos	Pos
+Estrela	Estrella
+Impacto	Impacto
+Comport.	Comport.
+Div.	Div.
+Divisão	División
+País	País
+Amar.	Amar.
+Amarelos na carreira	Amarillas en su carrera
+Expuls.	Expuls.
+Expulsões	Expulsiones
+Sit.	Sit.
+Situação	Situación
+Parte do nome	Parte del nombre
+Só com estrela (✱)	Solo con estrella (✱)
+Só estrangeiros (contam no limite)	Solo extranjeros (cuentan en el límite)
+Esconder suspensos e lesionados	Ocultar sancionados y lesionados
+Esconder as equipas humanas	Ocultar los equipos humanos
+até {0}	hasta {0}
+Só Fair Play	Solo Fair Play
+{0}ª	{0}ª
+Dist.	Reg.
+Jogo gravado:	Partida guardada:
+Recarregar	Recargar
+Filtros	Filtros
+O que significa cada coluna	Qué significa cada columna
+País do jogador	País del jugador
+Valor até	Valor hasta
+Limpar filtros	Borrar filtros
+Equipa humana	Equipo humano
+Nenhum jogo gravado em {0}.	No hay partidas guardadas en {0}.
+Não consegui ler o jogo gravado: {0}	No pude leer la partida guardada: {0}
+Todos ({0})	Todos ({0})
+Todas	Todas
+{0} de {1} jogadores · clique nos títulos para ordenar (Shift+clique junta colunas) · duplo clique abre o jogador	{0} de {1} jugadores · haz clic en los títulos para ordenar (Mayús+clic suma columnas) · doble clic abre el jugador
+pontos por época	puntos por temporada
+suspenso por {0} jogos	sancionado {0} partidos
+lesionado por {0} jogos	lesionado {0} partidos
+conta como estrangeiro	cuenta como extranjero
+disponível	disponible
+humano	humano
+{0} jogadores	{0} jugadores
+duplo clique abre	doble clic abre
+Score (0 a 1000)	Score (0 a 1000)
+Nota × 100, descontando os jogos que ele deve perder na época por lesão e por suspensão (cerca de 0,13 jogo por ponto de Lesão e 0,21 por ponto de Comportamento, em 14 jogos). Não depende da força.	Nota × 100, descontando los partidos que debería perderse en la temporada por lesión y sanción (unos 0,13 partidos por punto de Lesión y 0,21 por punto de Comportamiento, en 14 partidos). No depende de la fuerza.
+Pontos por época (14 jogos) que a equipa ganha ou perde com ele, comparado a um jogador da mesma posição sem estrela, Lesão 0 e Fair Play (medido em simulações). O jogo sorteia por minuto se a equipa terá uma lesão ou expulsão; Lesão e Comportamento só escolhem quem sofre. Por isso um avançado violento ou um defesa frágil podem até ajudar: atraem os problemas que iriam para o guarda-redes ou para as estrelas.	Puntos por temporada (14 partidos) que el equipo gana o pierde con él, frente a un jugador de la misma posición sin estrella, Lesión 0 y Fair Play (medido en simulaciones). El juego sortea cada minuto si el equipo tendrá una lesión o una expulsión; Lesión y Comportamiento solo eligen a quién le toca. Por eso un delantero violento o un defensa frágil pueden incluso ayudar: atraen los problemas que irían al portero o a las estrellas.
+✱ Estrela	✱ Estrella
+Nota 8 ou mais num médio ou avançado. Soma 2 à força do sector dele enquanto está em campo.	Nota 8 o más en un centrocampista o delantero. Suma 2 a la fuerza de su línea mientras está en el campo.
+Nota (1 a 10)	Nota (1 a 10)
+Decide quem marca os golos da equipa (avançado pesa 9, médio 4, defesa 1; o guarda-redes nunca marca) e quem bate os penáltis. Não muda quantos golos a equipa faz: isso vem da força dos sectores.	Decide quién marca los goles del equipo (delantero pesa 9, centrocampista 4, defensa 1; el portero nunca marca) y quién tira los penaltis. No cambia cuántos goles hace el equipo: eso sale de la fuerza de cada línea.
+Lesão (0 a 10)	Lesión (0 a 10)
+Chance de ser ele o lesionado quando a equipa sofre uma lesão. 0 nunca se lesiona. Cada lesão: 1 a 20 jogos fora e 10 de força a menos.	Probabilidad de que sea él el lesionado cuando el equipo sufre una lesión. 0 nunca se lesiona. Cada lesión: 1 a 20 partidos fuera y 10 de fuerza menos.
+Chance de ser ele o expulso. Fair Play nunca é expulso. Suspensão de 1 a 4 jogos; guarda-redes expulso dá penálti certo, defesa dá em 1 de 3.	Probabilidad de que sea él el expulsado. Fair Play nunca es expulsado. Sanción de 1 a 4 partidos; un portero expulsado siempre da penalti, un defensa en 1 de cada 3.
+O valor do jogador para o jogo (força, nota, lesão, comportamento, moeda e inflação). O preço base dos leilões e os pedidos das equipas partem dele.	El valor del jugador para el juego (fuerza, nota, lesión, comportamiento, moneda e inflación). El precio base de las subastas y lo que piden los equipos parten de él.
+Jogos, Golos, Lesões, Amar., Expuls.	Partidos, Goles, Lesiones, Amar., Expuls.
+O historial do jogador no save (golos desta época; Amar. = cartões amarelos na carreira, só com as regras do RetroFoot).	El historial del jugador en la partida guardada (goles de esta temporada; Amar. = tarjetas amarillas en su carrera, solo con las reglas de RetroFoot).
+S = suspenso por N jogos, A = N amarelos acumulados (o 3º suspende por 1 jogo), L = lesionado por N jogos; Estrang. = conta como estrangeiro (Bosman e PLOP não contam).	S = sancionado N partidos, A = N amarillas acumuladas (la 3ª sanciona 1 partido), L = lesionado N partidos; Extranj. = cuenta como extranjero (Bosman y PLOP no cuentan).
+Idade	Edad
+O jogo gravado não guarda a idade dos jogadores, por isso o Scout não tem filtro de idade.	La partida guardada no tiene la edad de los jugadores, por eso el Scout no tiene filtro de edad.
+1 amarelo acumulado	1 amarilla acumulada

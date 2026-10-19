@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PONTE_PR.EFT",
+  "name": "PONTE PRETA",
+  "shortName": "PONTE PRETA",
+  "country": "BRA",
+  "level": 7,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Pardal",
+  "players": [
+    { "name": "Ivair", "position": "G", "country": "BRA" },
+    { "name": "Ricardo Gomes", "position": "G", "country": "BRA" },
+    { "name": "Jorge Luís", "position": "D", "country": "BRA" },
+    { "name": "Marcelo Sousa", "position": "D", "country": "BRA" },
+    { "name": "Marcus Vinicius", "position": "D", "country": "BRA" },
+    { "name": "Serginho", "position": "D", "country": "BRA" },
+    { "name": "Toninho Carlos", "position": "D", "country": "BRA" },
+    { "name": "Ataliba", "position": "M", "country": "BRA" },
+    { "name": "Cezar", "position": "M", "country": "BRA" },
+    { "name": "Fabinho", "position": "M", "country": "BRA" },
+    { "name": "Junior", "position": "M", "country": "BRA" },
+    { "name": "Renato Carioca", "position": "M", "country": "BRA" },
+    { "name": "Almir", "position": "A", "country": "BRA" },
+    { "name": "Grizzo", "position": "A", "country": "BRA" },
+    { "name": "Marcelo Borges", "position": "A", "country": "BRA" },
+    { "name": "Vander", "position": "A", "country": "BRA" }
+  ]
+}

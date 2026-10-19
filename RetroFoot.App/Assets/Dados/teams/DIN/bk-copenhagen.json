@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BK_COPEN.EFT",
+  "name": "BK COPENHAGEN",
+  "shortName": "COPENHAGEN",
+  "country": "DIN",
+  "level": 8,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Sepp Piontek",
+  "players": [
+    { "name": "Kjaer", "position": "G", "country": "DIN" },
+    { "name": "Rasmussen", "position": "G", "country": "DIN" },
+    { "name": "Andersen", "position": "D", "country": "DIN" },
+    { "name": "Bartram", "position": "D", "country": "DIN" },
+    { "name": "Busk", "position": "D", "country": "DIN" },
+    { "name": "M. Olsen", "position": "D", "country": "DIN" },
+    { "name": "Nielsen", "position": "D", "country": "DIN" },
+    { "name": "Arnesen", "position": "M", "country": "DIN" },
+    { "name": "Bertelsen", "position": "M", "country": "DIN" },
+    { "name": "Jan Molby", "position": "M", "country": "DIN" },
+    { "name": "Lauridsen", "position": "M", "country": "DIN" },
+    { "name": "Pierre Larsen", "position": "M", "country": "DIN" },
+    { "name": "Simonssen", "position": "M", "country": "DIN" },
+    { "name": "Elkjaer Larsen", "position": "A", "country": "DIN" },
+    { "name": "Jesper Olsen", "position": "A", "country": "DIN" }
+  ]
+}

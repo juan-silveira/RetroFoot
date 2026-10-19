@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "GOIAS.EFT",
+  "name": "GOIAS EC",
+  "shortName": "GOIAS",
+  "country": "BRA",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#008000",
+  "coach": "Amado Bucar",
+  "players": [
+    { "name": "Cleber", "position": "G", "country": "BRA" },
+    { "name": "Jeferson", "position": "G", "country": "BRA" },
+    { "name": "Altair", "position": "D", "country": "BRA" },
+    { "name": "Marcelo", "position": "D", "country": "BRA" },
+    { "name": "Marquinhos", "position": "D", "country": "BRA" },
+    { "name": "Ronildo", "position": "D", "country": "BRA" },
+    { "name": "Silvio Criciúma", "position": "D", "country": "BRA" },
+    { "name": "Betinho", "position": "M", "country": "BRA" },
+    { "name": "Dill", "position": "M", "country": "BRA" },
+    { "name": "Guara", "position": "M", "country": "BRA" },
+    { "name": "Júlio", "position": "M", "country": "BRA" },
+    { "name": "Reidner", "position": "M", "country": "BRA" },
+    { "name": "Alex", "position": "A", "country": "BRA" },
+    { "name": "Evandro", "position": "A", "country": "BRA" },
+    { "name": "Fernando", "position": "A", "country": "BRA" },
+    { "name": "Leonardo", "position": "A", "country": "BRA" }
+  ]
+}

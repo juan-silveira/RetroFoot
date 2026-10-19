@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CASTVIDE.EFT",
+  "name": "CASTELO DE VIDE",
+  "shortName": "CASTELO DE VIDE",
+  "country": "POR",
+  "level": 1,
+  "textColor": "#000000",
+  "backgroundColor": "#00FF00",
+  "coach": "António Pita",
+  "players": [
+    { "name": "Nuno Macedo", "position": "G", "country": "POR" },
+    { "name": "Paulo Ferreira", "position": "G", "country": "POR" },
+    { "name": "Anselde", "position": "D", "country": "POR" },
+    { "name": "Elói", "position": "D", "country": "POR" },
+    { "name": "Ivo", "position": "D", "country": "POR" },
+    { "name": "Lousada", "position": "D", "country": "POR" },
+    { "name": "Mário", "position": "D", "country": "POR" },
+    { "name": "Ricardo", "position": "D", "country": "POR" },
+    { "name": "Nabais", "position": "M", "country": "POR" },
+    { "name": "Oliveira", "position": "M", "country": "POR" },
+    { "name": "Paço", "position": "M", "country": "POR" },
+    { "name": "Rui", "position": "M", "country": "POR" },
+    { "name": "Álvaro", "position": "M", "country": "POR" },
+    { "name": "António Carlos", "position": "A", "country": "POR" },
+    { "name": "Luís", "position": "A", "country": "POR" },
+    { "name": "Vilela", "position": "A", "country": "POR" }
+  ]
+}

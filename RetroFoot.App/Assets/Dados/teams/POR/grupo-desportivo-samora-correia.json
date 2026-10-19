@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SAMORA.EFT",
+  "name": "GRUPO DESPORTIVO SAMORA CORREIA",
+  "shortName": "SAMORA CORREIA",
+  "country": "POR",
+  "level": 1,
+  "textColor": "#000080",
+  "backgroundColor": "#C0C0C0",
+  "coach": "João Luís",
+  "players": [
+    { "name": "Kikas", "position": "G", "country": "POR" },
+    { "name": "Zé Manel", "position": "G", "country": "POR" },
+    { "name": "Bicha", "position": "D", "country": "POR" },
+    { "name": "Hélder", "position": "D", "country": "POR" },
+    { "name": "Luís Santos", "position": "D", "country": "POR" },
+    { "name": "Marco Dias", "position": "D", "country": "POR" },
+    { "name": "Marco Teixeira", "position": "D", "country": "POR" },
+    { "name": "Padinha", "position": "D", "country": "POR" },
+    { "name": "Santos", "position": "D", "country": "POR" },
+    { "name": "Torrão", "position": "D", "country": "POR" },
+    { "name": "Adelino", "position": "M", "country": "POR" },
+    { "name": "José Duarte", "position": "M", "country": "POR" },
+    { "name": "Marinho", "position": "M", "country": "POR" },
+    { "name": "Santana", "position": "M", "country": "POR" },
+    { "name": "Varela", "position": "M", "country": "POR" },
+    { "name": "Allé", "position": "A", "country": "MOC" },
+    { "name": "Correia", "position": "A", "country": "POR" },
+    { "name": "Joy", "position": "A", "country": "MOC" },
+    { "name": "Vitor Pereira", "position": "A", "country": "POR" }
+  ]
+}

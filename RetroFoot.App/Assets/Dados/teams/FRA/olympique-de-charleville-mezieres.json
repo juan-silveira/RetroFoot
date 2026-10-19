@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CHARLEVI.EFT",
+  "name": "OLYMPIQUE DE CHARLEVILLE MÉZIÈRES",
+  "shortName": "CHARLEVILLE",
+  "country": "FRA",
+  "level": 9,
+  "textColor": "#000000",
+  "backgroundColor": "#C0C0C0",
+  "coach": "Lucien Pinel",
+  "players": [
+    { "name": "Fabrice Grange", "position": "G", "country": "FRA" },
+    { "name": "Patrick Regnault", "position": "G", "country": "FRA" },
+    { "name": "Antoine Pfrunner", "position": "D", "country": "FRA" },
+    { "name": "Dominique Ottato", "position": "D", "country": "FRA" },
+    { "name": "Ludovic Clément", "position": "D", "country": "FRA" },
+    { "name": "Olivier Debert", "position": "D", "country": "FRA" },
+    { "name": "Regis Dziecoil", "position": "D", "country": "FRA" },
+    { "name": "Cyril Revillet", "position": "M", "country": "FRA" },
+    { "name": "Didier Martel", "position": "M", "country": "FRA" },
+    { "name": "Hermann Helion", "position": "M", "country": "FRA" },
+    { "name": "Mickael Maurice", "position": "M", "country": "FRA" },
+    { "name": "Miguel Andry", "position": "M", "country": "FRA" },
+    { "name": "Regis Szulc", "position": "M", "country": "FRA" },
+    { "name": "Stephane Grosselin", "position": "M", "country": "FRA" },
+    { "name": "Frederic Chevalme", "position": "A", "country": "FRA" },
+    { "name": "Pierre Gabzydl", "position": "A", "country": "FRA" },
+    { "name": "Samuel Wiart", "position": "A", "country": "FRA" },
+    { "name": "William Dymant", "position": "A", "country": "FRA" }
+  ]
+}

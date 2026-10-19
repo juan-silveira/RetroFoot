@@ -1,0 +1,221 @@
+# RetroFoot: countries. UTF-8, one per line, columns separated by TAB.
+# code = 3-letter code used by teams and players ("country" in teams/*.json and referees.tsv)
+# name = the name shown in the game (up to 20 letters are used)
+code	name
+AFG	Afeganistão
+AFS	África do Sul
+AGI	Anguilla
+AGL	Argélia
+ALA	Alândia
+ALB	Albânia
+ALE	Alemanha
+AND	Andorra
+ANG	Angola
+ANT	Antigua
+ARG	Argentina
+ARM	Arménia
+ARU	Aruba
+ASA	Arábia Saudita
+ATH	Antilhas Holandesas
+AUS	Austrália
+AUT	Áustria
+AZB	Azerbeijão
+BAH	Bahamas
+BAR	Bahrain
+BBD	Barbados
+BEL	Bélgica
+BER	Bermuda
+BGD	Bangladesh
+BIR	Birmânia
+BKF	Burkina-Fasso
+BLA	Belau
+BLR	Bielorússia
+BLZ	Belize
+BNI	Benin
+BOL	Bolívia
+BOS	Bósnia
+BRA	Brasil
+BRU	Brunei
+BTW	Botswana
+BUL	Bulgária
+BUR	Burundi
+BUT	Butão
+CAM	Camarões
+CAN	Canadá
+CAV	Cabo Verde
+CBD	Cambodja
+CHD	Chade
+CHL	Chile
+CHN	China
+CHP	Chipre
+CMF	Costa do Marfim
+CMR	Comoros
+CNG	Congo
+COK	Ilhas Cook
+COL	Colômbia
+CQT	Casaquistão
+CRC	Costa Rica
+CRN	Coreia do Norte
+CRO	Croácia
+CRS	Coreia do Sul
+CUB	Cuba
+CYM	Ilhas Cayman
+DIN	Dinamarca
+DJB	Djibuti
+DOM	Dominica
+EAU	Emiratos Árabes
+EGT	Egipto
+EQU	Equador
+ESC	Escócia
+ESP	Espanha
+EST	Estónia
+ETI	Etiópia
+EUA	Estados Unidos
+EVN	Eslovénia
+EVQ	Eslováquia
+FAR	Ilhas Faroé
+FIJ	Ilhas Fiji
+FIL	Filipinas
+FIN	Finlândia
+FLK	Ilhas Falkland
+FRA	França
+GAB	Gabão
+GBI	Guiné-Bissau
+GEO	Geórgia
+GMB	Gâmbia
+GNA	Gana
+GNE	Guiné
+GNQ	Guiné Equatorial
+GRE	Grécia
+GRN	Grenada
+GRO	Groenlândia
+GUA	Guatemala
+GUE	Guernsey
+GUI	Guiana
+GUM	Guam
+HOL	Holanda
+HON	Honduras
+HTI	Haiti
+HUN	Hungria
+IEM	Iémen
+ILN	Irlanda do Norte
+IND	Índia
+ING	Inglaterra
+IRL	Irlanda
+IRQ	Iraque
+ISL	Islândia
+ISR	Israel
+ITA	Itália
+JAM	Jamaica
+JAP	Japão
+JER	Jersey
+JOR	Jordânia
+JUG	Jugoslávia
+KIR	Kiribati
+KUW	Kuwait
+LAO	Laos
+LBA	Líbia
+LBE	Libéria
+LES	Lesoto
+LET	Letónia
+LIB	Líbano
+LIT	Lituânia
+LTS	Lichtenstein
+LUX	Luxemburgo
+MAC	Macedónia
+MAD	Madagáscar
+MAL	Malásia
+MAN	Ilha de Man
+MAR	Marrocos
+MEX	México
+MGL	Mongólia
+MIC	Ilhas Mícrones
+MLD	Maldivas
+MLI	Mali
+MLT	Malta
+MLW	Malawi
+MNG	Montenegro
+MOC	Moçambique
+MOL	Moldávia
+MON	Mónaco
+MRC	Ilhas Maurícias
+MRN	Ilhas Marianas
+MRS	Ilhas Marshall
+MRT	Mauritânia
+MTN	Martinica
+NAU	Nauru
+NEP	Nepal
+NGE	Níger
+NIC	Nicarágua
+NIG	Nigéria
+NMI	Namíbia
+NOR	Noruega
+NZE	Nova Zelândia
+OMA	Oman
+PAN	Panamá
+PAQ	Paquistão
+PAR	Paraguai
+PER	Perú
+PLN	Polinésia
+PNG	Papua Nova Guiné
+POL	Polónia
+POR	Portugal
+PRC	Porto Rico
+QAT	Qatar
+QUE	Quénia
+RCA	Rep. Centro-Africana
+RCH	República Checa
+RDO	República Dominicana
+ROM	Roménia
+RUA	Ruanda
+RUS	Rússia
+SAL	El Salvador
+SAM	Samoa
+SEN	Senegal
+SER	Sérvia
+SEY	Seycheles
+SHE	Santa Helena
+SIN	Singapura
+SIR	Síria
+SKN	St Kittis e Nevis
+SLE	Serra Leoa
+SLU	Santa Lúcia
+SMA	São Marino
+SMO	Samoa Ocidental
+SOL	Ilhas Solomão
+SOM	Somália
+SPR	St Pierre e Reunião
+SRI	Sri Lanka
+STP	São Tomé e Príncipe
+SUA	Suazilândia
+SUD	Sudão
+SUE	Suécia
+SUI	Suíça
+SUR	Suriname
+SVG	S Vicente e Grinalda
+TAI	Tailândia
+TAN	Tanzânia
+TIM	Timor
+TJQ	Tadiquistão
+TKM	Turkmenistão
+TND	Trinidad
+TNG	Tonga
+TOG	Togo
+TUN	Tunísia
+TUR	Turquia
+TVL	Tuvalu
+TWN	Taiwan
+UCR	Ucrânia
+UGA	Uganda
+URU	Uruguai
+UZB	Uzbequistão
+VGK	Ilhas Virgens (UK)
+VGS	Ilhas Virgens (USA)
+VNT	Vanuatu
+VNZ	Venezuela
+VTC	Vaticano
+VTM	Vietname
+WAL	País de Gales
+ZAI	Zaire
+ZAM	Zâmbia
+ZBW	Zimbabwe

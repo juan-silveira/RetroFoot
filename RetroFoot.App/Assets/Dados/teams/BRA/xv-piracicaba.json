@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PICARICA.EFT",
+  "name": "XV PIRACICABA",
+  "shortName": "PIRACICABA",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Tele",
+  "players": [
+    { "name": "Birobiro", "position": "G", "country": "BRA" },
+    { "name": "Maizena", "position": "G", "country": "BRA" },
+    { "name": "André", "position": "D", "country": "BRA" },
+    { "name": "Cléber Lima", "position": "D", "country": "BRA" },
+    { "name": "Ferreira", "position": "D", "country": "BRA" },
+    { "name": "Paulo César", "position": "D", "country": "BRA" },
+    { "name": "Tarciso", "position": "D", "country": "BRA" },
+    { "name": "Adriano", "position": "M", "country": "BRA" },
+    { "name": "Cartaxo", "position": "M", "country": "BRA" },
+    { "name": "Delgado", "position": "M", "country": "BRA" },
+    { "name": "Edin", "position": "M", "country": "BRA" },
+    { "name": "Zé Nando", "position": "M", "country": "BRA" },
+    { "name": "Amarildo", "position": "A", "country": "BRA" },
+    { "name": "José Manuel", "position": "A", "country": "BRA" },
+    { "name": "Lopes", "position": "A", "country": "BRA" },
+    { "name": "Popov Stevan", "position": "A", "country": "BRA" }
+  ]
+}

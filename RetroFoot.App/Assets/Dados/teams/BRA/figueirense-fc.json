@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FIGUEIRA.EFT",
+  "name": "FIGUEIRENSE F.C.",
+  "shortName": "FIGUEIRENSE",
+  "country": "BRA",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Lauro Búrigo ",
+  "players": [
+    { "name": "Carlos Alberto", "position": "G", "country": "BRA" },
+    { "name": "Gilberto", "position": "G", "country": "BRA" },
+    { "name": "Dionisio", "position": "D", "country": "BRA" },
+    { "name": "Leonardo", "position": "D", "country": "BRA" },
+    { "name": "Luciano", "position": "D", "country": "BRA" },
+    { "name": "Nass", "position": "D", "country": "BRA" },
+    { "name": "Nilson", "position": "D", "country": "BRA" },
+    { "name": "Nilson Costa", "position": "D", "country": "BRA" },
+    { "name": "Marquinhos", "position": "M", "country": "BRA" },
+    { "name": "Petry", "position": "M", "country": "BRA" },
+    { "name": "Sandro Ventura", "position": "M", "country": "BRA" },
+    { "name": "Vinicius", "position": "M", "country": "BRA" },
+    { "name": "Marcelinho", "position": "A", "country": "BRA" },
+    { "name": "Nando", "position": "A", "country": "BRA" },
+    { "name": "Willian", "position": "A", "country": "BRA" }
+  ]
+}

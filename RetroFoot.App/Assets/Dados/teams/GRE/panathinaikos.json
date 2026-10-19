@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PANATHIN.EFT",
+  "name": "PANATHINAIKOS",
+  "shortName": "PANATHINAIKOS",
+  "country": "GRE",
+  "level": 11,
+  "textColor": "#00FFFF",
+  "backgroundColor": "#000080",
+  "coach": "Alketas Panagoulias",
+  "players": [
+    { "name": "Atmatzidis", "position": "G", "country": "GRE" },
+    { "name": "Karkamanis", "position": "G", "country": "GRE" },
+    { "name": "Minou", "position": "G", "country": "GRE" },
+    { "name": "Apostolakis", "position": "D", "country": "GRE" },
+    { "name": "Kalitzakis", "position": "D", "country": "GRE" },
+    { "name": "Karataidis", "position": "D", "country": "GRE" },
+    { "name": "Kolisidakis", "position": "D", "country": "GRE" },
+    { "name": "Manolas", "position": "D", "country": "GRE" },
+    { "name": "Hantzidis", "position": "M", "country": "GRE" },
+    { "name": "Marangos", "position": "M", "country": "GRE" },
+    { "name": "Nioplias", "position": "M", "country": "GRE" },
+    { "name": "Saravakos", "position": "M", "country": "GRE" },
+    { "name": "Tsiantakis", "position": "M", "country": "GRE" },
+    { "name": "Alexoudis", "position": "A", "country": "GRE" },
+    { "name": "Dimitriadis", "position": "A", "country": "GRE" },
+    { "name": "Kofidis", "position": "A", "country": "GRE" },
+    { "name": "Machlas", "position": "A", "country": "GRE" }
+  ]
+}

@@ -1,0 +1,63 @@
+# Telas de inicio, opcoes, acerca/registo, treinadores, dialogos (pt-PT): so as chaves
+# que ficaram em pt-BR no codigo voltam ao original. Formato: RetroFoot.App/Idioma.cs.
+Todas as rodadas	Todas as jornadas
+De 3 em 3 rodadas	De 3 em 3 jornadas
+No início da temporada	No início da época
+Mostrar demissões de treinadores	Mostrar chicotadas psicológicas
+Ver sorteio da copa	Ver sorteio da taça
+Salvar o jogo	Gravar o jogo
+Substituições no intervalo	Substituições ao intervalo
+Ver as disputas de pênaltis	Ver os desempates por penaltis
+Nível de inflação	Nível de inflacção
+Times com empréstimos...	Equipas com empréstimos...
+Times endividados...	Equipas endividadas...
+Sobre	Acerca
+Registrar	Registar
+Quando registrar o jogo, você poderá	Quando registar o jogo, poderá
+1 extra ativo	1 extra activo
+{0} extras ativos	{0} extras activos
+Nenhum extra ativo: a cópia não está registrada.	Nenhum extra activo: a cópia não está registada.
+Os outros não veem as minhas ofertas nos leilões.	Os outros não vêem as minhas ofertas nos leilões.
+Elenco...	Plantel...
+Nome do arquivo (8 letras):	Nome do ficheiro (8 letras):
+Jogos salvos:	Jogos gravados:
+Nome do arquivo inválido	Nome do ficheiro inválido
+Não achei a pasta do jogo original (COUNTRY.TXE, EQUIPAS...). Use a variável RETROFOOT_JOGO.	Não encontrei a pasta do jogo original (COUNTRY.TXE, EQUIPAS...). Use a variável RETROFOOT_JOGO.
+Seleção de Países	Selecção de Países
+Times selecionados	Equipas seleccionadas
+Times existentes	Equipas existentes
+Países selecionados	Países seleccionados
+Selecione os países com que quer jogar, de modo a totalizar pelo menos {0} times.	Seleccione os países com que pretende jogar, de modo a totalizar pelo menos {0} equipas.
+" times"	" equipas"
+" time"	" equipa"
+Sortear times	Sortear equipas
+Não consegui gravar o jogo: {0}	Não foi possível gravar o jogo: {0}
+O nome do arquivo do jogo: até 8 letras ou algarismos.	O nome do ficheiro do jogo: até 8 letras ou algarismos.
+Nome do arquivo inválido: só letras (sem acento), algarismos, _ e -.	Nome do ficheiro inválido: só letras (sem acento), algarismos, _ e -.
+1 time	1 equipa
+{0} times	{0} equipas
+Faltam {0} times para o mínimo.	Faltam {0} equipas para o mínimo.
+Ver as disputas de pênaltis nos jogos sem treinadores humanos	Ver os desempates por penalties nos jogos sem treinadores humanos
+Times com empréstimos	Equipas com empréstimos
+Times endividados	Equipas endividadas
+Cópia não registrada	Cópia não registada
+Cópia registrada	Cópia registada
+velocidade:Ultrassônico	Ultrassónico
+Ler times de versões anteriores	Ler equipas de versões anteriores
+Jogos ultrassônicos	Jogos ultrassónicos
+Jogadores selecionados dos outros times	Jogadores seleccionados das outras equipas
+Balanço dos times	Balanço das equipas
+Compra direta de jogadores	Compra directa de jogadores
+Ver o elenco quando for convidado	Ver o plantel quando for convidado
+Escalação individual de jogadores	Selecção individual de jogadores
+Quando registrar o jogo, você poderá:	Quando registar o jogo, poderá:
+- Comprar jogadores diretamente de qualquer time	- Efectuar a compra directa de jogadores a qualquer equipa
+- Escalar, um a um, os jogadores para cada jogo	- Seleccionar, um a um, os jogadores para cada jogo
+- Efetuar substituições durante o jogo (e não só ao intervalo)	- Efectuar substituições durante o jogo (e não só ao intervalo)
+- Obter informação sobre a influência do árbitro para cada time	- Obter informaçao sobre a influência do árbitro para cada equipa
+- Ver o elenco do time adversário e de todos os outros	- Visualizar o plantel da equipa adversária e de todas as outras
+Comprar jogadores diretamente de qualquer time	Efectuar a compra directa de jogadores a qualquer equipa
+Escalar, um a um, os jogadores para cada jogo	Seleccionar, um a um, os jogadores para cada jogo
+Efetuar substituições durante o jogo (e não só ao intervalo)	Efectuar substituições durante o jogo (e não só ao intervalo)
+Obter informação sobre a influência do árbitro para cada time	Obter informação sobre a influência do árbitro para cada equipa
+Ver o elenco do time adversário e de todos os outros	Visualizar o plantel da equipa adversária e de todas as outras

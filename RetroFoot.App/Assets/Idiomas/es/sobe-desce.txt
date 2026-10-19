@@ -1,0 +1,14 @@
+# Sobem e descem por divisao (Regras.SobemDescemEscolhido; TelaConfiguracoes) (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Sobem e descem por divisão	Ascienden y descienden por división
+Sobem e descem por divisão:	Ascienden y descienden por división:
+Sobem e descem	Ascienden y descienden
+Automático	Automático
+Automático ({0})	Automático ({0})
+Entre as divisões e do Distrital para a 4ª divisão (por sorteio). Fica gravado no jogo novo e não muda depois. No máximo 4 e menos de metade da divisão.	Entre las divisiones y del Regional a la 4.ª división (por sorteo). Queda guardado en el juego nuevo y no cambia después. Como máximo 4 y menos de la mitad de la división.
+Na versão Clássica sobem e descem 2, como em 1998.	En la versión Clásica ascienden y descienden 2, como en 1998.
+Automático: com {0} equipas por divisão sobem e descem {1} (2, ou 4 com 16 ou mais equipas).	Automático: con {0} equipos por división ascienden y descienden {1} (2, o 4 con 16 o más equipos).
+Com {0} equipas por divisão o máximo é {1} (menos de metade da divisão): valem {1}.	Con {0} equipos por división el máximo es {1} (menos de la mitad de la división): valen {1}.
+Sobem e descem {0}; o jogo novo precisa de pelo menos {1} equipas.	Ascienden y descienden {0}; el juego nuevo necesita al menos {1} equipos.
+sobem e descem {0}	ascienden y descienden {0}
+; sobem e descem {0}.	; ascienden y descienden {0}.

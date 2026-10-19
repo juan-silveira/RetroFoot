@@ -1,0 +1,78 @@
+# Ferramenta Scout do hub (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Estrang.	Estrang.
+Pos	Pos
+Posição	Posição
+Nome	Nome
+Estrela	Estrela
+Impacto	Impacto
+Força	Força
+Nota	Nota
+Lesão	Lesão
+Comport.	Comport.
+Comportamento	Comportamento
+Div.	Div.
+Divisão	Divisão
+País	País
+Valor	Valor
+Salário	Salário
+Jogos	Jogos
+Lesões	Lesões
+Amar.	Amar.
+Amarelos na carreira	Amarelos na carreira
+Expuls.	Expuls.
+Expulsões	Expulsões
+Sit.	Sit.
+Situação	Situação
+Parte do nome	Parte do nome
+Qualquer	Qualquer
+Só com estrela (✱)	Só com estrela (✱)
+Só estrangeiros (contam no limite)	Só estrangeiros (contam no limite)
+Esconder suspensos e lesionados	Esconder suspensos e lesionados
+Esconder as equipas humanas	Esconder os times humanos
+{0} ou mais	{0} ou mais
+até {0}	até {0}
+Só Fair Play	Só Fair Play
+Até {0}	Até {0}
+{0}ª	{0}ª
+Dist.	Dist.
+Jogo gravado:	Jogo salvo:
+Recarregar	Recarregar
+Filtros	Filtros
+O que significa cada coluna	O que significa cada coluna
+País do jogador	País do jogador
+Valor até	Valor até
+Limpar filtros	Limpar filtros
+Equipa humana	Time humano
+Nenhum jogo gravado em {0}.	Nenhum jogo salvo em {0}.
+Não consegui ler o jogo gravado: {0}	Não consegui ler o jogo salvo: {0}
+Todos ({0})	Todos ({0})
+Todas	Todas
+{0} de {1} jogadores · clique nos títulos para ordenar (Shift+clique junta colunas) · duplo clique abre o jogador	{0} de {1} jogadores · clique nos títulos para ordenar (Shift+clique junta colunas) · clique duplo abre o jogador
+Fechar	Fechar
+pontos por época	pontos por temporada
+suspenso por {0} jogos	suspenso por {0} jogos
+lesionado por {0} jogos	lesionado por {0} jogos
+{0} amarelos acumulados	{0} amarelos acumulados
+conta como estrangeiro	conta como estrangeiro
+disponível	disponível
+humano	humano
+Dinheiro	Dinheiro
+{0} jogadores	{0} jogadores
+duplo clique abre	clique duplo abre
+Score (0 a 1000)	Score (0 a 1000)
+Nota × 100, descontando os jogos que ele deve perder na época por lesão e por suspensão (cerca de 0,13 jogo por ponto de Lesão e 0,21 por ponto de Comportamento, em 14 jogos). Não depende da força.	Nota × 100, descontando os jogos que ele deve perder na temporada por lesão e por suspensão (cerca de 0,13 jogo por ponto de Lesão e 0,21 por ponto de Comportamento, em 14 jogos). Não depende da força.
+Pontos por época (14 jogos) que a equipa ganha ou perde com ele, comparado a um jogador da mesma posição sem estrela, Lesão 0 e Fair Play (medido em simulações). O jogo sorteia por minuto se a equipa terá uma lesão ou expulsão; Lesão e Comportamento só escolhem quem sofre. Por isso um avançado violento ou um defesa frágil podem até ajudar: atraem os problemas que iriam para o guarda-redes ou para as estrelas.	Pontos por temporada (14 jogos) que o time ganha ou perde com ele, comparado a um jogador da mesma posição sem estrela, Lesão 0 e Fair Play (medido em simulações). O jogo sorteia por minuto se o time terá uma lesão ou expulsão; Lesão e Comportamento só escolhem quem sofre. Por isso um atacante violento ou um defensor frágil podem até ajudar: atraem os problemas que iriam para o goleiro ou para as estrelas.
+✱ Estrela	✱ Estrela
+Nota 8 ou mais num médio ou avançado. Soma 2 à força do sector dele enquanto está em campo.	Nota 8 ou mais num meia ou atacante. Soma 2 à força do setor dele enquanto está em campo.
+Nota (1 a 10)	Nota (1 a 10)
+Decide quem marca os golos da equipa (avançado pesa 9, médio 4, defesa 1; o guarda-redes nunca marca) e quem bate os penáltis. Não muda quantos golos a equipa faz: isso vem da força dos sectores.	Decide quem marca os gols do time (atacante pesa 9, meia 4, defensor 1; o goleiro nunca marca) e quem bate os pênaltis. Não muda quantos gols o time faz: isso vem da força dos setores.
+Lesão (0 a 10)	Lesão (0 a 10)
+Chance de ser ele o lesionado quando a equipa sofre uma lesão. 0 nunca se lesiona. Cada lesão: 1 a 20 jogos fora e 10 de força a menos.	Chance de ser ele o lesionado quando o time sofre uma lesão. 0 nunca se lesiona. Cada lesão: 1 a 20 jogos fora e 10 de força a menos.
+Chance de ser ele o expulso. Fair Play nunca é expulso. Suspensão de 1 a 4 jogos; guarda-redes expulso dá penálti certo, defesa dá em 1 de 3.	Chance de ser ele o expulso. Fair Play nunca é expulso. Suspensão de 1 a 4 jogos; goleiro expulso dá pênalti certo, defensor dá em 1 de 3.
+O valor do jogador para o jogo (força, nota, lesão, comportamento, moeda e inflação). O preço base dos leilões e os pedidos das equipas partem dele.	O valor do jogador para o jogo (força, nota, lesão, comportamento, moeda e inflação). O preço base dos leilões e os pedidos dos times partem dele.
+Jogos, Golos, Lesões, Amar., Expuls.	Jogos, Gols, Lesões, Amar., Expuls.
+O historial do jogador no save (golos desta época; Amar. = cartões amarelos na carreira, só com as regras do RetroFoot).	O histórico do jogador no jogo salvo (gols desta temporada; Amar. = cartões amarelos na carreira, só com as regras do RetroFoot).
+S = suspenso por N jogos, A = N amarelos acumulados (o 3º suspende por 1 jogo), L = lesionado por N jogos; Estrang. = conta como estrangeiro (Bosman e PLOP não contam).	S = suspenso por N jogos, A = N amarelos acumulados (o 3º suspende por 1 jogo), L = lesionado por N jogos; Estrang. = conta como estrangeiro (Bosman e PLOP não contam).
+Idade	Idade
+O jogo gravado não guarda a idade dos jogadores, por isso o Scout não tem filtro de idade.	O jogo salvo não guarda a idade dos jogadores, por isso o Scout não tem filtro de idade.

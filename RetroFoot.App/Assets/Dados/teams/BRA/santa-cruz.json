@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SANTACRZ.EFT",
+  "name": "SANTA CRUZ",
+  "shortName": "SANTA CRUZ",
+  "country": "BRA",
+  "level": 2,
+  "textColor": "#FFFF00",
+  "backgroundColor": "#FF0000",
+  "coach": "Basílio",
+  "players": [
+    { "name": "Nunes", "position": "G", "country": "BRA" },
+    { "name": "Vladan", "position": "G", "country": "BRA" },
+    { "name": "Armando", "position": "D", "country": "BRA" },
+    { "name": "Bravo", "position": "D", "country": "BRA" },
+    { "name": "Cao", "position": "D", "country": "BRA" },
+    { "name": "Joaquim Santos", "position": "D", "country": "BRA" },
+    { "name": "Nando", "position": "D", "country": "BRA" },
+    { "name": "Constantino", "position": "M", "country": "BRA" },
+    { "name": "Cristovão", "position": "M", "country": "BRA" },
+    { "name": "Jarrais", "position": "M", "country": "BRA" },
+    { "name": "Orlando", "position": "M", "country": "BRA" },
+    { "name": "Sérgio", "position": "M", "country": "BRA" },
+    { "name": "Cláudio", "position": "A", "country": "BRA" },
+    { "name": "Earl", "position": "A", "country": "BRA" },
+    { "name": "Ricardo", "position": "A", "country": "BRA" },
+    { "name": "Serifo", "position": "A", "country": "BRA" }
+  ]
+}

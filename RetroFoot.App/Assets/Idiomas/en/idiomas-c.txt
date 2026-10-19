@@ -1,0 +1,228 @@
+# Market, squad, lists, money, stadium, sponsors and end of season (en).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+# --- Jogador ---
+Goleiro	Goalkeeper
+Defensor	Defender
+Meia	Midfielder
+Atacante	Forward
+Fair play	Fair Play
+Fair Play	Fair Play
+Cordeirinho	Lamb
+Cavalheiro	Gentleman
+Caneleiro	Shin-kicker
+Caceteiro	Thug
+Sarrafeiro	Hatchet man
+comportamento:FP	FP
+comportamento:Cor	Lmb
+comportamento:Cav	Gnt
+comportamento:Can	Shn
+comportamento:Cac	Thg
+comportamento:Sar	Hat
+coluna: L	" I"
+Time	Team
+Time...	Team...
+Jogador	Player
+Posição	Position
+Força	Strength
+Nacionalidade	Nationality
+Comportamento	Behaviour
+Nota	Rating
+Risco de lesão	Injury risk
+Gols na Temporada	Season goals
+Gols	Goals
+Jogos	Games
+Cartões amarelos	Yellow cards
+Cartões vermelhos	Red cards
+Amarelos	Yellows
+Vermelhos	Reds
+Lesões	Injuries
+Histórico	History
+HISTÓRICO	HISTORY
+Suspenso por 1 jogo	Suspended for 1 match
+Suspenso por {0} jogos	Suspended for {0} matches
+Lesionado por 1 jogo	Injured for 1 match
+Lesionado por {0} jogos	Injured for {0} matches
+Salário pretendido	Wage demand
+Salário pretendido:	Wage demand:
+Preço base	Reserve price
+Preço	Price
+Nome	Name
+
+# --- Leilao e venda ---
+Venda de jogador por leilão	Player auction
+Oferta (milhares de{0})	Bid (thousands of{0})
+"Dinheiro em caixa: "	"Cash: "
+Dinheiro em caixa	Cash
+Não houve ofertas	No bids
+Vendido ao {0} por {1}	Sold to {0} for {1}
+Vender	Sell
+Preço de venda\n(milhares de {0})	Asking price\n(thousands of {0})
+Não pode vender mais jogadores	You can't sell any more players
+Este jogador já está vendido	This player is already sold
+Este jogador só pode ser vendido na próxima temporada	This player can only be sold next season
+Só pode tentar vender este jogador novamente no próximo jogo	You can only try to sell this player again after the next match
+Não pode vender mais goleiros	You can't sell any more goalkeepers
+Não pode vender mais jogadores de campo	You can't sell any more outfield players
+OK	OK
+Cancelar	Cancel
+Fechar	Close
+Sim	Yes
+Não	No
+
+# --- Salario ---
+Renovar contrato	Renew contract
+Novo salário:	New wage:
+Propor	Offer
+Atualização de Salário	Wage Review
+"{0} pede que lhe seja aumentado o salário para {1}."	"{0} is asking for a wage rise to {1}."
+Se não aceitar o aumento, o jogador será posto à venda em leilão.	If you refuse the rise, the player will be put up for auction.
+Aceita o aumento?	Do you accept the rise?
+Uma vez que este jogador não pode ser vendido, tem de aceitar o aumento.	As this player can't be sold, you have to accept the rise.
+Nem pensar! Exijo {0}!	No way! I want {0}!
+
+# --- Procura e observados ---
+Lista de Jogadores	Player List
+Procurar	Search
+Comprar	Buy
+Qualquer	Any
+{0} ou mais	{0} or more
+Até {0}	Up to {0}
+" {0} a {1}"	" {0} to {1}"
+" Até {0}"	" Up to {0}"
+" De {0} até {1}"	" {0} to {1}"
+" Mais de {0}"	" Over {0}"
+Não mostrar os jogadores do meu time	Hide my team's players
+Nota   RL	Rtg    IR
+Só estão listados os primeiros 50 jogadores encontrados	Only the first 50 players found are listed
+Jogadores sob observação	Watched players
+Só pode ter {0} jogadores sob observação	You can only watch {0} players
+Limpar	Clear
+Remover	Remove
+
+# --- Plantel ---
+Balanço	Balance
+Calendário	Fixtures
+Empréstimo	Loan
+Observado	Watch
+Lista	List
+Distrital	Regional League
+
+# --- Listas ---
+"  a. p."	"  a.e.t."
+"  v. pen."	"  w. pens"
+"  d. pen."	"  l. pens"
+local:C	H
+local:F	A
+Artilheiros de todos os tempos	All-time top scorers
+Artilheiros desta temporada	Top scorers this season
+Últimos vencedores do campeonato e da copa	Past league and cup winners
+Últimas transferências	Latest transfers
+Campeonato	League
+Copa	Cup
+DOBRADINHA	DOUBLE
+2º lugar	2nd place
+3º lugar	3rd place
+Jogadores adquiridos	Signings
+"Contratado pelo "	"Hired by "
+Despedido	Sacked
+VENCEDOR DO CAMPEONATO	LEAGUE CHAMPION
+VENCEDOR DA COPA	CUP WINNER
+"Entrada no "	"Joined "
+"Rebaixado para o "	"Relegated with "
+"Promovido para o "	"Promoted with "
+Demissões de Técnicos	Managerial Sackings
+" foi demitido do "	" was sacked by "
+"Para o seu lugar foi contratado "	"Replaced by "
+"Troca com "	"Swapped with "
+Ranking de Treinadores	Manager Rankings
+férias	on holiday
+
+# --- Balanco ---
+Temporada	Season
+Receitas	Income
+Bilheteria	Tickets
+Jogadores vendidos	Players sold
+Prêmios	Bonuses
+Gastos	Expenses
+Salários	Wages
+Jogadores comprados	Players bought
+Arquibancadas	Stands
+Juros	Interest
+Receita total	Total income
+Gasto total	Total expenses
+Saldo	Balance
+Receita × gasto	Income × expenses
+Balanço financeiro	Balance sheet
+
+# --- Emprestimo ---
+Empréstimos	Loans
+Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo realizado	Loan interest is 5% of the outstanding amount for every match played
+Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo realizado.	Loan interest is 5% of the outstanding amount for every match played.
+O montante em dívida poderá ser reduzido sempre que o desejar, ou aumentado, se tal lhe for permitido.	You can reduce the debt whenever you like, or increase it, if you are allowed to.
+O montante máximo a emprestar está condicionado pela confiança que o banco tem em si, neste momento.	The maximum loan depends on how much the bank trusts you right now.
+Capital em dívida	Debt
+Juro a pagar	Interest due
+Juro por jogo	Interest per match
+−  Pagar {0}	−  Repay {0}
++  Pedir {0}	+  Borrow {0}
+"Limite do banco: "	"Bank limit: "
+
+# --- Estadio ---
+Estádio	Stadium
+Construir	Build
+Pedir empréstimo	Take out a loan
+Construir mais 5000 lugares	Build 5000 more seats
+{0} lugares	{0} seats
+"Preço de uma arquibancada com\n5000 lugares: "	"Price of a stand with\n5000 seats: "
+As novas arquibancadas só estarão disponíveis no próximo jogo	The new stands will be ready for the next match
+Capacidade	Capacity
+Nova arquibancada (5000 lugares)	New stand (5000 seats)
+{0} de 24 arquibancadas	{0} of 24 stands
+
+# --- Patrocinio ---
+Patrocínio	Sponsorship
+Proposta de patrocínio	Sponsorship offer
+Renovação de patrocinador master	Main sponsor renewal
+Patrocínio no uniforme	Kit sponsorship
+Patrocinador master	Main sponsor
+Valor	Value
+Duração	Duration
+Multa pela troca	Penalty for switching
+" por jogo"	" per match"
+" por temporada"	" per season"
+" jogo"	" match"
+" jogos"	" matches"
+" temporada"	" season"
+" temporadas"	" seasons"
+Para estampar a marca no uniforme. Aceita?	To put their brand on your kit. Accept?
+Para renovar o contrato de patrocinador master. Aceita?	To renew the main sponsor contract. Accept?
+Para ser o patrocinador master do seu time. Aceita?	To become your team's main sponsor. Accept?
+Recusar	Decline
+Aceitar	Accept
+
+# --- Fim de temporada ---
+Fim de Temporada	End of Season
+Temporada {0}	Season {0}
+Vencedor do campeonato	League champion
+Vencedor da copa	Cup winner
+Campeão	Champion
+Treinador	Manager
+"Treinador: "	"Manager: "
+Artilheiro	Top scorer
+Artilheiro ({0} gols)	Top scorer ({0} goals)
+{0} gols	{0} goals
+1 gol	1 goal
+{0}ª copa	Cup win no. {0}
+{0}ª vitória no campeonato	League title no. {0}
+"Prêmio: "	"Prize: "
+Fecha sozinha em {0} s	Closes in {0} s
+Continuar	Continue
+{0}ª Divisão	Division {0}
+▲ subiu	▲ promoted
+▼ desceu	▼ relegated
+subiu	promoted
+desceu	relegated
+Nenhuma equipa mudou de divisão.	No team changed division.
+Subidas e descidas	Promotion and relegation
+As equipas que mudam de divisão	Teams changing division

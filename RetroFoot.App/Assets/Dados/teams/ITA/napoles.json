@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "NAPOLES.EFT",
+  "name": "NAPOLES",
+  "shortName": "NAPOLES",
+  "country": "ITA",
+  "level": 7,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#0000FF",
+  "coach": "Azeglio Vicini",
+  "players": [
+    { "name": "Giacomo Zunico", "position": "G", "country": "ITA" },
+    { "name": "Jiulano Giuliani", "position": "G", "country": "ITA" },
+    { "name": "Alessandr.Renica", "position": "D", "country": "ITA" },
+    { "name": "Gianc.Corradini", "position": "D", "country": "ITA" },
+    { "name": "Giovann.Francini", "position": "D", "country": "ITA" },
+    { "name": "Marco Baroni", "position": "D", "country": "ITA" },
+    { "name": "Marocci", "position": "D", "country": "ITA" },
+    { "name": "Fern.De Napoli", "position": "M", "country": "ITA" },
+    { "name": "Francesco Romano", "position": "M", "country": "ITA" },
+    { "name": "Luca Fusi", "position": "M", "country": "ITA" },
+    { "name": "Massimo Mauro", "position": "M", "country": "ITA" },
+    { "name": "Ricardo Alemao", "position": "M", "country": "BRA" },
+    { "name": "Andrea Carnevale", "position": "A", "country": "ITA" },
+    { "name": "Antonio Careca", "position": "A", "country": "BRA" }
+  ]
+}

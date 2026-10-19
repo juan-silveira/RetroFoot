@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BLUMENAU.EFT",
+  "name": "BLUMENAU F.C.",
+  "shortName": "BLUMENAU",
+  "country": "BRA",
+  "level": 5,
+  "textColor": "#800000",
+  "backgroundColor": "#008000",
+  "coach": "Joel Castro Flores",
+  "players": [
+    { "name": "Dagoberto", "position": "G", "country": "BRA" },
+    { "name": "Marcelo", "position": "G", "country": "BRA" },
+    { "name": "Castro", "position": "D", "country": "BRA" },
+    { "name": "Gérson", "position": "D", "country": "BRA" },
+    { "name": "Jacó", "position": "D", "country": "BRA" },
+    { "name": "Maicon", "position": "D", "country": "BRA" },
+    { "name": "Silas", "position": "D", "country": "BRA" },
+    { "name": "Cláudio", "position": "M", "country": "BRA" },
+    { "name": "Gil", "position": "M", "country": "BRA" },
+    { "name": "Hebert", "position": "M", "country": "BRA" },
+    { "name": "Lê", "position": "M", "country": "BRA" },
+    { "name": "Marquinhos", "position": "M", "country": "BRA" },
+    { "name": "Cal", "position": "A", "country": "BRA" },
+    { "name": "Denis", "position": "A", "country": "BRA" },
+    { "name": "Toninho", "position": "A", "country": "BRA" }
+  ]
+}

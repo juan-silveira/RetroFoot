@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "WIMBLEDO.EFT",
+  "name": "WIMBLEDON",
+  "shortName": "WIMBLEDON",
+  "country": "ING",
+  "level": 4,
+  "textColor": "#FFFF00",
+  "backgroundColor": "#0000FF",
+  "coach": "Joe Kinnear",
+  "players": [
+    { "name": "Neil Sullivan", "position": "G", "country": "ING" },
+    { "name": "Paul Heald", "position": "G", "country": "ING" },
+    { "name": "Alan Reeves", "position": "D", "country": "ING" },
+    { "name": "Andy Thorn", "position": "D", "country": "ING" },
+    { "name": "Ben Tatcher", "position": "D", "country": "ING" },
+    { "name": "Chris Perry", "position": "D", "country": "ING" },
+    { "name": "Gerald Dobbs", "position": "D", "country": "ING" },
+    { "name": "Ken Cunningham", "position": "D", "country": "IRL" },
+    { "name": "Roger Joseph", "position": "D", "country": "ING" },
+    { "name": "Duncan Jupp", "position": "M", "country": "ESC" },
+    { "name": "Marcus Gayle", "position": "M", "country": "ING" },
+    { "name": "Peter Fear", "position": "M", "country": "ING" },
+    { "name": "Steve Lomas", "position": "M", "country": "ILN" },
+    { "name": "Vinny Jones", "position": "M", "country": "WAL" },
+    { "name": "Dean Holdsworth", "position": "A", "country": "IRL" },
+    { "name": "Efan Ekoku", "position": "A", "country": "NIG" },
+    { "name": "Gary Blissett", "position": "A", "country": "ING" },
+    { "name": "Jon Goodman", "position": "A", "country": "ING" },
+    { "name": "Neil Ardley", "position": "A", "country": "ING" }
+  ]
+}

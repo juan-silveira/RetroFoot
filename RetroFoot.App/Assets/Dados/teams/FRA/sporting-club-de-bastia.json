@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BASTIA.EFT",
+  "name": "SPORTING CLUB DE BASTIA",
+  "shortName": "BASTIA",
+  "country": "FRA",
+  "level": 10,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Francisco Nicolai",
+  "players": [
+    { "name": "Fabien Piveteau", "position": "G", "country": "FRA" },
+    { "name": "Éric Durand", "position": "G", "country": "FRA" },
+    { "name": "Christophe Deguervil", "position": "D", "country": "FRA" },
+    { "name": "Frédéric Mendy", "position": "D", "country": "FRA" },
+    { "name": "Morlaye Soumah", "position": "D", "country": "FRA" },
+    { "name": "Pascal Garrido", "position": "D", "country": "FRA" },
+    { "name": "Patrick Moreau", "position": "D", "country": "FRA" },
+    { "name": "Sébastien Perez", "position": "D", "country": "FRA" },
+    { "name": "Cyril Rool", "position": "M", "country": "FRA" },
+    { "name": "Franck Jurietti", "position": "M", "country": "FRA" },
+    { "name": "Hervé Anziani", "position": "M", "country": "FRA" },
+    { "name": "Mamadou Faye", "position": "M", "country": "FRA" },
+    { "name": "Menad Jestrovic", "position": "M", "country": "FRA" },
+    { "name": "Piotr Swierczewski", "position": "M", "country": "FRA" },
+    { "name": "Prince Daye", "position": "M", "country": "FRA" },
+    { "name": "Ousmane Soumah", "position": "A", "country": "FRA" },
+    { "name": "Pierreyves André", "position": "A", "country": "FRA" },
+    { "name": "Wilfrid Gohel", "position": "A", "country": "FRA" }
+  ]
+}

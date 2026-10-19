@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MIDLOTH.EFT",
+  "name": "HEART OF MIDLOTHIAN",
+  "shortName": "MIDLOTHIAN",
+  "country": "ESC",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "JIM JEFFRIES",
+  "players": [
+    { "name": "Gary Naysmth", "position": "G", "country": "ESC" },
+    { "name": "Giles Rousset", "position": "G", "country": "ESC" },
+    { "name": "Allan Mcmanus", "position": "D", "country": "ESC" },
+    { "name": "Dave Mcpherson", "position": "D", "country": "ESC" },
+    { "name": "David Weir", "position": "D", "country": "ESC" },
+    { "name": "Gary Locke", "position": "D", "country": "ESC" },
+    { "name": "Neil Pointon", "position": "D", "country": "ESC" },
+    { "name": "Pasquale Bruno", "position": "D", "country": "ITA" },
+    { "name": "Paul Ritchie", "position": "D", "country": "ESC" },
+    { "name": "Colin Cameron", "position": "M", "country": "ESC" },
+    { "name": "Jeremy Goss", "position": "M", "country": "ESC" },
+    { "name": "Neil Mccann", "position": "M", "country": "ESC" },
+    { "name": "Stephano Salvatore", "position": "M", "country": "ITA" },
+    { "name": "Steve Fulton", "position": "M", "country": "ESC" },
+    { "name": "Darren Beckford", "position": "A", "country": "ESC" },
+    { "name": "Jim Hamilton", "position": "A", "country": "ESC" },
+    { "name": "John Robertson", "position": "A", "country": "ESC" },
+    { "name": "Kevin Thomas", "position": "A", "country": "ESC" },
+    { "name": "Stephen Paille", "position": "A", "country": "FRA" }
+  ]
+}

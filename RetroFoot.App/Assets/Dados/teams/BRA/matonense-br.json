@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MATON_BR.EFT",
+  "name": "MATONENSE-BR",
+  "shortName": "MATONENSE",
+  "country": "BRA",
+  "level": 2,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#0000FF",
+  "coach": "Geninho",
+  "players": [
+    { "name": "Júlio César", "position": "G", "country": "BRA" },
+    { "name": "Leandro", "position": "G", "country": "BRA" },
+    { "name": "Cláudio", "position": "D", "country": "BRA" },
+    { "name": "Cristiano", "position": "D", "country": "BRA" },
+    { "name": "Deci", "position": "D", "country": "BRA" },
+    { "name": "Denys", "position": "D", "country": "BRA" },
+    { "name": "Silvan", "position": "D", "country": "BRA" },
+    { "name": "Dininho", "position": "M", "country": "BRA" },
+    { "name": "Helcio", "position": "M", "country": "BRA" },
+    { "name": "Júnior", "position": "M", "country": "BRA" },
+    { "name": "Ranielli", "position": "M", "country": "BRA" },
+    { "name": "Charles", "position": "A", "country": "BRA" },
+    { "name": "Flávio", "position": "A", "country": "BRA" },
+    { "name": "Taílson", "position": "A", "country": "BRA" }
+  ]
+}

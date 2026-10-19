@@ -1,0 +1,174 @@
+# Inicio, opciones, acerca/registro, entrenadores, dialogos (es).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs). Termos: docs/glossario-idiomas.md.
+Ligado	Activado
+Desligado	Desactivado
+Opções	Opciones
+Como o jogo corre e o que ele mostra. Valem a partir de já.	Cómo se desarrolla el juego y qué muestra. Se aplican al momento.
+Dos humanos	De humanos
+Quando houver humanos	Si hay humanos
+Sempre	Siempre
+Todas as rodadas	Cada jornada
+De 3 em 3 rodadas	Cada 3 jornadas
+No início da temporada	Al inicio de temporada
+Mostrar demissões de treinadores	Ver destituciones
+Ver sorteio da copa	Ver sorteo de copa
+Salvar o jogo	Guardar la partida
+Habilitar som	Activar sonido
+Tempo de jogo	Ritmo de juego
+A velocidade do relógio da jornada.	La velocidad del reloj de la jornada.
+Substituições no intervalo	Cambios en el descanso
+Parar no intervalo para mexer na equipa.	Parar en el descanso para cambiar el equipo.
+Ver as disputas de pênaltis	Ver tandas de penaltis
+Também nos jogos sem treinadores humanos.	También en partidos sin entrenadores humanos.
+Geral	General
+Nível de inflação	Nivel de inflación
+Times com empréstimos...	Equipos con préstamos...
+Times endividados...	Equipos endeudados...
+Controle	Control
+Sobre	Acerca de
+Senha	Clave
+Contra-Senha	Contraclave
+Quando registrar o jogo, você poderá	Cuando registres el juego, podrás
+1 extra ativo	1 extra activo
+{0} extras ativos	{0} extras activos
+Nenhum extra ativo: a cópia não está registrada.	Ningún extra activo: la copia no está registrada.
+Gestão de Treinadores	Gestión de Entrenadores
+Os treinadores humanos deste jogo (até 6).	Los entrenadores humanos de esta partida (hasta 6).
+De férias	De vacaciones
+O computador cuida da equipa enquanto o treinador está de férias.	El ordenador lleva el equipo mientras el entrenador está de vacaciones.
+Adicionar...	Añadir...
+Remover	Quitar
+sem equipa	sin equipo
+de férias	de vacaciones
+{0} deixa de jogar?	¿{0} deja de jugar?
+Novo treinador	Nuevo entrenador
+Nome do novo treinador:	Nombre del nuevo entrenador:
+Quero que o computador cuide dos salários:	Quiero que el ordenador se ocupe de los sueldos:
+Dos jogadores nacionais	De los jugadores nacionales
+Dos estrangeiros abrangidos pela Lei Bosman	De los extranjeros de la Ley Bosman
+Dos outros jogadores estrangeiros	De los demás jugadores extranjeros
+Quero fazer ofertas a todos os jogadores	Quiero pujar por todos los jugadores
+Não quero fazer ofertas aos jogadores mais fracos	No quiero pujar por los jugadores más flojos
+Não quero comprar jogadores em leilão	No quiero comprar jugadores en subasta
+Esconder as minhas ofertas	Ocultar mis pujas
+Os outros não veem as minhas ofertas nos leilões.	Los demás no ven mis pujas en las subastas.
+Ofertas	Pujas
+Gestão de Salários	Gestión de Sueldos
+Compra em leilão	Compra en subasta
+Elenco...	Plantilla...
+Convite	Oferta
+Quer vir treinar o {0}?	¿Quieres entrenar al {0}?
+Nome do arquivo (8 letras):	Nombre del archivo (8 letras):
+Jogos salvos:	Guardadas:
+Nome do arquivo inválido	Nombre de archivo no válido
+Quero começar um jogo do início	Quiero empezar una partida nueva
+Quero continuar um jogo	Quiero continuar una partida
+Já existe um jogo com esse nome	Ya existe una partida con ese nombre
+Erro	Error
+Não achei a pasta do jogo original (COUNTRY.TXE, EQUIPAS...). Use a variável RETROFOOT_JOGO.	No encontré la carpeta del juego original (COUNTRY.TXE, EQUIPAS...). Usa la variable RETROFOOT_JOGO.
+{0} (pasta do jogo: {1})	{0} (carpeta del juego: {1})
+Seleção de Países	Selección de Países
+Times selecionados	Equipos elegidos
+Times existentes	Equipos existentes
+Países selecionados	Países elegidos
+Selecione os países com que quer jogar, de modo a totalizar pelo menos {0} times.	Elige los países con los que quieres jugar, hasta sumar al menos {0} equipos.
+Nenhum	Ninguno
+" times"	" equipos"
+" time"	" equipo"
+Dinheiro	Dinero
+Com que moeda vai querer jogar?	¿Con qué moneda quieres jugar?
+Sortear times	Sortear equipos
+Jogadores	Jugadores
+Nome	Nombre
+Jogador {0}	Jugador {0}
+Não consegui gravar o jogo: {0}	No se pudo guardar la partida: {0}
+Jogo novo	Partida nueva
+Continuar um jogo	Continuar una partida
+Moeda	Moneda
+Treinadores	Entrenadores
+Versão Atual	Versión Actual
+Versão Clássica	Versión Clásica
+cartões amarelos	tarjetas amarillas
+patrocínios	patrocinios
+estrangeiros liberados	extranjeros sin límite
+NOME	NOMBRE
+Começar jogo novo	Empezar partida nueva
+Regras do jogo novo	Reglas de la partida nueva
+Mudar nas Configurações	Cambiar en Configuración
+O nome do arquivo do jogo: até 8 letras ou algarismos.	El nombre del archivo de la partida: hasta 8 letras o cifras.
+Nenhum jogo gravado	Ninguna partida guardada
+Comece um jogo novo ao lado.	Empieza una partida nueva al lado.
+Setas para cima e para baixo: escolhem o jogo gravado.	Flechas arriba y abajo: eligen la partida guardada.
+Enter: abre o jogo escolhido (ou começa o novo, com o nome escrito).	Enter: abre la partida elegida (o empieza la nueva, con el nombre escrito).
+Nome do arquivo inválido: só letras (sem acento), algarismos, _ e -.	Nombre de archivo no válido: solo letras (sin tilde), cifras, _ y -.
+Já existe um jogo com esse nome.	Ya existe una partida con ese nombre.
+A ler as equipas e os países...	Leyendo los equipos y los países...
+1 time	1 equipo
+{0} times	{0} equipos
+mínimo {0} · existem {1}	mínimo {0} · hay {1}
+Faltam {0} times para o mínimo.	Faltan {0} equipos para el mínimo.
+Voltar	Volver
+Os preços, os salários e o dinheiro das equipas aparecem nesta moeda durante todo o jogo.	Los precios, los sueldos y el dinero de los equipos aparecen en esta moneda durante toda la partida.
+A moeda do jogo.	La moneda de la partida.
+Treinador {0}	Entrenador {0}
+Sortear equipas	Sortear equipos
+Até 6 treinadores humanos. Escreva os nomes e sorteie as equipas: cada um começa numa equipa da última divisão.	Hasta 6 entrenadores humanos. Escribe los nombres y sortea los equipos: cada uno empieza en un equipo de la última división.
+Começar	Empezar
+As equipas foram sorteadas. Boa sorte!	Los equipos ya están sorteados. ¡Suerte!
+Os treinadores humanos.	Los entrenadores humanos.
+Ver as disputas de pênaltis nos jogos sem treinadores humanos	Ver tandas de penaltis en partidos sin entrenadores humanos
+Times com empréstimos	Equipos con préstamos
+Times endividados	Equipos endeudados
+Cópia não registrada	Copia no registrada
+Cópia registrada	Copia registrada
+aos jogadores nacionais	jugadores nacionales
+aos jogadores estrangeiros abrangidos pela Lei Bosman	jugadores extranjeros de la Ley Bosman
+aos outros jogadores estrangeiros	demás jugadores extranjeros
+Não quero que os outros vejam as minhas ofertas	No quiero que los demás vean mis pujas
+Quer vir treinar o	¿Entrenar al
+velocidade:Lento	Lento
+velocidade:Médio	Medio
+velocidade:Rápido	Rápido
+velocidade:Super-rápido	Superrápido
+velocidade:Rapidíssimo	Rapidísimo
+velocidade:Ultrassônico	Ultrasónico
+Ler times de versões anteriores	Leer equipos de versiones anteriores
+Adicionar países	Añadir países
+Memória livre	Memoria libre
+Página de controle	Página de control
+Ver tendência do árbitro	Ver tendencia del árbitro
+Ver influência do árbitro	Ver influencia del árbitro
+Jogos super-rápidos	Partidos superrápidos
+Jogos ultrassônicos	Partidos ultrasónicos
+Jogadores selecionados dos outros times	Alineaciones de otros equipos
+Gestão de treinadores	Gestión de entrenadores
+Férias dos treinadores	Vacaciones de entrenadores
+Todos os treinadores de férias	Todos los entrenadores de vacaciones
+Balanço dos times	Balance de los equipos
+Compra direta de jogadores	Compra directa de jugadores
+Pedir dinheiro emprestado	Pedir dinero prestado
+Ver o elenco quando for convidado	Ver la plantilla al ser invitado
+Ver pontuação dos treinadores	Ver puntuación de entrenadores
+Jogadores sob observação	Jugadores en observación
+Escalação individual de jogadores	Alineación jugador a jugador
+Substituições durante o jogo	Cambios durante el partido
+Pesquisar todos os jogadores	Buscar todos los jugadores
+Quando registrar o jogo, você poderá:	Cuando registres el juego, podrás:
+- Comprar jogadores diretamente de qualquer time	- Comprar jugadores directamente a cualquier equipo
+- Escalar, um a um, os jogadores para cada jogo	- Alinear, uno a uno, los jugadores de cada partido
+- Efetuar substituições durante o jogo (e não só ao intervalo)	- Hacer cambios durante el partido (no solo en el descanso)
+- Obter empréstimos bancários	- Obtener préstamos bancarios
+- Obter informação sobre a influência do árbitro para cada time	- Ver la influencia del árbitro en cada equipo
+- Ver o elenco do time adversário e de todos os outros	- Ver la plantilla del rival y de todos los demás
+- Adicionar e retirar treinadores (humanos) no decorrer do jogo	- Añadir y quitar entrenadores (humanos) durante la partida
+"Terá ainda acesso a outras possibilidades que o ajudarão "	"Tendrás además otras posibilidades que te ayudarán "
+a ser o melhor de todos os treinadores.	a ser el mejor de todos los entrenadores.
+Comprar jogadores diretamente de qualquer time	Comprar jugadores directamente a cualquier equipo
+Escalar, um a um, os jogadores para cada jogo	Alinear, uno a uno, los jugadores de cada partido
+Efetuar substituições durante o jogo (e não só ao intervalo)	Hacer cambios durante el partido (no solo en el descanso)
+Obter empréstimos bancários	Obtener préstamos bancarios
+Obter informação sobre a influência do árbitro para cada time	Ver la influencia del árbitro en cada equipo
+Ver o elenco do time adversário e de todos os outros	Ver la plantilla del rival y de todos los demás
+Adicionar e retirar treinadores (humanos) no decorrer do jogo	Añadir y quitar entrenadores (humanos) durante la partida
+1 jogo	1 partida
+{0} jogos	{0} partidas

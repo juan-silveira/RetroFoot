@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "INTERNAC.EFT",
+  "name": "INTERNACIONAL PORTOALEGRE",
+  "shortName": "INTERNACIONAL",
+  "country": "BRA",
+  "level": 11,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Celso Roth",
+  "players": [
+    { "name": "André", "position": "G", "country": "BRA" },
+    { "name": "Enciso", "position": "G", "country": "PAR" },
+    { "name": "Gustavo", "position": "D", "country": "BRA" },
+    { "name": "Luciano", "position": "D", "country": "BRA" },
+    { "name": "Marcão", "position": "D", "country": "BRA" },
+    { "name": "Régis", "position": "D", "country": "BRA" },
+    { "name": "Anderson", "position": "M", "country": "BRA" },
+    { "name": "Arilson", "position": "M", "country": "BRA" },
+    { "name": "Fernando", "position": "M", "country": "BRA" },
+    { "name": "Mabília", "position": "M", "country": "BRA" },
+    { "name": "Marcelo", "position": "M", "country": "BRA" },
+    { "name": "Sandoval", "position": "M", "country": "BRA" },
+    { "name": "Christian", "position": "A", "country": "BRA" },
+    { "name": "Fabiano", "position": "A", "country": "BRA" },
+    { "name": "Pedro Diniz", "position": "A", "country": "BRA" },
+    { "name": "Sandro Sotilli", "position": "A", "country": "BRA" }
+  ]
+}

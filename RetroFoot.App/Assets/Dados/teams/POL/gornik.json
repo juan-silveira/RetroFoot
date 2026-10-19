@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "GORNIK.EFT",
+  "name": "GORNIK",
+  "shortName": "GORNIK",
+  "country": "POL",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#800080",
+  "coach": "Ant. Piechniczek",
+  "players": [
+    { "name": "Cebrat", "position": "G", "country": "POL" },
+    { "name": "Dziekanowski", "position": "D", "country": "POL" },
+    { "name": "Ostrowski", "position": "D", "country": "POL" },
+    { "name": "Pawlak", "position": "D", "country": "POL" },
+    { "name": "Przybys", "position": "D", "country": "POL" },
+    { "name": "Tarasiewicz", "position": "D", "country": "POL" },
+    { "name": "Wojcicki", "position": "D", "country": "POL" },
+    { "name": "Buncol", "position": "M", "country": "POL" },
+    { "name": "Karas", "position": "M", "country": "POL" },
+    { "name": "Komornicki", "position": "M", "country": "POL" },
+    { "name": "Matysik", "position": "M", "country": "POL" },
+    { "name": "Urban", "position": "M", "country": "POL" },
+    { "name": "John Aldridge", "position": "A", "country": "IRL" },
+    { "name": "Palasz", "position": "A", "country": "POL" },
+    { "name": "Warzycha", "position": "A", "country": "POL" }
+  ]
+}

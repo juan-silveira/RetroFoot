@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "LUSAS_BR.EFT",
+  "name": "PORTUGUESA SANTISTA-BR",
+  "shortName": "LUSA SANTISTA",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#00FF00",
+  "backgroundColor": "#FF0000",
+  "coach": "Orlando Pereira",
+  "players": [
+    { "name": "Nasser", "position": "G", "country": "BRA" },
+    { "name": "Ayupe", "position": "D", "country": "BRA" },
+    { "name": "Jairo", "position": "D", "country": "BRA" },
+    { "name": "Toninho", "position": "D", "country": "BRA" },
+    { "name": "Vital", "position": "D", "country": "BRA" },
+    { "name": "Deda", "position": "M", "country": "BRA" },
+    { "name": "Júlio César", "position": "M", "country": "BRA" },
+    { "name": "Kico", "position": "M", "country": "BRA" },
+    { "name": "Paulo Henrique", "position": "M", "country": "BRA" },
+    { "name": "Renatinho", "position": "M", "country": "BRA" },
+    { "name": "Rodrigo", "position": "M", "country": "BRA" },
+    { "name": "Valdeir", "position": "M", "country": "BRA" },
+    { "name": "Luiz Muller", "position": "A", "country": "BRA" },
+    { "name": "Nildo", "position": "A", "country": "BRA" }
+  ]
+}

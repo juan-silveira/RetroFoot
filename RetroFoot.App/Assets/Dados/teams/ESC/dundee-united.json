@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "DUNDEE.EFT",
+  "name": "DUNDEE UNITED",
+  "shortName": "DUNDEE",
+  "country": "ESC",
+  "level": 8,
+  "textColor": "#0000FF",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Tommy McLean",
+  "players": [
+    { "name": "Ally Maxwell", "position": "G", "country": "ESC" },
+    { "name": "Sieb Dykstra", "position": "G", "country": "DIN" },
+    { "name": "Erik Pedersen", "position": "D", "country": "SUE" },
+    { "name": "Higg Newman", "position": "D", "country": "ESC" },
+    { "name": "Mark Perry", "position": "D", "country": "ESC" },
+    { "name": "Maurice Malpas", "position": "D", "country": "FRA" },
+    { "name": "Paul Simon", "position": "D", "country": "ESC" },
+    { "name": "Steven Pressley", "position": "D", "country": "ESC" },
+    { "name": "Bob Lewis", "position": "M", "country": "ESC" },
+    { "name": "David Bowman", "position": "M", "country": "ESC" },
+    { "name": "Jim Mcinally", "position": "M", "country": "ESC" },
+    { "name": "Jimmy Botts", "position": "M", "country": "ESC" },
+    { "name": "John Mcnamara", "position": "M", "country": "IRL" },
+    { "name": "Lars Zetterlund", "position": "M", "country": "DIN" },
+    { "name": "Ray Mckinnon", "position": "M", "country": "ESC" },
+    { "name": "Andy Mclaren", "position": "A", "country": "ESC" },
+    { "name": "Gary Mcswegan", "position": "A", "country": "ESC" },
+    { "name": "Kjell Olofsson", "position": "A", "country": "NOR" },
+    { "name": "Robbie Winters", "position": "A", "country": "ESC" }
+  ]
+}

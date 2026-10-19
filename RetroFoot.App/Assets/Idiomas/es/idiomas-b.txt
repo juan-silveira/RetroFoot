@@ -1,0 +1,166 @@
+# As telas do grupo idiomas-b (es): TelaEquipa(Moderna), TelaJornada(Moderna),
+# TelaClassificacao*, TelaDetalhesModerna, TelaCelular. Formato: chave<TAB>traducao (Idioma.cs).
+
+# --- TelaEquipa: as abas e a pagina Jogo
+Jogo	Partido
+Finanças	Finanzas
+Escalação	Alineación
+Adversário	Rival
+Patrocínio	Patrocinio
+CASA	LOCAL
+FORA	VISITANTE
+Distrital	Regional
+{0}º lugar · {1}	{0}º puesto · {1}
+Último jogo	Último partido
+Próximo jogo	Próximo partido
+Dinheiro em caixa	Dinero en caja
+Em caixa	En caja
+V	G
+D	P
+Campanha	Trayectoria
+Sem jogo nesta rodada	Sin partido esta jornada
+Sem adversário nesta rodada	Sin rival esta jornada
+Jogar	Jugar
+Jogo salvo.	Partida guardada.
+Não foi possível salvar o jogo.	No se pudo guardar la partida.
+
+# o dinheiro por extenso (a moeda vem do jogo)
+
+# --- o elenco e a ficha do jogador
+Nome	Nombre
+Força	Fuerza
+Salário	Sueldo
+Jogos	PJ
+Gols	Goles
+Elenco	Plantilla
+{0} jogadores  ·  {1} titulares  ·  {2} reservas	{0} jugadores  ·  {1} titulares  ·  {2} suplentes
+Goleiros	Porteros
+Defensores	Defensas
+Meio-campistas	Centrocampistas
+Atacantes	Delanteros
+Goleiro	Portero
+Defensor	Defensa
+Meio-campista	Centrocampista
+Atacante	Delantero
+Escolha um jogador na lista para ver a ficha dele.	Elige un jugador de la lista para ver su ficha.
+Não é considerado jogador estrangeiro, ao abrigo da Lei Bosman	No cuenta como extranjero, por la Ley Bosman
+Comportamento	Comportamiento
+Risco de lesão	Riesgo lesión
+Gols na Temporada	Goles temporada
+Gols na temporada	Goles esta temporada
+Gols na temp.	Goles temp.
+Histórico	Historial
+Cartões amarelos	Tarjetas amarillas
+Cartões vermelhos	Tarjetas rojas
+Amarelos	Amarillas
+Vermelhos	Rojas
+Lesões	Lesiones
+Reserva	Suplente
+Reservas	Suplentes
+Fora da escalação	No alineado
+Escalação incompleta	Alineación incompleta
+Suspenso por 1 jogo	Sancionado 1 partido
+Suspenso por {0} jogos	Sancionado {0} partidos
+1 amarelo acumulado	1 amarilla acumulada
+{0} amarelos acumulados	{0} amarillas acumuladas
+1 amarelo	1 amarilla
+{0} amarelos	{0} amarillas
+Lesionado por 1 jogo	Lesionado 1 partido
+Lesionado por {0} jogos	Lesionado {0} partidos
+
+# comportamento (nomes proprios do jogo)
+Fair play	Juego limpio
+Fair Play	Juego limpio
+Cordeirinho	Corderito
+Cavalheiro	Caballero
+Caneleiro	Pegón
+Caceteiro	Bronco
+Sarrafeiro	Leñero
+
+# --- pagina Financas
+Receitas	Ingresos
+Bilheteria	Taquilla
+Jogadores vendidos	Jugadores vendidos
+Prêmios	Primas
+Salários	Sueldos
+Jogadores comprados	Jugadores comprados
+Arquibancadas	Gradas
+Juros	Intereses
+Receita total	Total ingresos
+Gasto total	Total gastos
+Total de salários	Total sueldos
+Juros do empréstimo	Intereses préstamo
+Preço do ingresso	Precio entrada
+Ingressos (% da tabela)	Entradas (% de tarifa)
+
+# --- Adversario, Ajuda do Arbitro, Patrocinio
+Técnico	Entrenador
+Calendário	Calendario
+Tendência do Árbitro	Tendencia del árbitro
+Fechar	Cerrar
+"   Pênalti: {0}%   Cartões: -{1}%"	"   Penalti: {0}%   Tarjetas: -{1}%"
+Pênalti: {0}%   Cartões: -{1}%	Penalti: {0}%   Tarjetas: -{1}%
+Patrocinador master	Patrocinador principal
+Sem patrocinador	Sin patrocinador
+Patrocínio pontual: {0} - {1} jogo restante	Patrocinio puntual: {0} - {1} partido restante
+Patrocínio pontual: {0} - {1} jogos restantes	Patrocinio puntual: {0} - {1} partidos restantes
+
+# --- jornada (o titulo vem do save: Jogos.cs)
+{0}ª Jornada	Jornada {0}
+TAÇA	COPA
+Meias-finais	Semifinales
+Quartos de final	Cuartos de final
+Oitavos de final	Octavos de final
+{0} avos de final	1/{0} de final
+Taça	Copa
+Fim	Final
+Clique ou Enter para continuar	Haz clic o pulsa Enter para continuar
+
+# --- detalhes do jogo (Moderno)
+Intervalo	Descanso
+Fim do tempo normal	Fin del tiempo reglamentario
+Gol de pênalti	Gol de penalti
+Cartão amarelo	Tarjeta amarilla
+Cartão vermelho	Tarjeta roja
+Segundo amarelo · expulso	Segunda amarilla · expulsado
+Lesão	Lesión
+Ainda sem lances	Aún sin jugadas
+
+# --- classificacao
+Classificação	Clasificación
+Classificação - {0}ª rodada	Clasificación - Jornada {0}
+Classificação · {0}ª rodada	Clasificación · Jornada {0}
+{0}ª Divisão	{0}ª División
+GM	GF
+GS	GC
+pontos:P	Pts
+Clube	Club
+VIT	G
+DER	P
+SG	DG
+Últimas 5	Últimos 5
+Campeão	Campeón
+Sobe de divisão	Asciende
+Desce de divisão	Desciende
+Últimas 5 partidas	Últimos 5 partidos
+Vitória	Victoria
+
+# --- TelaCelular (a prova do celular)
+FP	JL
+CAV	CAB
+CAN	PEG
+CAC	BRO
+SAR	LEÑ
+Salário acertado	Sueldo acordado
+Acertado	Acordado
+Não acertado	Sin acordar
+Folha de salários	Masa salarial
+{0} por jogo	{0} por partido
+Estádio	Estadio
+{0} lugares	{0} plazas
+O adversário vem do motor do jogo (ainda não feito nesta prova).	El rival viene del motor del juego (aún no hecho en esta prueba).
+Vem do motor do jogo.	Viene del motor del juego.
+Vem do motor do jogo (ainda não feito nesta prova).	Viene del motor del juego (aún no hecho en esta prueba).
+{0} › {1}: ainda não feito nesta prova	{0} › {1}: aún no hecho en esta prueba
+{0} {1}: ainda não feito nesta prova	{0} {1}: aún no hecho en esta prueba
+O jogo parou por um erro inesperado. Carregue de novo o último jogo salvo para continuar.	El juego se detuvo por un error inesperado. Vuelve a cargar la última partida guardada para continuar.

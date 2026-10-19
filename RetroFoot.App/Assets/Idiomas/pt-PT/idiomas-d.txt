@@ -1,0 +1,8 @@
+# Partida (substituicao, lesao, penalti, penaltis, sorteio) e os textos do motor (idiomas-d).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs). Aqui so as chaves que ficaram em pt-BR no codigo (as propostas de patrocinio do launcher).
+
+{0} oferece {1} por temporada, durante {2} temporada	{0} oferece {1} por época, durante {2} época
+{0} oferece {1} por temporada, durante {2} temporadas	{0} oferece {1} por época, durante {2} épocas
+,\rpara renovar o contrato de patrocinador master.	,\rpara renovar o contrato de patrocinador principal.
+,\rpara ser o patrocinador master do seu time.	,\rpara ser o patrocinador principal da sua equipa.
+,\rpara estampar a marca no uniforme.	,\rpara estampar a marca no equipamento.

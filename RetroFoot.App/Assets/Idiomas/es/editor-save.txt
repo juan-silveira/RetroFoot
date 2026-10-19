@@ -1,0 +1,59 @@
+# Editor de Save (RetroFoot.App/FerramentaEditorSave.cs) (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Jogo gravado	Partida guardada
+Pasta	Carpeta
+Recarregar	Recargar
+Época {0}	Temporada {0}
+inflação de 5 a 100 (o jogo mostra x 10)	inflación de 5 a 100 (el juego muestra x 10)
+Inflação	Inflación
+Moral: 0 a 20 · Estádio: 5.000 a 120.000 lugares	Moral: 0 a 20 · Estadio: 5.000 a 120.000 plazas
+Limites de 16 bits	Límites de 16 bits
+Soma da força	Suma de la fuerza
+Pesos de golo (pos² × força × nota)	Pesos de gol (pos² × fuerza × nota)
+Melhor escalação (3G + D + M + A)	Mejor alineación (3P + D + C + DL)
+Clique (ou Enter) num jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).	Haz clic (o Enter) en un jugador para editarlo. S = sancionado, A = amarillas, L = lesionado (partidos).
+Pos	Pos
+Máx.	Máx.
+Comport.	Comport.
+Sit.	Sit.
+Nenhum jogo gravado em {0}	No hay partidas guardadas en {0}
+{0}: {1} equipas	{0}: {1} equipos
+Não consegui ler {0}: {1}	No se pudo leer {0}: {1}
+Alterações por gravar	Cambios sin guardar
+Valor fora do limite	Valor fuera de rango
+{0}: use um valor de {1} a {2}.	{0}: usa un valor de {1} a {2}.
+Gravado. O original fica em {0}	Guardado. El original queda en {0}
+Não consegui gravar:\n{0}	No se pudo guardar:\n{0}
+sem equipa	sin equipo
+Trocar	Cambiar
+Trocar de equipa	Cambiar de equipo
+Este jogo não tem divisões: não dá para saber que equipas podem ter um treinador humano.	Esta partida no tiene divisiones: no se puede saber qué equipos pueden tener un entrenador humano.
+{0} vai para {1}.	{0} pasa a {1}.
+As duas equipas ficam com moral 10, como numa chicotada psicológica. Só aparecem equipas das divisões (no Distrital o jogo quebra).	Los dos equipos quedan con moral 10, como en una destitución de entrenador. Solo aparecen equipos de las divisiones (en la Regional el juego falla).
+Equipa atual: {0}	Equipo actual: {0}
+1 a 10	1 a 10
+0 = nunca, 10 = muito	0 = nunca, 10 = mucho
+Suspenso (S)	Sancionado (S)
+jogos, 0 a {0}	partidos, 0 a {0}
+Amarelos (A)	Amarillas (A)
+acumulados, 0 a {0}	acumuladas, 0 a {0}
+Lesionado (L)	Lesionado (L)
+Estrela	Estrella
+Sem estrela	Sin estrella
+1 a {0} (normal até {1})	1 a {0} (normal hasta {1})
+o plantel já passa do limite	la plantilla ya pasa del límite
+Força máxima neste plantel: {0}	Fuerza máxima en esta plantilla: {0}
+O resto do plantel já passa de um limite: diminua a força de outros jogadores.	El resto de la plantilla ya pasa de un límite: baja la fuerza de otros jugadores.
+Força {0} é bem acima do normal (1 a {1}).	Fuerza {0} está muy por encima de lo normal (1 a {1}).
+Jogos {0} · Golos {1}	Partidos {0} · Goles {1}
+Estrela (✱): médio ou avançado com nota 8 ou mais. Muda sozinha com a nota.	Estrella (✱): centrocampista o delantero con nota 8 o más. Cambia sola con la nota.
+Com nota {0}, acima de força {1} o jogo calcula errado e ele nunca marca golo.	Con nota {0}, por encima de fuerza {1} el juego calcula mal y nunca marca gol.
+Os pesos de golo do plantel somariam {0} (máximo {1}): os golos sairiam sempre do mesmo jogador, ou a equipa deixaria de marcar.	Los pesos de gol de la plantilla sumarían {0} (máximo {1}): los goles serían siempre del mismo jugador, o el equipo dejaría de marcar.
+A força do plantel somaria {0} (máximo {1}): o público dos jogos sairia errado.	La fuerza de la plantilla sumaría {0} (máximo {1}): el público de los partidos saldría mal.
+A melhor escalação somaria {0} (máximo {1}): a força das equipas na partida sairia errada.	La mejor alineación sumaría {0} (máximo {1}): la fuerza de los equipos en el partido saldría mal.
+As alterações a este jogo ainda não foram gravadas. Descartar?	Los cambios en esta partida aún no se han guardado. ¿Descartarlos?
+Descartar	Descartar
+{0} a {1}	{0} a {1}
+Pesos de golo	Pesos de gol
+pos² × força × nota	pos² × fuerza × nota
+Melhor escalação	Mejor alineación

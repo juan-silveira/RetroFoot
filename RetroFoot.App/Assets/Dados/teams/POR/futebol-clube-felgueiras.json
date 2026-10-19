@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FELGUEIR.EFT",
+  "name": "FUTEBOL CLUBE FELGUEIRAS",
+  "shortName": "FELGUEIRAS",
+  "country": "POR",
+  "level": 3,
+  "textColor": "#FF0000",
+  "backgroundColor": "#000080",
+  "coach": "Jorge Jesus",
+  "players": [
+    { "name": "Boskovic", "position": "G", "country": "EVN" },
+    { "name": "Lopes", "position": "G", "country": "POR" },
+    { "name": "Bandeirinha", "position": "D", "country": "POR" },
+    { "name": "Eliseu", "position": "D", "country": "POR" },
+    { "name": "Erivonaldo", "position": "D", "country": "BRA" },
+    { "name": "José Joaquim", "position": "D", "country": "POR" },
+    { "name": "Rui Gregório", "position": "D", "country": "POR" },
+    { "name": "Vicente", "position": "D", "country": "POR" },
+    { "name": "Carlo Camilieri", "position": "M", "country": "ITA" },
+    { "name": "Edgar", "position": "M", "country": "POR" },
+    { "name": "João Baptista", "position": "M", "country": "POR" },
+    { "name": "Lima Pereira", "position": "M", "country": "POR" },
+    { "name": "Lopes da Silva", "position": "M", "country": "POR" },
+    { "name": "Ricardo Oliveira", "position": "M", "country": "POR" },
+    { "name": "Bambo", "position": "A", "country": "POR" },
+    { "name": "Filipe Azevedo", "position": "A", "country": "POR" },
+    { "name": "José Silva", "position": "A", "country": "BRA" },
+    { "name": "Orlando", "position": "A", "country": "POR" },
+    { "name": "Sandro", "position": "A", "country": "POR" }
+  ]
+}

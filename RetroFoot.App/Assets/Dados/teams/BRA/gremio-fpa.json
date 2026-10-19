@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "GREMIO.EFT",
+  "name": "GREMIO FPA",
+  "shortName": "GREMIO",
+  "country": "BRA",
+  "level": 7,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000080",
+  "coach": "Beto Almeida",
+  "players": [
+    { "name": "Danrlei", "position": "G", "country": "BRA" },
+    { "name": "Murilo", "position": "G", "country": "BRA" },
+    { "name": "André Silva", "position": "D", "country": "BRA" },
+    { "name": "Arce", "position": "D", "country": "PAR" },
+    { "name": "Luciano", "position": "D", "country": "BRA" },
+    { "name": "Mauro Galvao", "position": "D", "country": "BRA" },
+    { "name": "Roger", "position": "D", "country": "BRA" },
+    { "name": "Carlos Miguel", "position": "M", "country": "BRA" },
+    { "name": "Dinho", "position": "M", "country": "BRA" },
+    { "name": "Emerson", "position": "M", "country": "BRA" },
+    { "name": "Joao Antonio", "position": "M", "country": "BRA" },
+    { "name": "L C Goiano", "position": "M", "country": "BRA" },
+    { "name": "Marcos Paulo", "position": "A", "country": "BRA" },
+    { "name": "Paulo Henrique", "position": "A", "country": "BRA" },
+    { "name": "Sérgio Manoel", "position": "A", "country": "BRA" },
+    { "name": "Zé Alcino", "position": "A", "country": "BRA" }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MALINES.EFT",
+  "name": "FC MALINES",
+  "shortName": "MALINES",
+  "country": "BEL",
+  "level": 12,
+  "textColor": "#FFFF00",
+  "backgroundColor": "#800000",
+  "coach": "Guus Hiddink",
+  "players": [
+    { "name": "Claudio Taffarel", "position": "G", "country": "BRA" },
+    { "name": "Gilbert Bodart", "position": "G", "country": "BEL" },
+    { "name": "De Mesmaecker", "position": "D", "country": "BEL" },
+    { "name": "Koen Sanders", "position": "D", "country": "BEL" },
+    { "name": "Leo Clijsters", "position": "D", "country": "BEL" },
+    { "name": "Leo Van Der Elst", "position": "D", "country": "BEL" },
+    { "name": "Rudi Smidts", "position": "D", "country": "BEL" },
+    { "name": "Danny Veyt", "position": "M", "country": "BEL" },
+    { "name": "Franky Van Der Elst", "position": "M", "country": "BEL" },
+    { "name": "Jean Mar. Houben", "position": "M", "country": "BEL" },
+    { "name": "Lorenzo Staelens", "position": "M", "country": "BEL" },
+    { "name": "Win Hofkens", "position": "M", "country": "HOL" },
+    { "name": "Alex Czerniatynski", "position": "A", "country": "BEL" },
+    { "name": "Fr. Vercauteren", "position": "A", "country": "BEL" },
+    { "name": "Francis Severeyens", "position": "A", "country": "BEL" },
+    { "name": "Nico Claesen", "position": "A", "country": "BEL" }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BRUSQUE.EFT",
+  "name": "BRUSQUE FUTEBOL CLUBE",
+  "shortName": "BRUSQUE",
+  "country": "BRA",
+  "level": 6,
+  "textColor": "#008000",
+  "backgroundColor": "#800000",
+  "coach": "Gassem",
+  "players": [
+    { "name": "Fabiano", "position": "G", "country": "BRA" },
+    { "name": "Jorge", "position": "G", "country": "BRA" },
+    { "name": "Kléber", "position": "D", "country": "BRA" },
+    { "name": "Marcelo", "position": "D", "country": "BRA" },
+    { "name": "Marco Antônio", "position": "D", "country": "BRA" },
+    { "name": "Solis", "position": "D", "country": "BRA" },
+    { "name": "Alemão", "position": "M", "country": "BRA" },
+    { "name": "Alex", "position": "M", "country": "BRA" },
+    { "name": "Celso", "position": "M", "country": "BRA" },
+    { "name": "Mário Jr", "position": "M", "country": "BRA" },
+    { "name": "Jairo", "position": "A", "country": "BRA" },
+    { "name": "Polaco", "position": "A", "country": "BRA" },
+    { "name": "Tecão", "position": "A", "country": "BRA" },
+    { "name": "Vitón", "position": "A", "country": "BRA" }
+  ]
+}

@@ -1,0 +1,3 @@
+Excluir	Eliminar
+Excluir jogo	Eliminar partida
+Excluir o jogo gravado "{0}"? O arquivo vai para a pasta excluidos, dentro da pasta dos jogos.	¿Eliminar la partida guardada "{0}"? El archivo va a la carpeta excluidos, dentro de la carpeta de partidas.

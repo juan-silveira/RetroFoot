@@ -1,0 +1,198 @@
+# As telas do grupo idiomas-b (en): TelaEquipa(Moderna), TelaJornada(Moderna),
+# TelaClassificacao*, TelaDetalhesModerna, TelaCelular. Formato: chave<TAB>traducao (Idioma.cs).
+
+# --- TelaEquipa: as abas e a pagina Jogo
+Jogo	Match
+Finanças	Finances
+Escalação	Line-up
+Adversário	Opponent
+Patrocínio	Sponsor
+CASA	HOME
+FORA	AWAY
+Distrital	Regional League
+{0}º lugar · {1}	Pos. {0} · {1}
+Árbitro	Referee
+Último jogo	Last match
+Próximo jogo	Next match
+Dinheiro em caixa	Cash in hand
+Em caixa	Cash
+Moral	Morale
+V	W
+E	D
+D	L
+Campanha	Record
+Sem jogo nesta rodada	No match this round
+Sem adversário nesta rodada	No opponent this round
+Temporada {0}	Season {0}
+Jogar	Play
+Jogo salvo.	Game saved.
+Não foi possível salvar o jogo.	The game could not be saved.
+
+# o dinheiro por extenso (a moeda vem do jogo)
+
+# --- o elenco e a ficha do jogador
+Nome	Name
+Força	Strength
+País	Country
+Salário	Wage
+Jogos	Games
+Gols	Goals
+Temp.	Season
+Nota	Rating
+Elenco	Squad
+{0} jogadores  ·  {1} titulares  ·  {2} reservas	{0} players  ·  {1} starters  ·  {2} subs
+Goleiros	Goalkeepers
+Defensores	Defenders
+Meio-campistas	Midfielders
+Atacantes	Forwards
+Goleiro	Goalkeeper
+Defensor	Defender
+Meio-campista	Midfielder
+Atacante	Forward
+Escolha um jogador na lista para ver a ficha dele.	Pick a player from the list to see his details.
+Não é considerado jogador estrangeiro, ao abrigo da Lei Bosman	Not counted as a foreigner, under the Bosman ruling
+Comportamento	Behaviour
+Risco de lesão	Injury risk
+Gols na Temporada	Season goals
+Gols na temporada	Goals this season
+Gols na temp.	Season goals
+Histórico	History
+Ficha	Profile
+Cartões amarelos	Yellow cards
+Cartões vermelhos	Red cards
+Amarelos	Yellows
+Vermelhos	Reds
+Lesões	Injuries
+Titular	Starter
+Reserva	Sub
+Titulares	Starters
+Reservas	Subs
+Fora da escalação	Not picked
+Escalação incompleta	Incomplete line-up
+Suspenso por 1 jogo	Suspended for 1 match
+Suspenso por {0} jogos	Suspended for {0} matches
+1 amarelo acumulado	1 yellow card
+{0} amarelos acumulados	{0} yellow cards
+1 amarelo	1 yellow
+{0} amarelos	{0} yellows
+Lesionado por 1 jogo	Injured for 1 match
+Lesionado por {0} jogos	Injured for {0} matches
+Renovar contrato...	Renew contract...
+Automático	Automatic
+
+# comportamento (nomes proprios do jogo)
+Cordeirinho	Lamb
+Cavalheiro	Gentleman
+Caneleiro	Shin-kicker
+Caceteiro	Bruiser
+Sarrafeiro	Hatchet man
+
+# --- pagina Financas
+Temporada	Season
+Receitas	Income
+Bilheteria	Tickets
+Jogadores vendidos	Players sold
+Prêmios	Bonuses
+Gastos	Expenses
+Salários	Wages
+Jogadores comprados	Players bought
+Arquibancadas	Stands
+Juros	Interest
+Receita total	Total income
+Gasto total	Total expenses
+Saldo	Balance
+Total de salários	Total wages
+Juros do empréstimo	Loan interest
+Preço do ingresso	Ticket price
+Ingressos (% da tabela)	Tickets (% of list price)
+
+# --- Adversario, Ajuda do Arbitro, Patrocinio
+Técnico	Manager
+Calendário	Fixtures
+Tendência do Árbitro	Referee Bias
+Fechar	Close
+"   Pênalti: {0}%   Cartões: -{1}%"	"   Penalty: {0}%   Cards: -{1}%"
+Pênalti: {0}%   Cartões: -{1}%	Penalty: {0}%   Cards: -{1}%
+Patrocinador master	Main sponsor
+{0} por temporada	{0} per season
+{0} temporada restante	{0} season left
+{0} temporadas restantes	{0} seasons left
+Sem patrocinador	No sponsor
+Patrocínio pontual: {0} - {1} jogo restante	One-off sponsor: {0} - {1} match left
+Patrocínio pontual: {0} - {1} jogos restantes	One-off sponsor: {0} - {1} matches left
+
+# --- jornada (o titulo vem do save: Jogos.cs)
+{0}ª Jornada	Round {0}
+TAÇA	CUP
+Meias-finais	Semi-finals
+Quartos de final	Quarter-finals
+Oitavos de final	Last 16
+{0} avos de final	Round of {0}
+Taça	Cup
+pausa	paused
+Pausa	Paused
+Anulado	Disallowed
+Fim	FT
+Clique ou Enter para continuar	Click or press Enter to continue
+
+# --- detalhes do jogo (Moderno)
+Intervalo	Half-time
+Fim do tempo normal	End of normal time
+Gol	Goal
+Gol de pênalti	Penalty goal
+Gol anulado	Disallowed goal
+Cartão amarelo	Yellow card
+Cartão vermelho	Red card
+Segundo amarelo · expulso	Second yellow · sent off
+Lesão	Injury
+Ainda sem lances	No incidents yet
+Continuar	Continue
+Continuar ({0})	Continue ({0})
+
+# --- classificacao
+Classificação	Standings
+Classificação - {0}ª rodada	Standings - Round {0}
+Classificação · {0}ª rodada	Standings · Round {0}
+{0}ª Divisão	Division {0}
+GM	GF
+GS	GA
+pontos:P	Pts
+Clube	Club
+PJ	P
+VIT	W
+DER	L
+GC	GA
+SG	GD
+Últimas 5	Last 5
+Zonas	Zones
+Campeão	Champion
+Sobe de divisão	Promoted
+Desce de divisão	Relegated
+Últimas 5 partidas	Last 5 matches
+Vitória	Win
+Empate	Draw
+Derrota	Defeat
+
+# --- TelaCelular (a prova do celular)
+Comp	Beh
+RL	IR
+COR	LMB
+CAV	GEN
+CAN	SHN
+CAC	BRU
+SAR	HAT
+Imprimir	Print
+Observar	Watch
+Salário acertado	Wage agreed
+Acertado	Agreed
+Não acertado	Not agreed
+Folha de salários	Wage bill
+{0} por jogo	{0} per match
+Estádio	Stadium
+{0} lugares	{0} seats
+O adversário vem do motor do jogo (ainda não feito nesta prova).	The opponent comes from the game engine (not done yet in this preview).
+Vem do motor do jogo.	Comes from the game engine.
+Vem do motor do jogo (ainda não feito nesta prova).	Comes from the game engine (not done yet in this preview).
+{0} › {1}: ainda não feito nesta prova	{0} › {1}: not done yet in this preview
+{0} {1}: ainda não feito nesta prova	{0} {1}: not done yet in this preview
+O jogo parou por um erro inesperado. Carregue de novo o último jogo salvo para continuar.	The game stopped because of an unexpected error. Load the last saved game again to continue.

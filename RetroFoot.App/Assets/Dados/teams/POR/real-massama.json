@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MASSAMA.EFT",
+  "name": "REAL MASSAMÁ",
+  "shortName": "MASSAMÁ",
+  "country": "POR",
+  "level": 1,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFF00",
+  "coach": "José Carlos Pires",
+  "players": [
+    { "name": "André", "position": "G", "country": "POR" },
+    { "name": "Rui Jorge", "position": "G", "country": "POR" },
+    { "name": "Araújo", "position": "D", "country": "POR" },
+    { "name": "Farinha", "position": "D", "country": "POR" },
+    { "name": "Rodrigues", "position": "D", "country": "POR" },
+    { "name": "Sá", "position": "D", "country": "POR" },
+    { "name": "Teixeira", "position": "D", "country": "POR" },
+    { "name": "Venâncio", "position": "D", "country": "POR" },
+    { "name": "Augusto", "position": "M", "country": "POR" },
+    { "name": "Azevedo", "position": "M", "country": "POR" },
+    { "name": "Diogo", "position": "M", "country": "POR" },
+    { "name": "Nuno Ferreira", "position": "M", "country": "POR" },
+    { "name": "Paulinho", "position": "M", "country": "POR" },
+    { "name": "Pimenta", "position": "M", "country": "POR" },
+    { "name": "Franklin", "position": "A", "country": "POR" },
+    { "name": "Santos", "position": "A", "country": "POR" },
+    { "name": "Serginho", "position": "A", "country": "POR" },
+    { "name": "Álvaro", "position": "A", "country": "POR" }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "LONDRINA.EFT",
+  "name": "LONDRINA",
+  "shortName": "LONDRINA",
+  "country": "BRA",
+  "level": 2,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#008000",
+  "coach": "Geno",
+  "players": [
+    { "name": "Gabriel", "position": "G", "country": "BRA" },
+    { "name": "Marcelo", "position": "G", "country": "BRA" },
+    { "name": "Augusto", "position": "D", "country": "BRA" },
+    { "name": "Da Guia", "position": "D", "country": "BRA" },
+    { "name": "Edson Baiano", "position": "D", "country": "BRA" },
+    { "name": "Junior", "position": "D", "country": "BRA" },
+    { "name": "Nei", "position": "D", "country": "BRA" },
+    { "name": "Caniggia", "position": "M", "country": "BRA" },
+    { "name": "Murinho", "position": "M", "country": "BRA" },
+    { "name": "Odair", "position": "M", "country": "BRA" },
+    { "name": "Pires", "position": "M", "country": "BRA" },
+    { "name": "Ronaldo Alfredo", "position": "M", "country": "BRA" },
+    { "name": "Adalberto", "position": "A", "country": "BRA" },
+    { "name": "Edilson", "position": "A", "country": "BRA" },
+    { "name": "Esquerdinha", "position": "A", "country": "BRA" },
+    { "name": "Kelly", "position": "A", "country": "BRA" }
+  ]
+}

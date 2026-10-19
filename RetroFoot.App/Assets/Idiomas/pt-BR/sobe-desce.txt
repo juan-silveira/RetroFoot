@@ -1,0 +1,5 @@
+# Sobem e descem por divisao (Regras.SobemDescemEscolhido; TelaConfiguracoes) (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Automático: com {0} equipas por divisão sobem e descem {1} (2, ou 4 com 16 ou mais equipas).	Automático: com {0} times por divisão sobem e descem {1} (2, ou 4 com 16 ou mais times).
+Sobem e descem {0}; o jogo novo precisa de pelo menos {1} equipas.	Sobem e descem {0}; o jogo novo precisa de pelo menos {1} times.
+Com {0} equipas por divisão o máximo é {1} (menos de metade da divisão): valem {1}.	Com {0} times por divisão o máximo é {1} (menos de metade da divisão): valem {1}.

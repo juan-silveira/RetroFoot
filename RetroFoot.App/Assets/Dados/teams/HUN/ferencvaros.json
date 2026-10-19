@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FERENCVA.EFT",
+  "name": "FERENCVAROS",
+  "shortName": "FERENCVAROS",
+  "country": "HUN",
+  "level": 10,
+  "textColor": "#00FF00",
+  "backgroundColor": "#000000",
+  "coach": "Cristov Vuliev",
+  "players": [
+    { "name": "Attila Hajdu", "position": "G", "country": "HUN" },
+    { "name": "József Szeiler", "position": "G", "country": "HUN" },
+    { "name": "Csaba Vámosi", "position": "D", "country": "HUN" },
+    { "name": "Dejan Milovanovic", "position": "D", "country": "JUG" },
+    { "name": "János Hrutka", "position": "D", "country": "HUN" },
+    { "name": "Mihály Szucs", "position": "D", "country": "HUN" },
+    { "name": "Oleg Korol", "position": "D", "country": "BLR" },
+    { "name": "Sergei Kuznetsov", "position": "D", "country": "UCR" },
+    { "name": "Zoltán Jagodics", "position": "D", "country": "HUN" },
+    { "name": "Zsolt Limperger", "position": "D", "country": "HUN" },
+    { "name": "Elek Nyilas", "position": "M", "country": "HUN" },
+    { "name": "Gábor Vincze", "position": "M", "country": "HUN" },
+    { "name": "László Arany", "position": "M", "country": "HUN" },
+    { "name": "Norbert Nagy", "position": "M", "country": "HUN" },
+    { "name": "Vasile Miriuta", "position": "M", "country": "ROM" },
+    { "name": "Ferenc Horváth", "position": "A", "country": "HUN" },
+    { "name": "Igor Nichenko", "position": "A", "country": "UCR" },
+    { "name": "Zsolt Nagy", "position": "A", "country": "HUN" }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PERUGIA.EFT",
+  "name": "ASSOCIAZIONE CALCIO PERUGIA",
+  "shortName": "PERUGIA",
+  "country": "ITA",
+  "level": 11,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Alfredo Salerni",
+  "players": [
+    { "name": "Aleksandar Kocic", "position": "G", "country": "JUG" },
+    { "name": "Juan Docabo", "position": "G", "country": "ARG" },
+    { "name": "Marco Storari", "position": "G", "country": "ITA" },
+    { "name": "Andrea Cottini", "position": "D", "country": "ITA" },
+    { "name": "Gianluca Colonnello", "position": "D", "country": "ITA" },
+    { "name": "Marc Emmers", "position": "D", "country": "BEL" },
+    { "name": "Massimiliano Tango", "position": "D", "country": "ITA" },
+    { "name": "Paolo Guastalvino", "position": "D", "country": "ITA" },
+    { "name": "Patrick Panucci", "position": "D", "country": "ITA" },
+    { "name": "Salvatore Matrecano", "position": "D", "country": "ITA" },
+    { "name": "Alessandro Cucciari", "position": "M", "country": "ITA" },
+    { "name": "Antonino Bernardini", "position": "M", "country": "ITA" },
+    { "name": "Bruno Versavel", "position": "M", "country": "BEL" },
+    { "name": "Daniele Russo", "position": "M", "country": "ITA" },
+    { "name": "Massimo Lombardo", "position": "M", "country": "SUI" },
+    { "name": "Pasquale Rocco", "position": "M", "country": "ITA" },
+    { "name": "Emiliano Testini", "position": "A", "country": "ITA" },
+    { "name": "Fernando Pandolfi", "position": "A", "country": "ARG" },
+    { "name": "Stefano Guidoni", "position": "A", "country": "ITA" }
+  ]
+}

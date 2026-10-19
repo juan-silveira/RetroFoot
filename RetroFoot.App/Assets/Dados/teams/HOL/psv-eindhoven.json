@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PSV.EFT",
+  "name": "PSV EINDHOVEN",
+  "shortName": "PSV EINDHOVEN",
+  "country": "HOL",
+  "level": 12,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Leo Beenhakker",
+  "players": [
+    { "name": "Lodewijks", "position": "G", "country": "HOL" },
+    { "name": "Van Breukelen", "position": "G", "country": "HOL" },
+    { "name": "Barry Van Aerle", "position": "D", "country": "HOL" },
+    { "name": "Jan Heintze", "position": "D", "country": "HOL" },
+    { "name": "Sonny Silloy", "position": "D", "country": "HOL" },
+    { "name": "Van Den Kerkof", "position": "D", "country": "HOL" },
+    { "name": "Van Der Zwaan", "position": "D", "country": "HOL" },
+    { "name": "Erwin Koeman", "position": "M", "country": "HOL" },
+    { "name": "Gerald Vanenburg", "position": "M", "country": "HOL" },
+    { "name": "Jozef Chovanec", "position": "M", "country": "RCH" },
+    { "name": "Linskens", "position": "M", "country": "HOL" },
+    { "name": "Johnny Bosman", "position": "A", "country": "HOL" },
+    { "name": "Jul Ellerman", "position": "A", "country": "HOL" },
+    { "name": "Win Kieft", "position": "A", "country": "HOL" }
+  ]
+}

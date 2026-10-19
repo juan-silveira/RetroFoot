@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "VSC_GAMA.EFT",
+  "name": "VASCO DA GAMA",
+  "shortName": "VASCO DA GAMA",
+  "country": "BRA",
+  "level": 12,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Antônio Lopes",
+  "players": [
+    { "name": "Carlos Germano", "position": "G", "country": "BRA" },
+    { "name": "Márcio", "position": "G", "country": "BRA" },
+    { "name": "Cassio", "position": "D", "country": "BRA" },
+    { "name": "Felipe", "position": "D", "country": "BRA" },
+    { "name": "Maricá", "position": "D", "country": "BRA" },
+    { "name": "Mauro Galvão", "position": "D", "country": "BRA" },
+    { "name": "Odvan", "position": "D", "country": "BRA" },
+    { "name": "Juninho", "position": "M", "country": "BRA" },
+    { "name": "Luisinho", "position": "M", "country": "BRA" },
+    { "name": "Nasa", "position": "M", "country": "BRA" },
+    { "name": "Nélson", "position": "M", "country": "BRA" },
+    { "name": "Pedrinho", "position": "M", "country": "BRA" },
+    { "name": "Edmundo", "position": "A", "country": "BRA" },
+    { "name": "Evair", "position": "A", "country": "BRA" },
+    { "name": "Mauricinho", "position": "A", "country": "BRA" },
+    { "name": "Nelson", "position": "A", "country": "BRA" }
+  ]
+}

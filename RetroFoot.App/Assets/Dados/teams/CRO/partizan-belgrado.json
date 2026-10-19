@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PARTIZAN.EFT",
+  "name": "PARTIZAN BELGRADO",
+  "shortName": "PARTIZAN BELGRADO",
+  "country": "CRO",
+  "level": 10,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF00FF",
+  "coach": "Ivan Osim",
+  "players": [
+    { "name": "Dragoje Lekovik", "position": "G", "country": "CRO" },
+    { "name": "Fahrud. Omeorovic", "position": "G", "country": "CRO" },
+    { "name": "Faruk Hadzibegic", "position": "D", "country": "CRO" },
+    { "name": "Gordon Petric", "position": "D", "country": "CRO" },
+    { "name": "Predrag Spasic", "position": "D", "country": "CRO" },
+    { "name": "Radanovic", "position": "D", "country": "CRO" },
+    { "name": "Slobodan Marovic", "position": "D", "country": "CRO" },
+    { "name": "Vuj. Stanojkivic", "position": "D", "country": "CRO" },
+    { "name": "Deveric", "position": "M", "country": "CRO" },
+    { "name": "Gudelj", "position": "M", "country": "CRO" },
+    { "name": "Rob. Prosinecki", "position": "M", "country": "CRO" },
+    { "name": "Safet Susic", "position": "M", "country": "CRO" },
+    { "name": "Darko Pancev", "position": "A", "country": "CRO" },
+    { "name": "Zlatko Vujovic", "position": "A", "country": "CRO" }
+  ]
+}

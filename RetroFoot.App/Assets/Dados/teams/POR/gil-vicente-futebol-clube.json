@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "GIL_VICE.EFT",
+  "name": "GIL VICENTE FUTEBOL CLUBE",
+  "shortName": "GIL VICENTE FC",
+  "country": "POR",
+  "level": 4,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "José Marconi",
+  "players": [
+    { "name": "João Pedro", "position": "G", "country": "POR" },
+    { "name": "Mihacic", "position": "G", "country": "CRO" },
+    { "name": "Vital", "position": "G", "country": "POR" },
+    { "name": "Joaquim Jorge", "position": "D", "country": "POR" },
+    { "name": "Lila", "position": "D", "country": "POR" },
+    { "name": "Margarido", "position": "D", "country": "POR" },
+    { "name": "Matias", "position": "D", "country": "POR" },
+    { "name": "Miguel", "position": "D", "country": "POR" },
+    { "name": "Wilson", "position": "D", "country": "BRA" },
+    { "name": "Beto", "position": "M", "country": "POR" },
+    { "name": "Lemos", "position": "M", "country": "POR" },
+    { "name": "Possi", "position": "M", "country": "BRA" },
+    { "name": "Tarcísio", "position": "M", "country": "BRA" },
+    { "name": "Tuck", "position": "M", "country": "POR" },
+    { "name": "Lim", "position": "A", "country": "POR" },
+    { "name": "Néné Santarém", "position": "A", "country": "BRA" },
+    { "name": "Paulo Vida", "position": "A", "country": "POR" },
+    { "name": "Robinho", "position": "A", "country": "POR" }
+  ]
+}

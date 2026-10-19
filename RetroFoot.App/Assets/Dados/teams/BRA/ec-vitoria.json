@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "VITORIA.EFT",
+  "name": "EC VITORIA",
+  "shortName": "VITORIA",
+  "country": "BRA",
+  "level": 4,
+  "textColor": "#FF0000",
+  "backgroundColor": "#000000",
+  "coach": "Evaristo de Macedo",
+  "players": [
+    { "name": "Nilson", "position": "G", "country": "BRA" },
+    { "name": "Zé Carlos", "position": "G", "country": "BRA" },
+    { "name": "Esquerdinha", "position": "D", "country": "BRA" },
+    { "name": "Flavio", "position": "D", "country": "BRA" },
+    { "name": "Moa", "position": "D", "country": "BRA" },
+    { "name": "Rubem", "position": "D", "country": "BRA" },
+    { "name": "Russo", "position": "D", "country": "BRA" },
+    { "name": "Chiquinho", "position": "M", "country": "BRA" },
+    { "name": "Elcio", "position": "M", "country": "BRA" },
+    { "name": "Marconi", "position": "M", "country": "BRA" },
+    { "name": "Preto", "position": "M", "country": "BRA" },
+    { "name": "Uélei", "position": "M", "country": "BRA" },
+    { "name": "Evando", "position": "A", "country": "BRA" },
+    { "name": "Gil Baiano", "position": "A", "country": "BRA" },
+    { "name": "Petkovic", "position": "A", "country": "RUS" },
+    { "name": "Saulo", "position": "A", "country": "BRA" }
+  ]
+}

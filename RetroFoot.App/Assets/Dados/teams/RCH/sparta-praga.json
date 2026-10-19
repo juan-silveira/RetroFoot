@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SPARTA.EFT",
+  "name": "SPARTA PRAGA",
+  "shortName": "SPARTA PRAGA",
+  "country": "RCH",
+  "level": 8,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Josef Venglos",
+  "players": [
+    { "name": "Jan Stejskal", "position": "G", "country": "RCH" },
+    { "name": "Petro Kostelnik", "position": "G", "country": "RCH" },
+    { "name": "Ivan Cabala", "position": "D", "country": "RCH" },
+    { "name": "Julius Bielik", "position": "D", "country": "RCH" },
+    { "name": "Lubomir Vilek", "position": "D", "country": "RCH" },
+    { "name": "Miroslav Kadlec", "position": "D", "country": "RCH" },
+    { "name": "Peter Fieber", "position": "D", "country": "RCH" },
+    { "name": "Vladimir Kinier", "position": "D", "country": "RCH" },
+    { "name": "Ivan Hasek", "position": "M", "country": "RCH" },
+    { "name": "Lubomir Moravcik", "position": "M", "country": "RCH" },
+    { "name": "Michal Bilek", "position": "M", "country": "RCH" },
+    { "name": "Vaclav Nemecek", "position": "M", "country": "RCH" },
+    { "name": "Villiam Hyravy", "position": "M", "country": "RCH" },
+    { "name": "Milan Luhovy", "position": "A", "country": "RCH" },
+    { "name": "Stanislav Griga", "position": "A", "country": "RCH" },
+    { "name": "Thomas Skuhravy", "position": "A", "country": "RCH" }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "EKERE.EFT",
+  "name": "KONINKLIJKE FOOTBALL CLUB GERMINAL EKERE",
+  "shortName": "GERMINAL EKERE",
+  "country": "BEL",
+  "level": 4,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Jos Verhaegen",
+  "players": [
+    { "name": "Jan Moons", "position": "G", "country": "BEL" },
+    { "name": "Mathieu Mertens", "position": "G", "country": "BEL" },
+    { "name": "Alex Camerman", "position": "D", "country": "BEL" },
+    { "name": "Erwin Kovacs", "position": "D", "country": "HUN" },
+    { "name": "Kevin Budts", "position": "D", "country": "BEL" },
+    { "name": "Mike Verstraeten", "position": "D", "country": "BEL" },
+    { "name": "Rudy Moury", "position": "D", "country": "BEL" },
+    { "name": "Thierry Siquet", "position": "D", "country": "BEL" },
+    { "name": "Tom Vandervee", "position": "D", "country": "BEL" },
+    { "name": "Cvijan Milosevic", "position": "M", "country": "BOS" },
+    { "name": "Emmanuël Karagiannis", "position": "M", "country": "BEL" },
+    { "name": "Fiorenzo Serchia", "position": "M", "country": "ITA" },
+    { "name": "Glenn Van Hoogten", "position": "M", "country": "BEL" },
+    { "name": "Laurent Dauwe", "position": "M", "country": "BEL" },
+    { "name": "Nick Descamps", "position": "M", "country": "BEL" },
+    { "name": "Alex Czeniatynski", "position": "A", "country": "BEL" },
+    { "name": "Edwin Van Ankeren", "position": "A", "country": "HOL" },
+    { "name": "Mihaly Toth", "position": "A", "country": "HUN" },
+    { "name": "Tomasz Radzinski", "position": "A", "country": "CAN" }
+  ]
+}

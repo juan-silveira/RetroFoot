@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PORTUGUE.EFT",
+  "name": "PORTUGUESA DE DESPORTOS",
+  "shortName": "LUSA",
+  "country": "BRA",
+  "level": 12,
+  "textColor": "#FF0000",
+  "backgroundColor": "#00FF00",
+  "coach": "Carlos A. Silva",
+  "players": [
+    { "name": "Marcelo Flores", "position": "G", "country": "BRA" },
+    { "name": "Sérgio", "position": "G", "country": "BRA" },
+    { "name": "Augusto", "position": "D", "country": "BRA" },
+    { "name": "César", "position": "D", "country": "BRA" },
+    { "name": "Fabrício", "position": "D", "country": "BRA" },
+    { "name": "Jorginho", "position": "D", "country": "BRA" },
+    { "name": "Valmir", "position": "D", "country": "BRA" },
+    { "name": "Aílton", "position": "M", "country": "BRA" },
+    { "name": "Caio", "position": "M", "country": "BRA" },
+    { "name": "Moacir", "position": "M", "country": "BRA" },
+    { "name": "Ricardo Miranda", "position": "M", "country": "BRA" },
+    { "name": "Alex Alves", "position": "A", "country": "BRA" },
+    { "name": "Cesinha", "position": "A", "country": "BRA" },
+    { "name": "Leandro", "position": "A", "country": "BRA" },
+    { "name": "Rodrigo", "position": "A", "country": "BRA" }
+  ]
+}

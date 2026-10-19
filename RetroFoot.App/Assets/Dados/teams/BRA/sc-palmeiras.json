@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PALMEIRA.EFT",
+  "name": "SC PALMEIRAS",
+  "shortName": "PALMEIRAS",
+  "country": "BRA",
+  "level": 13,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#008000",
+  "coach": "Luiz Felipe Scolari",
+  "players": [
+    { "name": "Marcos", "position": "G", "country": "BRA" },
+    { "name": "Veloso", "position": "G", "country": "BRA" },
+    { "name": "Cléber", "position": "D", "country": "BRA" },
+    { "name": "Edimilson", "position": "D", "country": "BRA" },
+    { "name": "Júnior", "position": "D", "country": "BRA" },
+    { "name": "Neném", "position": "D", "country": "BRA" },
+    { "name": "Roque Jr", "position": "D", "country": "BRA" },
+    { "name": "Amaral", "position": "M", "country": "BRA" },
+    { "name": "Euller", "position": "M", "country": "BRA" },
+    { "name": "Galeano", "position": "M", "country": "BRA" },
+    { "name": "Leandro", "position": "M", "country": "BRA" },
+    { "name": "Marquinhos", "position": "M", "country": "BRA" },
+    { "name": "Rogerio", "position": "M", "country": "BRA" },
+    { "name": "Alex", "position": "A", "country": "BRA" },
+    { "name": "Oséas", "position": "A", "country": "BRA" },
+    { "name": "Viola", "position": "A", "country": "BRA" }
+  ]
+}

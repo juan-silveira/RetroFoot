@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ATLET_PR.EFT",
+  "name": "C ATLETICO PR",
+  "shortName": "ATLETICO PR",
+  "country": "BRA",
+  "level": 4,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Abel Braga",
+  "players": [
+    { "name": "Flávio", "position": "G", "country": "BRA" },
+    { "name": "Ricardo Pinto", "position": "G", "country": "BRA" },
+    { "name": "Josicler", "position": "D", "country": "BRA" },
+    { "name": "Lira", "position": "D", "country": "BRA" },
+    { "name": "Robson", "position": "D", "country": "BRA" },
+    { "name": "Ronaldo", "position": "D", "country": "BRA" },
+    { "name": "Wilson", "position": "D", "country": "BRA" },
+    { "name": "Alex", "position": "M", "country": "BRA" },
+    { "name": "Jorginho", "position": "M", "country": "BRA" },
+    { "name": "Marildo", "position": "M", "country": "BRA" },
+    { "name": "Nowak", "position": "M", "country": "POL" },
+    { "name": "P Miranda", "position": "M", "country": "BRA" },
+    { "name": "Luisinho", "position": "A", "country": "BRA" },
+    { "name": "Nilson", "position": "A", "country": "BRA" },
+    { "name": "Pachequinho", "position": "A", "country": "BRA" },
+    { "name": "Rudnei", "position": "A", "country": "BRA" },
+    { "name": "Silvinho", "position": "A", "country": "BRA" }
+  ]
+}

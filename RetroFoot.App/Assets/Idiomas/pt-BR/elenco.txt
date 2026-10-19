@@ -1,0 +1,4 @@
+# O elenco: menu do botao direito, selos do estado (pt-BR). Formato: chave<TAB>traducao.
+Ver ficha	Ver ficha
+Pendurado	Pendurado
+Pendurado: mais um amarelo e fica suspenso	Pendurado: mais um amarelo e fica suspenso

@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BOTAFOGO.EFT",
+  "name": "BOTAFOGO FR",
+  "shortName": "BOTAFOGO",
+  "country": "BRA",
+  "level": 12,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Carlos A. Torres",
+  "players": [
+    { "name": "Carlao", "position": "G", "country": "BRA" },
+    { "name": "Wagner", "position": "G", "country": "BRA" },
+    { "name": "Gonçalves", "position": "D", "country": "BRA" },
+    { "name": "Jorge Luís", "position": "D", "country": "BRA" },
+    { "name": "Marcelo", "position": "D", "country": "BRA" },
+    { "name": "Pingo", "position": "D", "country": "BRA" },
+    { "name": "Wilson Goaino", "position": "D", "country": "BRA" },
+    { "name": "Alemão", "position": "M", "country": "BRA" },
+    { "name": "Bentinho", "position": "M", "country": "BRA" },
+    { "name": "Dimba", "position": "M", "country": "BRA" },
+    { "name": "Djair", "position": "M", "country": "BRA" },
+    { "name": "M Sousa", "position": "M", "country": "BRA" },
+    { "name": "Marcelo Alves", "position": "M", "country": "BRA" },
+    { "name": "Bentinho", "position": "A", "country": "BRA" },
+    { "name": "Reinaldo", "position": "A", "country": "BRA" },
+    { "name": "Sinval", "position": "A", "country": "BRA" },
+    { "name": "Túlio", "position": "A", "country": "BRA" }
+  ]
+}

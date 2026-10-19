@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "GLTSARAY.EFT",
+  "name": "GALATASARAY SPOR KULÜBÜ",
+  "shortName": "GALATASARAY",
+  "country": "TUR",
+  "level": 14,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFF00",
+  "coach": "Faruk Süren",
+  "players": [
+    { "name": "Gintaras Stauce", "position": "G", "country": "LIT" },
+    { "name": "Pierre Esser", "position": "G", "country": "ALE" },
+    { "name": "Volkan Kilimci", "position": "G", "country": "TUR" },
+    { "name": "Bülent Korkmaz", "position": "D", "country": "TUR" },
+    { "name": "Fatih Akyel", "position": "D", "country": "TUR" },
+    { "name": "Gheorghe Popescu", "position": "D", "country": "ROM" },
+    { "name": "Okuroglu Feti", "position": "D", "country": "TUR" },
+    { "name": "Omit Davala", "position": "D", "country": "TUR" },
+    { "name": "Osman Coskun", "position": "D", "country": "TUR" },
+    { "name": "Vedat Inceefe", "position": "D", "country": "TUR" },
+    { "name": "Adnan Ilgin", "position": "M", "country": "TUR" },
+    { "name": "Cengiz Dulgeroglu", "position": "M", "country": "TUR" },
+    { "name": "Emre Belozoglu", "position": "M", "country": "TUR" },
+    { "name": "Hakan Ünsal", "position": "M", "country": "TUR" },
+    { "name": "Okan Buruk", "position": "M", "country": "TUR" },
+    { "name": "Tugay Kerimoglu", "position": "M", "country": "TUR" },
+    { "name": "Adrian Knup", "position": "A", "country": "SUI" },
+    { "name": "Hakan Sükür", "position": "A", "country": "TUR" },
+    { "name": "Serkan Boyar", "position": "A", "country": "TUR" }
+  ]
+}

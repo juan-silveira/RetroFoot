@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PENAFIEL.EFT",
+  "name": "FUTEBOL CLUBE PENAFIEL",
+  "shortName": "PENAFIEL",
+  "country": "POR",
+  "level": 3,
+  "textColor": "#000000",
+  "backgroundColor": "#FF0000",
+  "coach": "José Alberto Torres",
+  "players": [
+    { "name": "Avelino", "position": "G", "country": "POR" },
+    { "name": "João Viva", "position": "G", "country": "POR" },
+    { "name": "Euclides Soares", "position": "D", "country": "BRA" },
+    { "name": "Joca", "position": "D", "country": "POR" },
+    { "name": "Martins", "position": "D", "country": "POR" },
+    { "name": "Ricardo", "position": "D", "country": "POR" },
+    { "name": "Tiago", "position": "D", "country": "POR" },
+    { "name": "Tozé", "position": "D", "country": "POR" },
+    { "name": "Zé Nando", "position": "D", "country": "POR" },
+    { "name": "Elias", "position": "M", "country": "POR" },
+    { "name": "Filipe Mendes", "position": "M", "country": "POR" },
+    { "name": "José Augusto", "position": "M", "country": "POR" },
+    { "name": "Ristovski", "position": "M", "country": "JUG" },
+    { "name": "Zé Armindo", "position": "M", "country": "POR" },
+    { "name": "Forbs", "position": "A", "country": "POR" },
+    { "name": "Monteiro", "position": "A", "country": "POR" },
+    { "name": "Moura", "position": "A", "country": "POR" },
+    { "name": "Porcel", "position": "A", "country": "ARG" },
+    { "name": "Tavares", "position": "A", "country": "GNE" }
+  ]
+}

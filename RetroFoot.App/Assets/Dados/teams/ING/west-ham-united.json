@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "WESTHAM.EFT",
+  "name": "WEST HAM UNITED",
+  "shortName": "WEST HAM",
+  "country": "ING",
+  "level": 5,
+  "textColor": "#00FFFF",
+  "backgroundColor": "#800080",
+  "coach": "Harry Redknapp",
+  "players": [
+    { "name": "Ludek Miklosco", "position": "G", "country": "RCH" },
+    { "name": "Adrian Whitbread", "position": "D", "country": "ING" },
+    { "name": "Julian Dicks", "position": "D", "country": "ING" },
+    { "name": "Keith Rowland", "position": "D", "country": "ILN" },
+    { "name": "Marc Rieper", "position": "D", "country": "DIN" },
+    { "name": "Rio Ferdinand", "position": "D", "country": "ING" },
+    { "name": "Slaven Bilic", "position": "D", "country": "CRO" },
+    { "name": "Steve Potts", "position": "D", "country": "ING" },
+    { "name": "Tim Breacker", "position": "D", "country": "ING" },
+    { "name": "Frank Lampard", "position": "M", "country": "ING" },
+    { "name": "Ian Bishop", "position": "M", "country": "ING" },
+    { "name": "John Moncur", "position": "M", "country": "ING" },
+    { "name": "Michael Hughes", "position": "M", "country": "ILN" },
+    { "name": "Robbie Slater", "position": "M", "country": "AUS" },
+    { "name": "Iain Dowie", "position": "A", "country": "ILN" },
+    { "name": "Ilie Dumitrescu", "position": "A", "country": "ROM" },
+    { "name": "John River", "position": "A", "country": "ILN" },
+    { "name": "Steve Jones", "position": "A", "country": "ING" },
+    { "name": "Tonny Cottee", "position": "A", "country": "ING" }
+  ]
+}

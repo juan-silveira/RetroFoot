@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ESPINHO.EFT",
+  "name": "SPORTING CLUBE DE ESPINHO",
+  "shortName": "ESPINHO",
+  "country": "POR",
+  "level": 5,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Zinho",
+  "players": [
+    { "name": "Dagoberto", "position": "G", "country": "BRA" },
+    { "name": "Luís Manuel", "position": "G", "country": "POR" },
+    { "name": "Carvalhal", "position": "D", "country": "POR" },
+    { "name": "Joilton", "position": "D", "country": "BRA" },
+    { "name": "Lino", "position": "D", "country": "POR" },
+    { "name": "Luís Miguel", "position": "D", "country": "POR" },
+    { "name": "Milton Mendes", "position": "D", "country": "BRA" },
+    { "name": "Paulo Pires", "position": "D", "country": "POR" },
+    { "name": "Rui Borges", "position": "D", "country": "POR" },
+    { "name": "Hélder", "position": "M", "country": "POR" },
+    { "name": "Márcio Luís", "position": "M", "country": "BRA" },
+    { "name": "Pedro", "position": "M", "country": "POR" },
+    { "name": "Soeiro", "position": "M", "country": "POR" },
+    { "name": "Sérgio Lavos", "position": "M", "country": "POR" },
+    { "name": "Artur Jorge ", "position": "A", "country": "POR" },
+    { "name": "Bolinhas", "position": "A", "country": "POR" },
+    { "name": "Delgado", "position": "A", "country": "POR" },
+    { "name": "Rocha", "position": "A", "country": "POR" }
+  ]
+}

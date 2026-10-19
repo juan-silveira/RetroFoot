@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PSG.EFT",
+  "name": "PARIS SAINT-GERMAIN",
+  "shortName": "PARIS SAINT-GERMAIN",
+  "country": "FRA",
+  "level": 13,
+  "textColor": "#FF0000",
+  "backgroundColor": "#000080",
+  "coach": "Ricardo Gomes",
+  "players": [
+    { "name": "Bruno Lama", "position": "G", "country": "FRA" },
+    { "name": "Philippe Bergerou", "position": "G", "country": "FRA" },
+    { "name": "Colleter", "position": "D", "country": "FRA" },
+    { "name": "Roche", "position": "D", "country": "FRA" },
+    { "name": "Sassus", "position": "D", "country": "FRA" },
+    { "name": "Thierry Tusseau", "position": "D", "country": "FRA" },
+    { "name": "William Ayache", "position": "D", "country": "FRA" },
+    { "name": "Fournier", "position": "M", "country": "FRA" },
+    { "name": "Guerin", "position": "M", "country": "FRA" },
+    { "name": "Le Guen", "position": "M", "country": "FRA" },
+    { "name": "Rai", "position": "M", "country": "BRA" },
+    { "name": "Florian Maurice", "position": "A", "country": "FRA" },
+    { "name": "Luis Fernandez", "position": "A", "country": "FRA" },
+    { "name": "Simone", "position": "A", "country": "ITA" }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "IFK_GOT.EFT",
+  "name": "IFK GOTEMBURGO",
+  "shortName": "IFK GOTEMBURGO",
+  "country": "SUE",
+  "level": 13,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#0000FF",
+  "coach": "Olle Nordin",
+  "players": [
+    { "name": "Sven Andersson", "position": "G", "country": "SUE" },
+    { "name": "Thomas Ravelli", "position": "G", "country": "SUE" },
+    { "name": "Andreas Ravelli", "position": "D", "country": "SUE" },
+    { "name": "Dennis Schiler", "position": "D", "country": "SUE" },
+    { "name": "Joachim Bjorklund", "position": "D", "country": "SUE" },
+    { "name": "Peter Larsson", "position": "D", "country": "SUE" },
+    { "name": "Peter Lönn", "position": "D", "country": "SUE" },
+    { "name": "Roland Nilsson", "position": "D", "country": "SUE" },
+    { "name": "Glenn Strömberg", "position": "M", "country": "SUE" },
+    { "name": "Joakim Nilsson", "position": "M", "country": "SUE" },
+    { "name": "Klas Ingesson", "position": "M", "country": "SUE" },
+    { "name": "Robert Prytz", "position": "M", "country": "SUE" },
+    { "name": "Stefan Rehn", "position": "M", "country": "SUE" },
+    { "name": "Johnny Ekström", "position": "A", "country": "SUE" },
+    { "name": "Stefan Lindqvist", "position": "A", "country": "SUE" },
+    { "name": "Stefan Petersson", "position": "A", "country": "SUE" }
+  ]
+}

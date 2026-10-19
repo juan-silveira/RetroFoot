@@ -1,0 +1,5 @@
+Clássica	Clásica
+Atual	Actual
+Realístico	Realista
+Clássica (98.003)	Clásica (98.003)
+Como o clássico: as telas no formato de 800x600.	Como el clásico: pantallas en formato 800x600.

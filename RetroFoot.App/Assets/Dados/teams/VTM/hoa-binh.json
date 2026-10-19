@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "HOABINH.EFT",
+  "name": "HOA BINH",
+  "shortName": "HOA BINH",
+  "country": "VTM",
+  "level": 4,
+  "textColor": "#FFFF00",
+  "backgroundColor": "#008000",
+  "coach": "Lin Son Va",
+  "players": [
+    { "name": "Hien Doan", "position": "G", "country": "VTM" },
+    { "name": "Kim Pi Na", "position": "G", "country": "CBD" },
+    { "name": "Thinh Nguyen", "position": "G", "country": "VTM" },
+    { "name": "Hoang Nguyen", "position": "D", "country": "VTM" },
+    { "name": "Nan Kitiyakara", "position": "D", "country": "VTM" },
+    { "name": "Nha Pham", "position": "D", "country": "CBD" },
+    { "name": "Phong Nguyen", "position": "D", "country": "VTM" },
+    { "name": "Qui Khanh Doan", "position": "D", "country": "VTM" },
+    { "name": "Thanh Nguyen", "position": "D", "country": "VTM" },
+    { "name": "La Dis Lau", "position": "M", "country": "CRS" },
+    { "name": "My Nguyen", "position": "M", "country": "VTM" },
+    { "name": "Nguyen Le", "position": "M", "country": "VTM" },
+    { "name": "Tomo", "position": "M", "country": "VTM" },
+    { "name": "Vu", "position": "M", "country": "VTM" },
+    { "name": "Chanh Truong", "position": "A", "country": "VTM" },
+    { "name": "Phong Tran", "position": "A", "country": "VTM" },
+    { "name": "Quoc Doan", "position": "A", "country": "VTM" }
+  ]
+}

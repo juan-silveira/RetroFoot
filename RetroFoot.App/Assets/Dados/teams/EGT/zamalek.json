@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ZAMALEK.EFT",
+  "name": "ZAMALEK",
+  "shortName": "ZAMALEK",
+  "country": "EGT",
+  "level": 4,
+  "textColor": "#FFFF00",
+  "backgroundColor": "#800000",
+  "coach": "El Khabir",
+  "players": [
+    { "name": "Abutai", "position": "G", "country": "EGT" },
+    { "name": "Nader", "position": "G", "country": "EGT" },
+    { "name": "Abui", "position": "D", "country": "EGT" },
+    { "name": "Himan", "position": "D", "country": "EGT" },
+    { "name": "Metahat", "position": "D", "country": "EGT" },
+    { "name": "Monine", "position": "D", "country": "EGT" },
+    { "name": "Samimey", "position": "D", "country": "EGT" },
+    { "name": "Abdala", "position": "M", "country": "EGT" },
+    { "name": "El Said", "position": "M", "country": "EGT" },
+    { "name": "Hussana", "position": "M", "country": "EGT" },
+    { "name": "Yusuf", "position": "M", "country": "EGT" },
+    { "name": "Akram", "position": "A", "country": "EGT" },
+    { "name": "Mustafa", "position": "A", "country": "EGT" },
+    { "name": "Romadan", "position": "A", "country": "EGT" }
+  ]
+}

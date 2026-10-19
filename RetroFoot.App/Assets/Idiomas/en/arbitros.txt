@@ -1,0 +1,34 @@
+# Ferramenta Árbitros do hub (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Procurar nome	Search name
+Só os ativos	Active only
+Só os desativados	Switched off only
+Ativo (usado nos jogos novos)	Active (used in new games)
+Liga	League
+Clássico (1998)	Classic (1998)
+Patch	Patch
+Seu	Yours
+Ativo	On
+Origem	Source
+Novo	New
+Os jogos novos usam os árbitros ativos. Se escolher só um país no jogo novo, ficam só os desse país.	New games use the active referees. If you pick a single country for a new game, only that country's referees are used.
+Repor a lista do jogo	Restore the game's list
+Ativo: clique para desativar	Active: click to switch off
+Desativado: clique para ativar	Switched off: click to activate
+(sem nome)	(no name)
+Não consegui ler {0}: {1}	Could not read {0}: {1}
+Arquivo: {0}	File: {0}
+Ainda sem lista: a do jogo entra ao repor.	No list yet: restoring brings in the game's list.
+Todos os países ({0})	All countries ({0})
+{0} árbitros ativos em {1} países · {2} desativados · Delete remove · clique na marca para ativar ou desativar	{0} active referees in {1} countries · {2} switched off · Delete removes · click the tick to switch on or off
+Sem nome: não é gravado.	No name: it is not saved.
+Letras fora do Latin-1 perdem o acento no jogo.	Letters outside Latin-1 lose their accent in the game.
+O jogo usa só as primeiras 40 letras.	The game only uses the first 40 letters.
+O país {0} não está em countries.tsv.	Country {0} is not in countries.tsv.
+Por gravar...	Saving...
+Gravado em {0} (o anterior fica em .bak).	Saved to {0} (the previous one is kept as .bak).
+Não consegui gravar: {0}	Could not save: {0}
+Repor a lista de árbitros que vem com o jogo? A sua lista atual fica guardada em {0}.bak.	Restore the referee list that comes with the game? Your current list is kept in {0}.bak.
+Repor	Restore
+Não consegui repor: {0}	Could not restore: {0}
+Lista do jogo reposta ({0} árbitros ativos).	Game's list restored ({0} active referees).

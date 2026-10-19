@@ -1,0 +1,15 @@
+# RetroFoot (es): o nome novo, o Sobre, o visual Clássico. Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Para que o registro tenha efeito, você terá de reiniciar o jogo.	Para que el registro tenga efecto, tendrás que reiniciar el juego.
+O registro libera todas as possibilidades do jogo.	El registro desbloquea todas las posibilidades del juego.
+Terá ainda acesso a outras possibilidades que o ajudarão a ser o melhor de todos os treinadores.	Tendrás además otras posibilidades que te ayudarán a ser el mejor de todos los entrenadores.
+Esc: sai do jogo.	Esc: sale del juego.
+O jogo só suporta {0} times. Alguns dos times dos países selecionados não farão parte deste jogo.	El juego solo admite {0} equipos. Algunos equipos de los países elegidos no estarán en esta partida.
+As regras de 1998 (98.003): 8 equipas por divisão, só cartões vermelhos, sem patrocínios.	Las reglas de 1998 (98.003): 8 equipos por división, solo tarjetas rojas, sin patrocinios.
+Clássico	Clásico
+O aspecto clássico: janelas do Windows 95 no verde, sem logos.	El aspecto clásico: ventanas de Windows 95 sobre verde, sin escudos.
+Os recursos da cópia registrada.	Las funciones de la copia registrada.
+Por padrão, o jogo como em 1998: as adições ficam desligadas até você ligar aqui.	Por defecto, el juego como en 1998: los añadidos quedan desactivados hasta que los actives aquí.
+Clássico: o aspecto do Windows 95, sem logos	Clásico: el aspecto de Windows 95, sin escudos
+Gestor de futebol	Mánager de fútbol
+Versão {0}	Versión {0}

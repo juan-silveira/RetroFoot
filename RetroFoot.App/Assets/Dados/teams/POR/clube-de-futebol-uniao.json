@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "UNMADEIR.EFT",
+  "name": "CLUBE DE FUTEBOL UNIÃO",
+  "shortName": "UNIÃO DA MADEIRA",
+  "country": "POR",
+  "level": 3,
+  "textColor": "#008000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Vítor Urbano",
+  "players": [
+    { "name": "Jorcey", "position": "G", "country": "BRA" },
+    { "name": "Mário Jorge", "position": "G", "country": "POR" },
+    { "name": "Agrela", "position": "D", "country": "POR" },
+    { "name": "Dragan", "position": "D", "country": "JUG" },
+    { "name": "Gouveia", "position": "D", "country": "POR" },
+    { "name": "Leonardo", "position": "D", "country": "BRA" },
+    { "name": "Moura", "position": "D", "country": "BRA" },
+    { "name": "Nelinho", "position": "D", "country": "POR" },
+    { "name": "Piá", "position": "D", "country": "BRA" },
+    { "name": "Edson", "position": "M", "country": "BRA" },
+    { "name": "Genilson", "position": "M", "country": "BRA" },
+    { "name": "Ignatov", "position": "M", "country": "BUL" },
+    { "name": "Renato", "position": "M", "country": "BRA" },
+    { "name": "Stevanovic", "position": "M", "country": "JUG" },
+    { "name": "Iran Gomes", "position": "A", "country": "BRA" },
+    { "name": "Jurandi", "position": "A", "country": "BRA" },
+    { "name": "Mladenovic", "position": "A", "country": "JUG" },
+    { "name": "Ney Júnior", "position": "A", "country": "BRA" },
+    { "name": "Regis", "position": "A", "country": "BRA" }
+  ]
+}

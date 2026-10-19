@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- O conversor da pasta de dados: patches do jogo classico (.EFT/.TXE, zip ou pasta) <-> JSON/TSV do RetroFoot -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RetroFoot.Motor\RetroFoot.Motor.csproj" />
+  </ItemGroup>
+</Project>

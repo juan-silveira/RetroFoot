@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CASTEL.EFT",
+  "name": "CASTEL DI SANGRO",
+  "shortName": "CASTEL DI SANGRO",
+  "country": "ITA",
+  "level": 9,
+  "textColor": "#FF0000",
+  "backgroundColor": "#000000",
+  "coach": "Gabriele Gravina",
+  "players": [
+    { "name": "Carlo Cudicini", "position": "G", "country": "ITA" },
+    { "name": "Massimo Lotti", "position": "G", "country": "ITA" },
+    { "name": "Damiano Cesari", "position": "D", "country": "ITA" },
+    { "name": "Fabio Rimedio", "position": "D", "country": "ITA" },
+    { "name": "Luca Dangelo", "position": "D", "country": "ITA" },
+    { "name": "Michele Mignani", "position": "D", "country": "ITA" },
+    { "name": "Nicola Calabro", "position": "D", "country": "ITA" },
+    { "name": "Alberto Bernardi", "position": "M", "country": "ITA" },
+    { "name": "Alessandro Teodorani", "position": "M", "country": "ITA" },
+    { "name": "Daniele Di Donato", "position": "M", "country": "ITA" },
+    { "name": "Davide Cangini", "position": "M", "country": "ITA" },
+    { "name": "Domenico Cristiano", "position": "M", "country": "ITA" },
+    { "name": "Marco Andreotti", "position": "M", "country": "ITA" },
+    { "name": "Massimo Nunziato", "position": "M", "country": "ITA" },
+    { "name": "Piero Panzanaro", "position": "M", "country": "ITA" },
+    { "name": "Roberto Alberti", "position": "M", "country": "ITA" },
+    { "name": "Cristian Baglieri", "position": "A", "country": "ITA" },
+    { "name": "Jonathan Spinesi", "position": "A", "country": "ITA" }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "VITOCHA.EFT",
+  "name": "VITOCHA SOFIA",
+  "shortName": "VITOCHA SOFIA",
+  "country": "BUL",
+  "level": 6,
+  "textColor": "#000080",
+  "backgroundColor": "#808000",
+  "coach": "Ivan Vutzov",
+  "players": [
+    { "name": "Ilia Vulov", "position": "G", "country": "BUL" },
+    { "name": "Valerij Novikov", "position": "G", "country": "RUS" },
+    { "name": "Emil Dimitrov", "position": "D", "country": "BUL" },
+    { "name": "Georghi Dimitrov", "position": "D", "country": "BUL" },
+    { "name": "Krasimir Kolev", "position": "D", "country": "BUL" },
+    { "name": "Lubom.Scheitanov", "position": "D", "country": "BUL" },
+    { "name": "Petar Petrov", "position": "D", "country": "BUL" },
+    { "name": "Stef. Lachtchiev", "position": "D", "country": "BUL" },
+    { "name": "Glenn Hoddle", "position": "M", "country": "ING" },
+    { "name": "Jivko Gozpodinov", "position": "M", "country": "BUL" },
+    { "name": "Pedro Troglio", "position": "M", "country": "ARG" },
+    { "name": "Plemen Getov", "position": "M", "country": "BUL" },
+    { "name": "Radosl. Zdravkov", "position": "M", "country": "BUL" },
+    { "name": "Kost. Kostadinov", "position": "A", "country": "BUL" },
+    { "name": "Russi Gochev", "position": "A", "country": "BUL" },
+    { "name": "Stoicho Mladenov", "position": "A", "country": "BUL" }
+  ]
+}

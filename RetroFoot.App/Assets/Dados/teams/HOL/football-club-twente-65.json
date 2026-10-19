@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "TWENTE.EFT",
+  "name": "FOOTBALL CLUB TWENTE '65",
+  "shortName": "TWENTE",
+  "country": "HOL",
+  "level": 11,
+  "textColor": "#FF0000",
+  "backgroundColor": "#C0C0C0",
+  "coach": "Hans Van den Berg",
+  "players": [
+    { "name": "Aldo Swager", "position": "G", "country": "HOL" },
+    { "name": "Sander Boschker", "position": "G", "country": "HOL" },
+    { "name": "Andreas Augustsson", "position": "D", "country": "HOL" },
+    { "name": "André Karnebeek", "position": "D", "country": "HOL" },
+    { "name": "Dennis Hulshoff", "position": "D", "country": "ALE" },
+    { "name": "Niels Oude Kamphuis", "position": "D", "country": "HOL" },
+    { "name": "Rab Mckinnon", "position": "D", "country": "ESC" },
+    { "name": "Bertil Ter Avest", "position": "M", "country": "HOL" },
+    { "name": "Erik Ten Hag", "position": "M", "country": "HOL" },
+    { "name": "Jan Van Halst", "position": "M", "country": "HOL" },
+    { "name": "Joeri Petrov", "position": "M", "country": "RUS" },
+    { "name": "Nicojan Hoogma", "position": "M", "country": "HOL" },
+    { "name": "Rico Steinmann", "position": "M", "country": "HOL" },
+    { "name": "Theo Ten Caat", "position": "M", "country": "HOL" },
+    { "name": "Antti Sumiala", "position": "A", "country": "FIN" },
+    { "name": "Jan Vennegoor", "position": "A", "country": "HOL" },
+    { "name": "Johnny Bosman", "position": "A", "country": "HOL" }
+  ]
+}

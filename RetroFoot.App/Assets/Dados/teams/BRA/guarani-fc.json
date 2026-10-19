@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "GUARANI.EFT",
+  "name": "GUARANI FC",
+  "shortName": "GUARANI",
+  "country": "BRA",
+  "level": 5,
+  "textColor": "#00FF00",
+  "backgroundColor": "#000000",
+  "coach": "Oswaldo Alwarez",
+  "players": [
+    { "name": "Cléguer", "position": "G", "country": "BRA" },
+    { "name": "Pitarelli", "position": "G", "country": "BRA" },
+    { "name": "Luís Cláudio", "position": "D", "country": "BRA" },
+    { "name": "Marinho", "position": "D", "country": "BRA" },
+    { "name": "Rubens Cardoso", "position": "D", "country": "BRA" },
+    { "name": "Sorlei", "position": "D", "country": "BRA" },
+    { "name": "Edinho Goiano", "position": "M", "country": "BRA" },
+    { "name": "Ferreira", "position": "M", "country": "BRA" },
+    { "name": "Jean Carlo", "position": "M", "country": "BRA" },
+    { "name": "Mineiro", "position": "M", "country": "BRA" },
+    { "name": "Paulo Isidoro", "position": "M", "country": "BRA" },
+    { "name": "Vaguinho", "position": "M", "country": "BRA" },
+    { "name": "Aíltom", "position": "A", "country": "BRA" },
+    { "name": "Dinei", "position": "A", "country": "BRA" },
+    { "name": "Samuel", "position": "A", "country": "BRA" },
+    { "name": "Silvinho", "position": "A", "country": "BRA" }
+  ]
+}

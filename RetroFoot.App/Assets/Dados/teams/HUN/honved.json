@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "HONVED.EFT",
+  "name": "HONVED",
+  "shortName": "HONVED",
+  "country": "HUN",
+  "level": 10,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Gyorgy Mezzey",
+  "players": [
+    { "name": "Joszef Andrusch", "position": "G", "country": "HUN" },
+    { "name": "Peter Disztil", "position": "G", "country": "HUN" },
+    { "name": "Antal Nagy", "position": "D", "country": "HUN" },
+    { "name": "Antal Roth", "position": "D", "country": "HUN" },
+    { "name": "Imre Garaba", "position": "D", "country": "HUN" },
+    { "name": "Joszef Csuhay", "position": "D", "country": "HUN" },
+    { "name": "Laszlo Disztil", "position": "D", "country": "HUN" },
+    { "name": "Sandor Sallai", "position": "D", "country": "HUN" },
+    { "name": "Attila Heredi", "position": "M", "country": "HUN" },
+    { "name": "Bela Bodonyi", "position": "M", "country": "HUN" },
+    { "name": "Joszef Kardos", "position": "M", "country": "HUN" },
+    { "name": "Katman Kovacs", "position": "M", "country": "HUN" },
+    { "name": "Lajos Detari", "position": "M", "country": "HUN" },
+    { "name": "Joszef Kiprich", "position": "A", "country": "HUN" },
+    { "name": "Joszef Szabo", "position": "A", "country": "HUN" },
+    { "name": "Marton Esterhazy", "position": "A", "country": "HUN" }
+  ]
+}

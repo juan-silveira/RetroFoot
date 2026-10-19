@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SAMPDORI.EFT",
+  "name": "SAMPDORIA",
+  "shortName": "SAMPDORIA",
+  "country": "ITA",
+  "level": 13,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#0000FF",
+  "coach": "Sven G Eriksson",
+  "players": [
+    { "name": "De Sanctis", "position": "G", "country": "ITA" },
+    { "name": "Walter Zenga", "position": "G", "country": "ITA" },
+    { "name": "Hugo", "position": "D", "country": "POR" },
+    { "name": "Luca Pelegrini", "position": "D", "country": "ITA" },
+    { "name": "Mannini", "position": "D", "country": "ITA" },
+    { "name": "Matteoli", "position": "D", "country": "ITA" },
+    { "name": "Vierchowood", "position": "D", "country": "ITA" },
+    { "name": "Albertino Evani", "position": "M", "country": "ITA" },
+    { "name": "Dossena", "position": "M", "country": "ITA" },
+    { "name": "Pari", "position": "M", "country": "ITA" },
+    { "name": "Sandro Pellegrini", "position": "M", "country": "ITA" },
+    { "name": "Srecko Katanec", "position": "M", "country": "JUG" },
+    { "name": "Victor Muñoz", "position": "M", "country": "ESP" },
+    { "name": "Atilio Lombardo", "position": "A", "country": "ITA" },
+    { "name": "Roberto Mancini", "position": "A", "country": "ITA" },
+    { "name": "Valdano", "position": "A", "country": "ARG" }
+  ]
+}

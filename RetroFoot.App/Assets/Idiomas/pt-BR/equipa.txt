@@ -1,0 +1,12 @@
+# A tela da equipa (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+# --- TelaEquipa: a barra de menus ---
+menu: Sair	Salvar e sair
+Gravar	Salvar
+Últimos vencedores...	Últimos campeões...
+
+# --- TelaEquipa: Time > Imprimir (o plantel em .txt e .csv) ---
+menu: Imprimir	Exportar elenco
+Exportar plantel	Exportar elenco
+Plantel exportado para:	Elenco exportado para:
+Não foi possível exportar o plantel.	Não foi possível exportar o elenco.

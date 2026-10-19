@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CORITIBA.EFT",
+  "name": "CORITIBA FBC",
+  "shortName": "CORITIBA",
+  "country": "BRA",
+  "level": 7,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#008000",
+  "coach": "Rubens Minelli",
+  "players": [
+    { "name": "Edílson", "position": "G", "country": "BRA" },
+    { "name": "Maizena", "position": "G", "country": "BRA" },
+    { "name": "Alexandre", "position": "D", "country": "BRA" },
+    { "name": "Flávio", "position": "D", "country": "BRA" },
+    { "name": "Pedro Aruba", "position": "D", "country": "BRA" },
+    { "name": "Reginaldo", "position": "D", "country": "BRA" },
+    { "name": "Zambiase", "position": "D", "country": "BRA" },
+    { "name": "Cléber", "position": "M", "country": "BRA" },
+    { "name": "Dirceu", "position": "M", "country": "BRA" },
+    { "name": "Marquinhos", "position": "M", "country": "BRA" },
+    { "name": "Paulo Foiani", "position": "M", "country": "BRA" },
+    { "name": "Vagner Mancini", "position": "M", "country": "BRA" },
+    { "name": "Alaor", "position": "A", "country": "BRA" },
+    { "name": "Eliomar", "position": "A", "country": "BRA" },
+    { "name": "Jajá", "position": "A", "country": "BRA" },
+    { "name": "Marcelinho", "position": "A", "country": "BRA" }
+  ]
+}

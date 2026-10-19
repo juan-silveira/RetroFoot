@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CAEN.EFT",
+  "name": "CAEN",
+  "shortName": "CAEN",
+  "country": "FRA",
+  "level": 9,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000080",
+  "coach": "Jean-Francois Fortin",
+  "players": [
+    { "name": "Luc Borrelli", "position": "G", "country": "FRA" },
+    { "name": "Marc Delaroche", "position": "G", "country": "FRA" },
+    { "name": "Alfredo Grelak", "position": "D", "country": "ARG" },
+    { "name": "Bernard Héréson", "position": "D", "country": "FRA" },
+    { "name": "David Sommeil", "position": "D", "country": "FRA" },
+    { "name": "Guillaume Ceccutti", "position": "D", "country": "FRA" },
+    { "name": "Jimmy Hebert", "position": "D", "country": "FRA" },
+    { "name": "Stéphane Moreau", "position": "D", "country": "FRA" },
+    { "name": "Arnaud Tanguy", "position": "M", "country": "FRA" },
+    { "name": "Emmanuel Rival", "position": "M", "country": "FRA" },
+    { "name": "Raphaël Guerreiro", "position": "M", "country": "FRA" },
+    { "name": "Régis Brouard", "position": "M", "country": "FRA" },
+    { "name": "Vincent Petit", "position": "M", "country": "FRA" },
+    { "name": "Alen Bajkusa", "position": "A", "country": "FRA" },
+    { "name": "Etienne Mendy", "position": "A", "country": "FRA" },
+    { "name": "Frédéric Nee", "position": "A", "country": "FRA" },
+    { "name": "Norberto Mercorella", "position": "A", "country": "FRA" },
+    { "name": "Pascal Vahirua", "position": "A", "country": "FRA" },
+    { "name": "Samuel Boutal", "position": "A", "country": "FRA" }
+  ]
+}

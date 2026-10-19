@@ -1,0 +1,195 @@
+# Os termos do jogo em portugues do Brasil (da tabela do launcher,
+# launcher/game/IDIOMAS/pt-BR.txt). Formato: chave<TAB>traducao (Idioma.cs).
+
+# A chave e o texto como no original (portugues de Portugal); entre aspas quando comeca ou
+# termina com espaco. Os termos: docs/glossario-idiomas.md.
+
+# --- Termos gerais ---
+Equipa	Time
+Equipa...	Time...
+Equipas existentes	Times existentes
+Equipas seleccionadas	Times selecionados
+Equipas com empréstimos...	Times com empréstimos...
+Equipas endividadas...	Times endividados...
+Equipas com empréstimos	Times com empréstimos
+Equipas endividadas	Times endividados
+" equipa"	" time"
+" equipas"	" times"
+" equipas."	" times."
+"A equipa "	"O time "
+Abrir uma equipa	Abrir um time
+Nova equipa	Novo time
+Próxima equipa	Próximo time
+Gravar Equipa	Salvar Time
+Gravar a equipa	Salvar o time
+Gravar o jogo	Salvar o jogo
+Jogos gravados:	Jogos salvos:
+Sair sem gravar	Sair sem salvar
+Não se pode gravar a equipa porque:	Não é possível salvar o time porque:
+Sortear equipas	Sortear times
+Golos	Gols
+Golos esta época	Gols na Temporada
+" golos)"	" gols)"
+Época	Temporada
+Fim de Época	Fim de Temporada
+No início da época	No início da temporada
+Jornada	Rodada
+De 3 em 3 jornadas	De 3 em 3 rodadas
+Todas as jornadas	Todas as rodadas
+ª jornada	ª rodada
+ª Jornada	ª Rodada
+"ª Jornada - "	"ª Rodada - "
+Selecção	Escalação
+Seleccionar	Escalar
+Selecção de Países	Seleção de Países
+Países seleccionados	Países selecionados
+Seleccione a equipa para onde pretende transferir o jogador	Selecione o time para onde pretende transferir o jogador
+"Seleccione os países com que pretende jogar, de modo a totalizar pelo menos "	"Selecione os países com que pretende jogar, de modo a totalizar pelo menos "
+Algumas das equipas dos países seleccionados não farão parte deste jogo.	Alguns dos times dos países selecionados não farão parte deste jogo.
+Plantel	Elenco
+Plantel...	Elenco...
+Historial	Histórico
+Historial...	Histórico...
+Treinador	Técnico
+Treinador...	Técnico...
+Gestão de Treinadores	Gestão de Técnicos
+Gestão de treinadores...	Gestão de técnicos...
+Nome do treinador da equipa	Nome do técnico do time
+Nome do novo treinador:	Nome do novo técnico:
+Novo treinador	Novo técnico
+Ranking de Treinadores	Ranking de Técnicos
+a ser o melhor de todos os treinadores.	a ser o melhor de todos os técnicos.
+" foi despedido do "	" foi demitido do "
+Chicotadas Psicológicas	Demissões de Técnicos
+Mostar chicotadas psicológicas	Mostrar demissões de técnicos
+Ficheiro	Arquivo
+Erro a abrir o ficheiro	Erro ao abrir o arquivo
+"Erro a abrir o ficheiro "	"Erro ao abrir o arquivo "
+Nome do ficheiro (8 letras):	Nome do arquivo (8 letras):
+Nome do ficheiro (max. 8 letras)	Nome do arquivo (máx. 8 letras)
+Nome do ficheiro inválido	Nome do arquivo inválido
+Nome do ficheiro para gravar o novo jogo	Nome do arquivo para salvar o novo jogo
+"Verifique a directoria "	"Verifique a pasta "
+Acerca	Sobre
+Acerca...	Sobre...
+Registar	Registrar
+Registo	Registro
+Quando registar o jogo, poderá:	Quando registrar o jogo, poderá:
+o seu registo, que será feito através da introdução correcta	o seu registro, que será feito através da digitação correta
+Actualização de Salário	Atualização de Salário
+Nível de inflacção	Nível de inflação
+Propôr	Propor
+Prémios	Prêmios
+Aquisições...	Contratações...
+Jogadores adquiridos	Jogadores contratados
+Preço dos bilhetes	Preço do ingresso
+As novas bancadas só estarão disponíveis para o próximo jogo	As novas arquibancadas só estarão disponíveis no próximo jogo
+Utilize os dois botões do rato para escolher a cor para o texto (T) e para o fundo (F). Veja neste texto o efeito.	Utilize os dois botões do mouse para escolher a cor do texto (T) e do fundo (F). Veja neste texto o efeito.
+Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo efectuado	Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo realizado
+O jogador será colocado na sua nova equipa quando esta for aberta através do comando Abrir ou Próxima Equipa (menu Ficheiro)	O jogador será colocado no seu novo time quando este for aberto pelo comando Abrir ou Próximo Time (menu Arquivo)
+O nível da equipa servirá para a ordenação das equipas pelas várias divisões.	O nível do time servirá para a ordenação dos times pelas várias divisões.
+Ex: Boavista	Ex: Santos
+Ex: Boavista Futebol Clube	Ex: Santos Futebol Clube
+"Escreva o novo país, correspondente a "	"Digite o novo país, correspondente a "
+
+# --- O que o registro libera (tela Registro) ---
+- Efectuar a compra directa de jogadores a qualquer equipa	- Efetuar a compra direta de jogadores de qualquer time
+- Efectuar substituições durante o jogo (e não só ao intervalo)	- Efetuar substituições durante o jogo (e não só no intervalo)
+- Obter informaçao sobre a influência do árbitro para cada equipa	- Obter informação sobre a influência do árbitro para cada time
+- Seleccionar, um a um, os jogadores para cada jogo	- Escalar, um a um, os jogadores para cada jogo
+- Visualizar o plantel da equipa adversária e de todas as outras	- Ver o elenco do time adversário e de todos os outros
+
+# --- Posições ---
+Guarda-redes	Goleiro
+Defesa	Defensor
+Médio	Meia
+Avançado	Atacante
+
+# --- Partida ---
+Penalti	Pênalti
+Penaltis	Pênaltis
+Penalty	Pênalti
+, escolha o jogador para marcar o penalti!	, escolha o jogador para bater o pênalti!
+Ver os desempates por penalties nos jogos sem treinadores humanos	Ver as disputas de pênaltis nos jogos sem técnicos humanos
+Substituições ao intervalo	Substituições no intervalo
+GOLO	GOL
+Ao poste	Na trave
+À barra	Travessão
+Melhor marcador	Artilheiro
+Melhor marcador (	Artilheiro (
+"Marcador: "	"Goleador: "
+Melhores marcadores...	Artilheiros...
+Melhores marcadores de sempre...	Maiores artilheiros...
+Melhores marcadores de sempre	Maiores artilheiros
+Melhores marcadores desta época	Artilheiros da temporada
+
+# --- Copa (Taça) ---
+Taça	Copa
+"Taça - "	"Copa - "
+"TAÇA - "	"COPA - "
+ª taça	ª copa
+ª taça)	ª copa)
+Sorteio dos jogos da taça	Sorteio dos jogos da copa
+Ver sorteio da taça	Ver sorteio da copa
+Vencedor da taça	Campeão da copa
+Vencedor do campeonato	Campeão do campeonato
+Últimos vencedores do campeonato e da taça	Últimos campeões do campeonato e da copa
+Meias-finais	Semifinais
+Quartos de final	Quartas de final
+Oitavos de final	Oitavas de final
+
+# --- Mensagens ---
+A carregar o jogo...	Carregando o jogo...
+A gravar o jogo...	Salvando o jogo...
+A iniciar o jogo...	Iniciando o jogo...
+Ultrassónico	Ultrassônico
+Este jogador já estyá vendido	Este jogador já está vendido
+Este jogador só pode ser vendido na próxima época	Este jogador só pode ser vendido na próxima temporada
+Não pode vender mais guarda-redes	Não pode vender mais goleiros
+Não está definido o nome da equipa	Não está definido o nome do time
+Não está definido o país da equipa	Não está definido o país do time
+Não está definido o nível da equipa	Não está definido o nível do time
+Não tem guarda-redes	Não tem goleiro
+Não está definido o treinador	Não está definido o técnico
+Cópia não registada	Cópia não registrada
+Cópia registada	Cópia registrada
+Cópia com registo VIP	Cópia com registro VIP
+Cópia com registo super-VIP	Cópia com registro super-VIP
+Registo para amigo dos autores	Registro para amigo dos autores
+Registo para grande amigo dos autores	Registro para grande amigo dos autores
+Cópia registada para experimentadores	Cópia registrada para testadores
+Registo para experimentador especial	Registro para testador especial
+Registo para autor	Registro para autor
+
+# --- Textos com TAB ou quebra de linha (\t, \n) ---
+# Balanco
+Época\t	Temporada\t
+Bilhetes\t	Bilheteria\t
+Despesas\t	Gastos\t
+Total de receitas\t	Receita total\t
+Total de despesas\t	Gasto total\t
+Prémios\t	Prêmios\t
+Bancadas\t	Arquibancadas\t
+# Estadio
+Preço de uma bancada com\n	Preço de uma arquibancada com\n
+# Historico do time
+PTaça\t	PCopa\t
+# Mensagens
+" equipas para poder jogar.\n"	" times para poder jogar.\n"
+" equipas.\n"	" times.\n"
+) lesionou-se e tem de ser substituído.\nEscolha o jogador a entrar.	) se lesionou e tem de ser substituído.\nEscolha o jogador a entrar.
+
+# --- Ajuda do Arbitro (chances no nome de cada time, do launcher) ---
+"   Penálti: "	"   Pênalti: "
+
+# --- Patrocinadores (propostas, do launcher) ---
+" por época, durante "	" por temporada, durante "
+" época"	" temporada"
+" épocas"	" temporadas"
+,\npara ser o patrocinador principal da sua equipa.	,\npara ser o patrocinador master do seu time.
+,\npara renovar o contrato de patrocinador principal.	,\npara renovar o contrato de patrocinador master.
+,\npara estampar a marca no equipamento.	,\npara estampar a marca no uniforme.
+" por época"	" por temporada"
+" época restante"	" temporada restante"
+" épocas restantes"	" temporadas restantes"
+Patrocinador principal	Patrocinador master

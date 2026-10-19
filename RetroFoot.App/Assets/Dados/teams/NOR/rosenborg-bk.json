@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ROSENBOR.EFT",
+  "name": "ROSENBORG BK",
+  "shortName": "ROSENBORG",
+  "country": "NOR",
+  "level": 13,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Nils Arne Eggen",
+  "players": [
+    { "name": "Jarntfall", "position": "G", "country": "NOR" },
+    { "name": "Sorlie", "position": "G", "country": "NOR" },
+    { "name": "Bergdolmo", "position": "D", "country": "NOR" },
+    { "name": "Bragstad", "position": "D", "country": "NOR" },
+    { "name": "Heggen", "position": "D", "country": "NOR" },
+    { "name": "Hernes", "position": "D", "country": "NOR" },
+    { "name": "Hoftun", "position": "D", "country": "NOR" },
+    { "name": "Mayer", "position": "D", "country": "NOR" },
+    { "name": "Berg", "position": "M", "country": "NOR" },
+    { "name": "Lein", "position": "M", "country": "NOR" },
+    { "name": "Shammelsrud", "position": "M", "country": "NOR" },
+    { "name": "Strand", "position": "M", "country": "NOR" },
+    { "name": "Winsnes", "position": "M", "country": "NOR" },
+    { "name": "Boateng", "position": "A", "country": "NOR" },
+    { "name": "Bratt Bakk", "position": "A", "country": "NOR" },
+    { "name": "Mini Jakobsen", "position": "A", "country": "NOR" },
+    { "name": "Rushfelt", "position": "A", "country": "NOR" }
+  ]
+}

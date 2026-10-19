@@ -1,0 +1,28 @@
+# Editor de Save (RetroFoot.App/FerramentaEditorSave.cs) (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Jogo gravado	Jogo salvo
+Época {0}	Temporada {0}
+Pesos de golo (pos² × força × nota)	Pesos de gol (pos² × força × nota)
+Nenhum jogo gravado em {0}	Nenhum jogo salvo em {0}
+{0}: {1} equipas	{0}: {1} times
+Alterações por gravar	Alterações não salvas
+Gravado. O original fica em {0}	Salvo. O original fica em {0}
+Não consegui gravar:\n{0}	Não consegui salvar:\n{0}
+sem equipa	sem time
+Trocar de equipa	Trocar de time
+Este jogo não tem divisões: não dá para saber que equipas podem ter um treinador humano.	Este jogo não tem divisões: não dá para saber quais times podem ter um técnico humano.
+As duas equipas ficam com moral 10, como numa chicotada psicológica. Só aparecem equipas das divisões (no Distrital o jogo quebra).	Os dois times ficam com moral 10, como numa demissão de técnico. Só aparecem times das divisões (no Distrital o jogo quebra).
+Equipa atual: {0}	Time atual: {0}
+o plantel já passa do limite	o elenco já passa do limite
+Força máxima neste plantel: {0}	Força máxima neste elenco: {0}
+O resto do plantel já passa de um limite: diminua a força de outros jogadores.	O resto do elenco já passa de um limite: diminua a força de outros jogadores.
+Jogos {0} · Golos {1}	Jogos {0} · Gols {1}
+Estrela (✱): médio ou avançado com nota 8 ou mais. Muda sozinha com a nota.	Estrela (✱): meia ou atacante com nota 8 ou mais. Muda sozinha com a nota.
+Com nota {0}, acima de força {1} o jogo calcula errado e ele nunca marca golo.	Com nota {0}, acima de força {1} o jogo calcula errado e ele nunca marca gol.
+Os pesos de golo do plantel somariam {0} (máximo {1}): os golos sairiam sempre do mesmo jogador, ou a equipa deixaria de marcar.	Os pesos de gol do elenco somariam {0} (máximo {1}): os gols sairiam sempre do mesmo jogador, ou o time deixaria de marcar.
+A força do plantel somaria {0} (máximo {1}): o público dos jogos sairia errado.	A força do elenco somaria {0} (máximo {1}): o público dos jogos sairia errado.
+A melhor escalação somaria {0} (máximo {1}): a força das equipas na partida sairia errada.	A melhor escalação somaria {0} (máximo {1}): a força dos times na partida sairia errada.
+As alterações a este jogo ainda não foram gravadas. Descartar?	As alterações neste jogo ainda não foram salvas. Descartar?
+Pesos de golo	Pesos de gol
+pos² × força × nota	pos² × força × nota
+Melhor escalação	Melhor escalação

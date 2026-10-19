@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "COLOCOLO.EFT",
+  "name": "COLO COLO",
+  "shortName": "COLO COLO",
+  "country": "ARG",
+  "level": 10,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Alberto Zamora",
+  "players": [
+    { "name": "Gabriel Mendoza", "position": "G", "country": "ARG" },
+    { "name": "Marcelo Ramírez", "position": "G", "country": "ARG" },
+    { "name": "Agustín Salvatierra", "position": "D", "country": "ARG" },
+    { "name": "Fabian Estay", "position": "D", "country": "ARG" },
+    { "name": "Francisco Rojas", "position": "D", "country": "ARG" },
+    { "name": "Javier Margas", "position": "D", "country": "ARG" },
+    { "name": "Miguel Ramirez", "position": "D", "country": "ARG" },
+    { "name": "Pedro Reyes", "position": "D", "country": "ARG" },
+    { "name": "Brune Rock", "position": "M", "country": "EUA" },
+    { "name": "Hector Tapia", "position": "M", "country": "ARG" },
+    { "name": "Hugo Rubio", "position": "M", "country": "ARG" },
+    { "name": "Marcelo Espina", "position": "M", "country": "ARG" },
+    { "name": "Marcelo Vega", "position": "M", "country": "ARG" },
+    { "name": "Alex Whiteley", "position": "A", "country": "EUA" },
+    { "name": "Fernando Vergara", "position": "A", "country": "ARG" },
+    { "name": "Mauricio Illesca", "position": "A", "country": "ARG" },
+    { "name": "Victor Mella", "position": "A", "country": "ARG" }
+  ]
+}

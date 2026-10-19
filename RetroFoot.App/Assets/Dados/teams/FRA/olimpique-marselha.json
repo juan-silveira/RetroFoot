@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MARSELHA.EFT",
+  "name": "OLIMPIQUE MARSELHA",
+  "shortName": "OLIMPIQUE MARSELHA",
+  "country": "FRA",
+  "level": 8,
+  "textColor": "#0000FF",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Gerard Gili",
+  "players": [
+    { "name": "Joel Bats", "position": "G", "country": "FRA" },
+    { "name": "Servane Bianchardi", "position": "G", "country": "FRA" },
+    { "name": "Bertrand Langney", "position": "D", "country": "FRA" },
+    { "name": "Jean Fr.Domergue", "position": "D", "country": "FRA" },
+    { "name": "Patr. Battiston", "position": "D", "country": "FRA" },
+    { "name": "Yvon Le Roux", "position": "D", "country": "FRA" },
+    { "name": "Bruno Bellone", "position": "M", "country": "FRA" },
+    { "name": "Dragan Stojkovic", "position": "M", "country": "JUG" },
+    { "name": "Enzo Francescoli", "position": "M", "country": "URU" },
+    { "name": "J. Mark Ferreri", "position": "M", "country": "FRA" },
+    { "name": "Chris Waddle", "position": "A", "country": "ING" },
+    { "name": "Domin. Rocheteau", "position": "A", "country": "FRA" },
+    { "name": "Mark Kennedy", "position": "A", "country": "IRL" },
+    { "name": "Ravanelli", "position": "A", "country": "ITA" },
+    { "name": "Sandro Martins", "position": "A", "country": "POR" }
+  ]
+}

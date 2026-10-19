@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SAOPAULO.EFT",
+  "name": "SÃO PAULO FC",
+  "shortName": "SÃO PAULO",
+  "country": "BRA",
+  "level": 16,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Nelsinho",
+  "players": [
+    { "name": "Roger", "position": "G", "country": "BRA" },
+    { "name": "Rogério", "position": "G", "country": "BRA" },
+    { "name": "Bordon", "position": "D", "country": "BRA" },
+    { "name": "Isaias", "position": "D", "country": "BRA" },
+    { "name": "Marcio Santos", "position": "D", "country": "BRA" },
+    { "name": "Serginho", "position": "D", "country": "BRA" },
+    { "name": "Beletti", "position": "M", "country": "BRA" },
+    { "name": "Capitão", "position": "M", "country": "BRA" },
+    { "name": "Carlos Miguel", "position": "M", "country": "BRA" },
+    { "name": "Gallo", "position": "M", "country": "BRA" },
+    { "name": "Luís Carlos", "position": "M", "country": "BRA" },
+    { "name": "Sidney", "position": "M", "country": "BRA" },
+    { "name": "Silas", "position": "M", "country": "BRA" },
+    { "name": "Adriano", "position": "A", "country": "BRA" },
+    { "name": "Aristizábal", "position": "A", "country": "COL" },
+    { "name": "Dodô", "position": "A", "country": "BRA" },
+    { "name": "Fábio Mello", "position": "A", "country": "BRA" },
+    { "name": "Marcelinho", "position": "A", "country": "BRA" }
+  ]
+}

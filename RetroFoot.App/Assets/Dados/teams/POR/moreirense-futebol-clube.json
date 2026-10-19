@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MOREIREN.EFT",
+  "name": "MOREIRENSE FUTEBOL CLUBE",
+  "shortName": "MOREIRENSE",
+  "country": "POR",
+  "level": 3,
+  "textColor": "#008000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Carlos Garcia",
+  "players": [
+    { "name": "Miguel", "position": "G", "country": "POR" },
+    { "name": "Nilson", "position": "G", "country": "GNE" },
+    { "name": "Chiquinho", "position": "D", "country": "POR" },
+    { "name": "Fernando Duarte", "position": "D", "country": "POR" },
+    { "name": "Ragne", "position": "D", "country": "BRA" },
+    { "name": "Renato", "position": "D", "country": "POR" },
+    { "name": "Rui Pedro", "position": "D", "country": "POR" },
+    { "name": "Serafim Caetano", "position": "D", "country": "POR" },
+    { "name": "Vilela", "position": "D", "country": "POR" },
+    { "name": "Altino", "position": "M", "country": "POR" },
+    { "name": "Fernando Jorge", "position": "M", "country": "POR" },
+    { "name": "Gomes", "position": "M", "country": "POR" },
+    { "name": "Guto", "position": "M", "country": "BRA" },
+    { "name": "Quevedo", "position": "M", "country": "FRA" },
+    { "name": "Vitinha", "position": "M", "country": "POR" },
+    { "name": "Armando", "position": "A", "country": "POR" },
+    { "name": "Cristiano", "position": "A", "country": "POR" },
+    { "name": "Dourival Júnior", "position": "A", "country": "BRA" },
+    { "name": "Janovic", "position": "A", "country": "JUG" }
+  ]
+}

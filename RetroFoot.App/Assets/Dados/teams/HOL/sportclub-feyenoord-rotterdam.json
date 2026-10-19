@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FEYENORD.EFT",
+  "name": "SPORTCLUB FEYENOORD ROTTERDAM",
+  "shortName": "FEYENOORD",
+  "country": "HOL",
+  "level": 13,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Jorien Van den Herik",
+  "players": [
+    { "name": "Jerzy Dudek", "position": "G", "country": "POL" },
+    { "name": "Zsolt Petry", "position": "G", "country": "HUN" },
+    { "name": "Bernard Schuitemann", "position": "D", "country": "ALE" },
+    { "name": "Clemens Zwijnenberg", "position": "D", "country": "HOL" },
+    { "name": "Geoffrey Claeys", "position": "D", "country": "BEL" },
+    { "name": "Kees Van Wonderen", "position": "D", "country": "HOL" },
+    { "name": "Patricio Graff", "position": "D", "country": "ARG" },
+    { "name": "Paul Bosvelt", "position": "D", "country": "HOL" },
+    { "name": "Ulrich Van Gobbel", "position": "D", "country": "HOL" },
+    { "name": "Giovanni Van Bronckh", "position": "M", "country": "HOL" },
+    { "name": "Henk Fräser", "position": "M", "country": "HOL" },
+    { "name": "Igor Korneev", "position": "M", "country": "RUS" },
+    { "name": "Jeanpaul Van Gastel", "position": "M", "country": "HOL" },
+    { "name": "Pablo Sánchez", "position": "M", "country": "ARG" },
+    { "name": "Ronald Graafland", "position": "M", "country": "HOL" },
+    { "name": "Volkan Kahraman", "position": "M", "country": "AUT" },
+    { "name": "David Connolly", "position": "A", "country": "IRL" },
+    { "name": "Eduardo Bustos", "position": "A", "country": "ESP" },
+    { "name": "Henk Vos", "position": "A", "country": "BEL" }
+  ]
+}

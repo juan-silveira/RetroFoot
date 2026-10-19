@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ARACA_BR.EFT",
+  "name": "ARAÇATUBA-BR",
+  "shortName": "ARAÇATUBA",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#000080",
+  "backgroundColor": "#00FF00",
+  "coach": "Cassiá",
+  "players": [
+    { "name": "Gilberto", "position": "G", "country": "BRA" },
+    { "name": "Biro", "position": "D", "country": "BRA" },
+    { "name": "Marcelo Moura", "position": "D", "country": "BRA" },
+    { "name": "Marcão", "position": "D", "country": "BRA" },
+    { "name": "Pedro Luiz", "position": "D", "country": "BRA" },
+    { "name": "Déga", "position": "M", "country": "BRA" },
+    { "name": "Fábio Bin", "position": "M", "country": "BRA" },
+    { "name": "Leonardo", "position": "M", "country": "BRA" },
+    { "name": "Mona", "position": "M", "country": "BRA" },
+    { "name": "Olindo", "position": "M", "country": "BRA" },
+    { "name": "Pichetti", "position": "M", "country": "BRA" },
+    { "name": "Curê", "position": "A", "country": "BRA" },
+    { "name": "Gilson", "position": "A", "country": "BRA" },
+    { "name": "Guerra", "position": "A", "country": "BRA" }
+  ]
+}

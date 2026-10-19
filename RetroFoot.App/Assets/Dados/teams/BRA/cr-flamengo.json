@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FLAMENGO.EFT",
+  "name": "CR FLAMENGO",
+  "shortName": "FLAMENGO",
+  "country": "BRA",
+  "level": 14,
+  "textColor": "#000000",
+  "backgroundColor": "#FF0000",
+  "coach": "C A Silva",
+  "players": [
+    { "name": "Clemer", "position": "G", "country": "BRA" },
+    { "name": "Zé Gustavo", "position": "G", "country": "BRA" },
+    { "name": "Fabiano", "position": "D", "country": "BRA" },
+    { "name": "Fábio Baiano", "position": "D", "country": "BRA" },
+    { "name": "Gilberto", "position": "D", "country": "BRA" },
+    { "name": "Jr Baiano", "position": "D", "country": "BRA" },
+    { "name": "Junior Baiano", "position": "D", "country": "BRA" },
+    { "name": "Luiz Alberto", "position": "D", "country": "BRA" },
+    { "name": "Athirson", "position": "M", "country": "BRA" },
+    { "name": "Iranildo", "position": "M", "country": "BRA" },
+    { "name": "Jamir", "position": "M", "country": "BRA" },
+    { "name": "Jorginho", "position": "M", "country": "BRA" },
+    { "name": "Marcio Costa", "position": "M", "country": "BRA" },
+    { "name": "Pierkaski", "position": "M", "country": "POL" },
+    { "name": "Lucio", "position": "A", "country": "BRA" },
+    { "name": "Renato Gaúcho", "position": "A", "country": "BRA" },
+    { "name": "Sávio", "position": "A", "country": "BRA" }
+  ]
+}

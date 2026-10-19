@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BEITAR.EFT",
+  "name": "BEITAR DE JERUSALEM",
+  "shortName": "BEITAR",
+  "country": "ISR",
+  "level": 9,
+  "textColor": "#008000",
+  "backgroundColor": "#FFFF00",
+  "coach": "Doris Kashtan",
+  "players": [
+    { "name": "Gaif", "position": "G", "country": "ISR" },
+    { "name": "Korenfein", "position": "G", "country": "ISR" },
+    { "name": "Amsalea", "position": "D", "country": "ISR" },
+    { "name": "Azulay", "position": "D", "country": "ISR" },
+    { "name": "Dery", "position": "D", "country": "ISR" },
+    { "name": "Kahila", "position": "D", "country": "ISR" },
+    { "name": "Telesvikov", "position": "D", "country": "LET" },
+    { "name": "Tretiak", "position": "D", "country": "ISR" },
+    { "name": "Abukasis", "position": "M", "country": "ISR" },
+    { "name": "Harazi", "position": "M", "country": "ISR" },
+    { "name": "Levi", "position": "M", "country": "ISR" },
+    { "name": "Oshry", "position": "M", "country": "ISR" },
+    { "name": "Pisont", "position": "M", "country": "ISR" },
+    { "name": "Yossi", "position": "M", "country": "ISR" },
+    { "name": "Mizrahi", "position": "A", "country": "ISR" },
+    { "name": "Nir", "position": "A", "country": "ISR" },
+    { "name": "Ohana", "position": "A", "country": "ISR" },
+    { "name": "Salloi", "position": "A", "country": "ISR" }
+  ]
+}

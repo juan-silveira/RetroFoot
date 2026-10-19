@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MILAN.EFT",
+  "name": "AC MILAN",
+  "shortName": "MILAN",
+  "country": "ITA",
+  "level": 14,
+  "textColor": "#FF0000",
+  "backgroundColor": "#000000",
+  "coach": "Fábio Capello",
+  "players": [
+    { "name": "Giovanni Galli", "position": "G", "country": "ITA" },
+    { "name": "Sebastiano Rossi", "position": "G", "country": "ITA" },
+    { "name": "Taibi", "position": "G", "country": "ITA" },
+    { "name": "Alessandr.Costacurta", "position": "D", "country": "ITA" },
+    { "name": "Desailly", "position": "D", "country": "FRA" },
+    { "name": "Ibrain Ba", "position": "D", "country": "FRA" },
+    { "name": "Mauro Tassoti", "position": "D", "country": "ITA" },
+    { "name": "Paolo Maldini", "position": "D", "country": "ITA" },
+    { "name": "Boban", "position": "M", "country": "CRO" },
+    { "name": "Carbone", "position": "M", "country": "ITA" },
+    { "name": "Demetrio Albertini", "position": "M", "country": "ITA" },
+    { "name": "Leonardo", "position": "M", "country": "BRA" },
+    { "name": "Roberto Donadoni", "position": "M", "country": "ITA" },
+    { "name": "Stefano Eranio", "position": "M", "country": "ITA" },
+    { "name": "Dejan Savicevic", "position": "A", "country": "CRO" },
+    { "name": "George Weah", "position": "A", "country": "LBE" },
+    { "name": "Maurício Ganz", "position": "A", "country": "ITA" },
+    { "name": "Patrick Kluivert", "position": "A", "country": "HOL" }
+  ]
+}

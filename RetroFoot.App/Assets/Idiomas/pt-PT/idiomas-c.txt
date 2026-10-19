@@ -1,0 +1,63 @@
+# Mercado, plantel, listas, dinheiro, estadio, patrocinio e fim de epoca (pt-PT): as chaves
+# que ficaram em pt-BR no codigo, de volta ao original. Formato: chave<TAB>traducao (Idioma.cs).
+
+# --- Jogador e mercado ---
+Goleiro	Guarda-redes
+Defensor	Defesa
+Meia	Médio
+Atacante	Avançado
+Gols	Golos
+Gols na Temporada	Golos esta época
+Histórico	Historial
+HISTÓRICO	HISTORIAL
+Time...	Equipa...
+Não mostrar os jogadores do meu time	Não mostrar os jogadores da minha equipa
+Atualização de Salário	Actualização de Salário
+Este jogador só pode ser vendido na próxima temporada	Este jogador só pode ser vendido na próxima época
+Não pode vender mais goleiros	Não pode vender mais guarda-redes
+
+# --- Listas ---
+Artilheiros de todos os tempos	Melhores marcadores de sempre
+Artilheiros desta temporada	Melhores marcadores desta época
+Últimos vencedores do campeonato e da copa	Últimos vencedores do campeonato e da taça
+Copa	Taça
+VENCEDOR DA COPA	VENCEDOR DA TAÇA
+"Rebaixado para o "	"Despromovido para o "
+Demissões de Técnicos	Chicotadas Psicológicas
+" foi demitido do "	" foi despedido do "
+
+# --- Dinheiro, estadio, patrocinio ---
+Temporada	Época
+Bilheteria	Bilhetes
+Prêmios	Prémios
+Gastos	Despesas
+Arquibancadas	Bancadas
+Receita total	Total de receitas
+Gasto total	Total de despesas
+Receita × gasto	Receitas × despesas
+Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo realizado	Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo efectuado
+Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo realizado.	Os juros a pagar pelo empréstimo são de 5% do capital em dívida por cada jogo efectuado.
+As novas arquibancadas só estarão disponíveis no próximo jogo	As novas bancadas só estarão disponíveis para o próximo jogo
+"Preço de uma arquibancada com\n5000 lugares: "	"Preço de uma bancada com\n5000 lugares: "
+{0} de 24 arquibancadas	{0} de 24 bancadas
+Nova arquibancada (5000 lugares)	Nova bancada (5000 lugares)
+Patrocinador master	Patrocinador principal
+Renovação de patrocinador master	Renovação de patrocinador principal
+Patrocínio no uniforme	Patrocínio no equipamento
+Para estampar a marca no uniforme. Aceita?	Para estampar a marca no equipamento. Aceita?
+Para renovar o contrato de patrocinador master. Aceita?	Para renovar o contrato de patrocinador principal. Aceita?
+Para ser o patrocinador master do seu time. Aceita?	Para ser o patrocinador principal da sua equipa. Aceita?
+" por temporada"	" por época"
+" temporada"	" época"
+" temporadas"	" épocas"
+
+# --- Fim de epoca ---
+Fim de Temporada	Fim de Época
+Temporada {0}	Época {0}
+Vencedor da copa	Vencedor da taça
+{0}ª copa	{0}ª taça
+Artilheiro	Melhor marcador
+Artilheiro ({0} gols)	Melhor marcador ({0} golos)
+{0} gols	{0} golos
+1 gol	1 golo
+"Prêmio: "	"Prémio: "

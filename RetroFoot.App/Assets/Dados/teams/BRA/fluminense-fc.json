@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FLUMINEN.EFT",
+  "name": "FLUMINENSE FC",
+  "shortName": "FLUMINENSE",
+  "country": "BRA",
+  "level": 8,
+  "textColor": "#00FF00",
+  "backgroundColor": "#FF0000",
+  "coach": "Artuzinho",
+  "players": [
+    { "name": "Fábio Noronha", "position": "G", "country": "BRA" },
+    { "name": "Wellerson", "position": "G", "country": "BRA" },
+    { "name": "André", "position": "D", "country": "BRA" },
+    { "name": "César", "position": "D", "country": "BRA" },
+    { "name": "Lima", "position": "D", "country": "BRA" },
+    { "name": "Mrcio Costa", "position": "D", "country": "BRA" },
+    { "name": "Ricardo Rocha", "position": "D", "country": "BRA" },
+    { "name": "Dirceu", "position": "M", "country": "BRA" },
+    { "name": "Leandro", "position": "M", "country": "BRA" },
+    { "name": "Nélio", "position": "M", "country": "BRA" },
+    { "name": "Paulinho", "position": "M", "country": "BRA" },
+    { "name": "Rogerinho", "position": "M", "country": "BRA" },
+    { "name": "Artur", "position": "A", "country": "BRA" },
+    { "name": "Gabriel", "position": "A", "country": "BRA" },
+    { "name": "Paulinho", "position": "A", "country": "BRA" },
+    { "name": "Paulo Roberto", "position": "A", "country": "BRA" }
+  ]
+}

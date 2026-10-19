@@ -1,0 +1,1397 @@
+# RetroFoot: referees. UTF-8, one per line, columns separated by TAB.
+# country = 3-letter code (countries.tsv); name = up to 40 letters are used
+# source = where the name came from (1998 = original game, fifa, liga, txe = converted patch); optional
+country	name	source
+AFG	Mohammad Ashraf Hussainzada	fifa
+AGI	Khamal Harding Hodge	fifa
+ALB	Eldorjan Hamiti	fifa
+ALB	Enea Jorgji	fifa
+ALB	Florian Lata	fifa
+ALB	Juxhin Xhaja	fifa
+AGL	Mohammed Rafiq Aouina	fifa
+AGL	Lotfi Bekouassa	fifa
+AGL	Lahlou Benbraham	fifa
+AGL	Houssam Benyahia	fifa
+AGL	Nabil Boukhalfa	fifa
+AGL	Youcef Gamouh	fifa
+AGL	Mustapha Ghorbal	fifa
+AND	Antoine Paul Chiaramonti	fifa
+AND	Andres Vilanova Simarro	fifa
+ANG	Ailton Jeovani Quissanga Carmelino	fifa
+ANG	Antonio Caluassi Dungula	fifa
+ANG	Edson Antonio Esoko	fifa
+ANG	Edilson Gomes	fifa
+ANG	Nelson Agostinho Da Silva	fifa
+ARG	Nazareno Jose Arasa	fifa
+ARG	Yael Falcon Perez	fifa
+ARG	Carlos Andres Gariano	fifa
+ARG	Dario Herrera	fifa
+ARG	Luis Orlando Lobo Medina	fifa
+ARG	Sebastian Nicolas Martinez	fifa
+ARG	Maximiliano Nicolas Ramirez	fifa
+ARG	Leandro Ezequiel Rey Hilfer	fifa
+ARG	Facundo Tello	fifa
+ARG	Sebastian Zunino	fifa
+ARM	Artem Gasparyan	fifa
+ARM	Ashot Ghaltakhchyan	fifa
+ARM	Yura Mahtesyan	fifa
+ARM	Henrik Nalbandyan	fifa
+ARU	Ricangel Emilio Nemisio de Leca	fifa
+ANT	Ken Pennyfeather	fifa
+AUS	Benjamin Abraham	fifa
+AUS	Timothy Danaskos	fifa
+AUS	Daniel Elder	fifa
+AUS	Shaun Evans	fifa
+AUS	Alireza Faghani	fifa
+AUS	Adam Kersey	fifa
+AUS	Alexander King	fifa
+AUS	Jack Morgan	fifa
+AUT	Walter Altmann	fifa
+AUT	Christian-Petru Ciochirca	fifa
+AUT	Stefan Ebner	fifa
+AUT	Sebastian Gishamer	fifa
+AUT	Jakob Semler	fifa
+AUT	Arnes Talic	fifa
+AUT	Julian Weinberger	fifa
+AZB	Aliyar Aghayev	fifa
+AZB	Tural Kurbanov	fifa
+AZB	Elchin Masiyev	fifa
+AZB	Kamal Umudlu	fifa
+BAH	Evens Julmis	fifa
+BGD	Jasim Akhter S M	fifa
+BGD	Alomgir Alomgir	fifa
+BGD	Md Symoon Hasan	fifa
+BGD	Md. Nazmul Huda	fifa
+BUR	Rodrigue Bigirimana	fifa
+BUR	Georges Gatogato	fifa
+BUR	Bertrand Manirakiza	fifa
+BUR	Pacifique Ndabihawenimana	fifa
+BEL	Simon Bourdeaudhui	fifa
+BEL	Lothar Dhondt	fifa
+BEL	Erik Lambrechts	fifa
+BEL	Bram van Driessche	fifa
+BEL	Nathan Verboomen	fifa
+BEL	Jasper Vergoote	fifa
+BEL	Lawrence Visser	fifa
+BNI	Dedjinnanchi Tanislas Ahomlanto	fifa
+BNI	Hans Romuald Bassadin	fifa
+BNI	Djindo Louis Houngnandande	fifa
+BNI	Adissa Abdul Raphiou Ligali	fifa
+BNI	Issa Mouhamed	fifa
+BER	Amaury Majors	fifa
+BKF	Benoit Bado	fifa
+BKF	Hamidou Diero	fifa
+BKF	Vincent Kabore	fifa
+BKF	Jean Ouattara	fifa
+BAR	Husain Ahmed Abdullaziz Alshowaikh	fifa
+BAR	Mohamed Khaled Tarrar Mohamed Deham	fifa
+BAR	Ismaeel Habib Ali Ismaeel	fifa
+BAR	Ammar Ebrahim Hasan Mahfoodh	fifa
+BAR	Ahmed Mohamed Khalil Saad	fifa
+BAR	Mohmed Ebrahim Saad Saad	fifa
+BUT	Ugyen Penjor	fifa
+BUT	Virendha Rai	fifa
+BUT	Pema Tshewang	fifa
+BOS	Antoni Bandic	fifa
+BOS	Luka Bilbija	fifa
+BOS	Milos Gigovic	fifa
+BOS	Irfan Peljto	fifa
+BLR	Amine Kourgheli	fifa
+BLR	Anton Lashuk	fifa
+BLR	Ihar Shumilau	fifa
+BLR	Viktar Shymusik	fifa
+BOL	Crhistian Jordy Aleman Peralta	fifa
+BOL	Ivo Mendez	fifa
+BOL	Gabriel Horacio Mendoza Blanco	fifa
+BOL	Javier Edgar Revollo Miranda	fifa
+BOL	Dilio Yfrain Rodriguez Suarez	fifa
+BOL	Gery Vargas	fifa
+BOL	Rodolfo Bruno Vera Penarrieta	fifa
+BTW	Keabetswe Dintwa	fifa
+BTW	Gaolaolwe Keabetswe Kethobogile	fifa
+BTW	Thabang Ketshabile	fifa
+BTW	Moemedi Thabologang	fifa
+BRA	Anderson Daronco	fifa
+BRA	Bruno Arleu de Araújo	fifa
+BRA	Flávio Rodrigues de Souza	fifa
+BRA	Matheus Delgado Candançan	fifa
+BRA	Paulo César Zanovelli da Silva	fifa
+BRA	Rafael Rodrigo Klein	fifa
+BRA	Ramon Abatti Abel	fifa
+BRA	Raphael Claus	fifa
+BRA	Rodrigo José Pereira de Lima	fifa
+BRA	Wilton Pereira Sampaio	fifa
+BRA	Alex Gomes Stefano	liga
+BRA	Bráulio da Silva Machado	liga
+BRA	Davi de Oliveira Lacerda	liga
+BRA	Edina Alves Batista	liga
+BRA	Felipe Fernandes de Lima	liga
+BRA	Jonathan Benkenstein Pinheiro	liga
+BRA	Lucas Casagrande	liga
+BRA	Lucas Paulo Torezin	liga
+BRA	Sávio Pereira Sampaio	liga
+BRA	Wagner do Nascimento Magalhães	liga
+BRA	Fernando Antônio Mendes de Salles Nascimento Filho	liga
+BRA	João Vitor Gobi	liga
+BRA	Daiane Caroline Muniz dos Santos	liga
+BRA	Yuri Elino Ferreira da Cruz	liga
+BRA	Bruno Pereira Vasconcelos	liga
+BRA	André Luiz Skettino Policarpo Bento	liga
+BRA	Charly Wendy Straub Deretti	liga
+BRA	Afro Rocha de Carvalho Filho	cbf
+BRA	Alan Trindade da Silva	cbf
+BRA	Alberth Antonio Arruda Belino da Costa	cbf
+BRA	Alciney Santos de Araujo	cbf
+BRA	Alexandre Expedito Vieira da Silva Junior	cbf
+BRA	Alisson Sidnei Furtado	cbf
+BRA	Allan Ricardo Freitas da Rosa Azevedo	cbf
+BRA	Anderson Luis Marques	cbf
+BRA	Anderson Ribeiro Gonçalves	cbf
+BRA	André Rodrigo Rocha	cbf
+BRA	Andressa Hartmann	cbf
+BRA	Andreza Helena de Siqueira	cbf
+BRA	Angleison Marcos Vieira Monteiro	cbf
+BRA	Antonio Dib Moraes de Sousa	cbf
+BRA	Arthur Fernandes Azevedo	cbf
+BRA	Arthur Gomes Rabelo	cbf
+BRA	Artur de Morais Fernandes	cbf
+BRA	Breno Vieira Souza	cbf
+BRA	Bruno Monteiro Cunha	cbf
+BRA	Bruno Mota Correia	cbf
+BRA	Bruno Nogueira Prado	cbf
+BRA	Caio Carvalho Pereira	cbf
+BRA	Carlos Tadeu Ferreira de Castro	cbf
+BRA	Cassia Franca de Souza	cbf
+BRA	Cristian Emanuel Rocha Lima	cbf
+BRA	Dagoberto Silva Modesto	cbf
+BRA	Daniel Alejandro Hidalgo Blanco	cbf
+BRA	Daniel da Cunha Oliveira Filho	cbf
+BRA	Daniel de Medeiros Segundo Calazans	cbf
+BRA	Deborah Cecilia Cruz Correia	cbf
+BRA	Dênis da Silva Ribeiro Serafim	cbf
+BRA	Dewson Fernando Freitas da Silva	cbf
+BRA	Diego da Silva Castro	cbf
+BRA	Diego Fernando Silva de Lima	cbf
+BRA	Diego Leonardo de Lima Santana Coutinho	cbf
+BRA	Diego Roberto Souza de Melo	cbf
+BRA	Diego Ruan Pacondes da Silva	cbf
+BRA	Douglas Magno de Melo Pereira	cbf
+BRA	Elenildo Batista Rodrigues Junior	cbf
+BRA	Emerson Ricardo de Almeida Andrade	cbf
+BRA	Emerson Souza Silva	cbf
+BRA	Fabiano Monteiro dos Santos	cbf
+BRA	Fábio Augusto Santos Sá Júnior	cbf
+BRA	Fábio Gomes de Sousa	cbf
+BRA	Fagson Junior dos Santos Silva	cbf
+BRA	Felype Wanderley Tenorio Uruba	cbf
+BRA	Fernando Henrique de Medeiros Miranda	cbf
+BRA	Franciel dos Santos Martins	cbf
+BRA	Francielly Fernanda Lima de Castro	cbf
+BRA	Francisco Soares Dias	cbf
+BRA	Gabriel dos Santos Queiroz	cbf
+BRA	Gleika Oliveira Pinheiro	cbf
+BRA	Guilherme Francisco Maciel da Silva e Rosario	cbf
+BRA	Guilherme Nunes de Santana	cbf
+BRA	Gustavo Ervino Bauermann	cbf
+BRA	Gustavo Holanda Souza	cbf
+BRA	Halbert Luis Moraes Baia	cbf
+BRA	Hieger Tulio Cardoso	cbf
+BRA	Hugo Soares Dias Figueiredo	cbf
+BRA	Igor da Silva Albuquerque	cbf
+BRA	Iudiney Cesar Rocha e Silva	cbf
+BRA	Ivan da Silva Guimarães Júnior	cbf
+BRA	Jackson Ribeiro de Souza Sobrinho	cbf
+BRA	Jackson Rodrigues da Silva	cbf
+BRA	Jailton Moura Silva Filho	cbf
+BRA	Jardiel da Rocha Soares	cbf
+BRA	Jean Carlos da Silva Narciso	cbf
+BRA	Jean Marcel Latorraca Ferreira	cbf
+BRA	Jefferson Ferreira de Moraes	cbf
+BRA	Joanilson Scarcella de Lima	cbf
+BRA	João Marcos Goncalves Fernandes	cbf
+BRA	João Paulo Cunha Ribeiro	cbf
+BRA	João Paulo dos Santos Nascimento	cbf
+BRA	Jodis Nascimento de Souza	cbf
+BRA	Jonas Alves Henrique	cbf
+BRA	Jonata de Souza Gouveia	cbf
+BRA	Jonathan Antero Silva	cbf
+BRA	José Henrique de Azevedo Junior	cbf
+BRA	José Magno Teixeira do Nascimento	cbf
+BRA	José Marciano Lopes da Silva Junior	cbf
+BRA	José Mendonça da Silva Júnior	cbf
+BRA	Jose Woshington da Silva	cbf
+BRA	Josue Franca de Castro	cbf
+BRA	Josué Reis de Jesus Júnior	cbf
+BRA	Julian Negreiros de Castro	cbf
+BRA	Júlio César de Oliveira	cbf
+BRA	Julio Cesar Pfleger	cbf
+BRA	Kléber Ariel Gonçalves Silva	cbf
+BRA	Klever da Costa Lobo	cbf
+BRA	Léo Simão Holanda	cbf
+BRA	Leonardo Willers Lorenzatto	cbf
+BRA	Lucas Canetto Bellote	cbf
+BRA	Lucas Guimarães Rechatiko Horn	cbf
+BRA	Luciano da Silva Miranda Filho	cbf
+BRA	Luiz Augusto Silveira Tisne	cbf
+BRA	Luiz Eduardo da Silva Duarte	cbf
+BRA	Luiz Paulo da Silva Aniceto	cbf
+BRA	Maguielson Lima Barbosa	cbf
+BRA	Marcel Phillipe Santos Martins	cbf
+BRA	Marcello Ruda Neves Ramos da Costa	cbf
+BRA	Marcelo de Lima Henrique	cbf
+BRA	Márcio dos Santos Oliveira	cbf
+BRA	Márcio Iglesias Araújo Silva	cbf
+BRA	Marcos Felipe Martins Machado	cbf
+BRA	Marcos Mateus de Sousa	cbf
+BRA	Marcos Mateus Pereira	cbf
+BRA	Marianna Nanni Batalha	cbf
+BRA	Mateus de Lima Dantas	cbf
+BRA	Matheus de Moraes Silva	cbf
+BRA	Maximiniano Fagundes de Assuncao	cbf
+BRA	Mayron Frederico dos Reis Novais	cbf
+BRA	Michael Vinicius Santos Freitas	cbf
+BRA	Michelangelo Martins de Almeida Junior	cbf
+BRA	Murilo Augusto Amoras de Almeida	cbf
+BRA	Murilo Tarrega Victor	cbf
+BRA	Murilo Ugolini Klein	cbf
+BRA	Nairon Pereira de Lira	cbf
+BRA	Olivaldo José Alves Moraes	cbf
+BRA	Osimar Moreira da Silva Junior	cbf
+BRA	Paulo Belence Alves dos Prazeres Filho	cbf
+BRA	Paulo Henrique Schleich Vollkopf	cbf
+BRA	Paulo José Souza Mourão	cbf
+BRA	Paulo Roberto Alves Júnior	cbf
+BRA	Pedro Alves de Oliveira	cbf
+BRA	Pierry Dias dos Santos	cbf
+BRA	Rafael Odilio Ramos dos Santos	cbf
+BRA	Rafael Santos de Andrade	cbf
+BRA	Raimundo Rodrigues de Oliveira Júnior	cbf
+BRA	Raphael de Souza Cosmo	cbf
+BRA	Rejane Caetano da Silva	cbf
+BRA	Renan Novaes Insabralde	cbf
+BRA	Renato Pinheiro	cbf
+BRA	Roberto Santos Sa	cbf
+BRA	Robson Babinski	cbf
+BRA	Rodrigo Brand da Silva	cbf
+BRA	Roger Goulart	cbf
+BRA	Romário Medeiros Soares de Sousa	cbf
+BRA	Ruthyanna Camila Medeiros da Silva	cbf
+BRA	Samuel dos Santos Santos	cbf
+BRA	Tarcísio Flores da Silva	cbf
+BRA	Tarcisio Nascimento Matos	cbf
+BRA	Thaillan Azevedo Gomes	cbf
+BRA	Thayslane de Melo Costa	cbf
+BRA	Thiago Lima Fontes	cbf
+BRA	Victor Lucas Pereira Silva	cbf
+BRA	Wagner Francisco Silva Souza	cbf
+BRA	Wagner Silveira Echevarria	cbf
+BRA	Wallas Martins Lopes	cbf
+BRA	Wanbelton Lisboa Valente	cbf
+BRA	Wanderson Marques Martins	cbf
+BRA	Wesley Silva dos Santos	cbf
+BRA	William Machado Steffen	cbf
+BRA	Wiomar Santana de Oliveira	cbf
+BBD	Cleon Junior Culley	fifa
+BRU	Mou Azhzham Zamakhsyarie Haji Marsidi	fifa
+BRU	Mohammad Adib Suimi	fifa
+BUL	Volen Chinkov	fifa
+BUL	Radoslav Gidzhenov	fifa
+BUL	Georgi Ginchev	fifa
+BUL	Georgi Kabakov	fifa
+BUL	Vasil Minev	fifa
+BUL	Martin Velikov	fifa
+CBD	Samdy Chy	fifa
+CBD	Tina Iv	fifa
+CBD	Ouseyha Khin	fifa
+CAN	Filip Dujic	fifa
+CAN	Drew Fischer	fifa
+CAN	Pierre-Luc Lauziere	fifa
+CAN	Michael Venne	fifa
+CYM	Micheal Ajawoh Akangou	fifa
+CYM	Jonathon Hughes	fifa
+CNG	Ruth Nandaiz Bilembi	fifa
+CNG	Fitial Charel Just Kokolo	fifa
+CNG	Jean Pierre Nguiene Bissila	fifa
+CNG	Messie Nkounkou	fifa
+CHD	Adoum Abdramane	fifa
+CHD	Pousri Armi Alfred	fifa
+CHD	Alhadji Allaou Mahamat	fifa
+CHD	Abdelkerim Ousmane	fifa
+CHL	Jose Cabero	fifa
+CHL	Diego Flores Seguel	fifa
+CHL	Cristian Garay	fifa
+CHL	Franco Jimenez Lazo	fifa
+CHL	Juan Lara	fifa
+CHL	Piero Maza	fifa
+CHL	Mathias Riquelme Sepulveda	fifa
+CHL	Fernando Vejar	fifa
+CHN	Du Jianxin	fifa
+CHN	Fu Ming	fifa
+CHN	Jin Jingyuan	fifa
+CHN	Ma Ning	fifa
+CHN	Shen Yinhao	fifa
+CHN	Wang Di	fifa
+CHN	Zhang Lei	fifa
+CMF	Kouassi Frederic Francois Biro	fifa
+CMF	Hugues Modeste Richard Kokora	fifa
+CMF	Clement Franklin Kpan	fifa
+CMF	Tuonifere Soro	fifa
+CMF	Ben Ali Toure	fifa
+CMF	Ibrahim Kalilou Traore	fifa
+CMF	Patrick Tanguy Vlei	fifa
+CAM	Hedgard Juste Biel Kolondo Er	fifa
+CAM	Antoine Effa	fifa
+CAM	Hyacinthe Emeyene Toukene	fifa
+CAM	Ze Mengatta Martin Arnold	fifa
+CAM	Abdou Mefire	fifa
+CAM	Willy Ngah	fifa
+CAM	Fodouop Yannick	fifa
+ZAI	Salomon Kabila Kiniatu	fifa
+ZAI	Pierre Kibingo Numbi	fifa
+ZAI	Yannick Malala Kabanga	fifa
+ZAI	Lambert Museka Padibualu	fifa
+ZAI	Louis Mwamba Masangune	fifa
+ZAI	Jean Jacques Ndala	fifa
+COL	Carlos Betancur	fifa
+COL	Jairo Mayorga	fifa
+COL	Carlos Ortega	fifa
+COL	Jose Alexander Ortiz Novoa	fifa
+COL	Jhon Ospina	fifa
+COL	Andres Rojas	fifa
+COL	Wilmar Roldan	fifa
+COL	Diego Ulloa Angulo	fifa
+CMR	Attoumani Elfachad	fifa
+CMR	Moustoifa Naoumane Kalido	fifa
+CMR	Abdou Mmadi Mohamed	fifa
+CMR	Athoumani Mohamed	fifa
+CAV	Leonidas Lenine Barbosa da Graca	fifa
+CAV	Fabricio Duarte Andrade Santos	fifa
+CAV	Juanilson Ailton Moreira dos Reis Borges Gomes	fifa
+CRC	Juan Calderon	fifa
+CRC	Pablo Camacho Espinoza	fifa
+CRC	Brayan Cruz Miranda	fifa
+CRC	David Daniel Gomez Araya	fifa
+CRC	Keylor Herrera	fifa
+CRC	Steven Madrigal	fifa
+CRC	Benjamin Pineda	fifa
+CRC	Josue Ugalde	fifa
+CRO	Dario Bel	fifa
+CRO	Ante Culina	fifa
+CRO	Mateo Erceg	fifa
+CRO	Patrik Kolaric	fifa
+CRO	Igor Pajac	fifa
+CRO	Duje Strukan	fifa
+RCA	Aime Landry Belly De Sombozo	fifa
+RCA	Andre Onesime Kolissala Mbangui	fifa
+RCA	Bodoin Maina	fifa
+RCA	Merveil Melvin Mandekouzou Vendafara	fifa
+CUB	Eric Guia de la Cruz	fifa
+CUB	Adrian Lage Perez	fifa
+CUW	Norberto Domingos Freitas Da Silva Costa	fifa
+CHP	Menelaos Antoniou	fifa
+CHP	Kyriakos Athanasiou	fifa
+CHP	Ioannis Christodoulou	fifa
+CHP	Konstantinos Fellas	fifa
+RCH	Ondrej Berka	fifa
+RCH	Dalibor Cerny	fifa
+RCH	Marek Radina	fifa
+RCH	Karel Roucek	fifa
+RCH	Dominik Stary	fifa
+RCH	Jan Vsetecka	fifa
+DIN	Lasse Laebel Graagaard	fifa
+DIN	Jacob Egholm Karlsen	fifa
+DIN	Jakob Kehlet	fifa
+DIN	Morten Krogh	fifa
+DIN	Sandi Putros	fifa
+DIN	Mikkel Redder	fifa
+DIN	Jakob Alexander Sundberg	fifa
+DJB	Mohamed Diraneh Guedi	fifa
+DJB	Nasser Houssein Mahamoud	fifa
+DJB	Saddam Houssein Mansour	fifa
+DJB	Ismael Said Abdillahi	fifa
+RDO	Adonis Carrasco	fifa
+RDO	Jose Corporan	fifa
+RDO	Randy Encarnacion	fifa
+EQU	Augusto Aragon	fifa
+EQU	Robert Nicolas Cabrera Cantos	fifa
+EQU	Alex Fabricio Cajas Torres	fifa
+EQU	Oswaldo Contreras	fifa
+EQU	Anthony Yamil Diaz Mora	fifa
+EQU	Guillermo Guerrero	fifa
+EQU	Bryan Loayza	fifa
+EQU	Yerson Leodan Zambrano Zambrano	fifa
+EGT	Mahmoud Ahmed Mohamed Bassiouny	fifa
+EGT	Mohamed Altabey Altabey Elghazi	fifa
+EGT	Mohamed Mahmoud Kassem	fifa
+EGT	Mohamed Marouf	fifa
+EGT	Amin Mohamed	fifa
+EGT	Mahmoud Nagy	fifa
+EGT	Mahmoud Wafa	fifa
+ING	Stuart Attwell	fifa
+ING	Sam Barrott	fifa
+ING	John Brooks	fifa
+ING	Darren England	fifa
+ING	Jarred Gillett	fifa
+ING	Robert Jones	fifa
+ING	Chris Kavanagh	fifa
+ING	Andy Madley	fifa
+ING	Michael Oliver	fifa
+ING	Anthony Taylor	fifa
+ING	Peter Bankes	liga
+ING	Darren Bond	liga
+ING	Tom Bramall	liga
+ING	Tony Harrington	liga
+ING	Simon Hooper	liga
+ING	Craig Pawson	liga
+ING	Tim Robinson	liga
+ING	Michael Salisbury	liga
+ING	Paul Tierney	liga
+ING	Farai Hallam	liga
+ING	Adam Herczeg	liga
+ING	Tom Kirk	liga
+ING	Ruebyn Ricardo	liga
+ING	Lewis Smith	liga
+ING	Ben Toner	liga
+GNQ	Gerson Adolfo Mico Esono Angono	fifa
+GNQ	Antimo Esono Esono Avomo	fifa
+GNQ	Jacinto Ondo Ondo Nchama	fifa
+GNQ	Jose Nguema Owono Asangono	fifa
+ERI	Idris Osman	fifa
+ERI	Henok Tesfamichael Zerom	fifa
+ERI	Henor Tesfay	fifa
+ERI	Teklu Mogos Tsegay	fifa
+ESP	Javier Alberola	fifa
+ESP	Guillermo Cuadra	fifa
+ESP	Mateo Busquets	fifa
+ESP	Ricardo De Burgos	fifa
+ESP	Jesús Gil Manzano	fifa
+ESP	Alejandro Hernández	fifa
+ESP	Juan Martínez	fifa
+ESP	José Luis Munuera	fifa
+ESP	Alejandro Muñiz	fifa
+ESP	José María Sánchez	fifa
+ESP	Adrián Cordero Vega	liga
+ESP	Isidro Díaz De Mera	liga
+ESP	Iosu Galech	liga
+ESP	Víctor García	liga
+ESP	José Luis Guzmán	liga
+ESP	Francisco Hernández	liga
+ESP	Miguel Ángel Ortiz	liga
+ESP	Alejandro Quintero	liga
+ESP	César Soto	liga
+ESP	Miguel Sesma	liga
+EST	Joonas Jaanovits	fifa
+EST	Karl Koppel	fifa
+EST	Kristo Tohver	fifa
+ETI	Henok Abebe	fifa
+ETI	Haymanot Adane	fifa
+ETI	Ephrame Debele Kabeta	fifa
+ETI	Tewodros Mitiku	fifa
+ETI	Beharu Teka	fifa
+ETI	Manuhe Woldetsadik	fifa
+ETI	Daniel Yitagesu	fifa
+FIJ	Kavitesh Chandra Behari	fifa
+FIJ	Veer Singh	fifa
+FIN	Mohammad Al-Emara	fifa
+FIN	Joni Hyytiae	fifa
+FIN	Oliver Reitala	fifa
+FIN	Peiman Simani	fifa
+FRA	Benoît Bastien	fifa
+FRA	Jérôme Brisard	fifa
+FRA	Clément Turpin	fifa
+FRA	Willy Delajod	fifa
+FRA	François Letexier	fifa
+FRA	Jérémie Pignard	fifa
+FRA	Éric Wattellier	fifa
+FRA	Mathieu Vernice	fifa
+FRA	Romain Lissorgue	fifa
+FRA	Bastien Dechepy	fifa
+FRA	Thomas Léonard	liga
+FRA	Jérémy Stinat	liga
+FRA	Stéphanie Frappart	liga
+FRA	Marc Bollengier	liga
+FRA	Abdelatif Kherradji	liga
+FRA	Hakim Ben El Hadj	liga
+FRA	Gaël Angoula	liga
+FRA	Benoît Millot	liga
+FRA	Ruddy Buquet	liga
+FRA	Guillaume Paradis	liga
+FAR	Johan Hendrik Ellefsen	fifa
+FAR	Heini Ziska Restorff Vioy	fifa
+GAB	Pierre Atcho	fifa
+GAB	Tanguy Mebiame	fifa
+GAB	Josy Roselin Mezui Abaa	fifa
+GAB	Cregue Fleury Moukagni	fifa
+GMB	Baboucarr Bass	fifa
+GMB	Abdallah L. Jammeh	fifa
+GMB	Lamin N Jammeh	fifa
+GMB	Mohamed Marigo	fifa
+GMB	Omar Sallah	fifa
+GEO	Aleko Aptsiauri	fifa
+GEO	Giorgi Avazashvili	fifa
+GEO	Goga Kikacheishvili	fifa
+GEO	Giorgi Kruashvili	fifa
+ALE	Florian Badstuebner	fifa
+ALE	Benjamin Brand	fifa
+ALE	Sven Jablonski	fifa
+ALE	Matthias Joellenbeck	fifa
+ALE	Harm Osmers	fifa
+ALE	Daniel Schlager	fifa
+ALE	Daniel Siebert	fifa
+ALE	Sascha Nicolai Stegemann	fifa
+ALE	Tobias Stieler	fifa
+ALE	Felix Zwayer	fifa
+GNA	Adaari Abdul Latif	fifa
+GNA	Selorm Bless Yao	fifa
+GNA	Charles Benle Bulu	fifa
+GNA	Daniel Laryea	fifa
+GNA	Julian Nii Akwa Nunoo	fifa
+GNA	Amoah Reginald Collins	fifa
+GIB	Seth Charles Sheehan-Galia	fifa
+GBI	Garinja Barbosa Lopes	fifa
+GBI	Aldair Alsau Lopes Grabe	fifa
+GBI	Balu Jose Nancassa	fifa
+GRE	Vasileios Fotias	fifa
+GRE	Ioannis Papadopoulos	fifa
+GRE	Anastasios Papapetrou	fifa
+GRE	Fotios Polychronis	fifa
+GRE	Anastasios Sidiropoulos	fifa
+GRE	Alexandros Tsakalidis	fifa
+GRE	Christos Vergetis	fifa
+GRN	McManaman Joseph Bedeau	fifa
+GRN	Reon Radix	fifa
+GUA	Alvaro Orlando Alvarado de Leon	fifa
+GUA	Cristhofer Daniel Corado Sarceno	fifa
+GUA	Mario Escobar	fifa
+GUA	Bryan Lopez	fifa
+GUA	Walter Lopez	fifa
+GUA	Julio Cesar De Jesus Luna Guzman	fifa
+GUA	Diego Abraham Ojer Gonzalez	fifa
+GUA	Sergio Reyna	fifa
+GNE	Daouda Camara	fifa
+GNE	Younoussa Tawel Camara	fifa
+GNE	Abdoulaye Manet	fifa
+GNE	Naby Laye Toure	fifa
+GUI	Shavin Dexroy Greene	fifa
+HTI	Olivier Jean Philippe Alexandre	fifa
+HTI	Wikelson Bonnet	fifa
+HTI	Patrick Senecharles	fifa
+HKG	Cheung Wai Lung Mario	fifa
+HKG	Ho Wai Sing	fifa
+HKG	Lau Fong Hei	fifa
+HKG	Liu Kwok Man	fifa
+HKG	Tam Ping Wun	fifa
+HKG	Wong Wai Lun	fifa
+HON	Selvin Brown	fifa
+HON	Raul Edgardo Castro Zuniga	fifa
+HON	Jefferson Alberto Escobar Benitez	fifa
+HON	Said Martinez	fifa
+HON	Nelson Alcides Salgado Trujillo	fifa
+HON	Jose Javier Valladares Canales	fifa
+HUN	Balazs Berke	fifa
+HUN	Gergo Bogar	fifa
+HUN	Tamas Bognar	fifa
+HUN	Bence Csonka	fifa
+HUN	Mihaly Kapraly	fifa
+HUN	Marton Rusz	fifa
+IDN	Thoriq Al Katiri	fifa
+IDN	Naufal Adya Fairuski	fifa
+IDN	Yudi Nurcahya	fifa
+IDN	Ryan Nanda Saputra	fifa
+IND	Crystal John	fifa
+IND	Ashwin Kumar	fifa
+IND	Harish Kundu	fifa
+IND	Aditya Purkayastha	fifa
+IND	Venkatesh Ramachandran	fifa
+IND	Senthilnathan Sekaran	fifa
+IRL	Robert Harvey	fifa
+IRL	Robert Hennessy	fifa
+IRL	Aaron O'Dowd	fifa
+IRL	Kevin O'Sullivan	fifa
+IRN	Hasan Akrami	fifa
+IRN	Amir Arab Baraghi	fifa
+IRN	Mooud Bonyadifard	fifa
+IRN	Bijan Heidari	fifa
+IRN	Payam Heidari	fifa
+IRN	Seyedvahid Kazemi	fifa
+IRN	Morteza Mansourian	fifa
+IRQ	Mohammed Tareq Ahmed Ahmed	fifa
+IRQ	Ali Ali Hussein Ali Doshi	fifa
+IRQ	Yousif Saeed Hasan	fifa
+IRQ	Zaid Thamer Mohammed	fifa
+IRQ	Ahmed Kadhim Gatea Rsetam	fifa
+IRQ	Mohanad Sarray	fifa
+ISL	Helgi Mikael Jonasson	fifa
+ISL	Johann Ingi Jonsson	fifa
+ISL	Ivar Orri Kristjansson	fifa
+ISL	Vilhjalmur Alvar Thorarinsson	fifa
+ISR	Yigal Frid	fifa
+ISR	David Fuxman	fifa
+ISR	Orel Grinfeeld	fifa
+ISR	Gal Leibovitz	fifa
+ISR	Gal Levi	fifa
+ISR	Snir Levy	fifa
+ITA	Daniele Chiffi	fifa
+ITA	Andrea Colombo	fifa
+ITA	Marco Guida	fifa
+ITA	Matteo Marcenaro	fifa
+ITA	Matteo Marchetti	fifa
+ITA	Maurizio Mariani	fifa
+ITA	Davide Massa	fifa
+ITA	Luca Pairetto	fifa
+ITA	Simone Sozza	fifa
+ITA	Luca Zufferli	fifa
+ITA	Rosario Abisso	liga
+ITA	Claudio Giuseppe Allegretta	liga
+ITA	Alberto Ruben Arena	liga
+ITA	Giovanni Ayroldi	liga
+ITA	Kevin Bonacina	liga
+ITA	Andrea Calzavara	liga
+ITA	Giuseppe Collu	liga
+ITA	Valerio Crezzini	liga
+ITA	Marco Di Bello	liga
+ITA	Davide Di Marco	liga
+ITA	Federico Dionisi	liga
+ITA	Daniele Doveri	liga
+ITA	Michael Fabbri	liga
+ITA	Ermanno Feliciani	liga
+ITA	Maria Sole Ferrieri Caputi	liga
+ITA	Francesco Fourneau	liga
+ITA	Simone Galipò	liga
+ITA	Federico La Penna	liga
+ITA	Gianluca Manganiello	liga
+ITA	Fabio Maresca	liga
+ITA	Livio Marinelli	liga
+ITA	Luca Massimi	liga
+ITA	Giuseppe Mucera	liga
+ITA	Daniele Perenzoni	liga
+ITA	Mario Perri	liga
+ITA	Ivano Pezzuto	liga
+ITA	Antonio Rapuano	liga
+ITA	Juan Luca Sacchi	liga
+ITA	Paride Tremolada	liga
+ITA	Niccolò Turrini	liga
+ITA	Andrea Zanotti	liga
+JAM	Steffon Dewar	fifa
+JAM	Christopher Mason	fifa
+JAM	Oshane Nation	fifa
+JAM	Okeito Nicholson	fifa
+JAM	Alexi Perry	fifa
+JOR	Ahmad Alkhawaldeh	fifa
+JOR	Mahmoud Alsawalmeh	fifa
+JOR	Marwan Ali Salem Alsmail	fifa
+JOR	Mohammad Ghabayen	fifa
+JOR	Ahmad Yacoub Ibrahim	fifa
+JOR	Adham Makhadmeh	fifa
+JAP	Yusuke Araki	fifa
+JAP	Jumpei Iida	fifa
+JAP	Hiroki Kasahara	fifa
+JAP	Koki Nagamine	fifa
+JAP	Yusuke Ohashi	fifa
+JAP	Koji Takasaki	fifa
+JAP	Ryo Tanimoto	fifa
+CQT	Arman Ismuratov	fifa
+CQT	Sayat Karabayev	fifa
+CQT	Daniyar Sakhi	fifa
+CQT	Bulat Sariyev	fifa
+QUE	Isaac Hamisi	fifa
+QUE	Peter Kamaku	fifa
+QUE	Kelvin Maina	fifa
+QUE	Dickens Mimisa Nyagrowa	fifa
+QUE	Edwin Ouma Mangoli	fifa
+KGZ	Nurzatbek Abdykadyrov	fifa
+KGZ	Zainiddin Alimov	fifa
+KGZ	Alimardon Bainazarov	fifa
+KGZ	Mederbek Taichiev	fifa
+KGZ	Sanzhar Zhakypbekov	fifa
+CRS	Chae Sanghyeop	fifa
+CRS	Choi Cheoljun	fifa
+CRS	Choi Hyunjai	fifa
+CRS	Kim Heegon	fifa
+CRS	Kim Jong Hyeok	fifa
+CRS	Kim Woosung	fifa
+CRS	Ko Hyungjin	fifa
+KOS	Mervan Bejtullahu	fifa
+KOS	Visar Kastrati	fifa
+KOS	Genc Nuza	fifa
+ASA	Mohammed Al Hoish	fifa
+ASA	Majed Al Shamrani	fifa
+ASA	Shukri Alhunfush	fifa
+ASA	Mohammed Sami Alismail	fifa
+ASA	Abdullah Alshehri	fifa
+ASA	Khalid Alturais	fifa
+ASA	Faisal Albalawi	fifa
+KUW	Ahmad Al Ali	fifa
+KUW	Saud M M T A Alsamhan	fifa
+KUW	Ammar Ashkanani	fifa
+KUW	Huseen A J M H Jamal	fifa
+KUW	Abdullah Jamali	fifa
+KUW	Ali Mohammad	fifa
+LAO	Loun Southivong	fifa
+LAO	Phimpha Vannasak	fifa
+LIB	Hussein Abo Yehia	fifa
+LIB	Ali Alachkar	fifa
+LIB	Shiekh Ahmad Alaeddin	fifa
+LIB	Maher Alali	fifa
+LIB	Wael Haidar	fifa
+LIB	Mohamad Issa	fifa
+LBE	Washington Dolo	fifa
+LBE	Moses B. Johnson	fifa
+LBE	Emmanuel Mensah	fifa
+LBA	Shuhoub Abdulbasit	fifa
+LBA	Mohamed Agha	fifa
+LBA	Abdulrazg Ahmed	fifa
+LBA	Abdulwahid Huraywidah	fifa
+LBA	Elmabrouk Muhammad	fifa
+LBA	Mutaz Ibrahim	fifa
+SLU	Renlee Napoleon	fifa
+LES	Sephaphathi Adam	fifa
+LES	Lebalang Martin Mokete	fifa
+LES	Retselisitsoe David Molise	fifa
+LIT	Manfredas Lukjancukas	fifa
+LIT	Vilius Paulauskas	fifa
+LIT	Donatas Rumsas	fifa
+LIT	Dovydas Svgzda	fifa
+LUX	Jeremy Mueller	fifa
+LUX	Jasmin Sabotic	fifa
+LUX	Loic Thomas	fifa
+LET	Edgars Malcevs	fifa
+LET	Kristaps Ratnieks	fifa
+LET	Vitalijs Spasjonnikovs	fifa
+LET	Andris Treimanis	fifa
+MCO	Cheong Song Ian	fifa
+MCO	Ho Ka Seng	fifa
+MAD	Hery Tiana Andrianaivoarison	fifa
+MAD	Andofetra Rakotojaona	fifa
+MAD	Lominson Josianno Elivas Todihajaniaina	fifa
+MAD	Arnaud Andrisoa Zafimahatoha	fifa
+MAR	Achraf Berrada	fifa
+MAR	Mohamed El Baroudi	fifa
+MAR	Hamza El Fariq	fifa
+MAR	Jalal Jayed	fifa
+MAR	Mustapha Kech Chaf	fifa
+MAR	Naoufal Nachite	fifa
+MAR	Hicham Temsamani	fifa
+MAL	Razlan Joffri Ali	fifa
+MAL	Mohamad Kamil Zakaria Bin Ismail	fifa
+MAL	Muhammad Izzul Fikri Bin Kamaruzaman	fifa
+MAL	Mohamad Nawal Bin Mohammad Zubir	fifa
+MAL	Nazmi Nasaruddin	fifa
+MAL	Tuan Mohd Yaasin Tuan Mohd Hanafiah	fifa
+MOL	Igor Bosca	fifa
+MOL	Roman Jitari	fifa
+MOL	Dumitru Muntean	fifa
+MOL	Ion Orlic	fifa
+MLD	Adam Fazeel	fifa
+MLD	Zaheer Hussain	fifa
+MLD	Mohamed Javiz	fifa
+MLD	Afsheen Naseer	fifa
+MLD	Hussain Sinan	fifa
+MEX	Victor Alfonso Caceres Hernandez	fifa
+MEX	Jorge Abraham Camacho Peregrina	fifa
+MEX	Adonai Escobedo Gonzalez	fifa
+MEX	Fernando Hernandez Gomez	fifa
+MEX	Ismael Lopez Penuelas	fifa
+MEX	Jesus Rafael Lopez Valle	fifa
+MEX	Marco Ortiz Nava	fifa
+MEX	Daniel Quintero Huitron	fifa
+MEX	Cesar Ramos	fifa
+MEX	Luis Enrique Santander	fifa
+MAC	Vlatko Ilioski	fifa
+MAC	Igor Stojchevski	fifa
+MAC	Stojancho Trpchevski	fifa
+MLI	Ousmane Diakate	fifa
+MLI	Abdoulaye Diarra	fifa
+MLI	Richard Kamate	fifa
+MLI	Sory Ibrahima Keita	fifa
+MLI	Adama Kone	fifa
+MLI	Lassana Salim Tounkara	fifa
+MLI	Boubou Traore	fifa
+MLT	Ishmael Barbara	fifa
+MLT	Matthew De Gabriele	fifa
+MLT	Philip Farrugia	fifa
+MLT	Alex Johnson	fifa
+MNG	Milos Boskovic	fifa
+MNG	Nikola Dabanovic	fifa
+MNG	Milos Savovic	fifa
+MGL	Khash-Erdene Bold	fifa
+MGL	Nyamsaikhan Enkhtaivan	fifa
+MOC	Celso Alvacao	fifa
+MOC	Herminio Boca	fifa
+MOC	Antonio Chivavel	fifa
+MOC	Simoes Bernardo Guambe	fifa
+MRC	Jean Brandy Stevie Baillache	fifa
+MRC	Muhammad Irshaad Beebeejaun	fifa
+MRC	Ahmad Heeralall	fifa
+MRC	Patrice Milazare	fifa
+MRT	Dahane Beida	fifa
+MRT	Abdelaziz Bouh	fifa
+MRT	Moussa Diou	fifa
+MRT	Abdelkader Mbareck	fifa
+MRT	Babacar Sarr	fifa
+MLW	David Chinoko	fifa
+MLW	Mayamiko Kanjere	fifa
+MLW	Godfrey Nkhakananga	fifa
+MLW	Easter Bright Kalikokha Zimba	fifa
+BIR	Kyaw Zayar Aung	fifa
+BIR	Khin Maung Soe	fifa
+BIR	Thura Zaw	fifa
+NMI	Petrus Amutenya	fifa
+NMI	Naftal Negongo	fifa
+NMI	Fillipus Hanyemunange Nghilinganye	fifa
+NIC	Roger Alexander Melendez Suarez	fifa
+NIC	Felix Daniel Mojica Gutierrez	fifa
+NIC	Jorge Luis Ojeda Sequeira	fifa
+NCL	Mederic Lacour	fifa
+HOL	Serdar Gozubuyuk	fifa
+HOL	Robin Hensgens	fifa
+HOL	Joey Kooij	fifa
+HOL	Allard Lindhout	fifa
+HOL	Danny Makkelie	fifa
+HOL	Marinus Johannis Nagtegaal	fifa
+HOL	Sander van der Eijk	fifa
+NEP	Umesh Bidari	fifa
+NEP	Prajwol Chhetri	fifa
+NEP	Shyam Lal Danuwar	fifa
+NEP	Nabindra Maharjan	fifa
+NIG	Abubakar Abdullahi	fifa
+NIG	Kasimu Abdulsalam	fifa
+NIG	Salisu Basheer	fifa
+NIG	Patrick John Egba	fifa
+NIG	Grema Mohammed Mustapha	fifa
+NIG	Abubakar Nurudeen	fifa
+NIG	Joseph Odey Ogabor	fifa
+NGE	Moussa Ahamadou Alou	fifa
+NGE	Mohamed Ali Moussa	fifa
+NGE	Hamza Amadou Yaye	fifa
+NGE	Brahamou Sadou Ali	fifa
+ILN	Tim Marshall	fifa
+ILN	McMASTER Ben	fifa
+ILN	Ian McNabb	fifa
+ILN	Jamie Robinson	fifa
+NOR	Mohammad Usman Aslam	fifa
+NOR	Espen Eskas	fifa
+NOR	Marius Hansen Grotta	fifa
+NOR	Daniel Higraff	fifa
+NOR	Sigurd Smehus Kringstad	fifa
+NOR	Rohit Saggi	fifa
+NOR	Mathias Stofringshaug	fifa
+NZE	Calvin Berg	fifa
+NZE	Campbell-Kirk Kawana-Waugh	fifa
+NZE	Cory Mills	fifa
+OMA	Yahya Ahmed Ibrahim Al Balushi	fifa
+OMA	Qasim Matar Ali Al Hatmi	fifa
+OMA	Ahmed Al Kaf	fifa
+OMA	Mahmood Salim Said Al Majarafi	fifa
+OMA	Mohammed Al Manii	fifa
+OMA	Said Al- Mezeini	fifa
+OMA	Omar Al Yaqoubi	fifa
+PAQ	Adnan Anjum	fifa
+PAQ	Ismaeel Muhammad Fazal	fifa
+PAN	Jorge Ivan Leira Estevez	fifa
+PAN	Fernando Moron	fifa
+PAN	Richard Martin Tejada Pinzon	fifa
+PAN	Oliver Vergara	fifa
+PAR	Carlos Paul Benitez Achar	fifa
+PAR	Derlis Benitez	fifa
+PAR	Juan Gabriel Benitez	fifa
+PAR	Mario Diaz	fifa
+PAR	Derlis Lopez	fifa
+PAR	Jose Mendez	fifa
+PAR	David Elias Ojeda Gauto	fifa
+PAR	Blas Antonio Romero	fifa
+PER	Joel Alarcon	fifa
+PER	Jordi Stanley Espinoza Valles	fifa
+PER	Michael Espinoza Valles	fifa
+PER	Augusto Menendez	fifa
+PER	Edwin Rodrigo Ordonez Medina	fifa
+PER	Kevin Ortega	fifa
+PER	Bruno Perez	fifa
+PER	Daniel Francisco Ureta Pereda	fifa
+FIL	John Mike Basinang	fifa
+FIL	Clifford Daypuyat	fifa
+FIL	Mick Jon Pineda	fifa
+PSE	Baraa A. Aisha	fifa
+PSE	Mohammed Abushahla	fifa
+PSE	Mohammed Barahma	fifa
+PSE	Muath Owfi	fifa
+PNG	David Yareboinen	fifa
+POL	Patryk Gryckiewicz	fifa
+POL	Damian Kos	fifa
+POL	Lukasz Kuzma	fifa
+POL	Szymon Marciniak	fifa
+POL	Wojciech Myc	fifa
+POL	Pawel Raczkowski	fifa
+POL	Damian Sylwestrzak	fifa
+POR	António Nobre	fifa
+POR	Cláudio Pereira	fifa
+POR	David Silva	fifa
+POR	Fábio Veríssimo	fifa
+POR	Gustavo Correia	fifa
+POR	João Gonçalves	fifa
+POR	João Pinheiro	fifa
+POR	Miguel Nogueira	fifa
+POR	André Narciso	liga
+POR	Anzhony Rodrigues	liga
+POR	Bruno Costa	liga
+POR	Carlos Macedo	liga
+POR	Diogo Rosa	liga
+POR	Hélder Carvalho	liga
+POR	Hélder Malheiro	liga
+POR	Iancu Vasilica	liga
+POR	José Bessa	liga
+POR	Luís Filipe	liga
+POR	Luís Godinho	liga
+POR	Márcio Torres	liga
+POR	Miguel Fonseca	liga
+POR	Pedro Ramalho	liga
+POR	Ricardo Baixinho	liga
+POR	Sérgio Guelho	liga
+POR	Luis Miguel Branco	fifa
+CRN	Choe Kwang Hyon	fifa
+CRN	Kang Yong Jin	fifa
+CRN	Kim Un Song	fifa
+PRC	Jose Torres	fifa
+PRC	Ray Torres	fifa
+QAT	Abdulla Al Marri	fifa
+QAT	Abdulrahman Aljassim	fifa
+QAT	Mohammed Ahmad N M Al-Mazyed	fifa
+QAT	Abdulhadi Alruaile	fifa
+QAT	Mohamed Ahmed E E Mohamed	fifa
+QAT	Mohammed Alshammari	fifa
+QAT	Salman Falahi	fifa
+ROM	Marian Barbu	fifa
+ROM	Andrei Florin Chivulete	fifa
+ROM	Horatiu Mircea Fesnic	fifa
+ROM	Istvan Kovacs	fifa
+ROM	Szabolcs Roland Kovacs	fifa
+ROM	Radu Petrescu	fifa
+ROM	Rares George Vidican	fifa
+AFS	Luxolo Badi	fifa
+AFS	Masixole Bambiso	fifa
+AFS	Jelly Chavani	fifa
+AFS	Sikhumbuzo Patrick Gasa	fifa
+AFS	Eugine Nkosinathi Mdluli	fifa
+AFS	Abongile Tom	fifa
+RUS	Sergey Cheban	fifa
+RUS	Egor Egorov	fifa
+RUS	Sergey Ivanov	fifa
+RUS	Sergei Karasev	fifa
+RUS	Evgenii Kukuliak	fifa
+RUS	Kirill Levnikov	fifa
+RUS	Vladimir Moskalev	fifa
+RUS	Rafael Shafeev	fifa
+RUS	Aleksei Sukhoi	fifa
+RUA	Jean Claude Ishimwe	fifa
+RUA	Celestin Nsabimana	fifa
+RUA	Patience Fidele Rurisa	fifa
+RUA	Abdoul Karim Twagirumukiza	fifa
+RUA	Samuel Uwikunda	fifa
+ESC	David Dickinson	fifa
+ESC	Ross Hardie	fifa
+ESC	Ryan Lee	fifa
+ESC	Matthew Cain MacDermid	fifa
+ESC	Duncan Nicolson	fifa
+ESC	Donald Robertson	fifa
+ESC	Nicolas Walsh	fifa
+SUD	Abalaziz Abdallah	fifa
+SUD	Abdalaziz Ahmed	fifa
+SUD	Alamin Alhadi Alamin Mohamed	fifa
+SUD	Amro Ismail Alsayed Mohammed	fifa
+SUD	Sabri Mohammed Fadul Aman	fifa
+SUD	Mahmood Ismail	fifa
+SUD	Omer Suliman Yahia	fifa
+SEN	Thierno Mamadou Dia	fifa
+SEN	Adalbert Diouf	fifa
+SEN	Daouda Gueye	fifa
+SEN	Aboubacry Ndiaye	fifa
+SEN	Elhadji Amadou Sy	fifa
+SEN	Issa Sy	fifa
+SEY	Noris Aaron Godfrey Arissol	fifa
+SEY	Darrio Landry	fifa
+SEY	Keren Yocette	fifa
+SIN	Ahmad Bin Ahmad Al Badowe	fifa
+SIN	Muhammad Bin Jahari	fifa
+SIN	Muhammad Zulfiqar Bin Mustaffa	fifa
+SIN	Chuan Hui Jansen Foo	fifa
+SIN	Clarence Leow	fifa
+SKN	Sanchez Bass	fifa
+SKN	Tristley Bassue	fifa
+SKN	Reginald Gumbs	fifa
+SKN	Hakeem Harvey	fifa
+SKN	Kimbell Ward	fifa
+SLE	Rashid Mohamed Conteh	fifa
+SLE	Sulaiman Santio Kamara	fifa
+SLE	Mohamed Bock Tarawally	fifa
+SAL	Ivan Barton	fifa
+SAL	Ismael Cornejo	fifa
+SAL	Jose Waldir Garcia Melendez	fifa
+SAL	Jaime Alfredo Herrera Bonilla	fifa
+SAL	Filiberto Enrique Martinez Calix	fifa
+SAL	Cesar Eduardo Nolasco Quintanilla	fifa
+SMA	Michele Beltrano	fifa
+SOL	Ben Aukwai	fifa
+SOL	Timothy Niu	fifa
+SOM	Omar Artan	fifa
+SOM	Abdullahi Hagi Hassan	fifa
+SOM	Ahmed Hassan Hussein	fifa
+SOM	Abdifatah Saed Mire	fifa
+SER	Pavle Ilic	fifa
+SER	Srdjan Jovanovic	fifa
+SER	Milos Milanovic	fifa
+SER	Nenad Minakovic	fifa
+SER	Danilo Nikolic	fifa
+SER	Novak Simovic	fifa
+SRI	Mohamed Jafran Athambawa	fifa
+SRI	Nivon Gamini	fifa
+SRI	Sashanka Madhushanka Samarathunge Arachchige	fifa
+SRI	Kasun Lakmal Weerakkody Weerakkodykarage	fifa
+SSD	Anthony Kiri Emmnauel Daud	fifa
+SSD	Solomon Okwera Lino Lokudo	fifa
+SSD	Ring Nyier Akech Malong	fifa
+STP	Gilson da Costa Lima Pereira	fifa
+STP	Auladyo dos Santos Pariz	fifa
+STP	Josefa Moreno Aurelio	fifa
+STP	Adelcio Santana Soares da Costa	fifa
+SUI	Luca Cibelli	fifa
+SUI	Alessandro Dudic	fifa
+SUI	Lukas Faehndrich	fifa
+SUI	Anojen Kanagasingam	fifa
+SUI	Sandro Schaerer	fifa
+SUI	Urs Schnyder	fifa
+SUI	Sven Wolfensberger	fifa
+SUR	Shekiel Byon Jokil	fifa
+SUR	Edson Wilgo Lieveld	fifa
+SUR	Sergio Patrick Rozenhout	fifa
+EVQ	Lukas Dzivjak	fifa
+EVQ	Filip Glova	fifa
+EVQ	Balint Kiss	fifa
+EVQ	Ivan Kruzliak	fifa
+EVQ	Michal Ocenas	fifa
+EVN	Martin Matosa	fifa
+EVN	Rade Obrenovic	fifa
+EVN	David Smajc	fifa
+EVN	Mateo Tozan	fifa
+EVN	Slavko Vincic	fifa
+SUE	Mohammed Al-Hakim	fifa
+SUE	Oscar Johnson	fifa
+SUE	Kristoffer Karlsson	fifa
+SUE	Adam Ladebaeck	fifa
+SUE	Granit Maqedonci	fifa
+SUE	Glenn Nyberg	fifa
+SUE	Joakim Sars	fifa
+SUA	Njabulo Thembinkosi Dlamini	fifa
+SUA	Sanele Cedric Ntimane	fifa
+SUA	Sabelo Thulani Sibandze	fifa
+SUA	Celumusa Siphepho	fifa
+SIR	Ammar Abo Alo	fifa
+SIR	Marwan Awwad	fifa
+SIR	Hanna Hattab	fifa
+SIR	Mohammed Kanah	fifa
+SIR	Wissam Rabie	fifa
+SIR	Feras Taweel	fifa
+TAN	Ahmed Arajiga	fifa
+TAN	Ramadhani Omary Kayoko	fifa
+TAN	Hery Ally Sasii	fifa
+TAN	Nasir Salum Siyah	fifa
+TAI	Songkran Bunmeekiart	fifa
+TAI	Wiwat Jumpaoon	fifa
+TAI	Alongkorn Khonwai	fifa
+TAI	Mongkolchai Pechsri	fifa
+TAI	Sivakorn Pu-Udom	fifa
+TAI	Torphong Somsing	fifa
+TJQ	Abdullo Davlatov	fifa
+TJQ	Sadullo Gulmurodi	fifa
+TJQ	Nasrullo Kabirov	fifa
+TJQ	Amirjon Khorkashev	fifa
+TJQ	Sayyodjon Zayniddinov	fifa
+TKM	Berdimammet Atdyyev	fifa
+TKM	Nariman Garajayev	fifa
+TKM	Arslan Goshanov	fifa
+TKM	Resul Mammedov	fifa
+TLS	Francisco Araujo de Andrade Pereira	fifa
+TOG	Arima Mohamed Moustapha Akakpo	fifa
+TOG	Aklesso Gnama	fifa
+TOG	Kossi Fabrice Senyo	fifa
+TOG	Donatien Kofitse Yena	fifa
+TWN	Chen Hsin Chuan	fifa
+TWN	Kuo Chia Hao	fifa
+TWN	Lin Te En	fifa
+TWN	Liu Hsiang Shao	fifa
+TND	Timothy Emmanuel Stephen Derry	fifa
+TND	Nikolai Levi Darius Jamie Nyron	fifa
+TND	Andrew Samuel	fifa
+TND	Kwinsi Williams	fifa
+TUN	Bassem Belaid	fifa
+TUN	Nidhal Ben Ltaief	fifa
+TUN	Abdellaoui Fredj	fifa
+TUN	Khaled Gouider	fifa
+TUN	Amir Loucif	fifa
+TUN	Mehrez Melki	fifa
+TUN	Haithem Trabelsi	fifa
+TUR	Cihan Aydin	fifa
+TUR	Oguzhan Cakir	fifa
+TUR	Ozan Erguen	fifa
+TUR	Atilla Karaoglan	fifa
+TUR	Halil Umut Meler	fifa
+TUR	Kadir Saglam	fifa
+TUR	Mehmet Tuerkmen	fifa
+EAU	Adel Al Naqbi	fifa
+EAU	Omar Mohamed Ahmed Hassan Al Ali	fifa
+EAU	Sultan Mohamed Alhammadi	fifa
+EAU	Mohamed Abdalla Ibrahim Alharmoodi	fifa
+EAU	Suhail Abdulla Ali Abdulla Almulla	fifa
+EAU	Yahya Ali Mohammad Hassan Almulla	fifa
+EAU	Ahmed Darwish	fifa
+UGA	Joshua Duula	fifa
+UGA	Lucky Razake Kasalirwe	fifa
+UGA	Dick Okello	fifa
+UGA	George Olemu	fifa
+UGA	William Oloya	fifa
+UCR	Mykola Balakin	fifa
+UCR	Oleksii Derevinskyi	fifa
+UCR	Viktor Kopiievskyi	fifa
+UCR	Dmytro Kubriak	fifa
+UCR	Dmytro Panchyshyn	fifa
+UCR	Denys Shurman	fifa
+UCR	Klym Zabroda	fifa
+URU	Jose Javier Burgos Terrazo	fifa
+URU	Mathias de Armas	fifa
+URU	Alberto Javier Feres Marino	fifa
+URU	Leodan Gonzalez	fifa
+URU	Hernan Gaston Heras Acosta	fifa
+URU	Andres Matonte	fifa
+URU	Esteban Ostojich	fifa
+URU	Gustavo Tejera	fifa
+EUA	Joe Dickerson	fifa
+EUA	Ismail Elfath	fifa
+EUA	Jon Freemon	fifa
+EUA	Guido Gonzales Jr	fifa
+EUA	Rosendo Mendoza Herrera	fifa
+EUA	Victor Rivas	fifa
+EUA	Lukasz Szpala	fifa
+EUA	Rubiel Vazquez	fifa
+EUA	Armando Villarreal	fifa
+UZB	Abdurashid Khudoyberganov	fifa
+UZB	Rustam Lutfullin	fifa
+UZB	Asker Nadjafaliev	fifa
+UZB	Firdavs Norsafarov	fifa
+UZB	Akhrol Riskullaev	fifa
+UZB	Akobir Shukurullaev	fifa
+UZB	Ilgiz Tantashev	fifa
+VNT	Arnold Tari	fifa
+VNZ	Rony Daniel Cueva Gonzalez	fifa
+VNZ	Alexis Herrera	fifa
+VNZ	Yender Herrera	fifa
+VNZ	Yeferzon Miranda	fifa
+VNZ	Carlos Manuel Parra Guarguati	fifa
+VNZ	Reyes Luis Soto Aular	fifa
+VNZ	Jesus Valenzuela	fifa
+VNZ	Alejandro Andres Velasquez Fernandez	fifa
+VGK	James Ramprashad	fifa
+VTM	Do Khanh Nam	fifa
+VTM	Hoang Ngoc Ha	fifa
+VTM	Le Vu Linh	fifa
+VTM	Ngo Duy Lan	fifa
+VTM	Nguyen Manh Hai	fifa
+SVG	Moeth Gaymes	fifa
+WAL	Iwan Arwel Griffith	fifa
+WAL	Aaron Wyn Jones	fifa
+WAL	Thomas Owen	fifa
+IEM	Yahya Ahmed	fifa
+IEM	Mokhtar Ahmed Mohammed Al-Arami	fifa
+IEM	Haithm Ebrahim Abbas Alwalidi	fifa
+IEM	Mohammed Abdulhakim Karama Ba-Saleh	fifa
+ZAM	Chola Chansa	fifa
+ZAM	Hillary Hambaba	fifa
+ZAM	Chanshi Kasongo	fifa
+ZAM	Charles Ngandwe	fifa
+ZBW	Brighton Chimene	fifa
+ZBW	Owen Manenda	fifa
+ZBW	Thabani Ruzario	fifa
+ZBW	Lawrence Zimondi	fifa
+#
+# Referees of the classic game (REFEREE.TXE) of countries the list above replaces.
+# Remove the '#' at the start of a line to use that referee too.
+#ALE	Bern Heyenemann	1998
+#ALE	Helmut Krug	1998
+#ALE	Hermann Albrecht	1998
+#ALE	Markus Merk	1998
+#AUT	Gerd Grabher	1998
+#AUT	Gunter Benko	1998
+#BEL	Michel Piraux	1998
+#BIR	Mika Peitota	1998
+#BLR	Vadim Zhuk	1998
+#BRA	Leo Feldman	1998
+#BRA	Wilson de Souza	1998
+#BRA	Valdomiro Matias	1998
+#BRA	Arnaldo Cezar Coelho	1998
+#BRA	Marcio Rezende de Freitas	1998
+#BRA	Edilson Pereira de Carvalho	1998
+#BRA	Oscar Roberto Godoi	1998
+#BRA	Antonio Pereira da Silva	1998
+#BRA	Romildo Correa	1998
+#BRA	Antonio Claudio Perin	1998
+#BRA	Sidrack Marinho	1998
+#DIN	Carl Christensen	1998
+#DIN	Jens Larsen	1998
+#DIN	Kim Milton Nielsen	1998
+#DIN	Knud Erik Fisker	1998
+#DIN	Peter  Mikkelsen	1998
+#ESC	Leslie Mottram	1998
+#ESC	Mike McCurry	1998
+#ESP	António Lopez Nieto	1998
+#ESP	César Montero	1998
+#ESP	F. Gracia	1998
+#ESP	Garcia Aranda	1998
+#ESP	J. Gonzales	1998
+#ESP	Lopez de la Fuente	1998
+#ESP	Manuel Diaz Vega	1998
+#ESP	Martin Abarrete	1998
+#FRA	Alain Sars	1998
+#FRA	Jean Harrel	1998
+#FRA	Marc Batta	1998
+#FRA	Pascal Raribian	1998
+#FRA	Stéphane Moulin	1998
+#HOL	Dick Jol	1998
+#HOL	Marco Van Der Ende	1998
+#HUN	Sandor Pull	1998
+#ING	David Elleray	1998
+#ING	Martin Bodenham	1998
+#ING	Paul Barren	1998
+#IRL	Richard O'Hanlon	1998
+#ITA	Graziano Cezare	1998
+#ITA	Paolo Collina	1998
+#ITA	Pasquale Rodomonti	1998
+#ITA	Pierluigi Pairetto	1998
+#ITA	Pietro Baggi	1998
+#ITA	Roberto Bettini	1998
+#LET	Terje Hauge	1998
+#MAR	Nafis Abdel-Ali	1998
+#MLT	Charles Aglus	1998
+#MRC	Lim Kee Chong	1998
+#NOR	Rune Pedersen	1998
+#POR	Alberto Azevedo	1998
+#POR	Alexandre Almeida	1998
+#POR	Andrelino Pena	1998
+#POR	Aníbal Guerreiro	1998
+#POR	António Baião	1998
+#POR	António Baptista	1998
+#POR	António Costa	1998
+#POR	António Eustácio	1998
+#POR	António Godinho	1998
+#POR	António Lucas	1998
+#POR	António Marçal	1998
+#POR	António Rebelo	1998
+#POR	António Rogério	1998
+#POR	António Rola	1998
+#POR	Augusto Duarte	1998
+#POR	Baptista de Sousa	1998
+#POR	Bento Marques	1998
+#POR	Bernardino Castanheira	1998
+#POR	Bruno Paixão	1998
+#POR	Carlos Asílio	1998
+#POR	Carlos Basílio	1998
+#POR	Carlos Estriga	1998
+#POR	Carlos Pinto	1998
+#POR	Carlos Triga	1998
+#POR	Carlos Xistra	1998
+#POR	Carvalho Araújo	1998
+#POR	Conceição Luís	1998
+#POR	Cunha Antunes	1998
+#POR	Daniel Soares	1998
+#POR	Duarte Gomes	1998
+#POR	Eduardo Francisco	1998
+#POR	Eduardo Marques	1998
+#POR	Eduardo Sequeira	1998
+#POR	Elmano Santos	1998
+#POR	Fernando Correia	1998
+#POR	Ferreira Rodrigues	1998
+#POR	Francisco Américo	1998
+#POR	Francisco Bizarro	1998
+#POR	Francisco Ferreira	1998
+#POR	Francisco Lopes Ferreira	1998
+#POR	Francisco Vicente	1998
+#POR	Hélio Santos	1998
+#POR	Hélder Barradas	1998
+#POR	Isidoro Rodrigues	1998
+#POR	Ivan Roque	1998
+#POR	Jacinto Paixão	1998
+#POR	João Caetano	1998
+#POR	João Ferreira	1998
+#POR	João Gil	1998
+#POR	João Rola	1998
+#POR	João Roque	1998
+#POR	João Torrão	1998
+#POR	João Vilas Boas	1998
+#POR	Joaquim Guerreiro	1998
+#POR	Joaquim Jesus	1998
+#POR	Jorge Coroado	1998
+#POR	Jorge Correia	1998
+#POR	Jorge Gomes	1998
+#POR	José Leirós	1998
+#POR	José Manuel Carvalho	1998
+#POR	José Mesquita	1998
+#POR	José Ourives	1998
+#POR	José Paulo Figueredo	1998
+#POR	José Pinto	1998
+#POR	José Pratas	1998
+#POR	José Rufino	1998
+#POR	José Santos	1998
+#POR	Júlio Lopes	1998
+#POR	Júlio Silva	1998
+#POR	Leonel Simões	1998
+#POR	Lucílio Baptista	1998
+#POR	Luís Agostinho	1998
+#POR	Luís Aguiar	1998
+#POR	Luís Lameira	1998
+#POR	Luís Miranda	1998
+#POR	Manuel Moreira	1998
+#POR	Manuel Pereira	1998
+#POR	Manuel Santos Silva	1998
+#POR	Manuel Sineiro	1998
+#POR	Manuel Vieira	1998
+#POR	Mário Bizarro	1998
+#POR	Mário Leal	1998
+#POR	Mário Mendes	1998
+#POR	Mário Santos	1998
+#POR	Martins dos Santos	1998
+#POR	Monteiro da Silva	1998
+#POR	Neves Coelho	1998
+#POR	Neves Fernandes	1998
+#POR	Olegário Benquerença	1998
+#POR	Pais Mendes	1998
+#POR	Palma Lucas	1998
+#POR	Paulo Baptista	1998
+#POR	Paulo Costa	1998
+#POR	Paulo Paraty	1998
+#POR	Paulo Silva	1998
+#POR	Pereira de Sousa	1998
+#POR	Pinto Correia	1998
+#POR	Pires Alves	1998
+#POR	Ramos Eustáquio	1998
+#POR	Rui Macau	1998
+#POR	Rui Silva	1998
+#POR	Rui Torres	1998
+#POR	Soares Baião	1998
+#POR	Soares Dias	1998
+#POR	Silva Barbosa	1998
+#POR	Silva Pereira	1998
+#POR	Teixeira Correia	1998
+#POR	Vitor Andrade	1998
+#POR	Vitor Pereira	1998
+#POR	Vitor Reis	1998
+#RUS	Nikolai Levnikov	1998
+#SUE	Anders Frisk	1998
+#SUE	Ian Larsson	1998
+#SUE	Lars Sundell	1998
+#SUE	Peter Svenson	1998
+#SUE	Sven Wittberg	1998
+#SUI	Paul Ahamid	1998
+#SUI	Peter Meier	1998
+#SUI	Serge Muhmenthaler	1998
+#TND	Peter Kelly	1998
+#TUR	Ahmed Cakar	1998
+#TUR	Duncan Servan	1998
+#UCR	Vassily Melnichuk	1998
+#VNT	Louis Fred	1998

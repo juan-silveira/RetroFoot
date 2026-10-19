@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "RIGA.EFT",
+  "name": "SKONTO  RIGA",
+  "shortName": "SKONTO  RIGA",
+  "country": "LET",
+  "level": 3,
+  "textColor": "#00FFFF",
+  "backgroundColor": "#800080",
+  "coach": "Andrej Starkov",
+  "players": [
+    { "name": "Kolinko", "position": "G", "country": "LET" },
+    { "name": "Blagonadezhdin", "position": "D", "country": "LET" },
+    { "name": "Bleidelis", "position": "D", "country": "LET" },
+    { "name": "Ivanov", "position": "D", "country": "LET" },
+    { "name": "Shevlyakov", "position": "D", "country": "LET" },
+    { "name": "Silagadze", "position": "D", "country": "LET" },
+    { "name": "Stepanov", "position": "D", "country": "LET" },
+    { "name": "Astafyev", "position": "M", "country": "LET" },
+    { "name": "Chaladze", "position": "M", "country": "LET" },
+    { "name": "Pakhar", "position": "M", "country": "LET" },
+    { "name": "Zemlinsky", "position": "M", "country": "LET" },
+    { "name": "Babichev", "position": "A", "country": "LET" },
+    { "name": "Mikholap", "position": "A", "country": "LET" },
+    { "name": "Rekhjviashvili", "position": "A", "country": "LET" }
+  ]
+}

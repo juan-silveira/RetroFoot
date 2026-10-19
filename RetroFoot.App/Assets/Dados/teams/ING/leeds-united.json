@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "LEEDS.EFT",
+  "name": "LEEDS UNITED",
+  "shortName": "LEEDS",
+  "country": "ING",
+  "level": 5,
+  "textColor": "#0000FF",
+  "backgroundColor": "#FFFFFF",
+  "coach": "George Graham",
+  "players": [
+    { "name": "Mark Beeny", "position": "G", "country": "ING" },
+    { "name": "Migel Martyn", "position": "G", "country": "ING" },
+    { "name": "Andrew Couzens", "position": "D", "country": "ING" },
+    { "name": "David Wetherall", "position": "D", "country": "ING" },
+    { "name": "Gary Kelley", "position": "D", "country": "IRL" },
+    { "name": "Lucas Radebe", "position": "D", "country": "AFS" },
+    { "name": "Paul Beesley", "position": "D", "country": "ING" },
+    { "name": "Richard Jobson", "position": "D", "country": "ING" },
+    { "name": "Rob Bowman", "position": "D", "country": "ING" },
+    { "name": "Bruno Ribeiro", "position": "M", "country": "POR" },
+    { "name": "Carlton Palmer", "position": "M", "country": "ING" },
+    { "name": "Lee Bowyer", "position": "M", "country": "ING" },
+    { "name": "Lee Sharpe", "position": "M", "country": "ING" },
+    { "name": "Matthew Smithard", "position": "M", "country": "ING" },
+    { "name": "Tony Dorigo", "position": "M", "country": "ING" },
+    { "name": "Jimmy", "position": "A", "country": "HOL" },
+    { "name": "Pierre Laurent", "position": "A", "country": "FRA" },
+    { "name": "Rodnwy Wallace", "position": "A", "country": "ING" },
+    { "name": "Tony Yebiah", "position": "A", "country": "GNA" }
+  ]
+}

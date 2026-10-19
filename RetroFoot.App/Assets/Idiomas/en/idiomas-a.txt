@@ -1,0 +1,186 @@
+# Start, options, about/registration, managers, dialogs (en).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs). Termos: docs/glossario-idiomas.md.
+Ligado	On
+Desligado	Off
+Opções	Options
+Como o jogo corre e o que ele mostra. Valem a partir de já.	How the game runs and what it shows. They apply right away.
+Nunca	Never
+Dos humanos	Humans only
+Todas	All
+Quando houver humanos	With humans
+Sempre	Always
+Todas as rodadas	Every round
+De 3 em 3 rodadas	Every 3 rounds
+No início da temporada	At season start
+Mostrar demissões de treinadores	Show manager sackings
+Ver sorteio da copa	Show cup draw
+Salvar o jogo	Save the game
+Habilitar som	Enable sound
+Tempo de jogo	Match speed
+A velocidade do relógio da jornada.	How fast the round clock runs.
+Substituições no intervalo	Half-time substitutions
+Parar no intervalo para mexer na equipa.	Stop at half-time to change the team.
+Ver as disputas de pênaltis	Show penalty shoot-outs
+Também nos jogos sem treinadores humanos.	Also in matches without human managers.
+Geral	General
+Nível de inflação	Inflation level
+Árbitros	Referees
+Times com empréstimos...	Teams with loans...
+Times endividados...	Teams in debt...
+Controle	Control
+Sobre	About
+Registrar	Register
+Senha	Code
+Contra-Senha	Counter-code
+Quando registrar o jogo, você poderá	Once you register the game, you can
+1 extra ativo	1 extra active
+{0} extras ativos	{0} extras active
+Nenhum extra ativo: a cópia não está registrada.	No extras active: this copy is not registered.
+Gestão de Treinadores	Manage Managers
+Os treinadores humanos deste jogo (até 6).	The human managers in this game (up to 6).
+De férias	On holiday
+O computador cuida da equipa enquanto o treinador está de férias.	The computer runs the team while the manager is on holiday.
+Adicionar...	Add...
+Remover	Remove
+sem equipa	no team
+de férias	on holiday
+{0} deixa de jogar?	Does {0} stop playing?
+Novo treinador	New manager
+Nome do novo treinador:	New manager's name:
+Perfil de {0}	{0}'s profile
+Quero que o computador cuide dos salários:	I want the computer to handle the wages:
+Dos jogadores nacionais	Of home players
+Dos estrangeiros abrangidos pela Lei Bosman	Of foreigners under the Bosman ruling
+Dos outros jogadores estrangeiros	Of the other foreign players
+Quero fazer ofertas a todos os jogadores	I want to bid for every player
+Não quero fazer ofertas aos jogadores mais fracos	I don't want to bid for the weaker players
+Não quero comprar jogadores em leilão	I don't want to buy players at auction
+Esconder as minhas ofertas	Hide my bids
+Os outros não veem as minhas ofertas nos leilões.	The others don't see my bids at auctions.
+Ofertas	Bids
+Gestão de Salários	Wage Management
+Compra em leilão	Auction buying
+Elenco...	Squad...
+Convite	Job offer
+Quer vir treinar o {0}?	Do you want to manage {0}?
+Nome do arquivo (8 letras):	File name (8 letters):
+Jogos salvos:	Saved games:
+Nome do arquivo inválido	Invalid file name
+Configurar	Settings
+Quero começar um jogo do início	I want to start a new game
+Quero continuar um jogo	I want to continue a game
+Já existe um jogo com esse nome	A game with that name already exists
+Erro	Error
+Não achei a pasta do jogo original (COUNTRY.TXE, EQUIPAS...). Use a variável RETROFOOT_JOGO.	Could not find the original game folder (COUNTRY.TXE, EQUIPAS...). Use the RETROFOOT_JOGO variable.
+{0} (pasta do jogo: {1})	{0} (game folder: {1})
+Seleção de Países	Choose Countries
+Times selecionados	Teams selected
+Times existentes	Teams available
+Países selecionados	Countries selected
+Países existentes	Countries available
+Selecione os países com que quer jogar, de modo a totalizar pelo menos {0} times.	Choose the countries you want to play with, for a total of at least {0} teams.
+Nenhum	None
+" times"	" teams"
+" time"	" team"
+Dinheiro	Money
+Com que moeda vai querer jogar?	Which currency do you want to play with?
+Sortear times	Draw teams
+Continuar	Continue
+Jogadores	Players
+Nome	Name
+Jogador {0}	Player {0}
+Não consegui gravar o jogo: {0}	Could not save the game: {0}
+Jogo novo	New game
+Continuar um jogo	Continue a game
+Países	Countries
+Moeda	Currency
+Treinadores	Managers
+Versão Atual	Current version
+Versão Clássica	Classic version
+cartões amarelos	yellow cards
+patrocínios	sponsors
+estrangeiros liberados	unlimited foreigners
+NOME	NAME
+Começar jogo novo	Start new game
+Regras do jogo novo	New game rules
+Mudar nas Configurações	Change in Settings
+O nome do arquivo do jogo: até 8 letras ou algarismos.	The game's file name: up to 8 letters or digits.
+Nenhum jogo gravado	No saved games
+Comece um jogo novo ao lado.	Start a new game alongside.
+Teclado	Keyboard
+Setas para cima e para baixo: escolhem o jogo gravado.	Up and down arrows: choose the saved game.
+Enter: abre o jogo escolhido (ou começa o novo, com o nome escrito).	Enter: opens the chosen game (or starts the new one, with the name typed).
+Nome do arquivo inválido: só letras (sem acento), algarismos, _ e -.	Invalid file name: only letters (no accents), digits, _ and -.
+Já existe um jogo com esse nome.	A game with that name already exists.
+A ler as equipas e os países...	Reading the teams and countries...
+Todos	All
+1 time	1 team
+{0} times	{0} teams
+mínimo {0} · existem {1}	minimum {0} · {1} available
+de {0}	of {0}
+Faltam {0} times para o mínimo.	{0} more teams needed for the minimum.
+Voltar	Back
+Os preços, os salários e o dinheiro das equipas aparecem nesta moeda durante todo o jogo.	Prices, wages and the teams' money are shown in this currency for the whole game.
+A moeda do jogo.	The game currency.
+Treinador {0}	Manager {0}
+Sortear equipas	Draw teams
+Até 6 treinadores humanos. Escreva os nomes e sorteie as equipas: cada um começa numa equipa da última divisão.	Up to 6 human managers. Type the names and draw the teams: each one starts at a team in the bottom division.
+Começar	Start
+As equipas foram sorteadas. Boa sorte!	The teams have been drawn. Good luck!
+Os treinadores humanos.	The human managers.
+Ver as disputas de pênaltis nos jogos sem treinadores humanos	Show penalty shoot-outs in matches without human managers
+Times com empréstimos	Teams with loans
+Times endividados	Teams in debt
+Cópia não registrada	Unregistered copy
+Cópia registrada	Registered copy
+aos jogadores nacionais	home players
+aos jogadores estrangeiros abrangidos pela Lei Bosman	foreign players under the Bosman ruling
+aos outros jogadores estrangeiros	other foreign players
+Não quero que os outros vejam as minhas ofertas	I don't want the others to see my bids
+Quer vir treinar o	Manage
+velocidade:Lento	Slow
+velocidade:Médio	Medium
+velocidade:Rápido	Fast
+velocidade:Super-rápido	Super-fast
+velocidade:Rapidíssimo	Very fast
+velocidade:Ultrassônico	Supersonic
+Ler times de versões anteriores	Read teams from older versions
+Adicionar países	Add countries
+Memória livre	Free memory
+Página de controle	Control page
+Ver tendência do árbitro	See referee bias
+Ver influência do árbitro	See referee influence
+Jogos super-rápidos	Super-fast matches
+Jogos ultrassônicos	Supersonic matches
+Jogadores selecionados dos outros times	Other teams' line-ups
+Gestão de treinadores	Manage managers
+Férias dos treinadores	Manager holidays
+Todos os treinadores de férias	All managers on holiday
+Balanço dos times	Teams' balance sheets
+Compra direta de jogadores	Direct player purchase
+Pedir dinheiro emprestado	Borrow money
+Ver o elenco quando for convidado	See the squad on job offers
+Ver pontuação dos treinadores	See manager ratings
+Jogadores sob observação	Watched players
+Escalação individual de jogadores	Pick players one by one
+Substituições durante o jogo	Substitutions during the match
+Pesquisar todos os jogadores	Search all players
+Quando registrar o jogo, você poderá:	Once you register the game, you can:
+- Comprar jogadores diretamente de qualquer time	- Buy players directly from any team
+- Escalar, um a um, os jogadores para cada jogo	- Pick, one by one, the players for each match
+- Efetuar substituições durante o jogo (e não só ao intervalo)	- Make substitutions during the match (not only at half-time)
+- Obter empréstimos bancários	- Get bank loans
+- Obter informação sobre a influência do árbitro para cada time	- See the referee's influence for each team
+- Ver o elenco do time adversário e de todos os outros	- See the opponent's squad and every other squad
+- Adicionar e retirar treinadores (humanos) no decorrer do jogo	- Add and remove (human) managers during the game
+"Terá ainda acesso a outras possibilidades que o ajudarão "	"You will also get other features that will help you "
+a ser o melhor de todos os treinadores.	become the best manager of all.
+Comprar jogadores diretamente de qualquer time	Buy players directly from any team
+Escalar, um a um, os jogadores para cada jogo	Pick, one by one, the players for each match
+Efetuar substituições durante o jogo (e não só ao intervalo)	Make substitutions during the match (not only at half-time)
+Obter empréstimos bancários	Get bank loans
+Obter informação sobre a influência do árbitro para cada time	See the referee's influence for each team
+Ver o elenco do time adversário e de todos os outros	See the opponent's squad and every other squad
+Adicionar e retirar treinadores (humanos) no decorrer do jogo	Add and remove (human) managers during the game
+1 jogo	1 game
+{0} jogos	{0} games

@@ -1,0 +1,59 @@
+# Editor de Save (RetroFoot.App/FerramentaEditorSave.cs) (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Jogo gravado	Saved game
+Pasta	Folder
+Recarregar	Reload
+Época {0}	Season {0}
+inflação de 5 a 100 (o jogo mostra x 10)	inflation 5 to 100 (the game shows x 10)
+Inflação	Inflation
+Moral: 0 a 20 · Estádio: 5.000 a 120.000 lugares	Morale: 0 to 20 · Stadium: 5,000 to 120,000 seats
+Limites de 16 bits	16-bit limits
+Soma da força	Total strength
+Pesos de golo (pos² × força × nota)	Goal weights (pos² × strength × rating)
+Melhor escalação (3G + D + M + A)	Best line-up (3G + D + M + F)
+Clique (ou Enter) num jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).	Click (or Enter) on a player to edit. S = suspended, A = yellow cards, L = injured (matches).
+Pos	Pos
+Máx.	Max.
+Comport.	Behav.
+Sit.	Stat.
+Nenhum jogo gravado em {0}	No saved games in {0}
+{0}: {1} equipas	{0}: {1} teams
+Não consegui ler {0}: {1}	Could not read {0}: {1}
+Alterações por gravar	Unsaved changes
+Valor fora do limite	Value out of range
+{0}: use um valor de {1} a {2}.	{0}: use a value from {1} to {2}.
+Gravado. O original fica em {0}	Saved. The original is kept in {0}
+Não consegui gravar:\n{0}	Could not save:\n{0}
+sem equipa	no team
+Trocar	Switch
+Trocar de equipa	Switch team
+Este jogo não tem divisões: não dá para saber que equipas podem ter um treinador humano.	This game has no divisions: there is no way to know which teams can have a human manager.
+{0} vai para {1}.	{0} goes to {1}.
+As duas equipas ficam com moral 10, como numa chicotada psicológica. Só aparecem equipas das divisões (no Distrital o jogo quebra).	Both teams get morale 10, as in a managerial sacking. Only teams in the divisions are listed (the game breaks in the Regional League).
+Equipa atual: {0}	Current team: {0}
+1 a 10	1 to 10
+0 = nunca, 10 = muito	0 = never, 10 = very often
+Suspenso (S)	Suspended (S)
+jogos, 0 a {0}	matches, 0 to {0}
+Amarelos (A)	Yellow cards (A)
+acumulados, 0 a {0}	accumulated, 0 to {0}
+Lesionado (L)	Injured (L)
+Estrela	Star
+Sem estrela	No star
+1 a {0} (normal até {1})	1 to {0} (normal up to {1})
+o plantel já passa do limite	the squad is already over the limit
+Força máxima neste plantel: {0}	Maximum strength in this squad: {0}
+O resto do plantel já passa de um limite: diminua a força de outros jogadores.	The rest of the squad is already over a limit: lower the strength of other players.
+Força {0} é bem acima do normal (1 a {1}).	Strength {0} is far above normal (1 to {1}).
+Jogos {0} · Golos {1}	Matches {0} · Goals {1}
+Estrela (✱): médio ou avançado com nota 8 ou mais. Muda sozinha com a nota.	Star (✱): midfielder or forward with rating 8 or more. Follows the rating.
+Com nota {0}, acima de força {1} o jogo calcula errado e ele nunca marca golo.	With rating {0}, above strength {1} the game miscalculates and he never scores.
+Os pesos de golo do plantel somariam {0} (máximo {1}): os golos sairiam sempre do mesmo jogador, ou a equipa deixaria de marcar.	The squad's goal weights would add up to {0} (maximum {1}): goals would always come from the same player, or the team would stop scoring.
+A força do plantel somaria {0} (máximo {1}): o público dos jogos sairia errado.	The squad's strength would add up to {0} (maximum {1}): match attendances would come out wrong.
+A melhor escalação somaria {0} (máximo {1}): a força das equipas na partida sairia errada.	The best line-up would add up to {0} (maximum {1}): team strengths in the match would come out wrong.
+As alterações a este jogo ainda não foram gravadas. Descartar?	The changes to this game have not been saved yet. Discard them?
+Descartar	Discard
+{0} a {1}	{0} to {1}
+Pesos de golo	Goal weights
+pos² × força × nota	pos² × strength × rating
+Melhor escalação	Best lineup

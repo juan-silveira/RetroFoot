@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BAHIA.EFT",
+  "name": "EC BAHIA",
+  "shortName": "BAHIA",
+  "country": "BRA",
+  "level": 3,
+  "textColor": "#FF0000",
+  "backgroundColor": "#000080",
+  "coach": "Jair Pereira",
+  "players": [
+    { "name": "Marcones", "position": "G", "country": "BRA" },
+    { "name": "Washington", "position": "G", "country": "BRA" },
+    { "name": "Bruno Carvalho", "position": "D", "country": "BRA" },
+    { "name": "Clébson", "position": "D", "country": "BRA" },
+    { "name": "Fabão", "position": "D", "country": "BRA" },
+    { "name": "Marcos Adriano", "position": "D", "country": "BRA" },
+    { "name": "Parreira", "position": "D", "country": "BRA" },
+    { "name": "Everton Luís", "position": "M", "country": "BRA" },
+    { "name": "Giuliano", "position": "M", "country": "BRA" },
+    { "name": "Lima", "position": "M", "country": "BRA" },
+    { "name": "Ney Santos", "position": "M", "country": "BRA" },
+    { "name": "Robson Luís", "position": "M", "country": "BRA" },
+    { "name": "Angelo", "position": "A", "country": "BRA" },
+    { "name": "Guga", "position": "A", "country": "BRA" },
+    { "name": "Odemílson", "position": "A", "country": "BRA" },
+    { "name": "Zinho", "position": "A", "country": "BRA" }
+  ]
+}

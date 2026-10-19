@@ -1,0 +1,39 @@
+# Ferramenta Árbitros do hub (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Procurar nome	Procurar nome
+Todos	Todos
+Só os ativos	Só os ativos
+Só os desativados	Só os desativados
+Ativo (usado nos jogos novos)	Ativo (usado nos jogos novos)
+Liga	Liga
+Clássico (1998)	Clássico (1998)
+Patch	Patch
+Seu	Seu
+Ativo	Ativo
+Origem	Origem
+Árbitro	Árbitro
+Novo	Novo
+Remover	Remover
+Os jogos novos usam os árbitros ativos. Se escolher só um país no jogo novo, ficam só os desse país.	Os jogos novos usam os árbitros ativos. Se você escolher só um país no jogo novo, ficam só os desse país.
+Repor a lista do jogo	Restaurar a lista do jogo
+Ativo: clique para desativar	Ativo: clique para desativar
+Desativado: clique para ativar	Desativado: clique para ativar
+(sem nome)	(sem nome)
+Não consegui ler {0}: {1}	Não consegui ler {0}: {1}
+Arquivo: {0}	Arquivo: {0}
+Ainda sem lista: a do jogo entra ao repor.	Ainda sem lista: a do jogo entra ao restaurar.
+Todos os países ({0})	Todos os países ({0})
+{0} árbitros ativos em {1} países · {2} desativados · Delete remove · clique na marca para ativar ou desativar	{0} árbitros ativos em {1} países · {2} desativados · Delete remove · clique na marca para ativar ou desativar
+Sem nome: não é gravado.	Sem nome: não é salvo.
+Letras fora do Latin-1 perdem o acento no jogo.	Letras fora do Latin-1 perdem o acento no jogo.
+O jogo usa só as primeiras 40 letras.	O jogo usa só as primeiras 40 letras.
+O país {0} não está em countries.tsv.	O país {0} não está em countries.tsv.
+Por gravar...	Salvando...
+Gravado em {0} (o anterior fica em .bak).	Salvo em {0} (o anterior fica em .bak).
+Não consegui gravar: {0}	Não consegui salvar: {0}
+Repor a lista de árbitros que vem com o jogo? A sua lista atual fica guardada em {0}.bak.	Restaurar a lista de árbitros que vem com o jogo? A sua lista atual fica guardada em {0}.bak.
+Repor	Restaurar
+Cancelar	Cancelar
+Não consegui repor: {0}	Não consegui restaurar: {0}
+Lista do jogo reposta ({0} árbitros ativos).	Lista do jogo restaurada ({0} árbitros ativos).
+Abrir pasta de dados	Abrir pasta de dados

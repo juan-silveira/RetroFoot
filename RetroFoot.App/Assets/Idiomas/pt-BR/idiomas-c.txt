@@ -1,0 +1,29 @@
+# Mercado, elenco, listas, dinheiro, estadio, patrocinio e fim de temporada (pt-BR). A maior
+# parte das chaves ja esta em pt-BR no codigo; aqui as que estao em pt-PT e as frases que
+# soam de Portugal. Formato: chave<TAB>traducao (Idioma.cs).
+
+# --- Mercado ---
+"{0} pede que lhe seja aumentado o salário para {1}."	"{0} pede aumento de salário para {1}."
+Aceita o aumento?	Você aceita o aumento?
+Se não aceitar o aumento, o jogador será posto à venda em leilão.	Se você não aceitar o aumento, o jogador será colocado em leilão.
+Uma vez que este jogador não pode ser vendido, tem de aceitar o aumento.	Como este jogador não pode ser vendido, você tem de aceitar o aumento.
+Nem pensar! Exijo {0}!	De jeito nenhum! Exijo {0}!
+Só pode tentar vender este jogador novamente no próximo jogo	Você só pode tentar vender este jogador de novo no próximo jogo
+Não pode vender mais jogadores	Você não pode vender mais jogadores
+Não pode vender mais jogadores de campo	Você não pode vender mais jogadores de linha
+Não pode vender mais goleiros	Você não pode vender mais goleiros
+Só pode ter {0} jogadores sob observação	Você só pode ter {0} jogadores sob observação
+
+# --- Listas ---
+"  a. p."	"  prorr."
+Despedido	Demitido
+"Entrada no "	"Chegou ao "
+
+# --- Dinheiro ---
+O montante em dívida poderá ser reduzido sempre que o desejar, ou aumentado, se tal lhe for permitido.	A dívida pode ser reduzida quando você quiser, ou aumentada, se o banco permitir.
+O montante máximo a emprestar está condicionado pela confiança que o banco tem em si, neste momento.	O valor máximo do empréstimo depende da confiança que o banco tem em você neste momento.
+
+# --- Fim de temporada ---
+"Treinador: "	"Técnico: "
+Nenhuma equipa mudou de divisão.	Nenhum time mudou de divisão.
+As equipas que mudam de divisão	Os times que mudam de divisão

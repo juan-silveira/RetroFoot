@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "FIORENTI.EFT",
+  "name": "FIORENTINA",
+  "shortName": "FIORENTINA",
+  "country": "ITA",
+  "level": 13,
+  "textColor": "#FF0000",
+  "backgroundColor": "#800080",
+  "coach": "Alberto Malesani",
+  "players": [
+    { "name": "Fiori", "position": "G", "country": "ITA" },
+    { "name": "Toldo", "position": "G", "country": "ITA" },
+    { "name": "Falcano", "position": "D", "country": "ITA" },
+    { "name": "Firicano", "position": "D", "country": "ITA" },
+    { "name": "Mirri", "position": "D", "country": "ITA" },
+    { "name": "Sandro Cois", "position": "D", "country": "ITA" },
+    { "name": "Serena", "position": "D", "country": "ITA" },
+    { "name": "Tarozzi", "position": "D", "country": "ITA" },
+    { "name": "Andrej Kanchelskis", "position": "M", "country": "RUS" },
+    { "name": "Bettarini", "position": "M", "country": "ITA" },
+    { "name": "Bigica", "position": "M", "country": "ITA" },
+    { "name": "Rui Costa", "position": "M", "country": "POR" },
+    { "name": "Stefan Schwarz", "position": "M", "country": "SUE" },
+    { "name": "Amoruso", "position": "A", "country": "ITA" },
+    { "name": "Batistuta", "position": "A", "country": "ARG" },
+    { "name": "Edmundo", "position": "A", "country": "BRA" },
+    { "name": "Oliveira", "position": "A", "country": "BEL" },
+    { "name": "Robbiati", "position": "A", "country": "ITA" }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MONTIJO.EFT",
+  "name": "CLUBE DESPORTIVO MONTIJO",
+  "shortName": "MONTIJO",
+  "country": "POR",
+  "level": 1,
+  "textColor": "#800000",
+  "backgroundColor": "#008080",
+  "coach": "Fernando Veiga",
+  "players": [
+    { "name": "Nuno", "position": "G", "country": "POR" },
+    { "name": "Paulinho", "position": "G", "country": "POR" },
+    { "name": "Fortes", "position": "D", "country": "POR" },
+    { "name": "Hildo", "position": "D", "country": "POR" },
+    { "name": "Hugo Almeida", "position": "D", "country": "POR" },
+    { "name": "Hugo Pereira", "position": "D", "country": "POR" },
+    { "name": "Sérgio André", "position": "D", "country": "POR" },
+    { "name": "António Joaquim", "position": "M", "country": "POR" },
+    { "name": "Cabete", "position": "M", "country": "POR" },
+    { "name": "Kali", "position": "M", "country": "QUE" },
+    { "name": "Paulo Jorge", "position": "M", "country": "POR" },
+    { "name": "Ricardo", "position": "M", "country": "POR" },
+    { "name": "Edel", "position": "A", "country": "PRC" },
+    { "name": "Luciano", "position": "A", "country": "POR" },
+    { "name": "Maurício", "position": "A", "country": "POR" },
+    { "name": "Picoto", "position": "A", "country": "POR" }
+  ]
+}

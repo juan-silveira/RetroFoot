@@ -1,0 +1,11 @@
+# As telas do grupo idiomas-b (pt-BR): TelaEquipa(Moderna), TelaJornada(Moderna),
+# TelaClassificacao*, TelaDetalhesModerna, TelaCelular. Formato: chave<TAB>traducao (Idioma.cs).
+
+# --- jornada (o titulo vem do save: Jogos.cs)
+{0}ª Jornada	{0}ª Rodada
+TAÇA	COPA
+
+# --- classificacao
+GM	GP
+GS	GC
+pontos:P	P

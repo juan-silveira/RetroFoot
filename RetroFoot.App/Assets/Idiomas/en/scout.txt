@@ -1,0 +1,61 @@
+# Ferramenta Scout do hub (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Estrang.	Foreign
+Pos	Pos
+Estrela	Star
+Impacto	Impact
+Comport.	Behav.
+Div.	Div.
+Divisão	Division
+Amar.	Yel.
+Amarelos na carreira	Career yellow cards
+Expuls.	Reds
+Expulsões	Sendings-off
+Sit.	Status
+Situação	Status
+Parte do nome	Part of the name
+Só com estrela (✱)	Stars only (✱)
+Só estrangeiros (contam no limite)	Foreigners only (count towards the limit)
+Esconder suspensos e lesionados	Hide suspended and injured
+Esconder as equipas humanas	Hide human teams
+até {0}	up to {0}
+Só Fair Play	Fair Play only
+{0}ª	D{0}
+Dist.	Reg.
+Jogo gravado:	Saved game:
+Recarregar	Reload
+Filtros	Filters
+O que significa cada coluna	What each column means
+País do jogador	Player's country
+Valor até	Value up to
+Limpar filtros	Clear filters
+Equipa humana	Human team
+Nenhum jogo gravado em {0}.	No saved games in {0}.
+Não consegui ler o jogo gravado: {0}	Could not read the saved game: {0}
+Todos ({0})	All ({0})
+{0} de {1} jogadores · clique nos títulos para ordenar (Shift+clique junta colunas) · duplo clique abre o jogador	{0} of {1} players · click the headers to sort (Shift+click adds columns) · double-click opens the player
+pontos por época	points per season
+suspenso por {0} jogos	suspended for {0} games
+lesionado por {0} jogos	injured for {0} games
+conta como estrangeiro	counts as foreign
+disponível	available
+humano	human
+{0} jogadores	{0} players
+duplo clique abre	double-click opens
+Score (0 a 1000)	Score (0 to 1000)
+Nota × 100, descontando os jogos que ele deve perder na época por lesão e por suspensão (cerca de 0,13 jogo por ponto de Lesão e 0,21 por ponto de Comportamento, em 14 jogos). Não depende da força.	Rating × 100, minus the games he is expected to miss in the season through injury and suspension (about 0.13 game per point of Injury and 0.21 per point of Behaviour, in 14 games). It does not depend on strength.
+Pontos por época (14 jogos) que a equipa ganha ou perde com ele, comparado a um jogador da mesma posição sem estrela, Lesão 0 e Fair Play (medido em simulações). O jogo sorteia por minuto se a equipa terá uma lesão ou expulsão; Lesão e Comportamento só escolhem quem sofre. Por isso um avançado violento ou um defesa frágil podem até ajudar: atraem os problemas que iriam para o guarda-redes ou para as estrelas.	Points per season (14 games) the team gains or loses with him, compared with a player in the same position with no star, Injury 0 and Fair Play (measured in simulations). Each minute the game draws whether the team gets an injury or a sending-off; Injury and Behaviour only choose who suffers it. So a violent forward or a fragile defender can even help: they draw the trouble that would hit the goalkeeper or the stars.
+✱ Estrela	✱ Star
+Nota 8 ou mais num médio ou avançado. Soma 2 à força do sector dele enquanto está em campo.	Rating 8 or more in a midfielder or forward. Adds 2 to the strength of his line while he is on the pitch.
+Nota (1 a 10)	Rating (1 to 10)
+Decide quem marca os golos da equipa (avançado pesa 9, médio 4, defesa 1; o guarda-redes nunca marca) e quem bate os penáltis. Não muda quantos golos a equipa faz: isso vem da força dos sectores.	Decides who scores the team's goals (forward weighs 9, midfielder 4, defender 1; the goalkeeper never scores) and who takes the penalties. It does not change how many goals the team scores: that comes from the strength of each line.
+Lesão (0 a 10)	Injury (0 to 10)
+Chance de ser ele o lesionado quando a equipa sofre uma lesão. 0 nunca se lesiona. Cada lesão: 1 a 20 jogos fora e 10 de força a menos.	Chance that he is the one injured when the team suffers an injury. 0 is never injured. Each injury: 1 to 20 games out and 10 less strength.
+Chance de ser ele o expulso. Fair Play nunca é expulso. Suspensão de 1 a 4 jogos; guarda-redes expulso dá penálti certo, defesa dá em 1 de 3.	Chance that he is the one sent off. Fair Play is never sent off. Suspension of 1 to 4 games; a goalkeeper sent off always gives a penalty, a defender in 1 of 3.
+O valor do jogador para o jogo (força, nota, lesão, comportamento, moeda e inflação). O preço base dos leilões e os pedidos das equipas partem dele.	The player's value to the game (strength, rating, injury, behaviour, currency and inflation). Auction base prices and the clubs' asking prices start from it.
+Jogos, Golos, Lesões, Amar., Expuls.	Games, Goals, Injuries, Yel., Reds
+O historial do jogador no save (golos desta época; Amar. = cartões amarelos na carreira, só com as regras do RetroFoot).	The player's record in the saved game (goals this season; Yel. = career yellow cards, only with the RetroFoot rules).
+S = suspenso por N jogos, A = N amarelos acumulados (o 3º suspende por 1 jogo), L = lesionado por N jogos; Estrang. = conta como estrangeiro (Bosman e PLOP não contam).	S = suspended for N games, A = N yellow cards (the 3rd means a 1-game ban), L = injured for N games; Foreign = counts as a foreigner (Bosman and PLOP do not count).
+Idade	Age
+O jogo gravado não guarda a idade dos jogadores, por isso o Scout não tem filtro de idade.	Saved games do not store the players' age, so the Scout has no age filter.
+1 amarelo acumulado	1 yellow card

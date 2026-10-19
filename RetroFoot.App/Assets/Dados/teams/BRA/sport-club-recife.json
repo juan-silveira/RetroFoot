@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "RECIFE.EFT",
+  "name": "SPORT CLUB RECIFE",
+  "shortName": "SPORT",
+  "country": "BRA",
+  "level": 6,
+  "textColor": "#FF0000",
+  "backgroundColor": "#000000",
+  "coach": "Eduardo Amorim",
+  "players": [
+    { "name": "Bosco", "position": "G", "country": "BRA" },
+    { "name": "Alex Lopes", "position": "D", "country": "BRA" },
+    { "name": "Cássio", "position": "D", "country": "BRA" },
+    { "name": "Dedé", "position": "D", "country": "BRA" },
+    { "name": "Erlon", "position": "D", "country": "BRA" },
+    { "name": "Marcinho", "position": "D", "country": "BRA" },
+    { "name": "Márcio", "position": "D", "country": "BRA" },
+    { "name": "Humberto", "position": "M", "country": "BRA" },
+    { "name": "Jackson", "position": "M", "country": "BRA" },
+    { "name": "Juninho", "position": "M", "country": "BRA" },
+    { "name": "Paulo Henrique", "position": "M", "country": "BRA" },
+    { "name": "Valdomiro", "position": "M", "country": "BRA" },
+    { "name": "Wallace", "position": "M", "country": "BRA" },
+    { "name": "Dega", "position": "A", "country": "BRA" },
+    { "name": "Didí", "position": "A", "country": "BRA" },
+    { "name": "Leonardo", "position": "A", "country": "BRA" },
+    { "name": "Luís Muller", "position": "A", "country": "BRA" },
+    { "name": "Maurício Pantera", "position": "A", "country": "BRA" }
+  ]
+}

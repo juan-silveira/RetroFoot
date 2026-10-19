@@ -1,0 +1,179 @@
+# Editor de Equipas (RetroFoot.App/FerramentaEditorEquipas.cs, EditorEquipasEscudo.cs) (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Procurar equipa…	Search team…
+Nova	New
+Apagar	Delete
+Importar…	Import…
+Exportar…	Export…
+Logos das ligas…	League logos…
+(sem nome)	(no name)
+nível {0} · {1} jog.	level {0} · {1} pl.
+O jogo não aceita esta equipa assim (abra para ver porquê)	The game does not accept this team as it is (open it to see why)
+Todos os países	All countries
+{0} equipas	{0} teams
+{0} arquivos com erro	{0} files with errors
+Há alterações não gravadas nesta equipa. Descartá-las?	This team has unsaved changes. Discard them?
+Escolha uma equipa na lista ou crie uma nova.	Pick a team from the list or create a new one.
+As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato clássico .EFT.	Teams live in the data folder (teams/<country>/<team>.json). The game uses them as they are; "Export .EFT" saves a team in the classic .EFT format.
+Jogadores ({0})	Players ({0})
+Escudo	Crest
+nova	new
+Desfazer	Undo
+Pronta para o jogo	Ready to play
+{0} problemas	{0} problems
+por gravar	unsaved
+(não existe em countries.tsv)	(not in countries.tsv)
+1 = mais fraca, 20 = mais forte; as maiores começam nas divisões de cima	1 = weakest, 20 = strongest; the highest start in the top divisions
+Letra	Text
+Fundo	Background
+Nome completo	Full name
+Nome abreviado	Short name
+Nível	Level
+Cores	Colours
+(escolhido ao gravar)	(chosen when saving)
+Exportar .EFT…	Export .EFT…
+Arquivo	File
+Situação para o jogo	Game readiness
+Jogadores: {0} (de {1} a {2})	Players: {0} ({1} to {2})
+Guarda-redes: {0} (mín. 1) · Campo: {1} (mín. {2})	Goalkeepers: {0} (min. 1) · Outfield: {1} (min. {2})
+Estrangeiros: sem limite (todos na Lei Bosman)	Foreigners: no limit (all under the Bosman ruling)
+Estrangeiros: {0} de {1} (Lei Bosman e PLOP não contam)	Foreigners: {0} of {1} (Bosman and PLOP do not count)
+As 16 cores clássicas:	The 16 classic colours:
+Código:	Code:
+Pos.	Pos.
+Estrangeiro	Foreigner
+{0} jogadores · {1} GR · {2} estrangeiros	{0} players · {1} GK · {2} foreigners
+Adicionar	Add
+Editar	Edit
+Não (Bosman)	No (Bosman)
+Não (PLOP)	No (PLOP)
+Nacional.	Domestic.
+Não conta como estrangeiro: os dois países estão na Lei Bosman.	Does not count as a foreigner: both countries are under the Bosman ruling.
+Não conta como estrangeiro: os dois países são de língua portuguesa (PLOP).	Does not count as a foreigner: both countries are Portuguese-speaking (PLOP).
+Estrangeiro: conta no limite de {0} por equipa.	Foreigner: counts towards the limit of {0} per team.
+O jogo tira estes valores do nome (e da posição):	The game derives these values from the name (and position):
+Escolha o país do jogador.	Choose the player's country.
+Novo jogador	New player
+Editar jogador	Edit player
+NOVA EQUIPA	NEW TEAM
+NOVA	NEW
+O jogo não aceita a equipa assim:	The game does not accept the team as it is:
+Já há outra equipa com este nome neste país. Gravar mesmo assim?	There is already another team with this name in this country. Save anyway?
+Erro ao gravar:	Error while saving:
+Apagar a equipa {0}? O arquivo vai para a pasta backup.	Delete the team {0}? The file goes to the backup folder.
+Erro ao apagar:	Error while deleting:
+O formato .EFT não aceita a equipa assim:	The .EFT format does not accept the team as it is:
+Exportar .EFT	Export .EFT
+Equipa no formato .EFT	Team in .EFT format
+Equipa exportada no formato .EFT:	Team exported in .EFT format:
+Para a usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.	To use it in the classic game, copy the file into its EQUIPAS folder.
+Só esta equipa: {0}	Only this team: {0}
+As equipas de {0} ({1})	The teams of {0} ({1})
+Todas as equipas ({0})	All teams ({0})
+Equipas de {0}	Teams of {0}
+Minhas equipas	My teams
+Incluir também os .EFT (formato clássico)	Also include the .EFT files (classic format)
+Incluir os logos das ligas desses países	Include the league logos of those countries
+Um patch (.zip) com as equipas em JSON e os logos delas, para aplicar noutro RetroFoot (ferramenta Patches ou Importar).	A patch (.zip) with the teams in JSON and their logos, to apply in another RetroFoot (Patches tool or Import).
+Nome do patch	Patch name
+Exportar patch	Export patch
+Patch do RetroFoot	RetroFoot patch
+Patch gravado: {0} equipas, {1} logos.	Patch saved: {0} teams, {1} logos.
+Gravar em patches/	Save to patches/
+Gravar como…	Save as…
+Exportar patch de equipas	Export team patch
+Aplica um patch na pasta de dados: as equipas (JSON ou .EFT) e os logos dele. Uma equipa com o mesmo arquivo .EFT é substituída.	Applies a patch to the data folder: its teams (JSON or .EFT) and logos. A team with the same .EFT file is replaced.
+Biblioteca (pasta patches/):	Library (patches/ folder):
+(vazia)	(empty)
+{0} equipas importadas	{0} teams imported
+{0} logos	{0} logos
+Erros:	Errors:
+Erro ao importar:	Error while importing:
+Aplicar	Apply
+Escolher arquivo…	Choose file…
+Importar patch	Import patch
+Patch (.zip) ou equipa (.EFT, .json)	Patch (.zip) or team (.EFT, .json)
+Importar patch de equipas	Import team patch
+Qualquer imagem PNG, JPG, WEBP, SVG ou BMP. O ideal: quadrada ou quase, fundo transparente, pelo menos 128 px. O RetroFoot corta as sobras, pode tirar um fundo de cor única e centra o escudo num quadrado de 256 px, como os do jogo.	Any PNG, JPG, WEBP, SVG or BMP image. Ideally: square or nearly square, transparent background, at least 128 px. RetroFoot trims the borders, can remove a single-colour background and centres the crest in a 256 px square, like the game's own.
+Arraste uma imagem para aqui	Drag an image here
+Escudo de {0}	Crest of {0}
+(vai para a pasta logos/ ao Gravar)	(goes to the logos/ folder on Save)
+Escolher imagem…	Choose image…
+Da pasta de dados…	From data folder…
+Uma imagem copiada para a pasta logos/ da pasta de dados	An image copied into the logos/ folder of the data folder
+Da coleção…	From collection…
+O logo que o jogo acha sozinho pelo país e nome (ou o escudo nas cores)	The logo the game finds by itself from country and name (or the crest in the team colours)
+Sem escudo	No crest
+Cores do escudo	Crest colours
+Imagem nova, adaptada	New image, adapted
+Da coleção do jogo: {0}	From the game collection: {0}
+Sem escudo: o jogo desenha o escudo nas cores	No crest: the game draws a crest in the team colours
+Automático: da coleção do jogo	Automatic: from the game collection
+Automático: sem logo (o jogo desenha o escudo nas cores)	Automatic: no logo (the game draws a crest in the team colours)
+Sem escudo (escolhido)	No crest (chosen)
+Escolhido: logos/{0}	Chosen: logos/{0}
+Da pasta logos/: {0}	From the logos/ folder: {0}
+Imagens	Images
+Copie a imagem para a pasta logos/ da pasta de dados e escolha-a aqui:	Copy the image into the logos/ folder of the data folder and pick it here:
+Atualizar	Refresh
+A pasta logos/ não tem imagens (PNG, JPG, WEBP, SVG ou BMP).	The logos/ folder has no images (PNG, JPG, WEBP, SVG or BMP).
+Imagens da pasta de dados	Images in the data folder
+Original	Original
+No padrão do jogo	In the game standard
+{0}x{0} px, PNG transparente	{0}x{0} px, transparent PNG
+Esta imagem não serve:	This image cannot be used:
+Imagem adaptada	Image adapted
+Tirar o fundo de cor única (#{0})	Remove the single-colour background (#{0})
+O fundo já é transparente.	The background is already transparent.
+Usar este escudo	Use this crest
+Outra imagem…	Another image…
+Visual Moderno	Modern look
+Outra equipa	Other team
+Visual Clássico	Classic look
+O visual Clássico não mostra logos: valem as cores da equipa.	The Classic look shows no logos: the team colours are used.
+Visual Moderno (a Classificação e a tela da equipa)	Modern look (Standings and the team screen)
+O visual Clássico não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	The Classic look shows no logos. The league logo appears when all the teams in the game are from the same country.
+Procurar na coleção…	Search the collection…
+Só de {0}	Only {0}
+{0} logos (mostrando {1}; procure pelo nome)	{0} logos (showing {1}; search by name)
+Coleção de escudos do jogo	Game crest collection
+Escolha as cores da equipa (letra sobre fundo), tiradas das 16 cores do jogo que mais aparecem no escudo:	Choose the team colours (text on background), taken from the 16 game colours that appear most in the crest:
+Os logos das divisões e da taça aparecem no visual Moderno quando todas as equipas do jogo são deste país. Mudanças gravadas na hora.	Division and cup logos appear in the Modern look when all the teams in the game are from this country. Changes are saved immediately.
+Sem logo (escolhido)	No logo (chosen)
+Automático: sem logo	Automatic: no logo
+Imagem…	Image…
+Coleção…	Collection…
+Sem logo	No logo
+Logos das ligas	League logos
+O arquivo não existe.	The file does not exist.
+Não é uma imagem que o RetroFoot consiga abrir. Use PNG, JPG, WEBP, SVG ou BMP.	This is not an image RetroFoot can open. Use PNG, JPG, WEBP, SVG or BMP.
+A imagem é grande demais ({0}x{1} px).	The image is too big ({0}x{1} px).
+Não consegui abrir a imagem: {0}	Could not open the image: {0}
+O SVG não tem nada para desenhar.	The SVG has nothing to draw.
+Não está definido o nome da equipa	The team name is not set
+O nome é comprido demais (completo até {0} letras, abreviado até {1})	The name is too long (full up to {0} letters, short up to {1})
+Não está definido o país da equipa	The team country is not set
+Não está definido o nível da equipa	The team level is not set
+Não tem jogadores suficientes (mínimo {0})	Not enough players (minimum {0})
+Tem demasiados jogadores (máximo {0})	Too many players (maximum {0})
+Não tem guarda-redes	No goalkeeper
+Não tem jogadores de campo suficientes (mínimo {0})	Not enough outfield players (minimum {0})
+Tem demasiados jogadores estrangeiros (máximo {0})	Too many foreign players (maximum {0})
+Não está definido o treinador	The manager is not set
+Nomes de jogadores inválidos: {0}	Invalid player names: {0}
+Escreva o nome.	Type the name.
+O nome tem mais de {0} letras.	The name has more than {0} letters.
+Use só letras (com ou sem acento), espaço, ponto, hífen ou apóstrofo.	Use only letters (with or without accents), space, full stop, hyphen or apostrophe.
+A imagem está vazia.	The image is empty.
+A imagem não tem nada além do fundo.	The image has nothing but the background.
+A imagem é pequena demais ({0}x{1} px). Use uma com pelo menos {2} px.	The image is too small ({0}x{1} px). Use one with at least {2} px.
+A imagem é comprida demais ({0}x{1} px): um escudo precisa ser quadrado ou quase.	The image is too elongated ({0}x{1} px): a crest must be square or nearly square.
+A imagem é pequena ({0}x{1} px): vai ficar desfocada. O ideal é pelo menos {2} px.	The image is small ({0}x{1} px): it will look blurry. Ideally at least {2} px.
+A imagem não é quadrada: o escudo vai ficar estreito.	The image is not square: the crest will look narrow.
+O fundo ficou: o escudo vai aparecer num quadrado de cor.	The background was kept: the crest will show in a coloured square.
+A imagem não tem fundo transparente: o escudo vai aparecer num quadrado. Prefira um PNG ou SVG com fundo transparente.	The image has no transparent background: the crest will show in a square. Prefer a PNG or SVG with a transparent background.
+1ª Divisão	1st Division
+2ª Divisão	2nd Division
+3ª Divisão	3rd Division
+4ª Divisão	4th Division
+Crie e edite equipas, jogadores, cores e escudos	Create and edit teams, players, colours and crests

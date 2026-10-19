@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "AVES.EFT",
+  "name": "CLUBE DESPORTIVO DAS AVES",
+  "shortName": "AVES",
+  "country": "POR",
+  "level": 3,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Luís Campos",
+  "players": [
+    { "name": "Baptista", "position": "G", "country": "POR" },
+    { "name": "Tó Ferreira", "position": "G", "country": "POR" },
+    { "name": "Chico Silva", "position": "D", "country": "POR" },
+    { "name": "Marco", "position": "D", "country": "POR" },
+    { "name": "Paulo Pereira", "position": "D", "country": "POR" },
+    { "name": "Picão", "position": "D", "country": "POR" },
+    { "name": "Quim da Costa", "position": "D", "country": "POR" },
+    { "name": "Raúl Monteiro", "position": "D", "country": "POR" },
+    { "name": "Ségio Nunes", "position": "D", "country": "POR" },
+    { "name": "Delfim", "position": "M", "country": "POR" },
+    { "name": "Madureira", "position": "M", "country": "POR" },
+    { "name": "Marco", "position": "M", "country": "POR" },
+    { "name": "Quim ", "position": "M", "country": "POR" },
+    { "name": "Ricardo Machado", "position": "M", "country": "POR" },
+    { "name": "Ricardo Pereira", "position": "M", "country": "POR" },
+    { "name": "Cardoso", "position": "A", "country": "POR" },
+    { "name": "Moreira de Sá", "position": "A", "country": "POR" },
+    { "name": "Túbia", "position": "A", "country": "ANG" },
+    { "name": "Vitinha", "position": "A", "country": "POR" }
+  ]
+}

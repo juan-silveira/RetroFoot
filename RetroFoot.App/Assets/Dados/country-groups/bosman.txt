@@ -1,0 +1,21 @@
+# RetroFoot: Bosman law countries (players from these countries are not foreigners in each other's teams)
+# one 3-letter country code per line (countries.tsv)
+POR
+ESP
+FRA
+ITA
+ALE
+AUT
+GRE
+ING
+ESC
+WAL
+ILN
+IRL
+DIN
+BEL
+HOL
+LUX
+FIN
+SUE
+

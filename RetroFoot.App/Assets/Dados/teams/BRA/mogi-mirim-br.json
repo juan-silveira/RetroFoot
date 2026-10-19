@@ -1,0 +1,28 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MOGIM_BR.EFT",
+  "name": "MOGI MIRIM-BR",
+  "shortName": "MOGI MIRIM",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#FF0000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Roberval Davino",
+  "players": [
+    { "name": "Aílton Cruz", "position": "G", "country": "BRA" },
+    { "name": "Luiz Cláudio", "position": "D", "country": "BRA" },
+    { "name": "Misso", "position": "D", "country": "BRA" },
+    { "name": "Márcio", "position": "D", "country": "BRA" },
+    { "name": "Paulão", "position": "D", "country": "BRA" },
+    { "name": "Ronaldo", "position": "D", "country": "BRA" },
+    { "name": "César", "position": "M", "country": "BRA" },
+    { "name": "Eduardo", "position": "M", "country": "BRA" },
+    { "name": "Lau", "position": "M", "country": "BRA" },
+    { "name": "Luís Mario", "position": "M", "country": "BRA" },
+    { "name": "Rodrigo", "position": "M", "country": "BRA" },
+    { "name": "Alex", "position": "A", "country": "BRA" },
+    { "name": "Lico", "position": "A", "country": "BRA" },
+    { "name": "Sandro", "position": "A", "country": "BRA" }
+  ]
+}

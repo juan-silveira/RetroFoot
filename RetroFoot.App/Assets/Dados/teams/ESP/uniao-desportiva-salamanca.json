@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SALAMANC.EFT",
+  "name": "UNIÃO DESPORTIVA SALAMANCA",
+  "shortName": "SALAMANCA",
+  "country": "ESP",
+  "level": 6,
+  "textColor": "#808080",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Andoni Goikoetxea",
+  "players": [
+    { "name": "Aizpurua", "position": "G", "country": "ESP" },
+    { "name": "Bogdan Stelea", "position": "G", "country": "ROM" },
+    { "name": "Axel Smeets", "position": "D", "country": "BEL" },
+    { "name": "Dubravko Pavlicic", "position": "D", "country": "CRO" },
+    { "name": "Loren", "position": "D", "country": "ESP" },
+    { "name": "Marco Lanna", "position": "D", "country": "ITA" },
+    { "name": "Paulo Torres", "position": "D", "country": "POR" },
+    { "name": "Sergio Korino", "position": "D", "country": "ESP" },
+    { "name": "Sito", "position": "D", "country": "ESP" },
+    { "name": "César Villafañe", "position": "M", "country": "ESP" },
+    { "name": "Giovanella", "position": "M", "country": "BRA" },
+    { "name": "Luciano Iturrino", "position": "M", "country": "ESP" },
+    { "name": "Rogério", "position": "M", "country": "POR" },
+    { "name": "Taira", "position": "M", "country": "POR" },
+    { "name": "César Brito", "position": "A", "country": "POR" },
+    { "name": "Martin Vellisca", "position": "A", "country": "ESP" },
+    { "name": "Pablo Zegarra", "position": "A", "country": "PER" },
+    { "name": "Pauleta", "position": "A", "country": "POR" },
+    { "name": "Ronen Harazi", "position": "A", "country": "ISR" }
+  ]
+}

@@ -1,0 +1,8 @@
+# Editor de Save (RetroFoot.App/FerramentaEditorSave.cs) (pt-PT). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Clique (ou Enter) num jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).	Clique (ou Enter) num jogador para o editar. S = suspenso, A = amarelos, L = lesionado (jogos).
+Não consegui ler {0}: {1}	Não foi possível ler {0}: {1}
+Gravado. O original fica em {0}	Gravado. O original fica guardado em {0}
+Não consegui gravar:\n{0}	Não foi possível gravar:\n{0}
+Este jogo não tem divisões: não dá para saber que equipas podem ter um treinador humano.	Este jogo não tem divisões: não é possível saber que equipas podem ter um treinador humano.
+O resto do plantel já passa de um limite: diminua a força de outros jogadores.	O resto do plantel já passa de um limite: diminua a força de outros jogadores.

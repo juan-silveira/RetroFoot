@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "PALERMO.EFT",
+  "name": "UNIONE SPORTIVA PALERMO",
+  "shortName": "PALERMO",
+  "country": "ITA",
+  "level": 10,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#C0C0C0",
+  "coach": "Liborio Polizzi",
+  "players": [
+    { "name": "Adriano Bonaiuti", "position": "G", "country": "ITA" },
+    { "name": "Vincenzo Sicignano", "position": "G", "country": "ITA" },
+    { "name": "Claudio Finetti", "position": "D", "country": "ITA" },
+    { "name": "Marcello Marrocco", "position": "D", "country": "ITA" },
+    { "name": "Marco Ciardiello", "position": "D", "country": "ITA" },
+    { "name": "Roberto Biffi", "position": "D", "country": "ITA" },
+    { "name": "Rosario Compagno", "position": "D", "country": "ITA" },
+    { "name": "Enrico Buonocore", "position": "M", "country": "ITA" },
+    { "name": "Fabio Favi", "position": "M", "country": "ITA" },
+    { "name": "Giuseppe Compagno", "position": "M", "country": "ITA" },
+    { "name": "Mariano Sotgia", "position": "M", "country": "ITA" },
+    { "name": "Vincenzo De Sio", "position": "M", "country": "ITA" },
+    { "name": "Federic Massara", "position": "A", "country": "ITA" },
+    { "name": "Giancarlo Ferrara", "position": "A", "country": "ITA" },
+    { "name": "Gianluca Triuzzi", "position": "A", "country": "ITA" },
+    { "name": "Giuseppe Antonaccio", "position": "A", "country": "ITA" },
+    { "name": "Lorenzo Scarafoni", "position": "A", "country": "ITA" },
+    { "name": "Luis Landini", "position": "A", "country": "ITA" },
+    { "name": "Marco Dittgen", "position": "A", "country": "ALE" }
+  ]
+}

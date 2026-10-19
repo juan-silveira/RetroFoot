@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "ESPANOL.EFT",
+  "name": "REAL CLUBE DESPORTIVO ESPANYOL",
+  "shortName": "ESPAÑOL DE BARCELONA",
+  "country": "ESP",
+  "level": 10,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#800080",
+  "coach": "José António Camacho",
+  "players": [
+    { "name": "Raúl", "position": "G", "country": "ESP" },
+    { "name": "Toni", "position": "G", "country": "ESP" },
+    { "name": "Branko Brnovic", "position": "D", "country": "JUG" },
+    { "name": "Cristóbal", "position": "D", "country": "ESP" },
+    { "name": "José Javier Cobos", "position": "D", "country": "FRA" },
+    { "name": "Moisés Arteaga", "position": "D", "country": "ESP" },
+    { "name": "Nando", "position": "D", "country": "ESP" },
+    { "name": "Pachettino", "position": "D", "country": "ARG" },
+    { "name": "Victor Mestre", "position": "D", "country": "ESP" },
+    { "name": "Francisco", "position": "M", "country": "ESP" },
+    { "name": "Lemoine", "position": "M", "country": "BEL" },
+    { "name": "Lluis", "position": "M", "country": "ESP" },
+    { "name": "Nenad Pralija", "position": "M", "country": "CRO" },
+    { "name": "Pacheta", "position": "M", "country": "ESP" },
+    { "name": "Florin Raducioiu", "position": "A", "country": "ROM" },
+    { "name": "Juan Esnaider", "position": "A", "country": "ARG" },
+    { "name": "Nicolas Quédec", "position": "A", "country": "FRA" },
+    { "name": "Quique Martin", "position": "A", "country": "ESP" },
+    { "name": "Raúl Tamudo", "position": "A", "country": "ESP" }
+  ]
+}

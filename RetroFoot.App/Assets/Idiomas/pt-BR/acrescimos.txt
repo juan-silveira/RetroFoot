@@ -1,0 +1,3 @@
+# Os acrescimos (Regras.Acrescimos; TelaConfiguracoes) (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no clássico.	De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com gols, cartões e lesões (45'+2'). Desligados: como no clássico.

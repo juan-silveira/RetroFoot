@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "STOCKPOR.EFT",
+  "name": "STOCKPORT COUNTY",
+  "shortName": "STOCKPORT",
+  "country": "ING",
+  "level": 2,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#0000FF",
+  "coach": "Dave Jones",
+  "players": [
+    { "name": "Neil Edwards", "position": "G", "country": "ING" },
+    { "name": "Paul Jones", "position": "G", "country": "ING" },
+    { "name": "Lee Todd", "position": "D", "country": "ING" },
+    { "name": "Matthew Bound", "position": "D", "country": "ING" },
+    { "name": "Mike Flynn", "position": "D", "country": "ING" },
+    { "name": "Paul Ware", "position": "D", "country": "ING" },
+    { "name": "Sean Connelly", "position": "D", "country": "ING" },
+    { "name": "Tony Dinning", "position": "D", "country": "ING" },
+    { "name": "Chris Marsden", "position": "M", "country": "ING" },
+    { "name": "Jim Gannon", "position": "M", "country": "ING" },
+    { "name": "Kieron Durkan", "position": "M", "country": "IRL" },
+    { "name": "Mark Williams", "position": "M", "country": "WAL" },
+    { "name": "Sérgio Vieira Pinto", "position": "M", "country": "POR" },
+    { "name": "Tom Bennett", "position": "M", "country": "ESC" },
+    { "name": "Adie Mike", "position": "A", "country": "ING" },
+    { "name": "Alun Armstrong", "position": "A", "country": "ING" },
+    { "name": "Andy Mutch", "position": "A", "country": "ING" },
+    { "name": "Cavaco", "position": "A", "country": "POR" },
+    { "name": "John Jeffers", "position": "A", "country": "ING" }
+  ]
+}

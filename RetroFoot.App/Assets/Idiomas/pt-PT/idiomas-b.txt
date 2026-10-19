@@ -1,0 +1,69 @@
+# As telas do grupo idiomas-b (pt-PT: so as chaves escritas em pt-BR no codigo, de volta ao original): TelaEquipa(Moderna), TelaJornada(Moderna),
+# TelaClassificacao*, TelaDetalhesModerna, TelaCelular. Formato: chave<TAB>traducao (Idioma.cs).
+
+# --- TelaEquipa: as abas e a pagina Jogo
+Escalação	Selecção
+Sem jogo nesta rodada	Sem jogo nesta jornada
+Sem adversário nesta rodada	Sem adversário nesta jornada
+Temporada {0}	Época {0}
+Jogo salvo.	Jogo gravado.
+Não foi possível salvar o jogo.	Não foi possível gravar o jogo.
+
+# --- o elenco e a ficha do jogador
+Gols	Golos
+Temp.	Ép.
+Elenco	Plantel
+Goleiros	Guarda-redes
+Defensores	Defesas
+Meio-campistas	Médios
+Atacantes	Avançados
+Goleiro	Guarda-redes
+Defensor	Defesa
+Meio-campista	Médio
+Atacante	Avançado
+Escolha um jogador na lista para ver a ficha dele.	Escolha um jogador da lista para ver a sua ficha.
+Gols na Temporada	Golos esta época
+Gols na temporada	Golos esta época
+Gols na temp.	Golos na época
+Histórico	Historial
+Fora da escalação	Fora da selecção
+Escalação incompleta	Selecção incompleta
+Suspenso por 1 jogo	Castigado por 1 jogo
+Suspenso por {0} jogos	Castigado por {0} jogos
+
+# --- pagina Financas
+Temporada	Época
+Bilheteria	Bilhetes
+Prêmios	Prémios
+Gastos	Despesas
+Arquibancadas	Bancadas
+Receita total	Total de receitas
+Gasto total	Total de despesas
+Preço do ingresso	Preço dos bilhetes
+Ingressos (% da tabela)	Bilhetes (% da tabela)
+
+# --- Adversario, Ajuda do Arbitro, Patrocinio
+Técnico	Treinador
+"   Pênalti: {0}%   Cartões: -{1}%"	"   Penálti: {0}%   Cartões: -{1}%"
+Pênalti: {0}%   Cartões: -{1}%	Penálti: {0}%   Cartões: -{1}%
+Patrocinador master	Patrocinador principal
+{0} por temporada	{0} por época
+{0} temporada restante	{0} época restante
+{0} temporadas restantes	{0} épocas restantes
+
+# --- detalhes do jogo (Moderno)
+Gol	Golo
+Gol de pênalti	Golo de penalti
+Gol anulado	Golo anulado
+
+# --- classificacao
+Classificação - {0}ª rodada	Classificação - {0}ª jornada
+Classificação · {0}ª rodada	Classificação · {0}ª jornada
+pontos:P	P
+PJ	J
+VIT	V
+DER	D
+GC	GS
+SG	DG
+Últimas 5 partidas	Últimos 5 jogos
+O jogo parou por um erro inesperado. Carregue de novo o último jogo salvo para continuar.	O jogo parou por um erro inesperado. Carregue de novo o último jogo gravado para continuar.

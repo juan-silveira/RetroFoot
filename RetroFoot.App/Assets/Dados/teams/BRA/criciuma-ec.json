@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "CRICIUMA.EFT",
+  "name": "CRICIUMA EC",
+  "shortName": "CRICIUMA",
+  "country": "BRA",
+  "level": 2,
+  "textColor": "#000000",
+  "backgroundColor": "#FFFF00",
+  "coach": "Pepe",
+  "players": [
+    { "name": "Jefferson", "position": "G", "country": "BRA" },
+    { "name": "Roberto", "position": "G", "country": "BRA" },
+    { "name": "Augusto", "position": "D", "country": "BRA" },
+    { "name": "Biro", "position": "D", "country": "BRA" },
+    { "name": "Fábio", "position": "D", "country": "BRA" },
+    { "name": "Magno Alves", "position": "D", "country": "BRA" },
+    { "name": "Paulo César", "position": "D", "country": "BRA" },
+    { "name": "Adil", "position": "M", "country": "BRA" },
+    { "name": "Daniel Frasson", "position": "M", "country": "BRA" },
+    { "name": "Humberto", "position": "M", "country": "BRA" },
+    { "name": "Marcelo Rocha", "position": "M", "country": "BRA" },
+    { "name": "Marco Aurélio", "position": "M", "country": "BRA" },
+    { "name": "Vinícius", "position": "M", "country": "BRA" },
+    { "name": "Alex", "position": "A", "country": "BRA" },
+    { "name": "Flávio", "position": "A", "country": "BRA" },
+    { "name": "M Rodrigues", "position": "A", "country": "BRA" }
+  ]
+}

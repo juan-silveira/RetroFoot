@@ -1,0 +1,83 @@
+# Partida (substituicao, lesao, penalti, penaltis, sorteio) e os textos do motor (idiomas-d).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs). Chave = o texto pt-PT do original.
+
+Guarda-redes	Goalkeeper
+Defesa	Defender
+Médio	Midfielder
+Avançado	Forward
+GOLO	GOAL
+Defendeu	Saved
+Ao poste	Post
+À barra	Crossbar
+Ao lado	Wide
+Por cima	Over
+GOLO!	GOAL!
+Lesão	Injury
+Lesões	Injuries
+{0} ({1}) lesionou-se	{0} ({1}) is injured
+Tem de ser substituído. Escolha o jogador a entrar.	He must be replaced. Choose who comes on.
+{0} ({1}) lesionou-se e tem de ser substituído.\rEscolha o jogador a entrar.	{0} ({1}) is injured and must be replaced.\rChoose the player to come on.
+Banco vazio	No substitutes
+1 substituição restante	1 substitution left
+{0} substituições restantes	{0} substitutions left
+Substituições só ao intervalo	Substitutions only at half-time
+Penalti	Penalty
+Penaltis	Penalties
+MARCADOR	TAKER
+Marcador: {0}	Taker: {0}
+Na marca de penalti…	On the spot…
+{0}, escolha o jogador para marcar o penalti	{0}, choose who takes the penalty
+Escolha o jogador para marcar o penalti	Choose who takes the penalty
+{0}, escolha o jogador para marcar o penalti!	{0}, choose who takes the penalty!
+Chutar	Shoot
+P E N A L T I	P E N A L T Y
+D e s e m p a t e   p o r   P e n a l t i s	P e n a l t y   S h o o t - o u t
+DESEMPATE POR PENALTIS	PENALTY SHOOT-OUT
+Penaltis alternados	Alternate kicks
+{0} passa à próxima fase	{0} go through
+TAÇA	CUP
+Sorteio dos jogos	The draw
+Sorteio dos jogos da taça	Cup draw
+NO POTE · {0}	IN THE POT · {0}
+JOGOS · {0} DE {1}	MATCHES · {0} OF {1}
+Todas as equipas sorteadas	All teams drawn
+Intervalo	Half-time
+Guarda-redes expulso	Keeper sent off
+Em jogo	In play
+Árbitro	Referee
+Árbitro: {0} ({1})	Referee: {0} ({1})
+Amarelos	Yellows
+Vermelhos	Reds
+Cartão amarelo	Yellow card
+Cartão vermelho	Red card
+Cartões vermelhos	Red cards
+Sem lances	No incidents
+Lances	Incidents
+Ninguém em campo	Nobody on the pitch
+Em campo · {0}	On the pitch · {0}
+Banco	Bench
+Substituir	Substitute
+Continuar	Continue
+Escolha quem sai e quem entra · S substitui · Enter continua	Choose who comes off and who goes on · S substitutes · Enter continues
+{0} amarelo {1}'	{0} booked {1}'
+{0} expulso {1}'	{0} sent off {1}'
+{0} lesionou-se {1}'	{0} injured {1}'
+{0} {1}' - Anulado	{0} {1}' - Disallowed
+{0}ª Jornada - {1}	Round {0} - {1}
+{0}ª Jornada	Round {0}
+TAÇA - {0}	CUP - {0}
+Taça - {0} - {1}	Cup - {0} - {1}
+Taça - {0}	Cup - {0}
+Meias-finais	Semi-finals
+Quartos de final	Quarter-finals
+Oitavos de final	Last 16
+{0} avos de final	Round of {0}
+{0} oferece {1} por temporada, durante {2} temporada	{0} offers {1} per season, for {2} season
+{0} oferece {1} por temporada, durante {2} temporadas	{0} offers {1} per season, for {2} seasons
+,\rpara renovar o contrato de patrocinador master.	,\rto renew the main sponsor contract.
+,\rpara ser o patrocinador master do seu time.	,\rto be your team's main sponsor.
+\rMulta pela troca de patrocinador: {0}	\rFee for changing sponsor: {0}
+{0} oferece {1} por jogo, durante {2} jogo	{0} offers {1} per match, for {2} match
+{0} oferece {1} por jogo, durante {2} jogos	{0} offers {1} per match, for {2} matches
+,\rpara estampar a marca no uniforme.	,\rto put its brand on your kit.
+\r\rAceita?	\r\rAccept?

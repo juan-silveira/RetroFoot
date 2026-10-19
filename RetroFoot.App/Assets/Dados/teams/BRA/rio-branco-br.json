@@ -1,0 +1,29 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "RIOBR_BR.EFT",
+  "name": "RIO BRANCO-BR",
+  "shortName": "RIO BRANCO",
+  "country": "BRA",
+  "level": 1,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#0000FF",
+  "coach": "Lula Pereira",
+  "players": [
+    { "name": "Ivan", "position": "G", "country": "BRA" },
+    { "name": "Alaor", "position": "D", "country": "BRA" },
+    { "name": "Alexandre", "position": "D", "country": "BRA" },
+    { "name": "Claudemir", "position": "D", "country": "BRA" },
+    { "name": "Ildo", "position": "D", "country": "BRA" },
+    { "name": "Maxsandro", "position": "D", "country": "BRA" },
+    { "name": "Valdson", "position": "D", "country": "BRA" },
+    { "name": "Careca", "position": "M", "country": "BRA" },
+    { "name": "César Gaúcho", "position": "M", "country": "BRA" },
+    { "name": "Marco Sena", "position": "M", "country": "BRA" },
+    { "name": "Mineiro", "position": "M", "country": "BRA" },
+    { "name": "Paulo", "position": "M", "country": "BRA" },
+    { "name": "Paulo César", "position": "M", "country": "BRA" },
+    { "name": "Batistinha", "position": "A", "country": "BRA" },
+    { "name": "Narcísio", "position": "A", "country": "BRA" }
+  ]
+}

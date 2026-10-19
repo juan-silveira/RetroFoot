@@ -1,0 +1,30 @@
+# Telas de inicio, opcoes, acerca/registo, treinadores, dialogos (pt-BR).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs). Termos: docs/glossario-idiomas.md.
+Como o jogo corre e o que ele mostra. Valem a partir de já.	Como o jogo corre e o que ele mostra. Valem a partir de agora.
+Mostrar demissões de treinadores	Mostrar demissões de técnicos
+A velocidade do relógio da jornada.	A velocidade do relógio da rodada.
+Parar no intervalo para mexer na equipa.	Parar no intervalo para mexer no time.
+Também nos jogos sem treinadores humanos.	Também nos jogos sem técnicos humanos.
+Os treinadores humanos deste jogo (até 6).	Os técnicos humanos deste jogo (até 6).
+O computador cuida da equipa enquanto o treinador está de férias.	O computador cuida do time enquanto o técnico está de férias.
+sem equipa	sem time
+Não consegui gravar o jogo: {0}	Não foi possível salvar o jogo: {0}
+Treinadores	Técnicos
+Nenhum jogo gravado	Nenhum jogo salvo
+Setas para cima e para baixo: escolhem o jogo gravado.	Setas para cima e para baixo: escolhem o jogo salvo.
+Enter: abre o jogo escolhido (ou começa o novo, com o nome escrito).	Enter: abre o jogo escolhido (ou começa o novo, com o nome digitado).
+A ler as equipas e os países...	Lendo os times e os países...
+Os preços, os salários e o dinheiro das equipas aparecem nesta moeda durante todo o jogo.	Os preços, os salários e o dinheiro dos times aparecem nesta moeda durante todo o jogo.
+Treinador {0}	Técnico {0}
+Até 6 treinadores humanos. Escreva os nomes e sorteie as equipas: cada um começa numa equipa da última divisão.	Até 6 técnicos humanos. Digite os nomes e sorteie os times: cada um começa num time da última divisão.
+As equipas foram sorteadas. Boa sorte!	Os times foram sorteados. Boa sorte!
+Os treinadores humanos.	Os técnicos humanos.
+Ver as disputas de pênaltis nos jogos sem treinadores humanos	Ver as disputas de pênaltis nos jogos sem técnicos humanos
+Gestão de treinadores	Gestão de técnicos
+Férias dos treinadores	Férias dos técnicos
+Todos os treinadores de férias	Todos os técnicos de férias
+Ver pontuação dos treinadores	Ver pontuação dos técnicos
+- Efetuar substituições durante o jogo (e não só ao intervalo)	- Efetuar substituições durante o jogo (e não só no intervalo)
+- Adicionar e retirar treinadores (humanos) no decorrer do jogo	- Adicionar e retirar técnicos (humanos) no decorrer do jogo
+Efetuar substituições durante o jogo (e não só ao intervalo)	Efetuar substituições durante o jogo (e não só no intervalo)
+Adicionar e retirar treinadores (humanos) no decorrer do jogo	Adicionar e retirar técnicos (humanos) no decorrer do jogo

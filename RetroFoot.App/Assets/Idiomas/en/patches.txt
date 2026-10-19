@@ -1,0 +1,74 @@
+# Ferramenta Patches do hub (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+ e mais {0}	 and {0} more
+1 bandeira	1 flag
+1 equipa	1 team
+1 logo	1 logo
+A aplicar o patch...	Applying the patch...
+A reverter o patch...	Reverting the patch...
+Abrir pasta	Open folder
+Aplicado	Applied
+Aplicado em {0}.	Applied on {0}.
+Aplicar	Apply
+Aplicar "{0}" na pasta de dados? Os arquivos substituídos ficam guardados para reverter.	Apply "{0}" to the data folder? The replaced files are kept so it can be reverted.
+Aplicar patch	Apply patch
+Aplicar um patch guarda os arquivos que ele substitui: pode revertê-lo quando quiser e voltar às equipas originais.	Applying a patch keeps the files it replaces: you can revert it whenever you like and go back to the original teams.
+Arquivos mudados depois do patch foram guardados em:\n{0}	Files changed after the patch were saved in:\n{0}
+Atualizar	Refresh
+Autor: {0}	Author: {0}
+Bandeiras	Flags
+Biblioteca de patches	Patch library
+Conflito com o patch aplicado "{1}" ({0} em comum). Este patch passa por cima; para reverter "{1}" será preciso reverter este antes.	Conflict with the applied patch "{1}" ({0} in common). This patch overrides it; to revert "{1}" you will have to revert this one first.
+Copie o .zip para a pasta patches:\n{0}	Copy the .zip to the patches folder:\n{0}
+Equipas de países que não estão na lista de países: {0}.	Teams from countries missing from the country list: {0}.
+Grupos	Groups
+Ignorados	Ignored
+Importar patch (.zip)	Import patch (.zip)
+Lei Bosman / PLOP ({0})	Bosman law / PLOP ({0})
+Logos	Logos
+Nada para aplicar	Nothing to apply
+Nenhum patch na biblioteca	No patches in the library
+Não consegui ler este zip: {0}	Could not read this zip: {0}
+Não foi possível reverter: {0}	Could not revert: {0}
+O .zip deste patch já não está na biblioteca, mas o patch continua aplicado e pode ser revertido.	This patch's .zip is no longer in the library, but the patch is still applied and can be reverted.
+O .zip saiu da biblioteca	The .zip left the library
+O patch continua aplicado e pode ser revertido depois.	The patch stays applied and can be reverted later.
+O patch não foi aplicado (nada mudou): {0}	The patch was not applied (nothing changed): {0}
+Passa por cima do patch "{1}" ({0} em comum).	Overrides the patch "{1}" ({0} in common).
+Patch (.zip)	Patch (.zip)
+Patch do RetroFoot	RetroFoot patch
+Patrocinadores	Sponsors
+Países das equipas	Teams' countries
+Remover da biblioteca	Remove from library
+Reverta antes "{0}" (aplicado depois e mexe nos mesmos arquivos).	Revert "{0}" first (applied later and changes the same files).
+Reverter	Revert
+Reverter patch	Revert patch
+Tirar "{0}" da biblioteca? O .zip é apagado da pasta patches.	Remove "{0}" from the library? The .zip is deleted from the patches folder.
+Vale para os jogos novos; os jogos gravados continuam como estavam.	It applies to new games; saved games stay as they were.
+Voltar a pasta de dados a como estava antes de "{0}"?	Put the data folder back the way it was before "{0}"?
+Zip com erro	Broken zip
+a lista de países (countries.tsv)	the country list (countries.tsv)
+a lista de árbitros (referees.tsv)	the referee list (referees.tsv)
+o .zip não está na biblioteca	the .zip is not in the library
+o patch já está aplicado	the patch is already applied
+o patch não está aplicado	the patch is not applied
+outro patch aplicado depois mexe nos mesmos arquivos	another patch applied later changes the same files
+patrocinadores	sponsors
+países	countries
+{0} ({1} novas, {2} substituídas)	{0} ({1} new, {2} replaced)
+{0} arquivos (programas, imagens...)	{0} files (programs, images...)
+{0} arquivos com problema ficaram de fora:	{0} files with problems were left out:
+{0} bandeiras	{0} flags
+{0} equipas	{0} teams
+{0} equipas que o patch não traz saem do jogo (voltam ao reverter).	{0} teams the patch does not include leave the game (they come back when reverting).
+{0} equipas saíram (voltam ao reverter).	{0} teams were removed (they come back when reverting).
+{0} logos	{0} logos
+{0}: não tem nada que o RetroFoot use (equipas, países, árbitros, bandeiras, logos).	{0}: has nothing RetroFoot can use (teams, countries, referees, flags, logos).
+árbitros	referees
+Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Import a classic .zip patch (EQUIPAS, FLAGS folders, COUNTRY.TXE...) or a team and logo patch exported by the Team Editor.
+Patch clássico (.EFT)	Classic patch (.EFT)
+Substituir todas as equipas (como trocar a pasta EQUIPAS inteira)	Replace all teams (like swapping the whole EQUIPAS folder)
+Também pode arrastar os .zip para aqui ou copiá-los para a pasta patches.	You can also drag the .zip files here or copy them to the patches folder.
+1 arquivo (programa, imagem...)	1 file (program, image...)
+Patch aplicado. Equipas: {0}; outros arquivos: {1}.	Patch applied. Teams: {0}; other files: {1}.
+Patch revertido. Arquivos repostos: {0}; apagados: {1}.	Patch reverted. Files restored: {0}; deleted: {1}.

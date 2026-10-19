@@ -1,0 +1,92 @@
+# As Configuracoes (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+# --- TelaConfiguracoes ---
+Configurações	Settings
+Cancelar	Cancel
+Salvar	Save
+Resumo	Summary
+"Não consegui gravar: "	"Could not save: "
+# secoes
+Jogo	Game
+Regras	Rules
+Aparência	Appearance
+Idioma	Language
+Registro	Registration
+Versão e equipas	Version and teams
+Cartões, patrocínios, estrangeiros	Cards, sponsors, foreigners
+Visual e formato	Look and format
+Recursos do jogo	Game features
+# Jogo
+A versão do jogo e o tamanho das divisões.	The game version and the size of the divisions.
+Versão do jogo	Game version
+Versão	Version
+Modificada	Current
+versão Clássica	Classic version
+versão Atual	Current version
+Nota e Risco de lesão, a tática 5-0-5, até 30 jogadores, desempate por vitórias e as regras que você escolher.	Rating and Injury risk, the 5-0-5 formation, up to 30 players, wins as tie-breaker and the rules you choose.
+Equipas por divisão	Teams per division
+Equipas por divisão:	Teams per division:
+(só na versão Atual)	(Current version only)
+Equipas	Teams
+8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 teams as in the classic: 14 rounds; a new game needs at least {0} teams in the chosen countries.
+{0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos	{0} teams: {1} rounds; a new game needs at least {2} teams in the chosen countries
+{0} equipas por divisão ({1} rodadas)	{0} teams per division ({1} rounds)
+{0} por divisão · {1} rodadas	{0} per division · {1} rounds
+As mudanças valem da próxima vez que um jogo for aberto; o visual e o formato da tela, na hora.	Changes apply the next time a game is opened; the look and the screen format, right away.
+Valem para o próximo jogo novo; o visual e o formato da tela, na hora. Um jogo gravado mantém o número de equipas com que começou.	They apply to the next new game; the look and the screen format, right away. A saved game keeps the number of teams it started with.
+Jogo em curso	Game in progress
+"Jogo em curso: "	"Game in progress: "
+O jogo em curso mantém as regras com que foi aberto.	The game in progress keeps the rules it was opened with.
+O número de equipas vem do jogo gravado e não muda. O que você mudar aqui vale da próxima vez que um jogo for aberto.	The number of teams comes from the saved game and does not change. What you change here applies the next time a game is opened.
+# Regras
+O que vale dentro do jogo.	What applies inside the game.
+Na versão Clássica as regras são as de 1998	In the Classic version the rules are those of 1998
+Na versão Clássica as regras são as de 1998: só cartões vermelhos e sem patrocínios.	In the Classic version the rules are those of 1998: red cards only and no sponsors.
+Cartões amarelos e patrocínios só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Yellow cards and sponsors only exist in the Current version. Your choice is kept for when you use the Modified one.
+Usar a versão Atual	Use the Current version
+Adições	Additions
+Cartões amarelos	Yellow cards
+Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no clássico.	Three accumulated yellows mean a one-match ban. Off: red cards only, as in the classic.
+Cartões amarelos (três suspendem por um jogo)	Yellow cards (three mean a one-match ban)
+Patrocínios	Sponsors
+Propostas e contratos de patrocínio master ao longo da temporada.	Main sponsorship offers and contracts throughout the season.
+Patrocínios (propostas de patrocínio master)	Sponsors (main sponsorship offers)
+Cartões	Cards
+Amarelos e vermelhos	Yellow and red
+Só vermelhos	Red only
+cartões amarelos ligados	yellow cards on
+só cartões vermelhos	red cards only
+patrocínios ligados	sponsors on
+patrocínios desligados	sponsors off
+Ligados	On
+Desligados	Off
+Jogadores estrangeiros	Foreign players
+Estrangeiros	Foreigners
+Liberado	Unlimited
+Até 5 por equipa; a Lei Bosman e os países de língua portuguesa não contam.	Up to 5 per team; the Bosman ruling and Portuguese-speaking countries do not count.
+Sem limite: todos os países entram na lista da Lei Bosman.	No limit: every country goes on the Bosman list.
+Realístico: até 5 por equipa (Bosman e lusófonos não contam)	Realistic: up to 5 per team (Bosman and Portuguese-speaking do not count)
+Liberado: sem limite de estrangeiros	Unlimited: no limit on foreigners
+Desempate na classificação	Standings tie-breaker
+Pontos, vitórias, saldo de golos e golos marcados.	Points, wins, goal difference and goals scored.
+Pontos, saldo de golos e golos marcados (como no clássico).	Points, goal difference and goals scored (as in the classic).
+# Aparencia
+Como as telas são desenhadas. Muda na hora, mesmo com um jogo aberto.	How the screens are drawn. Changes right away, even with a game open.
+Visual	Look
+Moderno	Modern
+Tema verde e amarelo, cartões e os logos das equipas e das ligas.	Green and yellow theme, cards and the team and league logos.
+Moderno: tema escuro, cartões e logos	Modern: dark theme, cards and logos
+Formato da tela	Screen format
+Formato	Format
+Como o clássico: as telas no formato de 800x600.	As in the original: the screens in 800x600 format.
+Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.	Wide window: the round with the divisions side by side and the screens using the width.
+4:3: como o clássico (800x600)	4:3: as in the classic (800x600)
+16:9: janela larga, as telas aproveitam a largura	16:9: wide window, the screens use the width
+O visual e o formato mudam na hora, mesmo com um jogo aberto.	The look and the format change right away, even with a game open.
+# Idioma
+Os textos do jogo.	The game texts.
+Idioma do jogo	Game language
+Os textos do jogo clássico.	The texts of the classic game (Portuguese).
+Os textos adaptados para o Brasil.	The texts adapted for Brazil.
+Os textos traduzidos para inglês.	The texts translated into English.
+Os textos traduzidos para espanhol.	The texts translated into Spanish.

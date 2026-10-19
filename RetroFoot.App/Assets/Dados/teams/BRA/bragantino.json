@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "BRAGANTI.EFT",
+  "name": "BRAGANTINO",
+  "shortName": "BRAGANTINO",
+  "country": "BRA",
+  "level": 3,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Cassiá",
+  "players": [
+    { "name": "Alex", "position": "G", "country": "BRA" },
+    { "name": "Ivan", "position": "G", "country": "BRA" },
+    { "name": "Wendell", "position": "G", "country": "BRA" },
+    { "name": "Ayupe", "position": "D", "country": "BRA" },
+    { "name": "Fábio", "position": "D", "country": "BRA" },
+    { "name": "Nei", "position": "D", "country": "BRA" },
+    { "name": "Pereira", "position": "D", "country": "BRA" },
+    { "name": "Edson Baiano", "position": "M", "country": "BRA" },
+    { "name": "Genilson", "position": "M", "country": "BRA" },
+    { "name": "Geraldo", "position": "M", "country": "BRA" },
+    { "name": "Norberto", "position": "M", "country": "BRA" },
+    { "name": "Odair", "position": "M", "country": "BRA" },
+    { "name": "Adalberto", "position": "A", "country": "BRA" },
+    { "name": "Luciano", "position": "A", "country": "BRA" },
+    { "name": "Paulinho", "position": "A", "country": "BRA" },
+    { "name": "Sandro", "position": "A", "country": "BRA" }
+  ]
+}

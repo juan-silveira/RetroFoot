@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "LEIRIA.EFT",
+  "name": "UNIÃO DESPORTIVA DE LEIRIA",
+  "shortName": "LEIRIA",
+  "country": "POR",
+  "level": 4,
+  "textColor": "#800080",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Quinito",
+  "players": [
+    { "name": "Ferreira", "position": "G", "country": "POR" },
+    { "name": "Miroslav", "position": "G", "country": "CRO" },
+    { "name": "Bilro", "position": "D", "country": "POR" },
+    { "name": "Crespo", "position": "D", "country": "POR" },
+    { "name": "João Armando", "position": "D", "country": "POR" },
+    { "name": "Mário Artur", "position": "D", "country": "POR" },
+    { "name": "Paulito", "position": "D", "country": "POR" },
+    { "name": "Paulo Duarte", "position": "D", "country": "POR" },
+    { "name": "Álvaro Gregório", "position": "D", "country": "POR" },
+    { "name": "Gervino", "position": "M", "country": "POR" },
+    { "name": "Hugo", "position": "M", "country": "POR" },
+    { "name": "João Manuel", "position": "M", "country": "POR" },
+    { "name": "Luís Vouzela", "position": "M", "country": "POR" },
+    { "name": "Poejo", "position": "M", "country": "POR" },
+    { "name": "Sérgio Santos", "position": "M", "country": "POR" },
+    { "name": "Fernando", "position": "A", "country": "BRA" },
+    { "name": "Fua", "position": "A", "country": "POR" },
+    { "name": "Tílico", "position": "A", "country": "POR" }
+  ]
+}

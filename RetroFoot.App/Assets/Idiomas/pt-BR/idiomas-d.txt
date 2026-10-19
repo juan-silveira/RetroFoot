@@ -1,0 +1,43 @@
+# Partida (substituicao, lesao, penalti, penaltis, sorteio) e os textos do motor (idiomas-d).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs). Chave = o texto pt-PT do original.
+
+Guarda-redes	Goleiro
+Defesa	Defensor
+Médio	Meia
+Avançado	Atacante
+GOLO	GOL
+Ao poste	Na trave
+À barra	Travessão
+Ao lado	Para fora
+GOLO!	GOL!
+{0} ({1}) lesionou-se	{0} ({1}) se lesionou
+Tem de ser substituído. Escolha o jogador a entrar.	Precisa ser substituído. Escolha o jogador que vai entrar.
+{0} ({1}) lesionou-se e tem de ser substituído.\rEscolha o jogador a entrar.	{0} ({1}) se lesionou e tem de ser substituído.\rEscolha o jogador que vai entrar.
+Substituições só ao intervalo	Substituições só no intervalo
+Penalti	Pênalti
+Penaltis	Pênaltis
+MARCADOR	BATEDOR
+Marcador: {0}	Batedor: {0}
+Na marca de penalti…	Na marca do pênalti…
+{0}, escolha o jogador para marcar o penalti	{0}, escolha o jogador para bater o pênalti
+Escolha o jogador para marcar o penalti	Escolha o jogador para bater o pênalti
+{0}, escolha o jogador para marcar o penalti!	{0}, escolha o jogador para bater o pênalti!
+P E N A L T I	P Ê N A L T I
+D e s e m p a t e   p o r   P e n a l t i s	D i s p u t a   d e   P ê n a l t i s
+DESEMPATE POR PENALTIS	DISPUTA DE PÊNALTIS
+Penaltis alternados	Cobranças alternadas
+{0} passa à próxima fase	{0} passa para a próxima fase
+TAÇA	COPA
+Sorteio dos jogos da taça	Sorteio dos jogos da copa
+Todas as equipas sorteadas	Todos os times sorteados
+Guarda-redes expulso	Goleiro expulso
+" (pen.)"	" (pên.)"
+{0} lesionou-se {1}'	{0} se lesionou {1}'
+{0}ª Jornada - {1}	{0}ª Rodada - {1}
+{0}ª Jornada	{0}ª Rodada
+TAÇA - {0}	COPA - {0}
+Taça - {0} - {1}	Copa - {0} - {1}
+Taça - {0}	Copa - {0}
+Meias-finais	Semifinais
+Quartos de final	Quartas de final
+Oitavos de final	Oitavas de final

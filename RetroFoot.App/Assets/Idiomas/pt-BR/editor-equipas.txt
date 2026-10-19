@@ -1,0 +1,59 @@
+# Editor de Equipas (RetroFoot.App/FerramentaEditorEquipas.cs, EditorEquipasEscudo.cs) (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Procurar equipa…	Procurar time…
+Nova	Novo
+Apagar	Excluir
+O jogo não aceita esta equipa assim (abra para ver porquê)	O jogo não aceita este time assim (abra para ver por quê)
+{0} equipas	{0} times
+Há alterações não gravadas nesta equipa. Descartá-las?	Este time tem alterações não salvas. Descartá-las?
+Escolha uma equipa na lista ou crie uma nova.	Escolha um time na lista ou crie um novo.
+As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato clássico .EFT.	Os times ficam na pasta de dados (teams/<país>/<time>.json). O jogo usa os times como estão; "Exportar .EFT" salva um time no formato clássico .EFT.
+nova	novo
+Pronta para o jogo	Pronto para o jogo
+por gravar	não salvo
+1 = mais fraca, 20 = mais forte; as maiores começam nas divisões de cima	1 = mais fraco, 20 = mais forte; os maiores começam nas divisões de cima
+(escolhido ao gravar)	(escolhido ao salvar)
+Guarda-redes: {0} (mín. 1) · Campo: {1} (mín. {2})	Goleiros: {0} (mín. 1) · Linha: {1} (mín. {2})
+{0} jogadores · {1} GR · {2} estrangeiros	{0} jogadores · {1} GOL · {2} estrangeiros
+Estrangeiro: conta no limite de {0} por equipa.	Estrangeiro: conta no limite de {0} por time.
+NOVA EQUIPA	NOVO TIME
+NOVA	NOVO
+O jogo não aceita a equipa assim:	O jogo não aceita o time assim:
+Já há outra equipa com este nome neste país. Gravar mesmo assim?	Já existe outro time com este nome neste país. Salvar mesmo assim?
+Erro ao gravar:	Erro ao salvar:
+Apagar a equipa {0}? O arquivo vai para a pasta backup.	Excluir o time {0}? O arquivo vai para a pasta backup.
+Erro ao apagar:	Erro ao excluir:
+O formato .EFT não aceita a equipa assim:	O formato .EFT não aceita o time assim:
+Equipa no formato .EFT	Time no formato .EFT
+Equipa exportada no formato .EFT:	Time exportado no formato .EFT:
+Para a usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.	Para usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.
+Só esta equipa: {0}	Só este time: {0}
+As equipas de {0} ({1})	Os times de {0} ({1})
+Todas as equipas ({0})	Todos os times ({0})
+Equipas de {0}	Times de {0}
+Minhas equipas	Meus times
+Um patch (.zip) com as equipas em JSON e os logos delas, para aplicar noutro RetroFoot (ferramenta Patches ou Importar).	Um patch (.zip) com os times em JSON e os logos deles, para aplicar em outro RetroFoot (ferramenta Patches ou Importar).
+Patch gravado: {0} equipas, {1} logos.	Patch salvo: {0} times, {1} logos.
+Gravar em patches/	Salvar em patches/
+Gravar como…	Salvar como…
+Exportar patch de equipas	Exportar patch de times
+Aplica um patch na pasta de dados: as equipas (JSON ou .EFT) e os logos dele. Uma equipa com o mesmo arquivo .EFT é substituída.	Aplica um patch na pasta de dados: os times (JSON ou .EFT) e os logos dele. Um time com o mesmo arquivo .EFT é substituído.
+{0} equipas importadas	{0} times importados
+Patch (.zip) ou equipa (.EFT, .json)	Patch (.zip) ou time (.EFT, .json)
+Importar patch de equipas	Importar patch de times
+(vai para a pasta logos/ ao Gravar)	(vai para a pasta logos/ ao Salvar)
+O logo que o jogo acha sozinho pelo país e nome (ou o escudo nas cores)	O logo que o jogo encontra sozinho pelo país e nome (ou o escudo nas cores)
+Copie a imagem para a pasta logos/ da pasta de dados e escolha-a aqui:	Copie a imagem para a pasta logos/ da pasta de dados e escolha aqui:
+Outra equipa	Outro time
+O visual Clássico não mostra logos: valem as cores da equipa.	O visual Clássico não mostra logos: valem as cores do time.
+Visual Moderno (a Classificação e a tela da equipa)	Visual Moderno (a Classificação e a tela do time)
+O visual Clássico não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	O visual Clássico não mostra logos. O logo da liga aparece quando todos os times do jogo são do mesmo país.
+Escolha as cores da equipa (letra sobre fundo), tiradas das 16 cores do jogo que mais aparecem no escudo:	Escolha as cores do time (letra sobre fundo), tiradas das 16 cores do jogo que mais aparecem no escudo:
+Os logos das divisões e da taça aparecem no visual Moderno quando todas as equipas do jogo são deste país. Mudanças gravadas na hora.	Os logos das divisões e da copa aparecem no visual Moderno quando todos os times do jogo são deste país. Mudanças salvas na hora.
+Tem demasiados jogadores (máximo {0})	Tem jogadores demais (máximo {0})
+Não tem jogadores de campo suficientes (mínimo {0})	Não tem jogadores de linha suficientes (mínimo {0})
+Tem demasiados jogadores estrangeiros (máximo {0})	Tem jogadores estrangeiros demais (máximo {0})
+Escreva o nome.	Digite o nome.
+O fundo ficou: o escudo vai aparecer num quadrado de cor.	O fundo ficou: o escudo vai aparecer em um quadrado de cor.
+A imagem não tem fundo transparente: o escudo vai aparecer num quadrado. Prefira um PNG ou SVG com fundo transparente.	A imagem não tem fundo transparente: o escudo vai aparecer em um quadrado. Prefira um PNG ou SVG com fundo transparente.
+Crie e edite equipas, jogadores, cores e escudos	Crie e edite times, jogadores, cores e escudos

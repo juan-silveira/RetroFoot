@@ -1,0 +1,33 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "VARZIM.EFT",
+  "name": "VARZIM SPORT CLUB",
+  "shortName": "VARZIM",
+  "country": "POR",
+  "level": 5,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Horácio Gonçalves",
+  "players": [
+    { "name": "Fernando Brassard", "position": "G", "country": "POR" },
+    { "name": "Miguel", "position": "G", "country": "POR" },
+    { "name": "Alexandre", "position": "D", "country": "POR" },
+    { "name": "André", "position": "D", "country": "POR" },
+    { "name": "Luisão", "position": "D", "country": "BRA" },
+    { "name": "Mariano", "position": "D", "country": "POR" },
+    { "name": "Quim Machado", "position": "D", "country": "POR" },
+    { "name": "Ribeiro", "position": "D", "country": "POR" },
+    { "name": "Slagalo", "position": "D", "country": "BOS" },
+    { "name": "Cristiano", "position": "M", "country": "BRA" },
+    { "name": "Lito", "position": "M", "country": "POR" },
+    { "name": "Miranda", "position": "M", "country": "POR" },
+    { "name": "Murdock", "position": "M", "country": "POR" },
+    { "name": "Paulo Piedade", "position": "M", "country": "POR" },
+    { "name": "Sérgio Lavos", "position": "M", "country": "POR" },
+    { "name": "Lino", "position": "A", "country": "GNE" },
+    { "name": "Pedro Renato", "position": "A", "country": "BRA" },
+    { "name": "Rui Alberto", "position": "A", "country": "POR" },
+    { "name": "Zacarias", "position": "A", "country": "POR" }
+  ]
+}

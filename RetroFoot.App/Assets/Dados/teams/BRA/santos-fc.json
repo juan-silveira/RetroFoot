@@ -1,0 +1,30 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "SANTOS.EFT",
+  "name": "SANTOS FC",
+  "shortName": "SANTOS",
+  "country": "BRA",
+  "level": 13,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#000000",
+  "coach": "Wanderley Luxemburgo",
+  "players": [
+    { "name": "Marcelo", "position": "G", "country": "BRA" },
+    { "name": "Zetti", "position": "G", "country": "BRA" },
+    { "name": "Anderson", "position": "D", "country": "BRA" },
+    { "name": "Dutra", "position": "D", "country": "BRA" },
+    { "name": "Jean", "position": "D", "country": "BRA" },
+    { "name": "R Marconato", "position": "D", "country": "BRA" },
+    { "name": "Sandro", "position": "D", "country": "BRA" },
+    { "name": "Arinelson", "position": "M", "country": "BRA" },
+    { "name": "Baiano", "position": "M", "country": "BRA" },
+    { "name": "Caíco", "position": "M", "country": "BRA" },
+    { "name": "Marcos Assunção", "position": "M", "country": "BRA" },
+    { "name": "Narciso", "position": "M", "country": "BRA" },
+    { "name": "Caio", "position": "A", "country": "BRA" },
+    { "name": "João Santos", "position": "A", "country": "BRA" },
+    { "name": "Macedo", "position": "A", "country": "BRA" },
+    { "name": "Muller", "position": "A", "country": "BRA" }
+  ]
+}

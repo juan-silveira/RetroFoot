@@ -1,0 +1,78 @@
+# Partida (substituicao, lesao, penalti, penaltis, sorteio) e os textos do motor (idiomas-d).
+# Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs). Chave = o texto pt-PT do original.
+
+Guarda-redes	Portero
+Defesa	Defensa
+Médio	Centrocampista
+Avançado	Delantero
+GOLO	GOL
+Defendeu	Parada
+Ao poste	Poste
+À barra	Larguero
+Ao lado	Fuera
+Por cima	Arriba
+GOLO!	¡GOL!
+Lesão	Lesión
+Lesões	Lesiones
+{0} ({1}) lesionou-se	{0} ({1}) se ha lesionado
+Tem de ser substituído. Escolha o jogador a entrar.	Debe ser sustituido. Elige quién entra.
+{0} ({1}) lesionou-se e tem de ser substituído.\rEscolha o jogador a entrar.	{0} ({1}) se ha lesionado y debe ser sustituido.\rElige al jugador que entra.
+Banco vazio	Banquillo vacío
+OK	Aceptar
+1 substituição restante	Queda 1 cambio
+{0} substituições restantes	Quedan {0} cambios
+Substituições só ao intervalo	Cambios solo en el descanso
+MARCADOR	LANZADOR
+Marcador: {0}	Lanzador: {0}
+Na marca de penalti…	En el punto de penalti…
+{0}, escolha o jogador para marcar o penalti	{0}, elige quién tira el penalti
+Escolha o jogador para marcar o penalti	Elige quién tira el penalti
+{0}, escolha o jogador para marcar o penalti!	{0}, ¡elige quién tira el penalti!
+Chutar	Tirar
+D e s e m p a t e   p o r   P e n a l t i s	T a n d a   d e   P e n a l t i s
+DESEMPATE POR PENALTIS	TANDA DE PENALTIS
+Penaltis alternados	Lanzamientos alternos
+{0} passa à próxima fase	{0} pasa a la siguiente ronda
+TAÇA	COPA
+Sorteio dos jogos	Sorteo de los partidos
+Sorteio dos jogos da taça	Sorteo de la copa
+NO POTE · {0}	EN EL BOMBO · {0}
+JOGOS · {0} DE {1}	PARTIDOS · {0} DE {1}
+Todas as equipas sorteadas	Todos los equipos sorteados
+Intervalo	Descanso
+Guarda-redes expulso	Portero expulsado
+Em jogo	En juego
+Amarelos	Amarillas
+Vermelhos	Rojas
+Cartão amarelo	Tarj. amarilla
+Cartão vermelho	Tarjeta roja
+Cartões vermelhos	Tarjetas rojas
+Sem lances	Sin incidencias
+Lances	Incidencias
+Ninguém em campo	Nadie en el campo
+Em campo · {0}	En el campo · {0}
+Banco	Banquillo
+Substituir	Sustituir
+Continuar	Seguir
+Escolha quem sai e quem entra · S substitui · Enter continua	Elige quién sale y quién entra · S sustituye · Enter sigue
+{0} amarelo {1}'	{0} amarilla {1}'
+{0} expulso {1}'	{0} expulsado {1}'
+{0} lesionou-se {1}'	{0} lesionado {1}'
+{0}ª Jornada - {1}	Jornada {0} - {1}
+{0}ª Jornada	Jornada {0}
+TAÇA - {0}	COPA - {0}
+Taça - {0} - {1}	Copa - {0} - {1}
+Taça - {0}	Copa - {0}
+Meias-finais	Semifinales
+Quartos de final	Cuartos de final
+Oitavos de final	Octavos de final
+{0} avos de final	{0}avos de final
+{0} oferece {1} por temporada, durante {2} temporada	{0} ofrece {1} por temporada, durante {2} temporada
+{0} oferece {1} por temporada, durante {2} temporadas	{0} ofrece {1} por temporada, durante {2} temporadas
+,\rpara renovar o contrato de patrocinador master.	,\rpara renovar el contrato de patrocinador principal.
+,\rpara ser o patrocinador master do seu time.	,\rpara ser el patrocinador principal de tu equipo.
+\rMulta pela troca de patrocinador: {0}	\rMulta por cambiar de patrocinador: {0}
+{0} oferece {1} por jogo, durante {2} jogo	{0} ofrece {1} por partido, durante {2} partido
+{0} oferece {1} por jogo, durante {2} jogos	{0} ofrece {1} por partido, durante {2} partidos
+,\rpara estampar a marca no uniforme.	,\rpara lucir su marca en la equipación.
+\r\rAceita?	\r\r¿Aceptas?

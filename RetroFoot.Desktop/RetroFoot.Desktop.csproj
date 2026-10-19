@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <!-- O pacote: um executavel so, com o runtime, cortado (ver docs/build.md).
+       So vale no publish com -r (linux-x64, win-x64, osx-x64...); build e run normais nao mudam. -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != '' And '$(Configuration)' == 'Release'">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <!-- corta o codigo nao usado do .NET e do Avalonia (o jogo nao tem XAML nem bindings por nome) -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>full</TrimMode>
+    <!-- o EquipaJson usa JsonSerializer.Serialize(string, opcoes): sem isto da excecao no corte -->
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    <!-- recursos de depuracao/diagnostico que o jogo nao usa -->
+    <EventSourceSupport>false</EventSourceSupport>
+    <DebuggerSupport>false</DebuggerSupport>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RetroFoot.App\RetroFoot.App.csproj" />
+  </ItemGroup>
+  <!-- No Windows, o pacote do Skia/HarfBuzz poe os .pdb nativos (105 MB) ao lado do .exe -->
+  <Target Name="TirarPdbNativos" AfterTargets="ComputeResolvedFilesToPublishList" Condition="'$(DebugType)' == 'none'">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(Extension)' == '.pdb'" />
+    </ItemGroup>
+  </Target>
+  <!-- No Linux, as .so do Skia e do HarfBuzz vem com a tabela de simbolos de depuracao:
+       tira (strip, so os simbolos de depuracao; os dinamicos ficam) antes de embutir. -->
+  <Target Name="TirarSimbolosNativos" AfterTargets="ComputeResolvedFilesToPublishList"
+          Condition="$(RuntimeIdentifier.StartsWith('linux')) And '$(OS)' != 'Windows_NT' And '$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <_SoComSimbolos Include="@(ResolvedFileToPublish)" Condition="'%(Extension)' == '.so' And ('%(Filename)' == 'libSkiaSharp' Or '%(Filename)' == 'libHarfBuzzSharp')" />
+    </ItemGroup>
+    <MakeDir Directories="$(IntermediateOutputPath)semsimbolos" />
+    <Exec Command="strip --strip-unneeded &quot;%(_SoComSimbolos.FullPath)&quot; -o &quot;$(IntermediateOutputPath)semsimbolos/%(_SoComSimbolos.Filename)%(_SoComSimbolos.Extension)&quot;" ContinueOnError="true" StandardOutputImportance="low">
+      <Output TaskParameter="ExitCode" PropertyName="_SaidaStrip" />
+    </Exec>
+    <ItemGroup Condition="'$(_SaidaStrip)' == '0'">
+      <ResolvedFileToPublish Remove="@(_SoComSimbolos)" />
+      <ResolvedFileToPublish Include="@(_SoComSimbolos->'$(IntermediateOutputPath)semsimbolos/%(Filename)%(Extension)')" />
+    </ItemGroup>
+  </Target>
+</Project>

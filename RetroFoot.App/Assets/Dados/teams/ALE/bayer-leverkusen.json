@@ -1,0 +1,32 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "B_LEVERK.EFT",
+  "name": "BAYER LEVERKUSEN",
+  "shortName": "BAYER LEVERKUSEN",
+  "country": "ALE",
+  "level": 10,
+  "textColor": "#008000",
+  "backgroundColor": "#FFFFFF",
+  "coach": "Dragoslav Stepanovic",
+  "players": [
+    { "name": "Heinen", "position": "G", "country": "ALE" },
+    { "name": "Vollborn", "position": "G", "country": "ALE" },
+    { "name": "Alois Reinhardt", "position": "D", "country": "ALE" },
+    { "name": "Becker", "position": "D", "country": "ALE" },
+    { "name": "De Keiser", "position": "D", "country": "ALE" },
+    { "name": "Falkenmayer", "position": "D", "country": "ALE" },
+    { "name": "Happe", "position": "D", "country": "ALE" },
+    { "name": "Paulo Sérgio", "position": "D", "country": "BRA" },
+    { "name": "Worns", "position": "D", "country": "ALE" },
+    { "name": "Bernd Schuster", "position": "M", "country": "ALE" },
+    { "name": "Hapal", "position": "M", "country": "RCH" },
+    { "name": "Lupescu", "position": "M", "country": "ROM" },
+    { "name": "Tolkmist", "position": "M", "country": "ALE" },
+    { "name": "Andreas Thom", "position": "A", "country": "ALE" },
+    { "name": "Herbert Waas", "position": "A", "country": "ALE" },
+    { "name": "Rob Witschge", "position": "A", "country": "HOL" },
+    { "name": "Tauber", "position": "A", "country": "ALE" },
+    { "name": "Ulf Kirsten", "position": "A", "country": "ALE" }
+  ]
+}

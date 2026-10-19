@@ -1,0 +1,31 @@
+{
+  "format": "retrofoot-team",
+  "version": 1,
+  "file": "MIDDLESB.EFT",
+  "name": "MIDDLESBROUGH",
+  "shortName": "MIDDLESBROUGH",
+  "country": "ING",
+  "level": 4,
+  "textColor": "#FFFFFF",
+  "backgroundColor": "#FF0000",
+  "coach": "Bryan Robson",
+  "players": [
+    { "name": "Alan Miller", "position": "G", "country": "ING" },
+    { "name": "Ben Roberts", "position": "G", "country": "ING" },
+    { "name": "Gary Walsh", "position": "G", "country": "ING" },
+    { "name": "Branco", "position": "D", "country": "BRA" },
+    { "name": "Curtis Fleming", "position": "D", "country": "IRL" },
+    { "name": "Michael Barron", "position": "D", "country": "ING" },
+    { "name": "Neil Cox", "position": "D", "country": "ING" },
+    { "name": "Nigel Pearson", "position": "D", "country": "ING" },
+    { "name": "Phil Whelan", "position": "D", "country": "ING" },
+    { "name": "Steve Vickers", "position": "D", "country": "ING" },
+    { "name": "Clayton Blackmore", "position": "M", "country": "WAL" },
+    { "name": "Craig Hignett", "position": "M", "country": "ING" },
+    { "name": "Craig Liddle", "position": "M", "country": "ING" },
+    { "name": "Robbie Mustoe", "position": "M", "country": "ING" },
+    { "name": "Graham Kavanagh", "position": "A", "country": "IRL" },
+    { "name": "Jan Fjortoft", "position": "A", "country": "NOR" },
+    { "name": "Nick Barmby", "position": "A", "country": "ING" }
+  ]
+}
