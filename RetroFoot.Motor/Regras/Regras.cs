@@ -19,11 +19,6 @@ public readonly partial record struct Regras(int EquipasPorDivisao, int LimiteJo
     // fim da prorrogacao. Mudam a sequencia do Random: so na versao Modificada
     public bool Acrescimos { get; init; }
 
-    // (versao Atual) as contas de 16 bits do original que estouram com forcas editadas acima
-    // do normal ficam no maximo em vez de virar negativas (Penaltis.ValorBatedor: um defensor
-    // com forca 31998 batia pior que um de forca 10). Desligado: o 98.003 byte a byte
-    public bool SemEstouro { get; init; }
-
     // a opcao "Sobem e descem por divisao" (so na versao Modificada): 0 = automatico (2, ou 4
     // com N >= 16, como o launcher); 1 a 4 = esse K, limitado por MaximoSobemDescem. Fica
     // gravada no save (MarcaSobemDescem): DoSave a le de la, nao das Configuracoes

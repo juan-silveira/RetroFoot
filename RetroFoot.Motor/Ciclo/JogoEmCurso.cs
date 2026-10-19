@@ -102,7 +102,6 @@ public sealed class JogoEmCurso
     {
         M = new Mundo(s, semente);
         M.Regras = TRegras.DoSave(s, op.Regras);
-        RetroFoot.Motor.Partida.Penaltis.SemEstouro = M.Regras.SemEstouro;
         Op = op; H = h;
         Mc = new MercadoJogo(s, M.R) { Regras = M.Regras, Bosman = op.Bosman, PLOP = op.PLOP };
         M.Bosman = op.Bosman; M.PLOP = op.PLOP;

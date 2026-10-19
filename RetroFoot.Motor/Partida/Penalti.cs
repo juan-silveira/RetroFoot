@@ -30,23 +30,14 @@ public sealed class Desempate
 
 public static class Penaltis
 {
-    // (versao Atual, Regras.SemEstouro) P sem estourar: as contas em 32 bits e o resultado no
-    // maximo de 32767. Vale para o motor e para a previsao da janela de penalti (a mesma
-    // conta); o JogoEmCurso liga pelas regras do jogo aberto.
-    public static volatile bool SemEstouro;
-
     // seg03:818c: P = Round((posicao + 1) x forca x (Nota/10 + 1) / 2)
     // (posicao + 1) x forca em 16 bits sem sinal, depois lido com sinal; o resto em Extended;
     // Round arredonda empates para o par (4,5 -> 4)
-    public static short ValorBatedor(Jogador j) => ValorBatedor(j, SemEstouro);
-
-    internal static short ValorBatedor(Jogador j, bool semEstouro)
+    // Com forca editada acima de 32767 / (posicao + 1) o valor estoura e fica negativo (o
+    // batedor chuta para fora ou o goleiro defende), como no original: quem evita e o limite
+    // do Editor de Save (LimitesSave.ForcaMaxima)
+    public static short ValorBatedor(Jogador j)
     {
-        if (semEstouro)
-        {
-            long p = (long)(j.Posicao + 1) * j.Forca * ((short)j.Nota + 10) / 20;
-            return (short)Math.Clamp(p, 0, short.MaxValue);
-        }
         short a = (short)(ushort)((j.Posicao + 1) * j.Forca);
         var f = Fpu.Soma(Fpu.Divide(Ext.Int((short)j.Nota), Dez), Um);
         return (short)Fpu.Arredondar(Fpu.Divide(Fpu.Mult(Ext.Int(a), f), Dois));

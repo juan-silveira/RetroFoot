@@ -67,7 +67,7 @@ public sealed class Configuracoes
     // os amarelos, os acrescimos e o K da opcao
     public TRegras RegrasPara(int n, bool forcarModificada = false) =>
         !Modificada && n == 8 && !forcarModificada ? TRegras.Original
-            : TRegras.Launcher(n) with { CartoesAmarelos = CartoesAmarelos, DesempateVitorias = true, Acrescimos = Acrescimos, SemEstouro = true, SobemDescemEscolhido = SobemDescem,
+            : TRegras.Launcher(n) with { CartoesAmarelos = CartoesAmarelos, DesempateVitorias = true, Acrescimos = Acrescimos, SobemDescemEscolhido = SobemDescem,
                 SubstituicoesEscolhidas = CincoSubstituicoes ? 5 : 3, ReservasEscolhidas = NoveReservas ? 9 : 5 };
 
     // o K que vale no proximo jogo novo (o automatico ou o escolhido, ate o maximo do N)

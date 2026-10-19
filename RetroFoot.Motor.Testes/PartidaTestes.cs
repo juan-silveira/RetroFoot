@@ -441,15 +441,19 @@ public partial class PartidaTestes(ITestOutputHelper saida)
         Assert.True(subs > 0 && pens > 0);
     }
 
-    // o valor do batedor de um defensor com forca editada (31998): no original (2 x 31998) estoura
-    // os 16 bits e fica negativo (ele bate pior que um de forca 10); na versao Atual fica no maximo
+    // o valor do batedor estoura como no original (2 x 31998 vira negativo) e o limite do
+    // Editor de Save (LimitesSave.ForcaMaxima) e o que evita: em cada posicao e nota, a forca
+    // maxima ainda da um valor positivo
     [Fact]
-    public void BatedorComForcaEnormeNaoEstouraNaVersaoAtual()
+    public void LimiteDoEditorEvitaEstouroDoPenalti()
     {
         var j = new RetroFoot.Motor.Save.Jogador { Posicao = 1, Forca = 31998, Nota = 5 };
-        Assert.True(RetroFoot.Motor.Partida.Penaltis.ValorBatedor(j, false) < 0);
-        Assert.Equal(short.MaxValue, RetroFoot.Motor.Partida.Penaltis.ValorBatedor(j, true));
-        var normal = new RetroFoot.Motor.Save.Jogador { Posicao = 1, Forca = 10, Nota = 5 };
-        Assert.Equal(RetroFoot.Motor.Partida.Penaltis.ValorBatedor(normal, false), RetroFoot.Motor.Partida.Penaltis.ValorBatedor(normal, true));
+        Assert.True(RetroFoot.Motor.Partida.Penaltis.ValorBatedor(j) < 0);
+        for (int pos = 0; pos <= 3; pos++)
+            for (int nota = 1; nota <= 10; nota++)
+            {
+                var m = new RetroFoot.Motor.Save.Jogador { Posicao = (byte)pos, Nota = (ushort)nota, Forca = (ushort)RetroFoot.Motor.Save.LimitesSave.ForcaMaxima(pos, nota) };
+                Assert.True(RetroFoot.Motor.Partida.Penaltis.ValorBatedor(m) > 0, $"posicao {pos}, nota {nota}, forca {m.Forca}");
+            }
     }
 }
