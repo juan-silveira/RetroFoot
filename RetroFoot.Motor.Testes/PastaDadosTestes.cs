@@ -27,6 +27,65 @@ public class PastaDadosTestes(ITestOutputHelper saida)
         return p;
     }
 
+    // o COUNTRY.TXE de um patch soma ao countries.tsv: os nomes do patch valem, os paises
+    // novos entram e os que o patch nao traz ficam (antes o arquivo era trocado inteiro)
+    [Fact]
+    public void PatchDePaisesSomaAoQueHa()
+    {
+        var raiz = Temp();
+        var origem = Temp();
+        try
+        {
+            var arq = Path.Combine(raiz, PastaDados.Paises);
+            TextosDados.GravarPaises(arq, new[] { new TextosDados.Pais("BRA", "Brasil"), new TextosDados.Pais("IDN", "Indonésia") });
+            var txe = Path.Combine(origem, "COUNTRY.TXE");
+            File.WriteAllBytes(txe, TextosDados.Txe("Country", new[] { "BRA BRASIL", "XYZ TERRA" }));
+            PastaDados.Importar(txe, raiz);
+            var l = TextosDados.LerPaises(arq);
+            Assert.Equal(new[] { "BRA", "IDN", "XYZ" }, l.Select(p => p.Codigo));
+            Assert.Equal("BRASIL", l[0].Nome);
+            Assert.Equal("Indonésia", l[1].Nome);
+        }
+        finally { Directory.Delete(raiz, true); Directory.Delete(origem, true); }
+    }
+
+    // o catalogo completa countries.tsv so com o que falta, sem mexer no resto; a 2a vez nao muda nada
+    [Fact]
+    public void CatalogoCompletaPaisesSemRepetir()
+    {
+        var raiz = Temp();
+        try
+        {
+            var arq = Path.Combine(raiz, PastaDados.Paises);
+            TextosDados.GravarPaises(arq, new[] { new TextosDados.Pais("BRA", "BRASIL"), new TextosDados.Pais("ZZZ", "Meu país") });
+            int n = PastaDados.CompletarPaises(raiz);
+            var l = TextosDados.LerPaises(arq);
+            Assert.Equal(Dados.Catalogo.Count + 1, l.Count);
+            Assert.Equal(Dados.Catalogo.Count - 1, n);
+            Assert.Equal("BRASIL", l[0].Nome);
+            Assert.Equal("ZZZ", l[1].Codigo);
+            Assert.Contains(l, p => p.Codigo == "IDN");
+            Assert.Contains(l, p => p.Codigo == "KOS");
+            var antes = File.GetLastWriteTimeUtc(arq);
+            Assert.Equal(0, PastaDados.CompletarPaises(raiz));
+            Assert.Equal(antes, File.GetLastWriteTimeUtc(arq));
+        }
+        finally { Directory.Delete(raiz, true); }
+    }
+
+    // um pais das equipas fora da lista nao para mais o jogo novo: entra com o nome do
+    // catalogo do jogo ou, fora dele, com o proprio codigo
+    [Fact]
+    public void PaisQueFaltaEntraNaLista()
+    {
+        var d = new Dados();
+        Assert.Equal("IDN", d.PaisDoArquivo("idn"));
+        Assert.Equal("Indonésia", Encoding.Latin1.GetString(Dados.AcharPais(d.Paises, "IDN")!.Nome));
+        Assert.Equal("QQQ", d.PaisDoArquivo("QQQ"));
+        Assert.Equal("QQQ", Encoding.Latin1.GetString(Dados.AcharPais(d.Paises, "QQQ")!.Nome));
+        Assert.Equal(2, d.Paises.Count);
+    }
+
     [Fact]
     public void EftJsonEftIgual()
     {

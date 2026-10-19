@@ -22,7 +22,10 @@ namespace RetroFoot.App;
 // vao para o topo, ao lado do minuto.
 public sealed partial class TelaJornada
 {
-    const double MTopo = 46, MPasso = 27, MMargem = 10, MBase = 8;
+    const double MTopo = 46, MMargem = 10, MBase = 8;
+    // a altura de cada linha: 27 pontos, mais com o texto acima de 100% (Acessibilidade), para
+    // o minuto e o placar caberem
+    static double MPasso => Math.Round(27 * Math.Max(1, Acessibilidade.Texto));
     const double MLarguraColuna = 620;
 
     // as cores sao as do TemaVerde (o tema do Moderno); o relogio ao vivo e amarelo
@@ -32,7 +35,7 @@ public sealed partial class TelaJornada
     static readonly IPen MBorda = new Pen(TemaVerde.Borda, 1);
     static readonly FontFamily Inter = new("fonts:Inter#Inter");
 
-    double passoM = MPasso, passoBase = MPasso;
+    double passoM = 27, passoBase = 27;
     Rect proximaM, anteriorM;
 
     static readonly IBrush FundoLogo = TemaVerde.DiscoLogo;
@@ -41,7 +44,7 @@ public sealed partial class TelaJornada
 
     static FormattedText TxtM(string t, double tam, IBrush cor, bool negrito = false) =>
         new(t, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(Inter, FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam, cor);
+            new Typeface(Inter, FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam * Acessibilidade.Texto, cor);
 
     static double LarguraModerna(int c) => c == 1 ? L : c * MLarguraColuna;
     static double AlturaModerna(int r) => MTopo + 6 + MPasso * r + MBase;
@@ -153,7 +156,9 @@ public sealed partial class TelaJornada
         var corStatus = Terminado ? MFraco : minuto > 90 ? MProrrog : MVivo;
         foreach (var (ini, fimC, nome, logo) in cartoes)
         {
-            var r = new Rect(cx, y0 + passoM * ini + 3, cw, passoM * (fimC - ini) - 6);
+            // o cartao vai ate o fim da ultima linha (antes parava 3 pontos antes e o placar da
+            // ultima linha encostava na borda); o proximo comeca 3 pontos abaixo
+            var r = new Rect(cx, y0 + passoM * ini + 3, cw, passoM * (fimC - ini) - 3);
             dc.DrawRectangle(MCartao, MBorda, r.Deflate(0.5), 10, 10);
             // cabecalho: o logo da liga e o nome
             double hy = y0 + passoM * ini;
@@ -204,6 +209,14 @@ public sealed partial class TelaJornada
         var st = TxtM(status, baixa ? 8 : 9, corStatus, true);
         var pl = TxtM($"{l.GC} - {l.GF}", baixa ? 14 : 15, MTexto, true);
         double alto = st.Height + pl.Height - 2;
+        // com o texto grande (Acessibilidade), o minuto e o placar encolhem ate caber na linha
+        if (alto > passoM - 1)
+        {
+            double f = (passoM - 1) / alto;
+            st = TxtM(status, (baixa ? 8 : 9) * f, corStatus, true);
+            pl = TxtM($"{l.GC} - {l.GF}", (baixa ? 14 : 15) * f, MTexto, true);
+            alto = st.Height + pl.Height - 2;
+        }
         double yt = meio - alto / 2 - 1;
         dc.DrawText(st, new Point(mc - st.Width / 2, yt));
         dc.DrawText(pl, new Point(mc - pl.Width / 2, yt + st.Height - 2));
@@ -272,11 +285,13 @@ public sealed partial class TelaJornada
         Ret(dc, MBarra, 0, 0, QL, MTopo);
         var tt = TxtM(titulo.Trim() + (pausado ? "   ·   " + T("Pausa") : ""), 15, MTexto, true);
         // o minuto num balao a direita
-        string st = StatusRelogio;
-        var ts = TxtM(st, 13, Terminado ? MTexto : TemaVerde.SobreDestaque, true);
-        double bw = Math.Max(ts.Width + 22, 52), bh = 26, by = (MTopo - 3 - bh) / 2;
+        // no fim, o balao vira o botao Continuar (a pilula ouro dos outros ecras; Enter ou clique)
+        string st = acabou ? T("Continuar") : StatusRelogio;
+        var ts = TxtM(st, 13, acabou || !Terminado ? TemaVerde.SobreDestaque : MTexto, true);
+        double bw = Math.Max(ts.Width + (acabou ? 36 : 22), 52), bh = acabou ? 30 : 26, by = (MTopo - 3 - bh) / 2;
         var balao = new Rect(QL - 14 - bw, by, bw, bh);
-        dc.DrawRectangle(Terminado ? MBotao : minuto > 90 ? MProrrog : MVivo, null, balao, 13, 13);
+        dc.DrawRectangle(acabou ? TemaVerde.BotaoPrimario : Terminado ? MBotao : minuto > 90 ? MProrrog : MVivo,
+            acabou ? new Pen(TemaVerde.Ouro, 1) : null, balao, bh / 2, bh / 2);
         dc.DrawText(ts, new Point(balao.X + (bw - ts.Width) / 2, balao.Y + (bh - ts.Height) / 2));
         double xd = balao.X - 12;
         if (BotoesVisiveis)
@@ -288,14 +303,6 @@ public sealed partial class TelaJornada
             dc.DrawText(tp, new Point(anteriorM.Right + 8, MTopo / 2 - 1.5 - tp.Height / 2));
             BotaoM(dc, proximaM, true, pagina < UltimaPagina);
             xd = anteriorM.X - 12;
-        }
-        if (acabou)
-        {
-            var tc = TxtM(T("Clique ou Enter para continuar"), 12, MFraco);
-
-            xd -= tc.Width;
-            dc.DrawText(tc, new Point(xd, MTopo / 2 - 1.5 - tc.Height / 2));
-            xd -= 12;
         }
         using (dc.PushClip(new Rect(0, 0, Math.Max(0, xd), MTopo)))
             dc.DrawText(tt, new Point(16, (MTopo - 3 - tt.Height) / 2));

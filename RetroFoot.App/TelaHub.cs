@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
@@ -44,6 +45,7 @@ public sealed class TelaHub : UserControl
         Escudos.Recarregar();
         Largura();
         MontarHub();
+        ProcurarAtualizacao();
         // RETROFOOT_FERRAMENTA=<id> (com RETROFOOT_TELA=hub): abre a ferramenta direto (testes, capturas)
         if (Environment.GetEnvironmentVariable("RETROFOOT_FERRAMENTA") is { Length: > 0 } fid && Ferramentas.Achar(fid) is { } fx)
             Dispatcher.UIThread.Post(() => AbrirFerramenta(fx), DispatcherPriority.Loaded);
@@ -141,7 +143,7 @@ public sealed class TelaHub : UserControl
     }
 
     static string Convertido(PastaDados.Relatorio r) =>
-        T("Arquivos clássicos convertidos: {0} equipas", r.Equipas) + (r.Outros.Count > 0 ? "; " + string.Join(", ", r.Outros) : "");
+        T("Arquivos Retrô convertidos: {0} equipas", r.Equipas) + (r.Outros.Count > 0 ? "; " + string.Join(", ", r.Outros) : "");
 
     // ---------------------------------------------------------------- o hub
     // Um tema so (o mesmo no Classico e no Moderno): a capa da marca enche a tela (16:9 ou 4:3,
@@ -369,6 +371,60 @@ public sealed class TelaHub : UserControl
         sobre.Children.Clear();
         sobre.Children.Add(veu);
         Dispatcher.UIThread.Post(() => sim.Focus(NavigationMethod.Directional), DispatcherPriority.Loaded);
+    }
+
+    // ---------------------------------------------------------------- atualizacao (OTA)
+    // uma vez por execucao: ao abrir o hub, procura uma versao nova (Atualizacao.cs) e, se
+    // houver, pergunta se atualiza agora
+    static bool _procurouAtualizacao;
+
+    void ProcurarAtualizacao()
+    {
+        if (_procurouAtualizacao || !Atualizacao.Suportada) return;
+        _procurouAtualizacao = true;
+        Atualizacao.LimparAntigo();
+        Task.Run(Atualizacao.Procurar).ContinueWith(t =>
+        {
+            if (t.Result is { } nova) Dispatcher.UIThread.Post(() => OferecerAtualizacao(nova));
+        });
+    }
+
+    void OferecerAtualizacao(Atualizacao.Nova nova)
+    {
+        void Fechar() { sobre.Children.Clear(); Focar(); }
+        var texto = Ui.Txt(T("A versão {0} do RetroFoot está disponível (você tem a {1}). Seus saves, equipas e configurações ficam como estão.",
+            nova.Versao.ToString(3), Atualizacao.Atual.ToString(3)), 13.5);
+        texto.TextWrapping = TextWrapping.Wrap;
+        var estado = Ui.Txt("", 12.5);
+        var depois = Ui.Botao(T("Depois"), Fechar);
+        Clicavel? agora = null;
+        bool baixando = false;
+        agora = Ui.Botao(T("Atualizar agora"), async () =>
+        {
+            if (baixando) return;
+            baixando = true;
+            agora!.IsEnabled = depois.IsEnabled = false;
+            var prog = new Progress<double>(f => estado.Text = T("Baixando... {0}%", (int)Math.Round(f * 100)));
+            try
+            {
+                estado.Text = T("Baixando... {0}%", 0);
+                var exe = await Atualizacao.Instalar(nova, prog);
+                estado.Text = T("Pronto. Abrindo a versão nova...");
+                await Task.Delay(600);
+                Atualizacao.Reabrir(exe, Sair);
+            }
+            catch (Exception ex)
+            {
+                estado.Text = T("Não consegui atualizar: {0}", ex.Message);
+                baixando = false;
+                agora.IsEnabled = depois.IsEnabled = true;
+            }
+        }, true);
+        var botoes = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Right, Children = { depois, agora } };
+        var corpo = new StackPanel { Spacing = 14, Margin = new Thickness(18, 14), Width = 420, Children = { texto, estado, botoes } };
+        sobre.Children.Clear();
+        sobre.Children.Add(Ui.Veu(Ui.Janela(T("Nova versão do RetroFoot"), corpo, () => { if (!baixando) Fechar(); }, "info"), () => { if (!baixando) Fechar(); }));
+        Dispatcher.UIThread.Post(() => agora.Focus(), DispatcherPriority.Loaded);
     }
 
     // ---------------------------------------------------------------- acoes

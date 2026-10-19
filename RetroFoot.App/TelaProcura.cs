@@ -55,8 +55,8 @@ public static class TelaProcura
     static bool _criada;
     static ushort _treinador;
     static string _nome = "";
-    static int _pais = -1, _forcaMin = -1, _forcaMax = -1, _posicao = -1, _preco = -1;
-    static bool _naoMinha, _soPrim50, _procurar;
+    static int _pais = -1, _forcaMin = -1, _forcaMax = -1, _faixa = -1, _posicao = -1, _preco = -1;
+    static bool _naoMinha, _procurar;
     static List<ushort> _achados = new();
     // os filtros do launcher (ItemIndex; 0 = "Qualquer")
     static int _comp, _nota, _risco;
@@ -65,6 +65,9 @@ public static class TelaProcura
     // todos os numeros de 1 a 50 e, em primeiro, o vazio (sem limite). O indice e o valor.
     const int ForcaMaxima = 50;
     static readonly string[] Forcas = new[] { "" }.Concat(Enumerable.Range(1, ForcaMaxima).Select(f => " " + f)).ToArray();
+    // (Configuracoes.ForcaPorFaixas) as faixas fixas do original (DS:02D6): uma caixa so
+    static readonly int[][] FaixasForca = { new[] { 1, 10 }, new[] { 5, 15 }, new[] { 10, 20 }, new[] { 20, 30 }, new[] { 30, 40 }, new[] { 40, 50 } };
+    static readonly string[] Faixas = FaixasForca.Select(f => $" {f[0]} - {f[1]}").ToArray();
 
     static readonly string[] ComportamentosLauncher = { "Qualquer", "Fair Play", "Cordeirinho", "Cavalheiro", "Caneleiro", "Caceteiro", "Sarrafeiro" };
     static string[] NotasLauncher => new[] { T("Qualquer"), "10" }.Concat(Enumerable.Range(2, 8).Reverse().Select(n => T("{0} ou mais", n))).ToArray();
@@ -83,6 +86,7 @@ public static class TelaProcura
         readonly Lista _lista;
         readonly Botao _equipaBtn, _procurarBtn;
         readonly TextBox _caixaNome;
+        readonly bool _porFaixas = OpcoesDoJogo.ForcaPorFaixasGravada;
 
         public Form(Sessao s, SEquipa e, Action<ushort> escolher)
             : base(s, 632 + (s.J.M.Regras.CartoesAmarelos ? 50 : 0), 453)
@@ -115,15 +119,19 @@ public static class TelaProcura
             // outro treinador: tudo limpo (a caixa de marcar e os filtros do launcher ficam)
             if (e.Treinador != _treinador)
             {
-                _nome = ""; _pais = _forcaMin = _forcaMax = _posicao = _preco = -1;
-                _achados = new(); _soPrim50 = false; _procurar = true;
+                _nome = ""; _pais = _forcaMin = _forcaMax = _faixa = _posicao = _preco = -1;
+                _achados = new(); _procurar = true;
             }
 
             // --- criterios (coordenadas do DFM)
             Comps.Add(Pequeno(new Rect(316, 8, 25, 25), "clearNameBtn", () => { _caixaNome!.Text = ""; Alterado(); }));
-            Comps.Add(Caixa(new Rect(108, 40, 88, 24), () => Forcas, () => _forcaMin, i => _forcaMin = i));
-            Comps.Add(Caixa(new Rect(220, 40, 88, 24), () => Forcas, () => _forcaMax, i => _forcaMax = i));
-            Comps.Add(Pequeno(new Rect(316, 40, 25, 25), "clearSkillBtn", () => { _forcaMin = _forcaMax = -1; Alterado(); }));
+            if (_porFaixas) Comps.Add(Caixa(new Rect(108, 40, 200, 24), () => Faixas, () => _faixa, i => _faixa = i));
+            else
+            {
+                Comps.Add(Caixa(new Rect(108, 40, 88, 24), () => Forcas, () => _forcaMin, i => _forcaMin = i));
+                Comps.Add(Caixa(new Rect(220, 40, 88, 24), () => Forcas, () => _forcaMax, i => _forcaMax = i));
+            }
+            Comps.Add(Pequeno(new Rect(316, 40, 25, 25), "clearSkillBtn", () => { _forcaMin = _forcaMax = _faixa = -1; Alterado(); }));
             Comps.Add(Caixa(new Rect(108, 72, 200, 24), () => Posicoes.Select(x => T(x)).ToArray(), () => _posicao, i => _posicao = i));
             Comps.Add(Pequeno(new Rect(316, 72, 25, 25), "clearPositionBtn", () => { _posicao = -1; Alterado(); }));
             var pais = Caixa(new Rect(108, 104, 200, 37), () => _paises.Select(p => p.Nome).ToList(), () => _pais, i => _pais = i);
@@ -143,10 +151,14 @@ public static class TelaProcura
             Comps.Add(Pequeno(new Rect(316, 148, 25, 25), "clearPriceBtn", () => { _preco = -1; Alterado(); }));
             if (_launcher)
             {
-                // filtros.py: na coluna da direita, nas linhas do Nome, da Forca e da Posicao
-                Comps.Add(Caixa(new Rect(505, 8, 170, 24), () => ComportamentosLauncher.Select(x => T(x)).ToArray(), () => _comp, i => _comp = i));
-                Comps.Add(Caixa(new Rect(505, 40, 170, 24), () => NotasLauncher, () => _nota, i => _nota = i));
-                Comps.Add(Caixa(new Rect(505, 72, 170, 24), () => RiscosLauncher, () => _risco, i => _risco = i));
+                // filtros.py: na coluna da direita, nas linhas do Nome, da Forca e da Posicao; o X
+                // de cada um (fora do launcher, como os da esquerda) volta ao "Qualquer"
+                Comps.Add(Caixa(new Rect(505, 8, 140, 24), () => ComportamentosLauncher.Select(x => T(x)).ToArray(), () => _comp, i => _comp = i));
+                Comps.Add(Pequeno(new Rect(650, 8, 25, 25), "clearPositionBtn", () => { _comp = 0; Alterado(); }));
+                Comps.Add(Caixa(new Rect(505, 40, 140, 24), () => NotasLauncher, () => _nota, i => _nota = i));
+                Comps.Add(Pequeno(new Rect(650, 40, 25, 25), "clearSkillBtn", () => { _nota = 0; Alterado(); }));
+                Comps.Add(Caixa(new Rect(505, 72, 140, 24), () => RiscosLauncher, () => _risco, i => _risco = i));
+                Comps.Add(Pequeno(new Rect(650, 72, 25, 25), "clearPositionBtn", () => { _risco = 0; Alterado(); }));
                 Comps.Add(new Marcar { R = new Rect(389, 102, 21, 29), Marcado = () => _naoMinha, Clique = TrocarNaoMinha });
             }
             else Comps.Add(new Marcar { R = new Rect(424, 96, 21, 29), Marcado = () => _naoMinha, Clique = TrocarNaoMinha });
@@ -250,12 +262,12 @@ public static class TelaProcura
 
         // ------------------------------------------------------------ botoes
         // findBtnClick (10:34f5): os jogadores da lista global (DS:26FE) do fim para o comeco
-        // que passam nos filtros, ate 50; a lista e Sorted (pelo nome, sem diferenciar
-        // maiusculas)
+        // que passam nos filtros (no original, so os primeiros 50 na copia nao registada; o
+        // RetroFoot nao tem registo: a lista vem toda); a lista e Sorted (pelo nome, sem
+        // diferenciar maiusculas)
         void Procurar()
         {
             _procurar = false;
-            _soPrim50 = false;
             _lista.Sel = -1;
             _lista.Rolagem = 0;
             var todos = S.S.Equipas.SelectMany(eq => eq.Jogadores.Select(p => (eq, p))).ToList();
@@ -265,7 +277,6 @@ public static class TelaProcura
                 var (eq, p) = todos[i];
                 if (!PassaFiltro(eq, p)) continue;
                 itens.Add((NomeJogador(p) + "," + p.ID, p.ID));
-                if (itens.Count == 50) { _soPrim50 = true; break; }
             }
             // LBS_SORT: lstrcmpi (sem diferenciar maiusculas, acentos so no fim)
             var cmp = StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, ignoreCase: true);
@@ -280,9 +291,16 @@ public static class TelaProcura
             if (_pais >= 0 && _pais < _paises.Count && PaisDe(p.Pais) != _paises[_pais].Cod) return false;
             if (_nome != "" && !NomeJogador(p).ToUpperInvariant().Contains(_nome.ToUpperInvariant())) return false;
             short f = (short)p.Forca;
-            // 0 (o vazio) ou -1: sem limite
-            if (_forcaMin > 0 && f < _forcaMin) return false;
-            if (_forcaMax > 0 && f > _forcaMax) return false;
+            if (_porFaixas)
+            {
+                if (_faixa >= 0 && _faixa < FaixasForca.Length && (f < FaixasForca[_faixa][0] || f > FaixasForca[_faixa][1])) return false;
+            }
+            else
+            {
+                // 0 (o vazio) ou -1: sem limite
+                if (_forcaMin > 0 && f < _forcaMin) return false;
+                if (_forcaMax > 0 && f > _forcaMax) return false;
+            }
             if (_preco >= 0)
             {
                 long v = S.Mercado.PrecoDeVenda(eq, _e, p, MercadoJogo.ForcaMedia(eq));
@@ -329,7 +347,7 @@ public static class TelaProcura
             Bevel(dc, new Rect(8, 184, 517 + _mais, 241));
             Escreve(dc, T("Nome"), 20, 12, 13, Preto);
             Escreve(dc, T("Força"), 20, 44, 13, Preto);
-            Escreve(dc, "–", 202, 44, 13, Preto);
+            if (!_porFaixas) Escreve(dc, "–", 202, 44, 13, Preto);
             Escreve(dc, T("Posição"), 20, 76, 13, Preto);
             Escreve(dc, T("Nacionalidade"), 20, 112, 13, Preto);
             Escreve(dc, T("Preço"), 20, 152, 13, Preto);
@@ -352,13 +370,6 @@ public static class TelaProcura
                 Rotulo(dc, T("Não mostrar os jogadores do meu time"), new Rect(452, 96, 149, 32), 13, Preto);
                 Escreve(dc, T("Dinheiro em caixa"), 420, 12, 13, Azul);
                 Rotulo(dc, Dinheiro((int)_e.Dinheiro), new Rect(420, 36, 205, 16), 13, Azul);
-            }
-            if (_soPrim50)
-            {
-                var t = T("Só estão listados os primeiros 50 jogadores encontrados");
-                double x = 94 + _mais / 2;
-                dc.FillRectangle(Branco, new Rect(x, 432, Largura(t, 13), 16));
-                Escreve(dc, t, x, 432, 13, Vermelho);
             }
         }
 

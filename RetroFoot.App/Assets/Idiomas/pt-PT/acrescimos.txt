@@ -1,10 +1,10 @@
 # Os acrescimos (Regras.Acrescimos; TelaConfiguracoes) (pt-PT). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
 
 Acréscimos	Descontos
-De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no clássico.	De 1 a 5 minutos no fim da 1.ª parte e de 1 a 10 no fim da 2.ª, com golos, cartões e lesões (45'+2'). Desligados: como no clássico.
+De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no Retrô.	De 1 a 5 minutos no fim da 1.ª parte e de 1 a 10 no fim da 2.ª, com golos, cartões e lesões (45'+2'). Desligados: como no Retrô.
 Acréscimos (1 a 5 minutos no 1º tempo, 1 a 10 no 2º)	Descontos (1 a 5 minutos na 1.ª parte, 1 a 10 na 2.ª)
 Cartões amarelos, patrocínios e acréscimos só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Cartões amarelos, patrocínios e descontos só existem na versão Modificada. A escolha fica guardada para quando usar a Modificada.
-Na versão Clássica as regras são as de 1998: só cartões vermelhos, sem patrocínios nem acréscimos.	Na versão Original as regras são as de 1998: só cartões vermelhos, sem patrocínios nem descontos.
+Na versão Retrô as regras são as de 1998: só cartões vermelhos, sem patrocínios nem acréscimos.	Na versão Original as regras são as de 1998: só cartões vermelhos, sem patrocínios nem descontos.
 acréscimos ligados	descontos ligados
 acréscimos desligados	descontos desligados
 acréscimos	descontos

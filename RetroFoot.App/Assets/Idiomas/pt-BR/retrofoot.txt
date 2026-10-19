@@ -1,7 +1,7 @@
 # RetroFoot (pt-BR): o nome novo, o Sobre, o visual Clássico. Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
 
 Terá ainda acesso a outras possibilidades que o ajudarão a ser o melhor de todos os treinadores.	Terá ainda acesso a outras possibilidades que o ajudarão a ser o melhor de todos os técnicos.
-As regras de 1998 (98.003): 8 equipas por divisão, só cartões vermelhos, sem patrocínios.	As regras de 1998 (98.003): 8 times por divisão, só cartões vermelhos, sem patrocínios.
-O aspecto clássico: janelas do Windows 95 no verde, sem logos.	O visual clássico: janelas do Windows 95 no verde, sem logos.
-Clássico: o aspecto do Windows 95, sem logos	Clássico: o visual do Windows 95, sem logos
+As regras de 1998: 8 equipas por divisão, só cartões vermelhos, sem patrocínios.	As regras de 1998: 8 times por divisão, só cartões vermelhos, sem patrocínios.
+O aspecto Retrô: janelas do Windows 95 no verde, sem logos.	O visual Retrô: janelas do Windows 95 no verde, sem logos.
+Retrô: o aspecto do Windows 95, sem logos	Retrô: o visual do Windows 95, sem logos
 Gestor de futebol	Gerenciador de futebol

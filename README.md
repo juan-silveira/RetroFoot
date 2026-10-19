@@ -22,18 +22,20 @@ Roda no Linux, no Windows e (em desenvolvimento) no Android.
 
 | Sistema | |
 |---|---|
-| 🐧 Linux (x64) | [Baixar v0.1.0 beta](https://github.com/juan-silveira/RetroFoot/releases/download/v0.1.0-beta/retrofoot-0.1.0-beta-linux-x64.tar.gz) |
-| 🪟 Windows (x64) | [Baixar v0.1.0 beta](https://github.com/juan-silveira/RetroFoot/releases/download/v0.1.0-beta/retrofoot-0.1.0-beta-windows-x64.zip) |
+| 🐧 Linux (x64) | [Baixar v0.1.1 beta](https://github.com/juan-silveira/RetroFoot/releases/download/v0.1.1-beta/retrofoot-0.1.1-beta-linux-x64.tar.gz) |
+| 🪟 Windows (x64) | [Baixar v0.1.1 beta](https://github.com/juan-silveira/RetroFoot/releases/download/v0.1.1-beta/retrofoot-0.1.1-beta-windows-x64.zip) |
 | 🍎 macOS | em breve... |
 | 🤖 Android | em breve... |
 
 Todas as versões ficam em [Releases](https://github.com/juan-silveira/RetroFoot/releases).
+A partir da 0.1.1 o jogo avisa ao abrir quando sai uma versão nova e se atualiza sozinho
+(Linux e Windows); seus saves e configurações ficam como estão.
 
 ## Destaques
 
-- **Dois visuais:** o **Clássico**, com a cara das janelas do Windows 95, e o **Moderno**,
+- **Dois visuais:** o **Retrô**, com a cara das janelas do Windows 95, e o **Moderno**,
   com o tema verde e amarelo. A tela pode ser 4:3 ou 16:9.
-- **Duas versões de regras:** a **Clássica**, igual ao jogo clássico, e a **Atual**, com
+- **Duas versões de regras:** a **Retrô**, igual ao jogo clássico, e a **Atual**, com
   5 substituições, banco maior, acréscimos, cartões amarelos e outras novidades
   (Configurações > Regras).
 - **Hub de ferramentas:** Editor de Equipas (com escudos), Editor de Save, Scout, Patches

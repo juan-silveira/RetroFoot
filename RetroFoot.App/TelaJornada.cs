@@ -164,11 +164,34 @@ public sealed partial class TelaJornada : UserControl
         this.continuar = continuar;
         sup.InvalidateVisual();
         Focus();
+        // o Enter do fim vale com o foco em qualquer lugar da janela: depois dos detalhes de
+        // um jogo ou de um clique no menu, o foco nao voltava a tela e o Enter nao fazia nada
+        if (TopLevel.GetTopLevel(this) is { } top && teclaFim == null)
+        {
+            teclaFimEm = top;
+            teclaFim = (_, e) =>
+            {
+                if (!acabou || continuar == null || e.Key is not (Key.Enter or Key.Return)) return;
+                e.Handled = true;
+                Seguir();
+            };
+            top.AddHandler(KeyDownEvent, teclaFim, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+        }
         if (FecharSozinha) Seguir();
+    }
+
+    EventHandler<KeyEventArgs>? teclaFim;
+    TopLevel? teclaFimEm;
+
+    void SoltarTeclaFim()
+    {
+        if (teclaFim != null) teclaFimEm?.RemoveHandler(KeyDownEvent, teclaFim);
+        teclaFim = null; teclaFimEm = null;
     }
 
     void Seguir()
     {
+        SoltarTeclaFim();
         var c = continuar;
         continuar = null;
         c?.Invoke();
@@ -185,6 +208,7 @@ public sealed partial class TelaJornada : UserControl
     {
         base.OnDetachedFromVisualTree(e);
         Pausar(false);
+        SoltarTeclaFim();
     }
 
     // ---------------------------------------------------------------- o instantaneo
@@ -526,7 +550,7 @@ public sealed partial class TelaJornada : UserControl
 
     static FormattedText Txt(string t, double tam, IBrush cor, bool negrito = false, FontFamily? f = null) =>
         new(t, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(f ?? Arial, FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam, cor);
+            new Typeface(f ?? Arial, FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam * Acessibilidade.Texto, cor);
 
     static void Ret(DrawingContext dc, IBrush b, double x, double y, double w, double h) =>
         dc.FillRectangle(b, new Rect(x, y, w, h));
@@ -546,7 +570,10 @@ public sealed partial class TelaJornada : UserControl
         {
             Ret(dc, VerdeB, 0, 0, CW, CH);
             DesenharJogos(dc);
-            DesenharRelogio(dc);
+            // (fora do original) no fim, o botao Continuar no lugar do relogio (o Enter e o
+            // clique em qualquer lugar tambem continuam)
+            if (acabou) Botao(dc, new Rect(QL - 110, 12, 100, 30), T("Continuar"), true, 13);
+            else DesenharRelogio(dc);
             if (BotoesVisiveis)
             {
                 Botao(dc, Anterior, "<", pagina > 0);
@@ -708,7 +735,7 @@ public sealed partial class TelaJornada : UserControl
     }
 
     // TButton do Windows 95: face cinza, borda dupla saltada, ">"/"<" em Arial negrito 27
-    static void Botao(DrawingContext dc, Rect r, string texto, bool ativo)
+    static void Botao(DrawingContext dc, Rect r, string texto, bool ativo, double tam = 27)
     {
         double x = r.X, y = r.Y, w = r.Width, h = r.Height;
         Ret(dc, Face, x, y, w, h);
@@ -720,9 +747,9 @@ public sealed partial class TelaJornada : UserControl
         Ret(dc, Luz, x + 1, y + 1, 1, h - 3);
         Ret(dc, Sombra, x + 1, y + h - 2, w - 2, 1);
         Ret(dc, Sombra, x + w - 2, y + 1, 1, h - 2);
-        var t = Txt(texto, 27, ativo ? Preto : Sombra, true);
+        var t = Txt(texto, tam, ativo ? Preto : Sombra, true);
         var p = new Point(x + (w - t.Width) / 2, y + (h - t.Height) / 2);
-        if (!ativo) dc.DrawText(Txt(texto, 27, Branco, true), p + new Point(1, 1));
+        if (!ativo) dc.DrawText(Txt(texto, tam, Branco, true), p + new Point(1, 1));
         dc.DrawText(t, p);
     }
 

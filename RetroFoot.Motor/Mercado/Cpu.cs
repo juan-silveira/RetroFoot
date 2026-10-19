@@ -158,6 +158,9 @@ public sealed partial class MercadoJogo
         {
             var (m, ok) = humano(c, v, p);
             if (!ok) m = 0;
+            // (fora do original) o lance vazio ou 0 nao e oferta: com a base 0, contava como
+            // lance valido e o humano levava o jogador de graca so por apertar Enter
+            if (m <= 0) return;
             if (m * 1000 <= (int)c.Dinheiro) { l.RegistrarLance(c.ID, m * 1000); return; }
         }
     }

@@ -118,6 +118,14 @@ public static class DadosJogo
                 }
             }
             catch (Exception e) { Console.Error.WriteLine("dados (conversao): " + e.Message); }
+            // os paises do catalogo do jogo que faltam em countries.tsv (um patch antigo que
+            // trocou a lista, por exemplo) entram de volta; os do jogador ficam como estao
+            try
+            {
+                int n = PastaDados.CompletarPaises(raiz);
+                if (n > 0) Console.Error.WriteLine($"dados: {n} países do catálogo acrescentados a {PastaDados.Paises}");
+            }
+            catch (Exception e) { Console.Error.WriteLine("dados (países): " + e.Message); }
         }
         return raiz;
     }

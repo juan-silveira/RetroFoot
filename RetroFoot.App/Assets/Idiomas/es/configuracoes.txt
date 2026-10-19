@@ -17,14 +17,14 @@ Recursos do jogo	Funciones del juego
 A versão do jogo e o tamanho das divisões.	La versión del juego y el tamaño de las divisiones.
 Versão do jogo	Versión del juego
 Versão	Versión
-versão Clássica	versión Clásica
+versão Retrô	versión Retro
 versão Atual	versión Actual
 Nota e Risco de lesão, a tática 5-0-5, até 30 jogadores, desempate por vitórias e as regras que você escolher.	Nota y Riesgo de lesión, la táctica 5-0-5, hasta 30 jugadores, desempate por victorias y las reglas que elijas.
 Equipas por divisão	Equipos por división
 Equipas por divisão:	Equipos por división:
 (só na versão Atual)	(solo en la versión Actual)
 Equipas	Equipos
-8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 equipos como en el clásico: 14 jornadas; el juego nuevo necesita al menos {0} equipos en los países elegidos.
+8 equipas como no Retrô: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 equipos como en el Retro: 14 jornadas; el juego nuevo necesita al menos {0} equipos en los países elegidos.
 {0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos	{0} equipos: {1} jornadas; el juego nuevo necesita al menos {2} equipos en los países elegidos
 {0} equipas por divisão ({1} rodadas)	{0} equipos por división ({1} jornadas)
 {0} por divisão · {1} rodadas	{0} por división · {1} jornadas
@@ -36,13 +36,13 @@ O jogo em curso mantém as regras com que foi aberto.	La partida en curso mantie
 O número de equipas vem do jogo gravado e não muda. O que você mudar aqui vale da próxima vez que um jogo for aberto.	El número de equipos viene de la partida guardada y no cambia. Lo que cambies aquí vale la próxima vez que se abra una partida.
 # Regras
 O que vale dentro do jogo.	Lo que vale dentro del juego.
-Na versão Clássica as regras são as de 1998	En la versión Clásica las reglas son las de 1998
-Na versão Clássica as regras são as de 1998: só cartões vermelhos e sem patrocínios.	En la versión Clásica las reglas son las de 1998: solo tarjetas rojas y sin patrocinios.
+Na versão Retrô as regras são as de 1998	En la versión Retro las reglas son las de 1998
+Na versão Retrô as regras são as de 1998: só cartões vermelhos e sem patrocínios.	En la versión Retro las reglas son las de 1998: solo tarjetas rojas y sin patrocinios.
 Cartões amarelos e patrocínios só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Las tarjetas amarillas y los patrocinios solo existen en la versión Actual. La elección queda guardada para cuando uses la Modificada.
 Usar a versão Atual	Usar la versión Actual
 Adições	Añadidos
 Cartões amarelos	Tarjetas amarillas
-Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no clássico.	Tres amarillas acumuladas suspenden un partido. Desactivadas: solo rojas, como en el clásico.
+Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no Retrô.	Tres amarillas acumuladas suspenden un partido. Desactivadas: solo rojas, como en el Retro.
 Cartões amarelos (três suspendem por um jogo)	Tarjetas amarillas (tres suspenden un partido)
 Patrocínios	Patrocinios
 Propostas e contratos de patrocínio master ao longo da temporada.	Ofertas y contratos de patrocinador principal a lo largo de la temporada.
@@ -65,22 +65,45 @@ Realístico: até 5 por equipa (Bosman e lusófonos não contam)	Realista: hasta
 Liberado: sem limite de estrangeiros	Libre: sin límite de extranjeros
 Desempate na classificação	Desempate en la clasificación
 Pontos, vitórias, saldo de golos e golos marcados.	Puntos, victorias, diferencia de goles y goles marcados.
-Pontos, saldo de golos e golos marcados (como no clássico).	Puntos, diferencia de goles y goles marcados (como en el clásico).
+Pontos, saldo de golos e golos marcados (como no Retrô).	Puntos, diferencia de goles y goles marcados (como en el Retro).
 # Aparencia
 Como as telas são desenhadas. Muda na hora, mesmo com um jogo aberto.	Cómo se dibujan las pantallas. Cambia al momento, incluso con una partida abierta.
 Visual	Aspecto
 Tema verde e amarelo, cartões e os logos das equipas e das ligas.	Tema verde y amarillo, tarjetas y los escudos de los equipos y las ligas.
 Moderno: tema escuro, cartões e logos	Moderno: tema oscuro, tarjetas y escudos
 Formato da tela	Formato de pantalla
-Como o clássico: as telas no formato de 800x600.	Como el original: las pantallas en formato 800x600.
+Como o Retrô: as telas no formato de 800x600.	Como el original: las pantallas en formato 800x600.
 Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.	Ventana ancha: la jornada con las divisiones lado a lado y las pantallas aprovechando el ancho.
-4:3: como o clássico (800x600)	4:3: como el clásico (800x600)
+4:3: como o Retrô (800x600)	4:3: como el Retro (800x600)
 16:9: janela larga, as telas aproveitam a largura	16:9: ventana ancha, las pantallas aprovechan el ancho
 O visual e o formato mudam na hora, mesmo com um jogo aberto.	El aspecto y el formato cambian al momento, incluso con una partida abierta.
 # Idioma
 Os textos do jogo.	Los textos del juego.
 Idioma do jogo	Idioma del juego
-Os textos do jogo clássico.	Los textos del juego clásico (portugués).
+Os textos do jogo Retrô.	Los textos del juego Retro (portugués).
 Os textos adaptados para o Brasil.	Los textos adaptados para Brasil.
 Os textos traduzidos para inglês.	Los textos traducidos al inglés.
 Os textos traduzidos para espanhol.	Los textos traducidos al español.
+Força na pesquisa de jogadores	Fuerza en la búsqueda de jugadores
+Mínimo e máximo	Mínimo y máximo
+Faixas do Retrô	Rangos del Retro
+Duas caixas, de 1 a 50: escolha a força mínima, a máxima ou as duas.	Dos casillas, de 1 a 50: elige la fuerza mínima, la máxima o las dos.
+Uma caixa só, com as faixas do jogo Retrô: 1-10, 5-15, 10-20, 20-30, 30-40 e 40-50.	Una sola casilla, con los rangos del juego Retro: 1-10, 5-15, 10-20, 20-30, 30-40 y 40-50.
+Mínimo e máximo: duas caixas, de 1 a 50	Mínimo y máximo: dos casillas, de 1 a 50
+Faixas do Retrô: 1-10, 5-15, 10-20, 20-30, 30-40, 40-50	Rangos del Retro: 1-10, 5-15, 10-20, 20-30, 30-40, 40-50
+Como escolher a força na Lista de Jogadores (Jogador > Procurar).	Cómo elegir la fuerza en la Lista de Jugadores (Jugador > Buscar).
+Mínimo e máximo: duas caixas, de 1 a 50. Faixas do Retrô: 1-10, 5-15, 10-20, 20-30, 30-40 e 40-50.	Mínimo y máximo: dos casillas, de 1 a 50. Rangos del Retro: 1-10, 5-15, 10-20, 20-30, 30-40 y 40-50.
+Mercado	Mercado
+Acessibilidade	Accesibilidad
+Tamanho do texto	Tamaño del texto
+O texto das telas do jogo (equipa, jornada, classificação, listas, mercado), de 80% a 120%. O que não couber ganha a dica com o texto inteiro.	El texto de las pantallas del juego (equipo, jornada, clasificación, listas, mercado), del 80% al 120%. Lo que no quepa muestra una pista con el texto completo.
+Efeitos sonoros	Efectos de sonido
+O apito do começo, do intervalo e do fim, o golo e o aviso de expulsão ou lesão nos jogos com treinador humano.	El silbato del inicio, del descanso y del final, el gol y el aviso de expulsión o lesión en los partidos con entrenador humano.
+Volume	Volumen
+Testar	Probar
+Volume dos efeitos	Volumen de los efectos
+O tamanho vale para o texto das telas do jogo. Os efeitos tocam com "Habilitar som" (Geral) ligado.	El tamaño vale para el texto de las pantallas del juego. Los efectos suenan con "Activar sonido" (General) activado.
+Patrocínio pontual	Patrocinio puntual
+{0} jogo restante	Queda {0} partido
+{0} jogos restantes	Quedan {0} partidos
+Nenhum no momento	Ninguno por ahora

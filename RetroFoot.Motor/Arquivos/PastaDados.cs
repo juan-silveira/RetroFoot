@@ -96,6 +96,21 @@ public static class PastaDados
 
     public static List<string> CodigosDosPaises(string raiz) => LerPaises(raiz).Select(p => p.Codigo).ToList();
 
+    // os paises do catalogo do jogo (Dados.Catalogo) que faltam em countries.tsv entram no fim,
+    // com o nome do catalogo; os que ja estao ficam como estao (nome, ordem). Idempotente: sem
+    // nada a acrescentar, o arquivo nem e regravado. Devolve quantos entraram.
+    public static int CompletarPaises(string raiz)
+    {
+        var arq = Path.Combine(raiz, Paises);
+        var l = File.Exists(arq) ? TextosDados.LerPaises(arq) : new List<TextosDados.Pais>();
+        var tem = new HashSet<string>(l.Select(p => p.Codigo), StringComparer.Ordinal);
+        int n = 0;
+        foreach (var (cod, nome) in Dados.Catalogo)
+            if (tem.Add(cod)) { l.Add(new TextosDados.Pais(cod, nome)); n++; }
+        if (n > 0) TextosDados.GravarPaises(arq, l);
+        return n;
+    }
+
     // os JSON de teams/ (sem backup/ nem pastas que comecam com '.' ou '_')
     public static IEnumerable<string> JsonsDeEquipas(string raiz)
     {
@@ -275,9 +290,21 @@ public static class PastaDados
             }
             else if (nome.Equals("COUNTRY.TXE", StringComparison.OrdinalIgnoreCase))
             {
+                // somado ao que ja ha: os nomes do patch valem e os paises novos entram no fim;
+                // os que o patch nao traz ficam (antes o arquivo era trocado inteiro, e as
+                // equipas de paises que so existiam nele, como IDN e KOS, paravam o jogo novo)
                 var l = TextosDados.PaisesDoTxe(ler());
-                TextosDados.GravarPaises(Path.Combine(raiz, Paises), l);
-                r.Outros.Add($"{Paises} ({l.Count})");
+                var arq = Path.Combine(raiz, Paises);
+                var juntos = File.Exists(arq) ? TextosDados.LerPaises(arq) : new List<TextosDados.Pais>();
+                int novos = 0;
+                foreach (var p in l)
+                {
+                    int k = juntos.FindIndex(x => x.Codigo == p.Codigo);
+                    if (k >= 0) juntos[k] = p;
+                    else { juntos.Add(p); novos++; }
+                }
+                TextosDados.GravarPaises(arq, juntos);
+                r.Outros.Add($"{Paises} ({l.Count}, {novos} novos)");
             }
             else if (nome.Equals("REFEREE.TXE", StringComparison.OrdinalIgnoreCase))
             {

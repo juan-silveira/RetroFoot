@@ -1,10 +1,10 @@
 # Os acrescimos (Regras.Acrescimos; TelaConfiguracoes) (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
 
 Acréscimos	Stoppage time
-De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no clássico.	1 to 5 minutes at the end of the 1st half and 1 to 10 at the end of the 2nd, with goals, cards and injuries (45'+2'). Off: as in the classic.
+De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no Retrô.	1 to 5 minutes at the end of the 1st half and 1 to 10 at the end of the 2nd, with goals, cards and injuries (45'+2'). Off: as in the Retro.
 Acréscimos (1 a 5 minutos no 1º tempo, 1 a 10 no 2º)	Stoppage time (1 to 5 minutes in the 1st half, 1 to 10 in the 2nd)
 Cartões amarelos, patrocínios e acréscimos só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Yellow cards, sponsors and stoppage time only exist in the Current version. Your choice is kept for when you use the Modified one.
-Na versão Clássica as regras são as de 1998: só cartões vermelhos, sem patrocínios nem acréscimos.	In the Classic version the rules are those of 1998: red cards only, no sponsors and no stoppage time.
+Na versão Retrô as regras são as de 1998: só cartões vermelhos, sem patrocínios nem acréscimos.	In the Retro version the rules are those of 1998: red cards only, no sponsors and no stoppage time.
 acréscimos ligados	stoppage time on
 acréscimos desligados	stoppage time off
 acréscimos	stoppage time

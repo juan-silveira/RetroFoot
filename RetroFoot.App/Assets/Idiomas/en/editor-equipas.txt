@@ -14,7 +14,7 @@ Todos os países	All countries
 {0} arquivos com erro	{0} files with errors
 Há alterações não gravadas nesta equipa. Descartá-las?	This team has unsaved changes. Discard them?
 Escolha uma equipa na lista ou crie uma nova.	Pick a team from the list or create a new one.
-As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato clássico .EFT.	Teams live in the data folder (teams/<country>/<team>.json). The game uses them as they are; "Export .EFT" saves a team in the classic .EFT format.
+As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato Retrô .EFT.	Teams live in the data folder (teams/<country>/<team>.json). The game uses them as they are; "Export .EFT" saves a team in the Retro .EFT format.
 Jogadores ({0})	Players ({0})
 Escudo	Crest
 nova	new
@@ -38,7 +38,7 @@ Jogadores: {0} (de {1} a {2})	Players: {0} ({1} to {2})
 Guarda-redes: {0} (mín. 1) · Campo: {1} (mín. {2})	Goalkeepers: {0} (min. 1) · Outfield: {1} (min. {2})
 Estrangeiros: sem limite (todos na Lei Bosman)	Foreigners: no limit (all under the Bosman ruling)
 Estrangeiros: {0} de {1} (Lei Bosman e PLOP não contam)	Foreigners: {0} of {1} (Bosman and PLOP do not count)
-As 16 cores clássicas:	The 16 classic colours:
+As 16 cores Retrô:	The 16 Retro colours:
 Código:	Code:
 Pos.	Pos.
 Estrangeiro	Foreigner
@@ -66,13 +66,13 @@ O formato .EFT não aceita a equipa assim:	The .EFT format does not accept the t
 Exportar .EFT	Export .EFT
 Equipa no formato .EFT	Team in .EFT format
 Equipa exportada no formato .EFT:	Team exported in .EFT format:
-Para a usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.	To use it in the classic game, copy the file into its EQUIPAS folder.
+Para a usar no jogo Retrô, copie o arquivo para a pasta EQUIPAS dele.	To use it in the Retro game, copy the file into its EQUIPAS folder.
 Só esta equipa: {0}	Only this team: {0}
 As equipas de {0} ({1})	The teams of {0} ({1})
 Todas as equipas ({0})	All teams ({0})
 Equipas de {0}	Teams of {0}
 Minhas equipas	My teams
-Incluir também os .EFT (formato clássico)	Also include the .EFT files (classic format)
+Incluir também os .EFT (formato Retrô)	Also include the .EFT files (Retro format)
 Incluir os logos das ligas desses países	Include the league logos of those countries
 Um patch (.zip) com as equipas em JSON e os logos delas, para aplicar noutro RetroFoot (ferramenta Patches ou Importar).	A patch (.zip) with the teams in JSON and their logos, to apply in another RetroFoot (Patches tool or Import).
 Nome do patch	Patch name
@@ -129,10 +129,10 @@ Usar este escudo	Use this crest
 Outra imagem…	Another image…
 Visual Moderno	Modern look
 Outra equipa	Other team
-Visual Clássico	Classic look
-O visual Clássico não mostra logos: valem as cores da equipa.	The Classic look shows no logos: the team colours are used.
+Visual Retrô	Retro look
+O visual Retrô não mostra logos: valem as cores da equipa.	The Retro look shows no logos: the team colours are used.
 Visual Moderno (a Classificação e a tela da equipa)	Modern look (Standings and the team screen)
-O visual Clássico não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	The Classic look shows no logos. The league logo appears when all the teams in the game are from the same country.
+O visual Retrô não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	The Retro look shows no logos. The league logo appears when all the teams in the game are from the same country.
 Procurar na coleção…	Search the collection…
 Só de {0}	Only {0}
 {0} logos (mostrando {1}; procure pelo nome)	{0} logos (showing {1}; search by name)

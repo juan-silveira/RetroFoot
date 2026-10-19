@@ -113,7 +113,7 @@ static class Dlg
 
     public static FormattedText Txt(string s, FontFamily f, double tam, IBrush cor, bool negrito = false, bool italico = false) =>
         new(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(f, italico ? FontStyle.Italic : FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam, cor);
+            new Typeface(f, italico ? FontStyle.Italic : FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam * Acessibilidade.Texto, cor);
 
     // texto do save (cifrado, com o tamanho na frente)
     public static string Texto(byte[] b) => b.Length == 0 ? "" : Encoding.Latin1.GetString(Cifra.TextoEFT(b).Texto);
@@ -234,8 +234,31 @@ static class Dlg
 // com [codigo] largura texto. Codigos: 2 negrito, 3 italico, 4 e 5 desligam, 6 alinha a
 // direita e deixa 10 pontos depois da coluna, 7 so alinha a direita, 0xFC a linha em
 // vermelho. 0xFF/0xFE no texto: os simbolos (bolinha/traco); 0xFD: um traco no fundo.
+// (RetroFoot) 1 lo hi, antes dos outros codigos da coluna: o logo de uma equipa (Logo) no
+// comeco da coluna, com o texto depois dele; sem logo (visual Classico), nada muda.
 static class Formatado
 {
+    // os logos que as linhas citam (1 lo hi = o indice aqui); os bitmaps sao os do cache dos
+    // Escudos, entao a lista nao passa do numero de equipas
+    static readonly List<Bitmap> _logos = new();
+    static readonly Dictionary<Bitmap, int> _indice = new();
+    // a largura do logo com o espaco depois dele; cresce e encolhe com o texto (Acessibilidade)
+    static double LogoW => Math.Round(18 * Acessibilidade.Texto);
+
+    // o logo da equipa no comeco da proxima coluna (chamar antes do Col dela)
+    public static void Logo(List<byte> b, RetroFoot.Motor.Save.Equipa? e)
+    {
+        if (e == null || Escudos.Escudo(e) is not { } bmp) return;
+        if (!_indice.TryGetValue(bmp, out int k))
+        {
+            if (_logos.Count >= 0xFFFF) return;
+            k = _logos.Count;
+            _logos.Add(bmp);
+            _indice[bmp] = k;
+        }
+        b.Add(1); b.Add((byte)k); b.Add((byte)(k >> 8));
+    }
+
     // quanto tirar da coluna larga (a mais larga alinhada a esquerda, antes da ultima) para a
     // linha nao chegar a barra de rolagem; quem desenha a lista mede (Excesso) e liga aqui
     // durante o desenho. 0 = as larguras do original.
@@ -244,7 +267,7 @@ static class Formatado
     // folga entre o fim do texto e a barra de rolagem
     public const double Folga = 6;
 
-    record struct Coluna(bool Negrito, bool Italico, bool Vermelho, bool Direita, bool Mais10, int W, string Txt);
+    record struct Coluna(bool Negrito, bool Italico, bool Vermelho, bool Direita, bool Mais10, int W, string Txt, Bitmap? Logo = null);
 
     static List<Coluna> Ler(byte[] s, bool negrito)
     {
@@ -253,6 +276,14 @@ static class Formatado
         int i = 0;
         while (i < s.Length)
         {
+            Bitmap? logo = null;
+            if (s[i] == 1 && i + 2 < s.Length)
+            {
+                int k = s[i + 1] | s[i + 2] << 8;
+                if (k < _logos.Count) logo = _logos[k];
+                i += 3;
+                if (i >= s.Length) break;
+            }
             switch (s[i])
             {
                 case 2: negrito = true; i++; break;
@@ -268,7 +299,7 @@ static class Formatado
             int ini = i;
             while (i < s.Length && s[i] != 9) i++;
             // o € passa pelo 0x80 do Windows-1252 (o Latin1 nao o tem)
-            l.Add(new Coluna(negrito, italico, vermelho, direita, mais10, w, Encoding.Latin1.GetString(s, ini, i - ini).Replace('\u0080', '\u20ac')));
+            l.Add(new Coluna(negrito, italico, vermelho, direita, mais10, w, Encoding.Latin1.GetString(s, ini, i - ini).Replace('\u0080', '\u20ac'), logo));
             i++;   // o TAB
             direita = false;
         }
@@ -296,7 +327,7 @@ static class Formatado
             var c = l[j];
             if (c.Txt.Length > 0 && !Simbolo(c.Txt))
             {
-                double tw = c.Direita ? c.W : Dlg.Txt(c.Txt, f.Familia, f.Tamanho, Brushes.Black, c.Negrito, c.Italico).Width;
+                double tw = c.Direita ? c.W : Dlg.Txt(c.Txt, f.Familia, f.Tamanho, Brushes.Black, c.Negrito, c.Italico).Width + (c.Logo != null ? LogoW : 0);
                 fim = Math.Max(fim, x + (j < l.Count - 1 && !c.Direita ? Math.Min(tw, c.W) : tw));
             }
             x += c.W;
@@ -323,6 +354,19 @@ static class Formatado
             var txt = c.Txt;
             var cr = c.Vermelho ? W95.Vermelho : cor;
             double w = j == k ? Math.Max(c.W / 2, c.W - Encolher) : c.W;
+            // o logo no comeco da coluna e o texto depois dele (na mesma largura)
+            double xl = 0;
+            if (c.Logo is { } lg && !c.Direita)
+            {
+                // centrado na linha do texto (que e desenhado no topo de r), nao no meio de r
+                double lh = Dlg.Txt("Ág", f.Familia, f.Tamanho, cor).Height;
+                double q = Math.Min(Math.Round(15 * Acessibilidade.Texto), r.Height - 2);
+                double yl = Math.Max(r.Y, r.Y + (lh - q) / 2);
+                using (dc.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = Avalonia.Media.Imaging.BitmapInterpolationMode.HighQuality }))
+                    dc.DrawImage(lg, new Rect(x, yl, q, q));
+                xl = LogoW;
+            }
+            x += xl; w -= xl;
             if (txt.Length > 0 && txt[0] == 'ÿ')
                 dc.FillRectangle(cr, new Rect(x + 1, r.Y + 6, 3, 3));
             else if (txt.Length > 0 && txt[0] == 'þ')

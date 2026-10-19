@@ -130,7 +130,7 @@ sealed class TelaArbitros : UserControl
     {
         "fifa" => "FIFA",
         "liga" => T("Liga"),
-        "1998" => T("Clássico (1998)"),
+        "1998" => T("Retrô (1998)"),
         "txe" => T("Patch"),
         "user" or "" => T("Seu"),
         _ => o,

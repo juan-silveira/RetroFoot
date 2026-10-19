@@ -147,14 +147,37 @@ public sealed class Dados
     }
 
     // seg12:0919: o codigo em maiusculas; se nao estiver em COUNTRY.TXE, o substituto de
-    // Mapa (o jogo procuraria no elif98.ini e depois perguntaria ao jogador)
+    // Mapa (o jogo procuraria no elif98.ini e depois perguntaria ao jogador). Sem nenhum dos
+    // dois (fora do original, que parava o jogo novo com erro): o pais entra na lista com o
+    // nome do catalogo do jogo (paises.tsv) ou, se nem la estiver, com o proprio codigo
     internal string PaisDoArquivo(string cod)
     {
         var c = Maiusculas(cod);
         if (c.Length > 3) c = c[..3];
         if (AcharPais(Paises, c) != null) return c;
         if (Mapa.TryGetValue(c, out var m)) return m;
-        throw new InvalidDataException($"país \"{c}\" não está em COUNTRY.TXE (o jogo perguntaria qual usar)");
+        var nome = Catalogo.TryGetValue(c, out var n) ? n : c;
+        var b = Arquivos.EquipaJson.Bytes(nome);
+        Paises.Add(new Pais { Codigo = c, Nome = b.Length > 20 ? b[..20] : b });
+        return c;
+    }
+
+    // o catalogo de paises do jogo (codigo -> nome), embutido no motor
+    public static IReadOnlyDictionary<string, string> Catalogo => catalogo ??= LerCatalogo();
+    static Dictionary<string, string>? catalogo;
+
+    static Dictionary<string, string> LerCatalogo()
+    {
+        var d = new Dictionary<string, string>(StringComparer.Ordinal);
+        using var s = typeof(Dados).Assembly.GetManifestResourceStream("paises.tsv");
+        if (s == null) return d;
+        using var r = new StreamReader(s, Encoding.UTF8);
+        for (string? l; (l = r.ReadLine()) != null;)
+        {
+            var c = l.Split('\t');
+            if (c.Length >= 2 && c[0].Trim().Length > 0 && !c[0].StartsWith('#')) d.TryAdd(c[0].Trim().ToUpperInvariant(), c[1].Trim());
+        }
+        return d;
     }
 
     // seg12:0a2f: 0 mesmo pais; 1 os dois na Lei Bosman ou os dois na PLOP; 2 estrangeiro

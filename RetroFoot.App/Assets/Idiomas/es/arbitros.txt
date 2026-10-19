@@ -6,7 +6,7 @@ Só os ativos	Solo los activos
 Só os desativados	Solo los desactivados
 Ativo (usado nos jogos novos)	Activo (se usa en las partidas nuevas)
 Liga	Liga
-Clássico (1998)	Clásico (1998)
+Retrô (1998)	Retro (1998)
 Patch	Parche
 Seu	Tuyo
 Ativo	Activo

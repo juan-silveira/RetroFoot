@@ -6,7 +6,7 @@ Sobem e descem	Promoted/relegated
 Automático	Automatic
 Automático ({0})	Automatic ({0})
 Entre as divisões e do Distrital para a 4ª divisão (por sorteio). Fica gravado no jogo novo e não muda depois. No máximo 4 e menos de metade da divisão.	Between the divisions and from the Regional League to the 4th division (by draw). It is saved in the new game and does not change later. At most 4 and less than half of the division.
-Na versão Clássica sobem e descem 2, como em 1998.	In the Classic version 2 are promoted and 2 relegated, as in 1998.
+Na versão Retrô sobem e descem 2, como em 1998.	In the Retro version 2 are promoted and 2 relegated, as in 1998.
 Automático: com {0} equipas por divisão sobem e descem {1} (2, ou 4 com 16 ou mais equipas).	Automatic: with {0} teams per division, {1} are promoted and {1} relegated (2, or 4 with 16 or more teams).
 Com {0} equipas por divisão o máximo é {1} (menos de metade da divisão): valem {1}.	With {0} teams per division the maximum is {1} (less than half of the division): {1} apply.
 Sobem e descem {0}; o jogo novo precisa de pelo menos {1} equipas.	{0} promoted and {0} relegated; a new game needs at least {1} teams.

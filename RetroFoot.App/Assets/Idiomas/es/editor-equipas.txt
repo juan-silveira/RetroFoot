@@ -14,7 +14,7 @@ Todos os países	Todos los países
 {0} arquivos com erro	{0} archivos con errores
 Há alterações não gravadas nesta equipa. Descartá-las?	Este equipo tiene cambios sin guardar. ¿Descartarlos?
 Escolha uma equipa na lista ou crie uma nova.	Elige un equipo de la lista o crea uno nuevo.
-As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato clássico .EFT.	Los equipos están en la carpeta de datos (teams/<país>/<equipo>.json). El juego los usa tal cual; "Exportar .EFT" guarda un equipo en el formato clásico .EFT.
+As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato Retrô .EFT.	Los equipos están en la carpeta de datos (teams/<país>/<equipo>.json). El juego los usa tal cual; "Exportar .EFT" guarda un equipo en el formato Retro .EFT.
 Jogadores ({0})	Jugadores ({0})
 Escudo	Escudo
 nova	nuevo
@@ -39,7 +39,7 @@ Jogadores: {0} (de {1} a {2})	Jugadores: {0} (de {1} a {2})
 Guarda-redes: {0} (mín. 1) · Campo: {1} (mín. {2})	Porteros: {0} (mín. 1) · Campo: {1} (mín. {2})
 Estrangeiros: sem limite (todos na Lei Bosman)	Extranjeros: sin límite (todos en la Ley Bosman)
 Estrangeiros: {0} de {1} (Lei Bosman e PLOP não contam)	Extranjeros: {0} de {1} (Ley Bosman y PLOP no cuentan)
-As 16 cores clássicas:	Los 16 colores clásicos:
+As 16 cores Retrô:	Los 16 colores Retro:
 Código:	Código:
 Pos.	Pos.
 Estrangeiro	Extranjero
@@ -67,13 +67,13 @@ O formato .EFT não aceita a equipa assim:	El formato .EFT no acepta el equipo a
 Exportar .EFT	Exportar .EFT
 Equipa no formato .EFT	Equipo en formato .EFT
 Equipa exportada no formato .EFT:	Equipo exportado en formato .EFT:
-Para a usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.	Para usarlo en el juego clásico, copia el archivo a su carpeta EQUIPAS.
+Para a usar no jogo Retrô, copie o arquivo para a pasta EQUIPAS dele.	Para usarlo en el juego Retro, copia el archivo a su carpeta EQUIPAS.
 Só esta equipa: {0}	Solo este equipo: {0}
 As equipas de {0} ({1})	Los equipos de {0} ({1})
 Todas as equipas ({0})	Todos los equipos ({0})
 Equipas de {0}	Equipos de {0}
 Minhas equipas	Mis equipos
-Incluir também os .EFT (formato clássico)	Incluir también los .EFT (formato clásico)
+Incluir também os .EFT (formato Retrô)	Incluir también los .EFT (formato Retro)
 Incluir os logos das ligas desses países	Incluir los logos de las ligas de esos países
 Um patch (.zip) com as equipas em JSON e os logos delas, para aplicar noutro RetroFoot (ferramenta Patches ou Importar).	Un parche (.zip) con los equipos en JSON y sus logos, para aplicar en otro RetroFoot (herramienta Parches o Importar).
 Nome do patch	Nombre del parche
@@ -131,10 +131,10 @@ Usar este escudo	Usar este escudo
 Outra imagem…	Otra imagen…
 Visual Moderno	Visual Moderno
 Outra equipa	Otro equipo
-Visual Clássico	Visual Clásico
-O visual Clássico não mostra logos: valem as cores da equipa.	El visual Clásico no muestra logos: valen los colores del equipo.
+Visual Retrô	Visual Retro
+O visual Retrô não mostra logos: valem as cores da equipa.	El visual Retro no muestra logos: valen los colores del equipo.
 Visual Moderno (a Classificação e a tela da equipa)	Visual Moderno (la Clasificación y la pantalla del equipo)
-O visual Clássico não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	El visual Clásico no muestra logos. El logo de la liga aparece cuando todos los equipos del juego son del mismo país.
+O visual Retrô não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	El visual Retro no muestra logos. El logo de la liga aparece cuando todos los equipos del juego son del mismo país.
 Procurar na coleção…	Buscar en la colección…
 Só de {0}	Solo de {0}
 {0} logos (mostrando {1}; procure pelo nome)	{0} logos (se muestran {1}; busca por nombre)

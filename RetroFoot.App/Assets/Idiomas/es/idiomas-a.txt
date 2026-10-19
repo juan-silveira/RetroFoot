@@ -87,7 +87,7 @@ Continuar um jogo	Continuar una partida
 Moeda	Moneda
 Treinadores	Entrenadores
 Versão Atual	Versión Actual
-Versão Clássica	Versión Clásica
+Versão Retrô	Versión Retro
 cartões amarelos	tarjetas amarillas
 patrocínios	patrocinios
 estrangeiros liberados	extranjeros sin límite

@@ -21,6 +21,9 @@ public static class Visual
     };
     public static event Action? Mudou;
 
+    // as telas abertas redesenham sem trocar o visual (o tamanho do texto mudou: Acessibilidade)
+    public static void Redesenhar() => Mudou?.Invoke();
+
     public static void Aplicar(bool moderno)
     {
         if (moderno == Moderno) return;

@@ -211,7 +211,11 @@ public static class TelaFimDeTemporada
         else { Grid.SetRow(taca, 2); Grid.SetRow(cartaoArt, 4); }
 
         var icone = Escudos.Controle(Escudos.Liga(s.S, 0), 44);
-        var j = new JanelaModerna(T("Fim de Temporada"), T("Temporada {0}", s.S.Cabecalho.Ano), icone, cartoes, largo ? 780 : 600, largo ? 430 : 500);
+        // a altura cabe o artilheiro inteiro: antes (500/430 fixos) a linha dele saia cortada
+        // embaixo; cada empatado a mais (ate 4 a vista; dai rola) acrescenta uma linha
+        double extra = 28 * (Math.Clamp(marc.Count, 1, 4) - 1);
+        var j = new JanelaModerna(T("Fim de Temporada"), T("Temporada {0}", s.S.Cabecalho.Ano), icone, cartoes, largo ? 780 : 600,
+            Math.Min(580, (largo ? 430 : 520) + extra));
         var conta = ClubeModerno.T("", 12, ClubeModerno.Fraco);
         j.NotaRodape(conta);
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };

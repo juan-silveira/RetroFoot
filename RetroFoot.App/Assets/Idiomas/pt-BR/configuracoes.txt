@@ -8,7 +8,7 @@ Versão e equipas	Versão e times
 Equipas por divisão	Times por divisão
 Equipas por divisão:	Times por divisão:
 Equipas	Times
-8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 times como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} times nos países escolhidos.
+8 equipas como no Retrô: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 times como no Retrô: 14 rodadas; o jogo novo precisa de pelo menos {0} times nos países escolhidos.
 {0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos	{0} times: {1} rodadas; o jogo novo precisa de pelo menos {2} times nos países escolhidos
 {0} equipas por divisão ({1} rodadas)	{0} times por divisão ({1} rodadas)
 Valem para o próximo jogo novo; o visual e o formato da tela, na hora. Um jogo gravado mantém o número de equipas com que começou.	Valem para o próximo jogo novo; o visual e o formato da tela, na hora. Um jogo salvo mantém o número de times com que começou.
@@ -17,8 +17,10 @@ O número de equipas vem do jogo gravado e não muda. O que você mudar aqui val
 Até 5 por equipa; a Lei Bosman e os países de língua portuguesa não contam.	Até 5 por time; a Lei Bosman e os países de língua portuguesa não contam.
 Realístico: até 5 por equipa (Bosman e lusófonos não contam)	Realístico: até 5 por time (Bosman e lusófonos não contam)
 Pontos, vitórias, saldo de golos e golos marcados.	Pontos, vitórias, saldo de gols e gols marcados.
-Pontos, saldo de golos e golos marcados (como no clássico).	Pontos, saldo de gols e gols marcados (como no clássico).
+Pontos, saldo de golos e golos marcados (como no Retrô).	Pontos, saldo de gols e gols marcados (como no Retrô).
 # Aparencia
 Tema verde e amarelo, cartões e os logos das equipas e das ligas.	Tema verde e amarelo, cartões e os logos dos times e das ligas.
 Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.	Janela larga: a rodada com as divisões lado a lado e as telas aproveitando a largura.
 # Idioma
+O texto das telas do jogo (equipa, jornada, classificação, listas, mercado), de 80% a 120%. O que não couber ganha a dica com o texto inteiro.	O texto das telas do jogo (equipe, rodada, classificação, listas, mercado), de 80% a 120%. O que não couber ganha a dica com o texto inteiro.
+O apito do começo, do intervalo e do fim, o golo e o aviso de expulsão ou lesão nos jogos com treinador humano.	O apito do começo, do intervalo e do fim, o gol e o aviso de expulsão ou lesão nos jogos com técnico humano.

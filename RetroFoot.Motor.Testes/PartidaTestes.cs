@@ -440,4 +440,16 @@ public partial class PartidaTestes(ITestOutputHelper saida)
         saida.WriteLine($"{subs} substituicoes ({intervalo} no intervalo), {pens} penaltis sem gol");
         Assert.True(subs > 0 && pens > 0);
     }
+
+    // o valor do batedor de um defensor com forca editada (31998): no original (2 x 31998) estoura
+    // os 16 bits e fica negativo (ele bate pior que um de forca 10); na versao Atual fica no maximo
+    [Fact]
+    public void BatedorComForcaEnormeNaoEstouraNaVersaoAtual()
+    {
+        var j = new RetroFoot.Motor.Save.Jogador { Posicao = 1, Forca = 31998, Nota = 5 };
+        Assert.True(RetroFoot.Motor.Partida.Penaltis.ValorBatedor(j, false) < 0);
+        Assert.Equal(short.MaxValue, RetroFoot.Motor.Partida.Penaltis.ValorBatedor(j, true));
+        var normal = new RetroFoot.Motor.Save.Jogador { Posicao = 1, Forca = 10, Nota = 5 };
+        Assert.Equal(RetroFoot.Motor.Partida.Penaltis.ValorBatedor(normal, false), RetroFoot.Motor.Partida.Penaltis.ValorBatedor(normal, true));
+    }
 }

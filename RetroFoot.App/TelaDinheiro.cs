@@ -197,7 +197,10 @@ sealed class BotaoMargem : Control
         if (Glifo != null)
         {
             int q = !habilitado && NumGlifos > 1 ? 1 : 0;
-            dc.DrawImage(Glifo, new Rect(q * gw, 0, gw, gh), new Rect(r.X + gx + d, r.Y + gy + d, gw, gh));
+            // um glifo so (sem o quadro "desligado"): desligado, desenhado esmaecido, como os
+            // botoes do mercado (antes ficava colorido e o botao parecia ligado)
+            using (dc.PushOpacity(!habilitado && NumGlifos == 1 ? 0.35 : 1))
+                dc.DrawImage(Glifo, new Rect(q * gw, 0, gw, gh), new Rect(r.X + gx + d, r.Y + gy + d, gw, gh));
         }
         if (Texto.Length == 0) return;
         if (habilitado) dc.DrawText(t, new Point(r.X + tx + d, r.Y + ty + d));

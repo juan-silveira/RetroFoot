@@ -344,7 +344,7 @@ public sealed partial class TelaEditorEquipas : UserControl
             var t1 = tema.T(T("Escolha uma equipa na lista ou crie uma nova."), 14, null, true);
             t1.TextAlignment = TextAlignment.Center;
             p.Children.Add(t1);
-            var t2 = tema.T(T("As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; \"Exportar .EFT\" grava uma equipa no formato clássico .EFT."), 12, tema.Fraco);
+            var t2 = tema.T(T("As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; \"Exportar .EFT\" grava uma equipa no formato Retrô .EFT."), 12, tema.Fraco);
             t2.TextAlignment = TextAlignment.Center;
             p.Children.Add(t2);
             direita.Content = tema.Caixa(p);
@@ -553,7 +553,7 @@ public sealed partial class TelaEditorEquipas : UserControl
             ToolTip.SetTip(q, "#" + c.ToString("X6"));
             grade.Children.Add(q);
         }
-        p.Children.Add(tema.T(T("As 16 cores clássicas:"), 12, tema.Fraco));
+        p.Children.Add(tema.T(T("As 16 cores Retrô:"), 12, tema.Fraco));
         p.Children.Add(grade);
         var lh = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         lh.Children.Add(tema.T(T("Código:"), 12, tema.Rotulo, true));
@@ -895,7 +895,7 @@ public sealed partial class TelaEditorEquipas : UserControl
         {
             Directory.CreateDirectory(Path.GetDirectoryName(destino)!);
             File.WriteAllBytes(destino, edit.ParaEft());
-            Mensagem(T("Equipa exportada no formato .EFT:") + "\n" + destino + "\n\n" + T("Para a usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele."));
+            Mensagem(T("Equipa exportada no formato .EFT:") + "\n" + destino + "\n\n" + T("Para a usar no jogo Retrô, copie o arquivo para a pasta EQUIPAS dele."));
         }
         catch (Exception x) { Mensagem(T("Erro ao gravar:") + "\n" + x.Message); }
     }
@@ -931,7 +931,7 @@ public sealed partial class TelaEditorEquipas : UserControl
             radios.Children.Add(r);
         }
 
-        var comEft = new CheckBox { Content = T("Incluir também os .EFT (formato clássico)"), IsChecked = true, FontFamily = tema.Fonte, FontSize = 12.5, Foreground = tema.Texto };
+        var comEft = new CheckBox { Content = T("Incluir também os .EFT (formato Retrô)"), IsChecked = true, FontFamily = tema.Fonte, FontSize = 12.5, Foreground = tema.Texto };
         var ligas = new CheckBox { Content = T("Incluir os logos das ligas desses países"), IsChecked = true, FontFamily = tema.Fonte, FontSize = 12.5, Foreground = tema.Texto };
         p.Children.Add(tema.T(T("Um patch (.zip) com as equipas em JSON e os logos delas, para aplicar noutro RetroFoot (ferramenta Patches ou Importar)."), 12, tema.Fraco));
         p.Children.Add(radios);

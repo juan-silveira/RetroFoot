@@ -6,8 +6,9 @@ Crie e edite equipas, jogadores e cores	Crie e edite times, jogadores e cores
 Altere dinheiro, jogadores e equipas de um jogo gravado	Altere dinheiro, jogadores e times de um jogo salvo
 Aplique patches de equipas e países	Aplique patches de times e países
 Pasta de dados (equipas, logos, saves, patches):	Pasta de dados (times, escudos, jogos salvos, patches):
-Arquivos clássicos convertidos: {0} equipas	Arquivos clássicos convertidos: {0} times
+Arquivos Retrô convertidos: {0} equipas	Arquivos Retrô convertidos: {0} times
 Esta ferramenta ainda está a ser feita. Enquanto isso, os arquivos podem ser editados na pasta de dados.	Esta ferramenta ainda está sendo feita. Enquanto isso, os arquivos podem ser editados na pasta de dados.
 Equipas, logos, saves e patches numa pasta que você abre no gestor de arquivos.	Times, escudos, jogos salvos e patches numa pasta que você abre no gerenciador de arquivos.
-teams (equipas em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos clássicos (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.	teams (times em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos clássicos (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.
+teams (equipas em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos Retrô (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.	teams (times em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos Retrô (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.
 Equipas, logos, saves e patches	Times, escudos, jogos salvos e patches
+A versão {0} do RetroFoot está disponível (você tem a {1}). Seus saves, equipas e configurações ficam como estão.	A versão {0} do RetroFoot está disponível (você tem a {1}). Seus saves, times e configurações ficam como estão.

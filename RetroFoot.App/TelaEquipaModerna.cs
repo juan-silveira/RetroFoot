@@ -103,7 +103,7 @@ public sealed partial class TelaEquipa
         static FormattedText TM(string s, double tam, IBrush cor, bool negrito = false, double max = 0, bool medio = false)
         {
             var t = new FormattedText(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-                new Typeface(Inter, FontStyle.Normal, negrito ? FontWeight.Bold : medio ? FontWeight.Medium : FontWeight.Normal), tam, cor);
+                new Typeface(Inter, FontStyle.Normal, negrito ? FontWeight.Bold : medio ? FontWeight.Medium : FontWeight.Normal), tam * Acessibilidade.Texto, cor);
             if (max > 0)
             {
                 t.MaxTextWidth = Math.Max(1, max);
@@ -252,7 +252,7 @@ public sealed partial class TelaEquipa
             ToolTip.SetIsOpen(this, false);
             ToolTip.SetTip(this, d);
             if (d == null) return;
-            _relogioDica ??= new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(450) };
+            _relogioDica ??= new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
             _relogioDica.Tick -= AbrirDica;
             _relogioDica.Tick += AbrirDica;
             _relogioDica.Start();
@@ -515,8 +515,12 @@ public sealed partial class TelaEquipa
             var cor = fora ? MFraco : MTexto;
             var selos = Selos(p, _launcher);
             double max = Math.Max(1, xMaxNome - xNome - 24 * selos.Count);
-            double wn = EscreveM(dc, NomeJogador(p), xNome, yc, 13, cor, sel, max, medio: !sel);
+            var nomeJ = NomeJogador(p);
+            double wn = EscreveM(dc, nomeJ, xNome, yc, 13, cor, sel, max, medio: !sel);
             double xb = xNome + Math.Min(wn, max) + 6;
+            // o nome cortado: a dica com ele inteiro, pela dica do painel (a geral demorava)
+            if (r.Bottom > RItens.Y && r.Y < RItens.Bottom && TM(nomeJ, 13, cor, sel, 0, !sel).WidthIncludingTrailingWhitespace > max)
+                _dicas.Add((new Rect(xNome, r.Y, Math.Min(wn, max), r.Height), nomeJ));
             foreach (var (tipo, n) in selos)
             {
                 var rs = Selo(dc, xb, yc, tipo, n);
@@ -753,7 +757,9 @@ public sealed partial class TelaEquipa
                 string txt = tipo == SeloAmarelo && n >= 2 ? T("Pendurado") : DicaSelo(tipo, n).Split('\n')[0];
                 var t = TM(txt, 11, tipo == SeloVermelho ? MLaranja : tipo == SeloAmarelo ? MAmarelo : MVermelho, true);
                 var r = new Rect(xc, y, t.WidthIncludingTrailingWhitespace + 14 + 24, 18);
-                if (r.Right > pg.Right) break;
+                // sem lugar na linha: o selo desce para a seguinte (antes era descartado, e no
+                // 4:3 a lesao sumia depois de "Fora da escalacao" e "Pendurado")
+                if (r.Right > pg.Right && xc > pg.X) { y += 22; xc = pg.X; r = new Rect(xc, y, r.Width, 18); }
                 dc.DrawRectangle(MCartao2, null, r, 9, 9);
                 var rs = Selo(dc, r.X + 6, r.Center.Y, tipo, n);
                 dc.DrawText(t, new Point(r.X + 30, r.Center.Y - t.Height / 2));
@@ -961,42 +967,64 @@ public sealed partial class TelaEquipa
         // ------------------------------------------------------------ pagina Patrocinio
         void PatrocinioModerno(DrawingContext dc, Rect pg)
         {
+            // duas secoes separadas por uma linha: o master (logo grande, nome, valor e
+            // temporadas) e o pontual (titulo proprio; logo pequeno a esquerda e o nome, o valor
+            // por jogo e os jogos a direita). Antes o logo do pontual ficava logo abaixo das
+            // linhas do master e parecia ser dele.
             var marcas = _s.J.Op.Marcas;
             double xc = pg.Center.X;
+            void Placa(Bitmap img, Rect r, double raio)
+            {
+                dc.DrawRectangle(Brushes.White, null, r, raio, raio);
+                var sz = img.Size;
+                double e = Math.Min(1, Math.Min((r.Width - 12) / sz.Width, (r.Height - 8) / sz.Height));
+                dc.DrawImage(img, new Rect(r.Center.X - sz.Width * e / 2, r.Center.Y - sz.Height * e / 2, sz.Width * e, sz.Height * e));
+            }
+            // a altura do bloco do pontual (titulo + linha) e o que sobra fica para o master
+            const double AltPontual = 96;
+            double divisoria = pg.Bottom - AltPontual;
+
             CentroM(dc, T("Patrocinador master"), xc, pg.Y + 16, 13, MFraco, true);
             var mc = _e.MarcaMaster() != 0 ? marcas?.Registro(_e.MarcaMaster()) : null;
             if (mc != null)
             {
+                // o logo do master e sempre maior que o do pontual (36 de altura): ocupa o que as
+                // tres linhas deixam, de 48 a 80
+                double hl = Math.Clamp(divisoria - (pg.Y + 32) - 74, 48, 80);
                 if (TelaPatrocinio.Logo(marcas!.CaminhoLogo(mc)) is { } img)
-                {
-                    var r = new Rect(xc - 70, pg.Y + 34, 140, 70);
-                    dc.DrawRectangle(Brushes.White, null, r, 8, 8);
-                    var sz = img.Size;
-                    double e = Math.Min(1, Math.Min((r.Width - 12) / sz.Width, (r.Height - 10) / sz.Height));
-                    dc.DrawImage(img, new Rect(r.Center.X - sz.Width * e / 2, r.Center.Y - sz.Height * e / 2, sz.Width * e, sz.Height * e));
-                }
-                CentroM(dc, mc.Nome, xc, pg.Y + 126, 18, MTexto, true, pg.Width);
-                CentroM(dc, T("{0} por temporada", Dinheiro(_e.ValorMaster())), xc, pg.Y + 152, 12.5, MFraco, max: pg.Width);
+                    Placa(img, new Rect(xc - hl * 1.1, pg.Y + 30, 2.2 * hl, hl), 8);
+                double y = pg.Y + 30 + hl + 16;
+                CentroM(dc, mc.Nome, xc, y, 17, MTexto, true, pg.Width);
+                CentroM(dc, T("{0} por temporada", Dinheiro(_e.ValorMaster())), xc, y + 22, 12, MFraco, max: pg.Width);
                 int n = _e.EpocasMaster();
-                CentroM(dc, T(n == 1 ? "{0} temporada restante" : "{0} temporadas restantes", (char)('0' + n)), xc, pg.Y + 172, 12.5, MFraco, max: pg.Width);
+                CentroM(dc, T(n == 1 ? "{0} temporada restante" : "{0} temporadas restantes", (char)('0' + n)), xc, y + 39, 12, MFraco, max: pg.Width);
             }
-            else CentroM(dc, T("Sem patrocinador"), xc, pg.Y + 110, 18, MTexto, true);
+            else CentroM(dc, T("Sem patrocinador"), xc, (pg.Y + divisoria) / 2, 18, MTexto, true);
+
+            // a divisoria e a secao do pontual
+            dc.FillRectangle(MLinha, new Rect(pg.X, divisoria, pg.Width, 1));
+            CentroM(dc, T("Patrocínio pontual"), xc, divisoria + 18, 13, MFraco, true);
             var mp = _e.JogosPontual() != 0 ? marcas?.Registro(_e.MarcaPontual()) : null;
+            double yl = divisoria + 34, hp = 36;
             if (mp != null)
             {
                 int j = _e.JogosPontual();
-                // o logo do pontual numa placa menor, acima da linha
-                if (pg.Bottom - 92 > pg.Y + 182 && TelaPatrocinio.Logo(marcas!.CaminhoLogo(mp)) is { } imgp)
-                {
-                    var r = new Rect(xc - 50, pg.Bottom - 92, 100, 50);
-                    dc.DrawRectangle(Brushes.White, null, r, 6, 6);
-                    var sz = imgp.Size;
-                    double e = Math.Min(1, Math.Min((r.Width - 10) / sz.Width, (r.Height - 8) / sz.Height));
-                    dc.DrawImage(imgp, new Rect(r.Center.X - sz.Width * e / 2, r.Center.Y - sz.Height * e / 2, sz.Width * e, sz.Height * e));
-                }
-                CentroM(dc, T(j == 1 ? "Patrocínio pontual: {0} - {1} jogo restante" : "Patrocínio pontual: {0} - {1} jogos restantes", mp.Nome, (char)('0' + j)),
-                    xc, pg.Bottom - 16, 12, MFraco, max: pg.Width);
+                var img = TelaPatrocinio.Logo(marcas!.CaminhoLogo(mp));
+                string l1 = mp.Nome;
+                string l2 = T("{0} por jogo", Dinheiro(_e.ValorPontual()));
+                string l3 = T(j == 1 ? "{0} jogo restante" : "{0} jogos restantes", (char)('0' + j));
+                // o logo e o texto centrados juntos na largura da pagina
+                double wl = img != null ? 2 * hp + 14 : 0;
+                double wt = Math.Max(LarguraM(l1, 15, true), Math.Max(LarguraM(l2, 12), LarguraM(l3, 12)));
+                double x0 = Math.Max(pg.X, xc - (wl + wt) / 2);
+                // o logo menor, no meio da altura das tres linhas
+                if (img != null) Placa(img, new Rect(x0, yl + 8, 2 * hp, hp), 6);
+                double xt = x0 + wl, maxT = pg.Right - xt;
+                EscreveM(dc, l1, xt, yl + 9, 15, MTexto, true, maxT);
+                EscreveM(dc, l2, xt, yl + 28, 12, MFraco, max: maxT);
+                EscreveM(dc, l3, xt, yl + 45, 12, MFraco, max: maxT);
             }
+            else CentroM(dc, T("Nenhum no momento"), xc, yl + hp / 2, 12.5, MFraco);
         }
 
         // ------------------------------------------------------------ Ajuda do Arbitro

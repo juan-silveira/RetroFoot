@@ -235,10 +235,14 @@ public static class LimitesSave
     // Maior forca que o jogador usa direito: o peso do sorteio do autor do gol (seg03:0f69) e
     // posicao^2 x forca x Nota em 16 bits com sinal. Acima de 32767 o peso fica negativo e ele
     // nunca marca. Guarda-redes (posicao 0) tem peso 0.
+    // E o penalti (seg03:818c): (posicao + 1) x forca tambem em 16 bits com sinal; acima de
+    // 32767 o valor do batedor fica negativo e ele chuta para fora ou o goleiro defende
+    // (um defensor com forca 31998 perdia penaltis). Vale o menor dos dois limites.
     public static int ForcaMaxima(int posicao, int nota)
     {
-        if (posicao <= 0) return ForcaMax;
-        return Math.Min(ForcaMax, 32767 / (posicao * posicao * Math.Clamp(nota, 1, 10)));
+        int penalti = 32767 / (Math.Max(0, posicao) + 1);
+        if (posicao <= 0) return Math.Min(ForcaMax, penalti);
+        return Math.Min(penalti, Math.Min(ForcaMax, 32767 / (posicao * posicao * Math.Clamp(nota, 1, 10))));
     }
 
     public static long PesoGol(int posicao, int forca, int nota) => (long)Math.Max(0, posicao) * Math.Max(0, posicao) * forca * nota;

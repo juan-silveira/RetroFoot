@@ -93,7 +93,7 @@ static class P98
 
     public static FormattedText Txt(string s, FontFamily f, double tam, IBrush cor, bool negrito, bool italico = false) =>
         new(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(f, italico ? FontStyle.Italic : FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam, cor);
+            new Typeface(f, italico ? FontStyle.Italic : FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam * Acessibilidade.Texto, cor);
 
     public static FormattedText Txt(string s, Fonte f, IBrush cor) => W95.Txt(s, f, cor);
 

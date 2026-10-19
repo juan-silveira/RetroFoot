@@ -66,8 +66,8 @@ países	países
 {0} logos	{0} escudos
 {0}: não tem nada que o RetroFoot use (equipas, países, árbitros, bandeiras, logos).	{0}: no tiene nada que RetroFoot use (equipos, países, árbitros, banderas, escudos).
 árbitros	árbitros
-Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe un parche .zip clásico (carpetas EQUIPAS, FLAGS, COUNTRY.TXE...) o un parche de equipos y escudos exportado por el Editor de Equipos.
-Patch clássico (.EFT)	Parche clásico (.EFT)
+Importe um patch .zip Retrô (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe un parche .zip Retro (carpetas EQUIPAS, FLAGS, COUNTRY.TXE...) o un parche de equipos y escudos exportado por el Editor de Equipos.
+Patch Retrô (.EFT)	Parche Retro (.EFT)
 Substituir todas as equipas (como trocar a pasta EQUIPAS inteira)	Sustituir todos los equipos (como cambiar la carpeta EQUIPAS entera)
 Também pode arrastar os .zip para aqui ou copiá-los para a pasta patches.	También puede arrastrar los .zip aquí o copiarlos a la carpeta patches.
 1 arquivo (programa, imagem...)	1 archivo (programa, imagen...)

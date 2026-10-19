@@ -7,7 +7,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-
+    <!-- o catalogo de paises do jogo (o mesmo arquivo da interface): a reserva de quando um
+         pais das equipas falta em countries.tsv (Dados.PaisDoArquivo) -->
+    <EmbeddedResource Include="..\RetroFoot.App\Assets\paises.tsv" LogicalName="paises.tsv" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="RetroFoot.Motor.Testes" />

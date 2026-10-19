@@ -5,7 +5,7 @@ Só os ativos	Active only
 Só os desativados	Switched off only
 Ativo (usado nos jogos novos)	Active (used in new games)
 Liga	League
-Clássico (1998)	Classic (1998)
+Retrô (1998)	Retro (1998)
 Patch	Patch
 Seu	Yours
 Ativo	On

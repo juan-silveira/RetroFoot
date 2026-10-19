@@ -71,8 +71,8 @@ países	países
 Árbitros	Árbitros
 árbitros	árbitros
 Cancelar	Cancelar
-Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de times e escudos exportado pelo Editor de Times.
-Patch clássico (.EFT)	Patch clássico (.EFT)
+Importe um patch .zip Retrô (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe um patch .zip Retrô (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de times e escudos exportado pelo Editor de Times.
+Patch Retrô (.EFT)	Patch Retrô (.EFT)
 Substituir todas as equipas (como trocar a pasta EQUIPAS inteira)	Substituir todos os times (como trocar a pasta EQUIPAS inteira)
 Também pode arrastar os .zip para aqui ou copiá-los para a pasta patches.	Você também pode arrastar os .zip para cá ou copiá-los para a pasta patches.
 1 arquivo (programa, imagem...)	1 arquivo (programa, imagem...)

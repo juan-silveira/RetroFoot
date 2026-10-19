@@ -96,7 +96,7 @@ Países	Countries
 Moeda	Currency
 Treinadores	Managers
 Versão Atual	Current version
-Versão Clássica	Classic version
+Versão Retrô	Retro version
 cartões amarelos	yellow cards
 patrocínios	sponsors
 estrangeiros liberados	unlimited foreigners

@@ -87,16 +87,16 @@ public sealed class TelaConfiguracoes : UserControl
     }
 
     // ---------------------------------------------------------------- textos (dos dois visuais)
-    static string TextoPastaDados => T("teams (equipas em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos clássicos (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.");
+    static string TextoPastaDados => T("teams (equipas em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos Retrô (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.");
 
-    static string DescOriginal => T("As regras de 1998 (98.003): 8 equipas por divisão, só cartões vermelhos, sem patrocínios.");
+    static string DescOriginal => T("As regras de 1998: 8 equipas por divisão, só cartões vermelhos, sem patrocínios.");
     static string DescModificada => T("Nota e Risco de lesão, a tática 5-0-5, até 30 jogadores, desempate por vitórias e as regras que você escolher.");
 
     string AjudaEquipas()
     {
         int n = _cfg.N, min = _cfg.MinimoDeEquipas(n), k = _cfg.SobemDescemPara(n);
         var t = n == 8
-            ? T("8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.", min).TrimEnd('.')
+            ? T("8 equipas como no Retrô: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.", min).TrimEnd('.')
             : T("{0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos", n, 2 * (n - 1), min);
         return t + (k != 2 ? T("; sobem e descem {0}.", k) : ".");
     }
@@ -110,7 +110,7 @@ public sealed class TelaConfiguracoes : UserControl
     string AjudaSobem()
     {
         int n = _cfg.N, k = _cfg.SobemDescemPara(n), max = TRegras.MaximoSobemDescem(n);
-        if (!_cfg.Modificada) return T("Na versão Clássica sobem e descem 2, como em 1998.");
+        if (!_cfg.Modificada) return T("Na versão Retrô sobem e descem 2, como em 1998.");
         if (_cfg.SobemDescem == 0) return T("Automático: com {0} equipas por divisão sobem e descem {1} (2, ou 4 com 16 ou mais equipas).", n, k);
         if (_cfg.SobemDescem > max) return T("Com {0} equipas por divisão o máximo é {1} (menos de metade da divisão): valem {1}.", n, max);
         return T("Sobem e descem {0}; o jogo novo precisa de pelo menos {1} equipas.", k, _cfg.MinimoDeEquipas(n));
@@ -118,7 +118,7 @@ public sealed class TelaConfiguracoes : UserControl
 
     string Desempate() => _cfg.Modificada
         ? T("Pontos, vitórias, saldo de golos e golos marcados.")
-        : T("Pontos, saldo de golos e golos marcados (como no clássico).");
+        : T("Pontos, saldo de golos e golos marcados (como no Retrô).");
 
     string Nota() => _emCurso != null
         ? T("As mudanças valem da próxima vez que um jogo for aberto; o visual e o formato da tela, na hora.")
@@ -133,7 +133,7 @@ public sealed class TelaConfiguracoes : UserControl
         bool mod = r != TRegras.Original;
         var partes = new List<string>
         {
-            mod ? T("versão Atual") : T("versão Clássica"),
+            mod ? T("versão Atual") : T("versão Retrô"),
             T("{0} equipas por divisão ({1} rodadas)", r.N, r.Jornadas),
             r.CartoesAmarelos ? T("cartões amarelos ligados") : T("só cartões vermelhos"),
         };
@@ -155,7 +155,7 @@ public sealed class TelaConfiguracoes : UserControl
         Background = TemaVerde.FundoTela;
 
         // as escolhas
-        var versao = new EscolhaModerna(new (string, string?)[] { (T("Clássica"), DescOriginal), (T("Atual"), DescModificada) }, _cfg.Modificada ? 1 : 0, lado: true);
+        var versao = new EscolhaModerna(new (string, string?)[] { (T("Retrô"), DescOriginal), (T("Atual"), DescModificada) }, _cfg.Modificada ? 1 : 0, lado: true);
         var listaN = new List<(string, string?)>();
         foreach (var n in Configuracoes.OpcoesEquipas) listaN.Add((n.ToString(), null));
         var equipas = new EscolhaModerna(listaN, Math.Max(0, Array.IndexOf(Configuracoes.OpcoesEquipas, _cfg.EquipasPorDivisao)), chips: true);
@@ -176,17 +176,17 @@ public sealed class TelaConfiguracoes : UserControl
         var desempate = new TextBlock { FontSize = 14, Foreground = Texto, TextWrapping = TextWrapping.Wrap };
         var visual = new EscolhaModerna(new (string, string?)[]
         {
-            (T("Clássico"), T("O aspecto clássico: janelas do Windows 95 no verde, sem logos.")),
+            (T("Retrô"), T("O aspecto Retrô: janelas do Windows 95 no verde, sem logos.")),
             (T("Moderno"), T("Tema verde e amarelo, cartões e os logos das equipas e das ligas.")),
         }, _cfg.Moderno ? 1 : 0, lado: true, figura: i => new Previa(i == 0 ? Previa.Tipo.Original : Previa.Tipo.Moderno));
         var formato = new EscolhaModerna(new (string, string?)[]
         {
-            ("4:3", T("Como o clássico: as telas no formato de 800x600.")),
+            ("4:3", T("Como o Retrô: as telas no formato de 800x600.")),
             ("16:9", T("Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.")),
         }, _cfg.Largo ? 1 : 0, lado: true, figura: i => new Previa(i == 0 ? Previa.Tipo.Quatro : Previa.Tipo.Dezesseis));
         var idioma = new EscolhaModerna(new (string, string?)[]
         {
-            (Nomes[0], T("Os textos do jogo clássico.")),
+            (Nomes[0], T("Os textos do jogo Retrô.")),
             (Nomes[1], T("Os textos adaptados para o Brasil.")),
             (Nomes[2], T("Os textos traduzidos para inglês.")),
             (Nomes[3], T("Os textos traduzidos para espanhol.")),
@@ -198,20 +198,20 @@ public sealed class TelaConfiguracoes : UserControl
             Background = FundoAviso, CornerRadius = new CornerRadius(12), Padding = new Thickness(16, 12),
         };
         var travadoTxt = new StackPanel { Spacing = 8 };
-        travadoTxt.Children.Add(Titulo(T("Na versão Clássica as regras são as de 1998"), 14.5, Azul));
+        travadoTxt.Children.Add(Titulo(T("Na versão Retrô as regras são as de 1998"), 14.5, Azul));
         travadoTxt.Children.Add(Ajuda(T("Cartões amarelos, patrocínios e acréscimos só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.")));
         var usarMod = Botao(T("Usar a versão Atual"), false, () => versao.Mover(1));
         usarMod.HorizontalAlignment = HorizontalAlignment.Left;
         travadoTxt.Children.Add(usarMod);
         travado.Child = travadoTxt;
         var adicoes = new StackPanel { Spacing = 16 };
-        adicoes.Children.Add(LinhaInterruptor(T("Cartões amarelos"), T("Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no clássico."), cartoes));
+        adicoes.Children.Add(LinhaInterruptor(T("Cartões amarelos"), T("Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no Retrô."), cartoes));
         adicoes.Children.Add(Separador());
         adicoes.Children.Add(LinhaInterruptor(T("Patrocínios"), T("Propostas e contratos de patrocínio master ao longo da temporada."), patrocinios));
         adicoes.Children.Add(Separador());
-        adicoes.Children.Add(LinhaInterruptor(T("Acréscimos"), T("De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no clássico."), acrescimos));
-        adicoes.Children.Add(LinhaInterruptor(T("5 substituições"), T("A regra da FIFA: até 5 substituições por jogo. Desligado: 3, como no clássico. Na prorrogação da Taça, mais uma."), cincoSubst));
-        adicoes.Children.Add(LinhaInterruptor(T("9 reservas"), T("Até 9 reservas no banco (20 relacionados). Desligado: 5, como no clássico."), noveRes));
+        adicoes.Children.Add(LinhaInterruptor(T("Acréscimos"), T("De 1 a 5 minutos no fim do 1º tempo e de 1 a 10 no fim do 2º, com golos, cartões e lesões (45'+2'). Desligados: como no Retrô."), acrescimos));
+        adicoes.Children.Add(LinhaInterruptor(T("5 substituições"), T("A regra da FIFA: até 5 substituições por jogo. Desligado: 3, como no Retrô. Na prorrogação da Taça, mais uma."), cincoSubst));
+        adicoes.Children.Add(LinhaInterruptor(T("9 reservas"), T("Até 9 reservas no banco (20 relacionados). Desligado: 5, como no Retrô."), noveRes));
         var equipasBloco = new StackPanel { Spacing = 10, Children = { equipas, ajudaEquipas } };
 
         // as paginas
@@ -408,7 +408,7 @@ public sealed class TelaConfiguracoes : UserControl
 
     List<(string, string)> Resumo()
     {
-        var r = new List<(string, string)> { (T("Versão"), _cfg.Modificada ? T("Atual") : T("Clássica")) };
+        var r = new List<(string, string)> { (T("Versão"), _cfg.Modificada ? T("Atual") : T("Retrô")) };
         r.Add((T("Equipas"), T("{0} por divisão · {1} rodadas", _cfg.N, 2 * (_cfg.N - 1))));
         r.Add((T("Cartões"), _cfg.Modificada && _cfg.CartoesAmarelos ? T("Amarelos e vermelhos") : T("Só vermelhos")));
         r.Add((T("Patrocínios"), _cfg.Modificada && _cfg.Patrocinios ? T("Ligados") : T("Desligados")));
@@ -418,7 +418,7 @@ public sealed class TelaConfiguracoes : UserControl
         int k = _cfg.SobemDescemPara(_cfg.N);
         r.Add((T("Sobem e descem"), _cfg.Modificada && _cfg.SobemDescem > 0 ? k.ToString() : T("Automático ({0})", k)));
         r.Add((T("Estrangeiros"), _cfg.EstrangeirosLiberados ? T("Liberado") : T("Realístico")));
-        r.Add((T("Visual"), _cfg.Moderno ? T("Moderno") : T("Clássico")));
+        r.Add((T("Visual"), _cfg.Moderno ? T("Moderno") : T("Retrô")));
         r.Add((T("Formato"), _cfg.FormatoTela));
         r.Add((T("Idioma"), Nomes[IndiceIdioma]));
         return r;
@@ -539,7 +539,7 @@ public sealed class TelaConfiguracoes : UserControl
             nb.Por(p, new Rotulo { Texto = t, Fonte = f ?? a11, Cor = cor ?? W95.Preto }, x, y, w, h);
 
         // Jogo
-        var versao = NovoGrupo(pJogo, T("Versão do jogo"), 12, 10, 460, 74, _cfg.Modificada ? 1 : 0, T("Clássica (98.003)"), T("Atual"));
+        var versao = NovoGrupo(pJogo, T("Versão do jogo"), 12, 10, 460, 74, _cfg.Modificada ? 1 : 0, T("Retrô"), T("Atual"));
         var descVersao = Texto(pJogo, "", 24, 92, 448, 30);
         Texto(pJogo, T("Equipas por divisão:"), 24, 136, 140, 16, W95.Arial13);
         var equipas = nb.Por(pJogo, new Combo { Fonte = W95.Arial13, AlturaItem = 16 }, 168, 132, 80, 22);
@@ -555,7 +555,7 @@ public sealed class TelaConfiguracoes : UserControl
         Texto(pJogo, Nota(), 24, 272, 448, 40, a11, W95.Cinzento);
 
         // Regras
-        var trav = Texto(pRegras, T("Na versão Clássica as regras são as de 1998: só cartões vermelhos, sem patrocínios nem acréscimos."), 24, 8, 448, 30, W95.Arial11b, W95.Vermelho);
+        var trav = Texto(pRegras, T("Na versão Retrô as regras são as de 1998: só cartões vermelhos, sem patrocínios nem acréscimos."), 24, 8, 448, 30, W95.Arial11b, W95.Vermelho);
         var cartoes = nb.Por(pRegras, new Marca { Texto = T("Cartões amarelos") }, 24, 40, 210, 17);
         var patrocinios = nb.Por(pRegras, new Marca { Texto = T("Patrocínios") }, 24, 62, 210, 17);
         var acrescimos = nb.Por(pRegras, new Marca { Texto = T("Acréscimos") }, 24, 84, 210, 17);
@@ -573,9 +573,9 @@ public sealed class TelaConfiguracoes : UserControl
 
         // Aparencia
         var visual = NovoGrupo(pAparencia, T("Visual"), 12, 10, 460, 74, _cfg.Moderno ? 1 : 0,
-            T("Clássico: o aspecto do Windows 95, sem logos"), T("Moderno: tema escuro, cartões e logos"));
+            T("Retrô: o aspecto do Windows 95, sem logos"), T("Moderno: tema escuro, cartões e logos"));
         var formato = NovoGrupo(pAparencia, T("Formato da tela"), 12, 96, 460, 74, _cfg.Largo ? 1 : 0,
-            T("4:3: como o clássico (800x600)"), T("16:9: janela larga, as telas aproveitam a largura"));
+            T("4:3: como o Retrô (800x600)"), T("16:9: janela larga, as telas aproveitam a largura"));
         Texto(pAparencia, T("O visual e o formato mudam na hora, mesmo com um jogo aberto."), 24, 184, 448, 30, a11, W95.Cinzento);
 
         // Idioma

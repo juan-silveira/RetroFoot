@@ -738,7 +738,7 @@ public sealed partial class TelaEquipa : UserControl
         {
             var t = new FormattedText(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
                 new Typeface(fonte ?? Arial, italico ? FontStyle.Italic : FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal),
-                tam, cor);
+                tam * Acessibilidade.Texto, cor);
             if (largura > 0) t.MaxTextWidth = largura;
             return t;
         }

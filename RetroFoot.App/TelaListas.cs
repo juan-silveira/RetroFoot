@@ -87,8 +87,15 @@ public static class TelaListas
         // a linha tem 8 pontos de cada lado dentro da area (a barra tem 12)
         double area = cw - 20 - 2 - (n * alt > 241 + dh - 8 ? 12 : 0) - 8;
         double enc = Formatado.Excesso(fonte, n, Linha, area);
-        l.Desenhar = Encolhida(enc, desenhar ?? ((dc, i, r, sel) =>
+        var desenho = Encolhida(enc, desenhar ?? ((dc, i, r, sel) =>
             Formatado.Desenhar(dc, fonte, sel ? MM.TextoEscolhido : MM.Texto, Linha(i), r)));
+        // o texto e desenhado no topo da linha: desce o necessario para ficar no meio da faixa
+        l.Desenhar = (dc, i, r, sel) =>
+        {
+            double dy = Math.Max(0, Math.Floor((r.Height - Dlg.Txt("Ág", fonte.Familia, fonte.Tamanho, MM.Texto).Height) / 2));
+            using (dc.PushTransform(Matrix.CreateTranslation(0, dy)))
+                desenho(dc, i, r, sel);
+        };
         if ((opcoes & OpUltimo) != 0 && n > 0) l.Sel = n - 1;
         CaixaDialogo? c = null;
         void Fechar() { d.Fechar(c!); fechou?.Invoke(); }
@@ -197,6 +204,7 @@ public static class TelaListas
             Formatado.Col(b, " ", 0);
             Formatado.Col(b, Jornada.NomeNaTela(p), 2, (byte)'x');
             Formatado.Col(b, g.ToString(), 6, 0x14);
+            Formatado.Logo(b, e);
             Formatado.Col(b, Dlg.Bytes(e.NomeCurto), 4, 0x8C);
             return b.ToArray();
         }, OpNumerada);
@@ -247,7 +255,11 @@ public static class TelaListas
             var w = cs[i].W;
             var b = new List<byte>();
             Formatado.Col(b, w[0].ToString(), (byte)'(');
-            void Eq(ushort id) => Formatado.Col(b, s.Equipa(id) is { } e ? Dlg.Bytes(e.NomeCurto) : Dlg.Latin1(" "), 4, (byte)'x');
+            void Eq(ushort id)
+            {
+                Formatado.Logo(b, s.Equipa(id));
+                Formatado.Col(b, s.Equipa(id) is { } e ? Dlg.Bytes(e.NomeCurto) : Dlg.Latin1(" "), 4, (byte)'x');
+            }
             void Tr(ushort id)
             {
                 var t = s.J.M.Treinador(id);
@@ -299,6 +311,7 @@ public static class TelaListas
             Formatado.Col(b, " ", 0x14);
         }
         Formatado.Col(b, FormatoDinheiro.Valor(s.S, (int)t.D0C), 6, (byte)'P');
+        Formatado.Logo(b, s.Equipa(t.W0A));
         Formatado.Col(b, s.Equipa(t.W0A) is { } c ? Dlg.Bytes(c.NomeCurto) : Dlg.Latin1(" "), 0xB4);
         return b.ToArray();
     }
@@ -342,6 +355,7 @@ public static class TelaListas
             Formatado.Col(b, " ", 0);
             Formatado.Col(b, Idioma.Posicao(Math.Min((int)p.Posicao, 3)), 0x0F);
             Formatado.Col(b, Jornada.NomeNaTela(p), 2, (byte)'x');
+            Formatado.Logo(b, eq);
             Formatado.Col(b, Dlg.Bytes(eq.NomeCurto), 4, 0x8C);
             Formatado.Col(b, p.Forca.ToString(), 6, 0x14);
             Formatado.Col(b, Dlg.Bytes(p.Pais), 0x19);
@@ -366,6 +380,8 @@ public static class TelaListas
     {
         var b = new List<byte>();
         Formatado.Col(b, ((int)ev.D05).ToString(), 0x1E);
+        // (Moderno) o logo da equipa do evento no comeco do texto
+        if (ev.B04 is 1 or 5 or 6 or 7) Formatado.Logo(b, s.Equipa(ev.W09));
         byte[] Equipa() => s.Equipa(ev.W09) is { } e ? Dlg.Bytes(e.NomeCurto) : Array.Empty<byte>();
         void Txt(string t) => b.AddRange(Dlg.Latin1(t));
         switch (ev.B04)
@@ -398,6 +414,8 @@ public static class TelaListas
         var b = new List<byte>();
         var t = s.J.M.Treinador(c.Treinador);
         var e = s.Equipa(c.Equipa);
+        // (Moderno) o logo da equipa no comeco da linha
+        if (e != null && (c.Tipo != 0 || t != null)) Formatado.Logo(b, e);
         if (t != null && t.Humano != 0) b.Add(2);
         b.Add(0);
         byte[] nome = t != null ? Dlg.Bytes(t.Nome) : Array.Empty<byte>();
@@ -437,7 +455,10 @@ public static class TelaListas
             Formatado.Col(b, Dlg.Bytes(t.Nome), 0x82);
         }
         if ((flags & 2) != 0)
+        {
+            Formatado.Logo(b, s.J.M.EquipaDoTreinador(t.ID));
             Formatado.Col(b, s.J.M.EquipaDoTreinador(t.ID) is { } e ? Dlg.Bytes(e.NomeCurto) : Dlg.Latin1(" "), 0xB4);
+        }
         if ((flags & 0x20) != 0)
         {
             short c = (short)t.D16, ta = (short)(t.D16 >> 16);

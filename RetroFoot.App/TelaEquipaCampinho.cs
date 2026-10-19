@@ -7,6 +7,8 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.Media.Imaging;
+using RetroFoot.Motor.Patrocinio;
 using Mem = RetroFoot.Motor.Partida.Memoria;
 using SJogador = RetroFoot.Motor.Save.Jogador;
 using static RetroFoot.App.Idioma;
@@ -203,7 +205,7 @@ public sealed partial class TelaEquipa
             // a perspectiva: a escala no fundo e sFundo da de perto
             const double sFundo = 0.68;
             double d0 = CampoC * sFundo / (1 - sFundo);
-            double mx = 14, topo = 34, baixo = 18;
+            double mx = 14, topo = 42, baixo = 18;
             double S = (r.Width - 2 * mx) / (2 * (CampoL + Recuo));
             double hp = r.Height - topo - baixo;
             double yPerto = r.Bottom - baixo, cx = r.Center.X;
@@ -256,18 +258,40 @@ public sealed partial class TelaEquipa
                 Poli(b0, b1, new Point(b1.X, b1.Y + esp), new Point(b0.X, b0.Y + esp)));
             dc.DrawGeometry(new SolidColorBrush(Cor("#24662a")), null, Poli(b0, b1, P(ul, df), P(-ul, df)));
 
-            // as placas de publicidade la no fundo, nas cores da equipa
+            // as placas de publicidade la no fundo, nas cores da equipa: com patrocinador, 3
+            // paineis brancos (so o master: M M M; so o pontual: P P P; os dois: M P M); sem
+            // patrocinador, o nome da equipa e "RETROFOOT"
+            var (master, pontual) = LogosPatrocinio();
+            var logos = new List<Bitmap>();
+            if (master != null) logos.Add(master);
+            if (pontual != null) logos.Add(pontual);
+            var nome = Texto(_e.NomeCurto).ToUpperInvariant();
             {
                 var a0 = P(-ul, df); var a1 = P(ul, df);
-                double hz = 1.6 * S * Esc(df);
+                double hz = (logos.Count > 0 ? 4.8 : 1.6) * S * Esc(df);
                 var placa = new Rect(a0.X, a0.Y - hz, a1.X - a0.X, hz);
                 dc.DrawRectangle(Vertical((Mist(corFundo, Colors.White, 0.15), 0), (Mist(corFundo, Colors.Black, 0.35), 1)), null, placa);
                 dc.FillRectangle(new SolidColorBrush(Alfa(Colors.White, 0.35)), new Rect(placa.X, placa.Y, placa.Width, 1));
-                var nome = Texto(_e.NomeCurto).ToUpperInvariant();
-                double tl = Math.Max(6, hz * 0.7);
                 using (dc.PushClip(placa))
-                    for (int q = 0; q < 3; q++)
-                        CentroM(dc, q == 1 ? "RETROFOOT" : nome, placa.X + placa.Width * (q * 2 + 1) / 6, placa.Center.Y, tl, new SolidColorBrush(corLetra), true, placa.Width / 3 - 6);
+                {
+                    if (logos.Count > 0)
+                    {
+                        var pontas = master ?? pontual!;
+                        var meio = pontual ?? master!;
+                        var itens = new[] { pontas, meio, pontas };
+                        double w = placa.Width / 3;
+                        for (int q = 0; q < 3; q++)
+                            PainelPlaca(dc, itens[q], new Rect(placa.X + q * w, placa.Y, w, hz).Deflate(1), nome, corLetra);
+                    }
+                    else
+                    {
+                        // o texto so quando cabe na placa: no 4:3 a placa tem poucos pontos de altura
+                        double tl = hz * 0.7;
+                        if (tl >= 6)
+                            for (int q = 0; q < 3; q++)
+                                CentroM(dc, q == 1 ? "RETROFOOT" : nome, placa.X + placa.Width * (q * 2 + 1) / 6, placa.Center.Y, tl, new SolidColorBrush(corLetra), true, placa.Width / 3 - 6);
+                    }
+                }
             }
 
             // as faixas do corte da relva (14 de 7,5 m, mais finas ao fundo)
@@ -361,6 +385,23 @@ public sealed partial class TelaEquipa
             // as balizas entram na mesma ordem de pintura (a do fundo atras de todos)
             // a baliza de perto vai por baixo das pecas (nao tapa o goleiro)
             Baliza(dc, P, CampoC, S, Esc, 1);
+            // os tapetes 3D atras da nossa baliza (so com patrocinador): deitados na relva mas
+            // pintados para parecer placas em pe, um de cada lado da baliza
+            // (os dois: o master a esquerda e o pontual a direita; um so: ele nos dois). Ficam na
+            // faixa de relva entre a linha de fundo e a borda, sem entrar no campo
+            if (logos.Count > 0)
+            {
+                for (int lado = 0; lado < 2; lado++)
+                {
+                    double u0 = lado == 0 ? -19 : 6, u1 = lado == 0 ? -6 : 19;
+                    var pa = P(u0, -0.8); var pb = P(u1, -Recuo);
+                    double topoT = pa.Y, baixoT = Math.Max(pb.Y + esp * 0.5, topoT + 9);
+                    var rt = new Rect(pa.X, topoT, P(u1, -0.8).X - pa.X, baixoT - topoT);
+                    // a sombra na relva, um pouco para tras
+                    dc.DrawRectangle(new SolidColorBrush(Alfa(Colors.Black, 0.25)), null, rt.Translate(new Vector(0, 2)), 2, 2);
+                    PainelPlaca(dc, lado == 0 ? (master ?? pontual) : (pontual ?? master), rt, nome, corLetra);
+                }
+            }
             Baliza(dc, P, 0, S, Esc, 0.8);
             desenhar.Sort((a, b) => b.D.CompareTo(a.D));
             foreach (var (p, u, d, a, v) in desenhar)
@@ -369,7 +410,7 @@ public sealed partial class TelaEquipa
             // a formacao (D-M-A) no canto, num chip de vidro
             string form = porPos[1] + "-" + porPos[2] + "-" + porPos[3];
             var tf = TM(form, 12, MTexto, true);
-            var rf = new Rect(r.X + 10, r.Y + 8, tf.WidthIncludingTrailingWhitespace + 18, 20);
+            var rf = new Rect(r.X + 10, r.Y + 4, tf.WidthIncludingTrailingWhitespace + 18, 20);
             dc.DrawRectangle(Vertical((Alfa(Colors.White, 0.16), 0), (Alfa(Colors.White, 0.05), 1)), new Pen(new SolidColorBrush(Alfa(Colors.White, 0.2)), 1), rf, 10, 10);
             dc.DrawText(tf, new Point(rf.X + 9, rf.Center.Y - tf.Height / 2));
             int res = _e.Jogadores.Count(p => Mem.Escalacao(p) == Mem.EscReserva);
@@ -390,6 +431,31 @@ public sealed partial class TelaEquipa
                 dc.DrawRectangle(new SolidColorBrush(Alfa(Cor("#062414"), 0.6)), null, ro, 10, 10);
                 dc.DrawText(to, new Point(ro.X + 9, ro.Center.Y - to.Height / 2));
             }
+        }
+
+        // os logos do patrocinador master e do pontual da equipa (null sem o contrato)
+        (Bitmap? Master, Bitmap? Pontual) LogosPatrocinio()
+        {
+            if (_s.J.Op.Marcas is not { } marcas) return (null, null);
+            Bitmap? Logo(int marca) => marca != 0 && marcas.Registro(marca) is { } m ? TelaPatrocinio.Logo(marcas.CaminhoLogo(m)) : null;
+            return (Logo(_e.MarcaMaster()), _e.JogosPontual() != 0 ? Logo(_e.MarcaPontual()) : null);
+        }
+
+        // um painel da placa: o logo num fundo branco ou, sem logo, o nome da equipa
+        void PainelPlaca(DrawingContext dc, Bitmap? logo, Rect r, string nome, Color corLetra)
+        {
+            if (r.Width < 4 || r.Height < 3) return;
+            if (logo == null)
+            {
+                double tl = r.Height * 0.62;
+                if (tl >= 6) CentroM(dc, nome, r.Center.X, r.Center.Y, tl, new SolidColorBrush(corLetra), true, r.Width - 4);
+                return;
+            }
+            dc.DrawRectangle(Brushes.White, null, r, 1.5, 1.5);
+            var sz = logo.Size;
+            double e = Math.Min((r.Width - 4) / sz.Width, (r.Height - 2) / sz.Height);
+            using (dc.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = BitmapInterpolationMode.HighQuality }))
+                dc.DrawImage(logo, new Rect(r.Center.X - sz.Width * e / 2, r.Center.Y - sz.Height * e / 2, sz.Width * e, sz.Height * e));
         }
 
         // a baliza na linha de fundo d (postes, travessao e a rede para fora do campo)
@@ -495,7 +561,8 @@ public sealed partial class TelaEquipa
             // o nome numa etiqueta escura por baixo da peca
             double tn = Math.Clamp(t * 0.42, 8.5, 11);
             double maxN = Math.Max(t * 1.6, Math.Min(t * 3.4, vizinho * esc - 14));
-            var tx = TM(NomeJogador(p), tn, sel ? MEscuro : MTexto, true, maxN);
+            var nomeJ = NomeJogador(p);
+            var tx = TM(nomeJ, tn, sel ? MEscuro : MTexto, true, maxN);
             double wn = Math.Min(tx.WidthIncludingTrailingWhitespace, maxN) + 10;
             var rn = new Rect(pe.X - wn / 2, pe.Y + 1, wn, tn + 5);
             dc.DrawRectangle(new SolidColorBrush(sel ? Alfa(TemaVerde.Cores.Destaque, 0.95) : Alfa(Cor("#062414"), 0.72 + 0.2 * s)), null, rn, rn.Height / 2, rn.Height / 2);
@@ -511,6 +578,9 @@ public sealed partial class TelaEquipa
                     else { _sel = jog; MostrarEscolhido(); }
                 }));
                 _brilhos.Add((alvoR, chave));
+                // o nome cortado: a dica com ele inteiro, pela dica do painel (a geral, que
+                // procura texto cortado redesenhando a tela, demorava com o campinho)
+                if (LarguraM(nomeJ, tn, true) > maxN) _dicas.Add((alvoR, nomeJ));
             }
         }
 

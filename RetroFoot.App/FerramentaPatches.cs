@@ -191,7 +191,7 @@ public sealed class TelaPatches : UserControl
         var t = Tit(T("Nenhum patch na biblioteca"), 22);
         t.HorizontalAlignment = HorizontalAlignment.Center;
         s.Children.Add(t);
-        var x = Txt(T("Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas."), 13);
+        var x = Txt(T("Importe um patch .zip Retrô (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas."), 13);
         x.TextAlignment = TextAlignment.Center;
         s.Children.Add(x);
         var y = Txt(T("Aplicar um patch guarda os arquivos que ele substitui: pode revertê-lo quando quiser e voltar às equipas originais."), 12, CorFraca);
@@ -225,7 +225,7 @@ public sealed class TelaPatches : UserControl
         var meta = new List<string>();
         if (p.Autor.Length > 0) meta.Add(T("Autor: {0}", p.Autor));
         if (p.Versao.Length > 0) meta.Add(T("Versão {0}", p.Versao));
-        meta.Add(p.RetroFoot ? T("Patch do RetroFoot") : T("Patch clássico (.EFT)"));
+        meta.Add(p.RetroFoot ? T("Patch do RetroFoot") : T("Patch Retrô (.EFT)"));
         if (p.Tamanho > 0) meta.Add(Tamanho(p.Tamanho));
         if (p.Erro != "sem-zip") s.Children.Add(Txt(string.Join("  ·  ", meta), 11.5, CorFraca));
         if (p.Aplicado)

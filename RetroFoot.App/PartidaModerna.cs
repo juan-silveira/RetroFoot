@@ -29,7 +29,7 @@ static class PM
 
     public static FormattedText T(string s, double tam, IBrush cor, bool negrito = false) =>
         new(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(Inter, FontStyle.Normal, negrito ? FontWeight.SemiBold : FontWeight.Normal), tam, cor);
+            new Typeface(Inter, FontStyle.Normal, negrito ? FontWeight.SemiBold : FontWeight.Normal), tam * Acessibilidade.Texto, cor);
 
     public static TextBlock Rotulo(string s, double tam, IBrush cor, bool negrito = false) => new()
     {

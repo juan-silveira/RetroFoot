@@ -189,7 +189,7 @@ internal abstract class MercadoForm : Control
         if (Moderno) { fonte = MM.Inter; tam = Math.Round(tam * MM.Escala, 1); }
         var t = new FormattedText(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
             new Typeface(fonte ?? Arial, italico ? FontStyle.Italic : FontStyle.Normal, negrito ? (Moderno ? FontWeight.SemiBold : FontWeight.Bold) : FontWeight.Normal),
-            tam, cor);
+            tam * Acessibilidade.Texto, cor);
         if (largura > 0) t.MaxTextWidth = largura;
         return t;
     }
@@ -579,6 +579,15 @@ internal abstract class MercadoForm : Control
         public Action<int>? AoClicar, AoDuplo;
 
         public Rect Itens => new(R.X + 2, R.Y + 2, R.Width - 4 - 16, R.Height - 4);
+
+        // metade da diferenca entre a altura do texto a 100% e a do tamanho escolhido
+        static double AjusteVertical()
+        {
+            if (Acessibilidade.Percentual == 100) return 0;
+            var f = Moderno ? MM.Inter : Arial;
+            var t = new FormattedText("Ág", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(f), 13, Preto);
+            return Math.Round(t.Height * (1 - Acessibilidade.Texto) / 2);
+        }
         public Rect Barra => new(R.Right - 2 - 16, R.Y + 2, 16, R.Height - 4);
         double Total => N() * ItemA;
 
@@ -628,7 +637,10 @@ internal abstract class MercadoForm : Control
                     if (y >= it.Bottom) break;
                     // as linhas alternadas do Moderno (a do escolhido, a lista pinta)
                     if (Moderno && i % 2 == 1 && i != Sel) dc.FillRectangle(MM.Zebra, new Rect(it.X, y, it.Width, ItemA));
-                    Item?.Invoke(dc, i, new Rect(it.X, y, it.Width, ItemA), i == Sel);
+                    // com o texto menor ou maior (Acessibilidade), a linha desce ou sobe metade da
+                    // diferenca de altura: o texto fica no meio da faixa como a 100%
+                    using (dc.PushTransform(Matrix.CreateTranslation(0, AjusteVertical())))
+                        Item?.Invoke(dc, i, new Rect(it.X, y, it.Width, ItemA), i == Sel);
                 }
             }
             BarraVertical(dc, Barra, CursorBarra());
@@ -789,13 +801,7 @@ internal abstract class MercadoForm : Control
                     dc.DrawText(t, new Point(r.X + 4, r.Y + Math.Floor((r.Height - t.Height) / 2)));
                 }
             }
-        if (rola)
-        {
-            var barra = new Rect(l.Right - 14, l.Y + 1, 12, l.Height - 2);
-            double h = Math.Max(16, barra.Height * Combo.Linhas / itens.Count);
-            double max = itens.Count - Combo.Linhas;
-            MM.BarraRolagem(dc, barra, new Rect(barra.X, barra.Y + (barra.Height - h) * (c.Topo / max), 12, h), true);
-        }
+        if (BarraAberta(c) is { } b) MM.BarraRolagem(dc, b.Barra, b.Cursor, true);
     }
 
     void DesenharAberto(DrawingContext dc, Combo c)
@@ -822,13 +828,43 @@ internal abstract class MercadoForm : Control
                     dc.DrawText(t, new Point(r.X + 2, r.Y + Math.Floor((r.Height - t.Height) / 2)));
                 }
             }
-        if (rola)
+        if (BarraAberta(c) is { } b) BarraVertical(dc, b.Barra, (b.Cursor, true));
+    }
+
+    // a barra de rolagem da lista aberta, o cursor dela e o curso livre do cursor (os dois
+    // visuais); null quando todos os itens cabem
+    (Rect Barra, Rect Cursor, double Livre)? BarraAberta(Combo c)
+    {
+        int n = c.Itens().Count;
+        if (n <= Combo.Linhas) return null;
+        var l = c.Lista;
+        double max = n - Combo.Linhas;
+        if (Moderno)
         {
-            var barra = new Rect(l.Right - 1 - 16, l.Y + 1, 16, l.Height - 2);
-            double trilho = barra.Height - 32, h = Math.Max(12, trilho * Combo.Linhas / itens.Count);
-            double max = itens.Count - Combo.Linhas;
-            BarraVertical(dc, barra, (new Rect(barra.X, barra.Y + 16 + (trilho - h) * (c.Topo / max), 16, h), true));
+            var bm = new Rect(l.Right - 14, l.Y + 1, 12, l.Height - 2);
+            double hm = Math.Max(16, bm.Height * Combo.Linhas / n);
+            return (bm, new Rect(bm.X, bm.Y + (bm.Height - hm) * (c.Topo / max), 12, hm), bm.Height - hm);
         }
+        var b = new Rect(l.Right - 1 - 16, l.Y + 1, 16, l.Height - 2);
+        double trilho = b.Height - 32, h = Math.Max(12, trilho * Combo.Linhas / n);
+        return (b, new Rect(b.X, b.Y + 16 + (trilho - h) * (c.Topo / max), 16, h), trilho - h);
+    }
+
+    // o item i da lista aberta a vista (a rolagem anda o minimo)
+    static void MostrarNaLista(Combo c, int i)
+    {
+        int n = c.Itens().Count;
+        if (i < c.Topo) c.Topo = i;
+        else if (i >= c.Topo + Combo.Linhas) c.Topo = i - Combo.Linhas + 1;
+        c.Topo = Math.Clamp(c.Topo, 0, Math.Max(0, n - Combo.Linhas));
+    }
+
+    void EscolherAberto(int i)
+    {
+        var c = _aberto;
+        _aberto = null;
+        if (c != null && i >= 0 && i < c.Itens().Count) c.Escolher?.Invoke(i);
+        InvalidateVisual();
     }
 
     // ============================================================ mouse e toque
@@ -837,6 +873,13 @@ internal abstract class MercadoForm : Control
     Point _arrasteIni;
     double _arrasteRol;
     bool _arrasteBarra, _moveu;
+    // a lista aberta: o cursor da barra arrastado (e a rolagem do comeco); _abrindo, o botao
+    // ainda premido desde o clique que abriu (soltar sobre um item escolhe, como no Windows)
+    bool _arrasteCombo, _abrindo;
+    double _arrasteTopo;
+    // a busca pelo que se digita com a lista aberta ("40" vai ao 40)
+    string _digitado = "";
+    DateTime _digitadoEm;
 
     Point Cliente(Point p) => new(p.X - Origem.X, p.Y - Origem.Y);
 
@@ -855,7 +898,7 @@ internal abstract class MercadoForm : Control
         e.Handled = true;
         if (_aberto != null)
         {
-            CliqueAberto(_aberto, pc);
+            CliqueAberto(_aberto, pc, e.Pointer);
             InvalidateVisual();
             return;
         }
@@ -868,9 +911,14 @@ internal abstract class MercadoForm : Control
                 e.Pointer.Capture(this);
                 break;
             case Combo cb when cb.EstaHabilitado:
-                _aberto = cb; _sobre = -1;
+                _aberto = cb; _sobre = -1; _digitado = "";
                 int n = cb.Itens().Count;
                 cb.Topo = Math.Clamp(cb.Indice() - Combo.Linhas / 2, 0, Math.Max(0, n - Combo.Linhas));
+                // o teclado vem para a janela (as setas e o que se digita vao para a lista,
+                // nao para a caixa do nome)
+                Focus();
+                _abrindo = true; _arrasteIni = pc;
+                e.Pointer.Capture(this);
                 break;
             case Marcar m when m.EstaHabilitado:
                 m.Clique?.Invoke();
@@ -905,7 +953,7 @@ internal abstract class MercadoForm : Control
         InvalidateVisual();
     }
 
-    void CliqueAberto(Combo c, Point pc)
+    void CliqueAberto(Combo c, Point pc, IPointer ponteiro)
     {
         var l = c.Lista;
         int n = c.Itens().Count;
@@ -914,7 +962,12 @@ internal abstract class MercadoForm : Control
         {
             if (rola && pc.X >= l.Right - 17)
             {
-                if (pc.Y < l.Y + 17) c.Topo = Math.Max(0, c.Topo - 1);
+                if (BarraAberta(c) is { } b && b.Cursor.Contains(pc))
+                {
+                    _arrasteCombo = true; _arrasteIni = pc; _arrasteTopo = c.Topo;
+                    ponteiro.Capture(this);
+                }
+                else if (pc.Y < l.Y + 17) c.Topo = Math.Max(0, c.Topo - 1);
                 else if (pc.Y >= l.Bottom - 17) c.Topo = Math.Min(n - Combo.Linhas, c.Topo + 1);
                 else c.Topo = Math.Clamp(c.Topo + (pc.Y < l.Y + l.Height / 2 ? -Combo.Linhas : Combo.Linhas), 0, n - Combo.Linhas);
                 return;
@@ -933,6 +986,16 @@ internal abstract class MercadoForm : Control
         var pc = Cliente(e.GetPosition(this));
         if (_aberto != null)
         {
+            if (_arrasteCombo)
+            {
+                if (BarraAberta(_aberto) is { } b && b.Livre > 0)
+                {
+                    int n = _aberto.Itens().Count;
+                    _aberto.Topo = Math.Clamp(Math.Round(_arrasteTopo + (pc.Y - _arrasteIni.Y) * (n - Combo.Linhas) / b.Livre), 0, n - Combo.Linhas);
+                    InvalidateVisual();
+                }
+                return;
+            }
             var l = _aberto.Lista;
             int s = l.Contains(pc) && pc.X < l.Right - 17 ? (int)_aberto.Topo + (int)Math.Floor((pc.Y - l.Y - 1) / _aberto.ItemA) : -1;
             if (s != _sobre) { _sobre = s; InvalidateVisual(); }
@@ -975,6 +1038,15 @@ internal abstract class MercadoForm : Control
         base.OnPointerReleased(e);
         e.Pointer.Capture(null);
         _arrasteLista = null;
+        _arrasteCombo = false;
+        if (_abrindo)
+        {
+            // o botao premido na caixa e solto sobre um item da lista: escolhe
+            _abrindo = false;
+            var pc = Cliente(e.GetPosition(this));
+            if (_aberto != null && _sobre >= 0 && _aberto.Lista.Contains(pc)) EscolherAberto(_sobre);
+            return;
+        }
         if (_premido is { } b)
         {
             _premido = null;
@@ -1021,10 +1093,30 @@ internal abstract class MercadoForm : Control
                 e.Handled = true;
                 break;
             case Key.Enter or Key.Return:
-                if (_aberto != null) { _aberto = null; InvalidateVisual(); }
+                if (_aberto != null) EscolherAberto(_sobre);
                 else ApertarPadrao();
                 e.Handled = true;
                 break;
+            case Key.Up or Key.Down or Key.PageUp or Key.PageDown or Key.Home or Key.End when _aberto is { } c:
+                {
+                    int n = c.Itens().Count;
+                    if (n == 0) break;
+                    int i = _sobre >= 0 ? _sobre : c.Indice();
+                    i = e.Key switch
+                    {
+                        Key.Up => i - 1,
+                        Key.Down => i < 0 ? 0 : i + 1,
+                        Key.PageUp => i - Combo.Linhas,
+                        Key.PageDown => i + Combo.Linhas,
+                        Key.Home => 0,
+                        _ => n - 1,
+                    };
+                    _sobre = Math.Clamp(i, 0, n - 1);
+                    MostrarNaLista(c, _sobre);
+                    InvalidateVisual();
+                    e.Handled = true;
+                    break;
+                }
             case Key.Up or Key.Down when ListaPrincipal is { } l && l.EstaVisivel && _aberto == null:
                 {
                     int n = l.N();
@@ -1039,6 +1131,28 @@ internal abstract class MercadoForm : Control
                     break;
                 }
         }
+    }
+
+    // com a lista aberta, o que se digita leva ao primeiro item que comeca com o texto
+    // (digitado em menos de 1 s junta: "4" e "0" vao ao 40)
+    protected override void OnTextInput(TextInputEventArgs e)
+    {
+        base.OnTextInput(e);
+        if (_aberto is not { } c || string.IsNullOrEmpty(e.Text)) return;
+        var agora = DateTime.UtcNow;
+        _digitado = (agora - _digitadoEm).TotalSeconds < 1 ? _digitado + e.Text : e.Text;
+        _digitadoEm = agora;
+        var itens = c.Itens();
+        int Achar(string t)
+        {
+            for (int i = 0; i < itens.Count; i++)
+                if (itens[i].Trim().StartsWith(t, StringComparison.CurrentCultureIgnoreCase)) return i;
+            return -1;
+        }
+        int k = Achar(_digitado);
+        if (k < 0 && _digitado.Length > 1) { _digitado = e.Text; k = Achar(_digitado); }
+        if (k >= 0) { _sobre = k; MostrarNaLista(c, k); InvalidateVisual(); }
+        e.Handled = true;
     }
 
     void ApertarPadrao()

@@ -171,7 +171,7 @@ public sealed partial class TelaInicio
         var r = cfg.RegrasDoJogoNovo;
         var partes = new List<string>
         {
-            cfg.Modificada ? T("Versão Atual") : T("Versão Clássica"),
+            cfg.Modificada ? T("Versão Atual") : T("Versão Retrô"),
             T("{0} equipas por divisão ({1} rodadas)", r.N, r.Jornadas),
             r.CartoesAmarelos ? T("cartões amarelos") : T("só cartões vermelhos"),
         };

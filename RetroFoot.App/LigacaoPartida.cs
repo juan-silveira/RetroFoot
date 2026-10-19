@@ -80,9 +80,16 @@ public static class LigacaoPartida
             var t = Mundo.TituloNaTela(System.Text.Encoding.Latin1.GetString(titulo));
             comeco?.Invoke(System.Text.Encoding.Latin1.GetBytes(t), jn);
         };
+        // os efeitos sonoros (Som.cs): golo e aviso nos lances dos jogos com humano, o apito
+        // no comeco, no intervalo e no fim da jornada
+        var lance2 = h.Lance2;
+        h.Lance2 = (jg, l) => { lance2?.Invoke(jg, l); SomDoLance(jg, l); };
+        bool intervaloTocado = false;
         var minuto = h.Minuto;
         h.Minuto = jn =>
         {
+            if (jn.Minuto == 1 && jn.Acrescimo == 0) { Som.Tocar(Som.Efeito.Apito); intervaloTocado = false; }
+            else if (jn.NoIntervalo && !intervaloTocado) { Som.Tocar(Som.Efeito.Apito); intervaloTocado = true; }
             minuto?.Invoke(jn);
             (JogoAtual, int)? p;
             lock (st.Trava) { p = st.Pedido; st.Pedido = null; }
@@ -92,9 +99,18 @@ public static class LigacaoPartida
         var fimJornada = h.FimJornada;
         h.FimJornada = jn =>
         {
+            Som.Tocar(Som.Efeito.ApitoFinal);
             lock (st.Trava) { st.Jornada = null; st.Pedido = null; }
             fimJornada?.Invoke(jn);
         };
+    }
+
+    // o som de um lance novo: so nos jogos com treinador humano (como o aviso do original)
+    static void SomDoLance(JogoAtual jg, Lance l)
+    {
+        if (jg.Treinador[Lado.Casa] is not { Humano: not 0 } && jg.Treinador[Lado.Visit] is not { Humano: not 0 }) return;
+        if (l.Tipo is TipoLance.Gol or TipoLance.Penalti) Som.Tocar(Som.Efeito.Golo);
+        else if (l.Tipo is TipoLance.Expulsao or TipoLance.Lesao) Som.Tocar(Som.Efeito.Aviso);
     }
 
     // Na thread da INTERFACE (o clique num jogo da TjourneyDlg): pede a janela de detalhes do

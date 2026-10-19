@@ -338,7 +338,7 @@ public sealed partial class TelaEditorEquipas
 
         // Classico: o original nao tem logos; valem as cores da equipa
         var c = new StackPanel { Spacing = 5 };
-        c.Children.Add(tema.Linha1(T("Visual Clássico"), 11.5, tema.Rotulo, true));
+        c.Children.Add(tema.Linha1(T("Visual Retrô"), 11.5, tema.Rotulo, true));
         c.Children.Add(new Border
         {
             Background = TemaEditor.Pincel(e.CorFundo), Padding = new Thickness(8, 4), BoxShadow = Relevo,
@@ -348,7 +348,7 @@ public sealed partial class TelaEditorEquipas
         tab.Children.Add(LinhaClassica("1", curto, "31", TemaEditor.Pincel(e.CorFundo), TemaEditor.Pincel(e.CorLetra)));
         tab.Children.Add(LinhaClassica("2", T("Outra equipa"), "28", Brushes.White, Brushes.Black));
         c.Children.Add(new Border { BoxShadow = RelevoAfundado, Padding = new Thickness(2), Background = Brushes.White, Child = tab });
-        c.Children.Add(tema.T(T("O visual Clássico não mostra logos: valem as cores da equipa."), 10.5, tema.Fraco));
+        c.Children.Add(tema.T(T("O visual Retrô não mostra logos: valem as cores da equipa."), 10.5, tema.Fraco));
         Grid.SetColumn(c, 1);
         g.Children.Add(c);
         return g;
@@ -398,7 +398,7 @@ public sealed partial class TelaEditorEquipas
         a1.Children.Add(new TextBlock { Text = nome, FontFamily = ConfigEstilo.Inter, FontSize = 13, Foreground = ConfigEstilo.Azul, VerticalAlignment = VerticalAlignment.Center });
         abas.Children.Add(new Border { BorderBrush = ConfigEstilo.Azul, BorderThickness = new Thickness(0, 0, 0, 3), Child = a1 });
         s.Children.Add(new Border { CornerRadius = new CornerRadius(8), ClipToBounds = true, Child = abas });
-        s.Children.Add(tema.T(T("O visual Clássico não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país."), 10.5, tema.Fraco));
+        s.Children.Add(tema.T(T("O visual Retrô não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país."), 10.5, tema.Fraco));
         return s;
     }
 

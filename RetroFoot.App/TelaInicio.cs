@@ -762,7 +762,7 @@ static class W95
 
     public static FormattedText Txt(string s, Fonte f, IBrush cor) =>
         new(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(f.Familia, FontStyle.Normal, f.Negrito ? FontWeight.Bold : FontWeight.Normal), f.Tamanho, cor);
+            new Typeface(f.Familia, FontStyle.Normal, f.Negrito ? FontWeight.Bold : FontWeight.Normal), f.Tamanho * Acessibilidade.Texto, cor);
 
     public static void Escreve(DrawingContext dc, string s, Fonte f, IBrush cor, double x, double y) =>
         dc.DrawText(Txt(s, f, cor), new Point(x, y));

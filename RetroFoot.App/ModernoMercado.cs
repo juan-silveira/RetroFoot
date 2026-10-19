@@ -41,7 +41,7 @@ static class MM
 
     public static FormattedText Txt(string s, double tam, IBrush cor, bool negrito = false, FontWeight? peso = null) =>
         new(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(Inter, FontStyle.Normal, peso ?? (negrito ? FontWeight.Bold : FontWeight.Normal)), tam, cor);
+            new Typeface(Inter, FontStyle.Normal, peso ?? (negrito ? FontWeight.Bold : FontWeight.Normal)), tam * Acessibilidade.Texto, cor);
 
     public static void Cartao_(DrawingContext dc, Rect r, IBrush? fundo, double raio, IBrush? borda = null, double espessura = 1)
     {

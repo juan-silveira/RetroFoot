@@ -21,14 +21,14 @@ A versão do jogo e o tamanho das divisões.	The game version and the size of th
 Versão do jogo	Game version
 Versão	Version
 Modificada	Current
-versão Clássica	Classic version
+versão Retrô	Retro version
 versão Atual	Current version
 Nota e Risco de lesão, a tática 5-0-5, até 30 jogadores, desempate por vitórias e as regras que você escolher.	Rating and Injury risk, the 5-0-5 formation, up to 30 players, wins as tie-breaker and the rules you choose.
 Equipas por divisão	Teams per division
 Equipas por divisão:	Teams per division:
 (só na versão Atual)	(Current version only)
 Equipas	Teams
-8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 teams as in the classic: 14 rounds; a new game needs at least {0} teams in the chosen countries.
+8 equipas como no Retrô: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 teams as in the Retro: 14 rounds; a new game needs at least {0} teams in the chosen countries.
 {0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos	{0} teams: {1} rounds; a new game needs at least {2} teams in the chosen countries
 {0} equipas por divisão ({1} rodadas)	{0} teams per division ({1} rounds)
 {0} por divisão · {1} rodadas	{0} per division · {1} rounds
@@ -40,13 +40,13 @@ O jogo em curso mantém as regras com que foi aberto.	The game in progress keeps
 O número de equipas vem do jogo gravado e não muda. O que você mudar aqui vale da próxima vez que um jogo for aberto.	The number of teams comes from the saved game and does not change. What you change here applies the next time a game is opened.
 # Regras
 O que vale dentro do jogo.	What applies inside the game.
-Na versão Clássica as regras são as de 1998	In the Classic version the rules are those of 1998
-Na versão Clássica as regras são as de 1998: só cartões vermelhos e sem patrocínios.	In the Classic version the rules are those of 1998: red cards only and no sponsors.
+Na versão Retrô as regras são as de 1998	In the Retro version the rules are those of 1998
+Na versão Retrô as regras são as de 1998: só cartões vermelhos e sem patrocínios.	In the Retro version the rules are those of 1998: red cards only and no sponsors.
 Cartões amarelos e patrocínios só existem na versão Atual. A escolha fica guardada para quando você usar a Modificada.	Yellow cards and sponsors only exist in the Current version. Your choice is kept for when you use the Modified one.
 Usar a versão Atual	Use the Current version
 Adições	Additions
 Cartões amarelos	Yellow cards
-Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no clássico.	Three accumulated yellows mean a one-match ban. Off: red cards only, as in the classic.
+Três amarelos acumulados suspendem por um jogo. Desligados: só vermelhos, como no Retrô.	Three accumulated yellows mean a one-match ban. Off: red cards only, as in the Retro.
 Cartões amarelos (três suspendem por um jogo)	Yellow cards (three mean a one-match ban)
 Patrocínios	Sponsors
 Propostas e contratos de patrocínio master ao longo da temporada.	Main sponsorship offers and contracts throughout the season.
@@ -69,7 +69,7 @@ Realístico: até 5 por equipa (Bosman e lusófonos não contam)	Realistic: up t
 Liberado: sem limite de estrangeiros	Unlimited: no limit on foreigners
 Desempate na classificação	Standings tie-breaker
 Pontos, vitórias, saldo de golos e golos marcados.	Points, wins, goal difference and goals scored.
-Pontos, saldo de golos e golos marcados (como no clássico).	Points, goal difference and goals scored (as in the classic).
+Pontos, saldo de golos e golos marcados (como no Retrô).	Points, goal difference and goals scored (as in the Retro).
 # Aparencia
 Como as telas são desenhadas. Muda na hora, mesmo com um jogo aberto.	How the screens are drawn. Changes right away, even with a game open.
 Visual	Look
@@ -78,15 +78,38 @@ Tema verde e amarelo, cartões e os logos das equipas e das ligas.	Green and yel
 Moderno: tema escuro, cartões e logos	Modern: dark theme, cards and logos
 Formato da tela	Screen format
 Formato	Format
-Como o clássico: as telas no formato de 800x600.	As in the original: the screens in 800x600 format.
+Como o Retrô: as telas no formato de 800x600.	As in the original: the screens in 800x600 format.
 Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.	Wide window: the round with the divisions side by side and the screens using the width.
-4:3: como o clássico (800x600)	4:3: as in the classic (800x600)
+4:3: como o Retrô (800x600)	4:3: as in the Retro (800x600)
 16:9: janela larga, as telas aproveitam a largura	16:9: wide window, the screens use the width
 O visual e o formato mudam na hora, mesmo com um jogo aberto.	The look and the format change right away, even with a game open.
 # Idioma
 Os textos do jogo.	The game texts.
 Idioma do jogo	Game language
-Os textos do jogo clássico.	The texts of the classic game (Portuguese).
+Os textos do jogo Retrô.	The texts of the Retro game (Portuguese).
 Os textos adaptados para o Brasil.	The texts adapted for Brazil.
 Os textos traduzidos para inglês.	The texts translated into English.
 Os textos traduzidos para espanhol.	The texts translated into Spanish.
+Força na pesquisa de jogadores	Strength in the player search
+Mínimo e máximo	Minimum and maximum
+Faixas do Retrô	Retro ranges
+Duas caixas, de 1 a 50: escolha a força mínima, a máxima ou as duas.	Two boxes, from 1 to 50: pick the minimum strength, the maximum or both.
+Uma caixa só, com as faixas do jogo Retrô: 1-10, 5-15, 10-20, 20-30, 30-40 e 40-50.	A single box with the Retro game's ranges: 1-10, 5-15, 10-20, 20-30, 30-40 and 40-50.
+Mínimo e máximo: duas caixas, de 1 a 50	Minimum and maximum: two boxes, 1 to 50
+Faixas do Retrô: 1-10, 5-15, 10-20, 20-30, 30-40, 40-50	Retro ranges: 1-10, 5-15, 10-20, 20-30, 30-40, 40-50
+Como escolher a força na Lista de Jogadores (Jogador > Procurar).	How to pick strength in the Player List (Player > Search).
+Mínimo e máximo: duas caixas, de 1 a 50. Faixas do Retrô: 1-10, 5-15, 10-20, 20-30, 30-40 e 40-50.	Minimum and maximum: two boxes, 1 to 50. Retro ranges: 1-10, 5-15, 10-20, 20-30, 30-40 and 40-50.
+Mercado	Market
+Acessibilidade	Accessibility
+Tamanho do texto	Text size
+O texto das telas do jogo (equipa, jornada, classificação, listas, mercado), de 80% a 120%. O que não couber ganha a dica com o texto inteiro.	The text of the game screens (team, round, standings, lists, market), from 80% to 120%. Whatever doesn't fit gets a tooltip with the full text.
+Efeitos sonoros	Sound effects
+O apito do começo, do intervalo e do fim, o golo e o aviso de expulsão ou lesão nos jogos com treinador humano.	The whistle at kick-off, half-time and full-time, the goal and the alert for red cards or injuries in matches with a human manager.
+Volume	Volume
+Testar	Test
+Volume dos efeitos	Effects volume
+O tamanho vale para o texto das telas do jogo. Os efeitos tocam com "Habilitar som" (Geral) ligado.	The size applies to the text of the game screens. Effects play with "Enable sound" (General) on.
+Patrocínio pontual	One-off sponsor
+{0} jogo restante	{0} match left
+{0} jogos restantes	{0} matches left
+Nenhum no momento	None right now

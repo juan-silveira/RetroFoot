@@ -54,7 +54,7 @@ public static class TelaAcerca
             var a = typeof(TelaAcerca).Assembly;
             var v = (Attribute.GetCustomAttribute(a, typeof(System.Reflection.AssemblyInformationalVersionAttribute))
                 as System.Reflection.AssemblyInformationalVersionAttribute)?.InformationalVersion
-                ?? a.GetName().Version?.ToString(3) ?? "0.1.0";
+                ?? a.GetName().Version?.ToString(3) ?? "0.1.1";
             int mais = v.IndexOf('+');
             return mais >= 0 ? v[..mais] : v;
         }

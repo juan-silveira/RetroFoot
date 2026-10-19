@@ -15,7 +15,7 @@ Idioma, visual, formato e regras do jogo	Language, look, screen format and game 
 Versão e créditos	Version and credits
 Fecha o RetroFoot	Closes RetroFoot
 Pasta de dados (equipas, logos, saves, patches):	Data folder (teams, logos, saves, patches):
-Arquivos clássicos convertidos: {0} equipas	Classic files converted: {0} teams
+Arquivos Retrô convertidos: {0} equipas	Retro files converted: {0} teams
 Abrir pasta de dados	Open data folder
 Pasta de dados	Data folder
 Não consegui abrir a pasta. Ela fica em:\n{0}	Could not open the folder. It is at:\n{0}
@@ -23,9 +23,16 @@ Em breve	Coming soon
 Esta ferramenta ainda está a ser feita. Enquanto isso, os arquivos podem ser editados na pasta de dados.	This tool is still being built. Meanwhile, the files can be edited in the data folder.
 Dados	Data
 Equipas, logos, saves e patches numa pasta que você abre no gestor de arquivos.	Teams, logos, saves and patches in a folder you open in your file manager.
-teams (equipas em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos clássicos (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.	teams (teams in JSON, one folder per country), logos, saves, patches, flags, sponsors, country-groups, countries.tsv and referees.tsv. Classic files (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) dropped there are converted on the next new game.
+teams (equipas em JSON, uma pasta por país), logos, saves, patches, flags, sponsors, country-groups, countries.tsv e referees.tsv. Arquivos Retrô (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) deixados lá são convertidos no próximo jogo novo.	teams (teams in JSON, one folder per country), logos, saves, patches, flags, sponsors, country-groups, countries.tsv and referees.tsv. Retro files (EQUIPAS, .EFT, COUNTRY.TXE, REFEREE.TXE, CTRGROUP) dropped there are converted on the next new game.
 Não achei os dados do jogo (countries.tsv, teams...) em {0}.	Could not find the game data (countries.tsv, teams...) in {0}.
 Esc: volta ao menu.	Esc: back to the menu.
 Equipas, logos, saves e patches	Teams, logos, saves and patches
 
 Sair do RetroFoot?	Quit RetroFoot?
+Nova versão do RetroFoot	New RetroFoot version
+A versão {0} do RetroFoot está disponível (você tem a {1}). Seus saves, equipas e configurações ficam como estão.	RetroFoot {0} is available (you have {1}). Your saves, teams and settings stay as they are.
+Depois	Later
+Atualizar agora	Update now
+Baixando... {0}%	Downloading... {0}%
+Pronto. Abrindo a versão nova...	Done. Opening the new version...
+Não consegui atualizar: {0}	Couldn't update: {0}

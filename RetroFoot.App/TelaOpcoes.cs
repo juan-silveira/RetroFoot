@@ -22,6 +22,16 @@ public sealed class OpcoesDoJogo
     public bool Som = true;                 // DS:2C6C
     public bool SubstituirNoIntervalo = true; // DS:2B32
     public bool VerPenaltisCPU;             // DS:2B33
+    // (fora do original) a forca na Lista de Jogadores: minimo e maximo (padrao) ou as faixas
+    // fixas do classico (1-10, 5-15, 10-20, 20-30, 30-40, 40-50); so a interface usa
+    public bool ForcaPorFaixas;
+    // (fora do original) Acessibilidade: o tamanho do texto em % (Acessibilidade.cs) e o
+    // volume dos efeitos sonoros (0 a 100; Som.cs)
+    public int TamanhoTexto = 100;
+    public int Volume = 50;
+
+    // a escolha gravada (sem arquivo: minimo e maximo)
+    public static bool ForcaPorFaixasGravada => Ler()?.ForcaPorFaixas ?? false;
 
     // os perfis de tempo (11:3f0c -> 11:3d71: nome e tres numeros, em +0x15, +0x19, +0x1D
     // do registro DS:2C55 + 0x21 x k); so os 3 primeiros sem add-ins (5:21f9): 4 com o
@@ -73,6 +83,9 @@ public sealed class OpcoesDoJogo
             r.Som = B("som", r.Som);
             r.SubstituirNoIntervalo = B("substituirNoIntervalo", r.SubstituirNoIntervalo);
             r.VerPenaltisCPU = B("verPenaltisCPU", r.VerPenaltisCPU);
+            r.TamanhoTexto = N("tamanhoTexto", 100, Acessibilidade.Minimo, Acessibilidade.Maximo);
+            r.Volume = N("volume", 50, 0, 100);
+            r.ForcaPorFaixas = o["forcaProcura"] is System.Text.Json.Nodes.JsonValue fp && fp.TryGetValue<string>(out var sf) ? sf == "faixas" : r.ForcaPorFaixas;
             return r;
         }
         catch { return null; }
@@ -87,6 +100,8 @@ public sealed class OpcoesDoJogo
             ["velocidade"] = (int)Velocidade, ["mostrarChicotadas"] = (int)MostrarChicotadas,
             ["gravarQuando"] = (int)GravarQuando, ["verSorteio"] = (int)VerSorteio, ["som"] = Som,
             ["substituirNoIntervalo"] = SubstituirNoIntervalo, ["verPenaltisCPU"] = VerPenaltisCPU,
+            ["forcaProcura"] = ForcaPorFaixas ? "faixas" : "minmax",
+            ["tamanhoTexto"] = TamanhoTexto, ["volume"] = Volume,
         };
         var tmp = arquivo + ".tmp";
         System.IO.File.WriteAllText(tmp, o.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
@@ -130,6 +145,14 @@ public sealed class OpcoesDoJogo
         VerSorteio = VerSorteio, SubstituirNoIntervalo = SubstituirNoIntervalo, VerPenaltisCPU = VerPenaltisCPU,
     };
 
+    // o som e o tamanho do texto valem na hora (tambem sem jogo aberto)
+    public void AplicarInterface()
+    {
+        global::RetroFoot.App.Som.Ligado = Som;
+        global::RetroFoot.App.Som.Volume = Volume;
+        Acessibilidade.Aplicar(TamanhoTexto);
+    }
+
     // o motor esta parado (na tela da equipa): as opcoes valem a partir de ja
     public void Aplicar(Sessao s)
     {
@@ -149,6 +172,9 @@ public static class TelaOpcoes
     public static void Abrir(Sessao s, Action<OpcoesDoJogo>? ok = null, bool som = true)
     {
         var op = OpcoesDoJogo.De(s.J.Op, som);
+        op.ForcaPorFaixas = OpcoesDoJogo.ForcaPorFaixasGravada;
+        op.TamanhoTexto = Acessibilidade.Percentual;
+        op.Volume = Som.Volume;
         Abrir(s, op, s.S, s.J.M, o => { o.Aplicar(s); ok?.Invoke(o); });
     }
 
@@ -158,9 +184,11 @@ public static class TelaOpcoes
         if (Visual.Moderno) { OpcoesModernas.Abrir(d, op, save, m, ok); return; }
         var j = new Janela(T("Opções"), 508, 282, W95.Face);
         var a11 = W95.Arial11;
-        var nb = j.Por(new Notebook { FonteAbas = W95.Arial13, CorAbas = W95.Azul, TopoPagina = 29, AbasPorLinha = 4 }, 0, 0, 508, 282);
+        var nb = j.Por(new Notebook { FonteAbas = W95.Arial13, CorAbas = W95.Azul, TopoPagina = 29, AbasPorLinha = 5 }, 0, 0, 508, 282);
         var geral = nb.Pagina(T("Geral"));
         var jogo = nb.Pagina(T("Jogo"));
+        var mercado = nb.Pagina(T("Mercado"));
+        var acess = nb.Pagina(T("Acessibilidade"));
         Canvas? ctrl = Registo.AddIn(Registo.AddInPaginaControle) ? nb.Pagina(T("Controle")) : null;
 
         Combo NovoCombo(Canvas p, double x, double y, double w, int indice, params string[] itens)
@@ -201,6 +229,31 @@ public static class TelaOpcoes
             mk.Marcado = (TelaJornada.LancesMostrados & bit) != 0;
             lances.Add((bit, mk));
         }
+        // Mercado (fora do original): a forca na pesquisa de jogadores
+        nb.Por(mercado, new Rotulo { Texto = T("Força na pesquisa de jogadores"), Fonte = a11, Auto = true }, 36, 40, 200, 14);
+        var forca = NovoCombo(mercado, 208, 36, 180, op.ForcaPorFaixas ? 1 : 0, T("Mínimo e máximo"), T("Faixas do Retrô"));
+        nb.Por(mercado, new Rotulo { Texto = T("Mínimo e máximo: duas caixas, de 1 a 50. Faixas do Retrô: 1-10, 5-15, 10-20, 20-30, 30-40 e 40-50."), Fonte = a11, Cor = W95.Cinzento }, 36, 72, 352, 44);
+        // Acessibilidade (fora do original): o tamanho do texto e o volume dos efeitos sonoros
+        nb.Por(acess, new Rotulo { Texto = T("Tamanho do texto"), Fonte = a11, Auto = true }, 36, 40, 140, 14);
+        var tamanhos = new System.Collections.Generic.List<string>();
+        for (int p = Acessibilidade.Minimo; p <= Acessibilidade.Maximo; p += Acessibilidade.Passo) tamanhos.Add(p + "%");
+        var tam = NovoCombo(acess, 208, 36, 105, (Acessibilidade.Normalizar(op.TamanhoTexto) - Acessibilidade.Minimo) / Acessibilidade.Passo, tamanhos.ToArray());
+        // o tamanho vale na hora (as telas por tras mudam); o Cancelar volta ao de antes
+        int tamanhoAntes = Acessibilidade.Percentual;
+        tam.Mudou += () => { if (tam.Indice >= 0) Acessibilidade.Aplicar(Acessibilidade.Minimo + tam.Indice * Acessibilidade.Passo); };
+        nb.Por(acess, new Rotulo { Texto = T("Volume dos efeitos"), Fonte = a11, Auto = true }, 36, 92, 140, 14);
+        var vols = new string[11];
+        for (int i = 0; i <= 10; i++) vols[i] = i * 10 + "%";
+        var vol = NovoCombo(acess, 208, 88, 105, Math.Clamp(op.Volume / 10, 0, 10), vols);
+        var testar = nb.Por(acess, new Botao { Texto = T("Testar"), Fonte = W95.Arial13 }, 320, 86, 70, 26);
+        testar.Clique += () =>
+        {
+            bool l = Som.Ligado; int v = Som.Volume;
+            Som.Ligado = true; Som.Volume = vol.Indice * 10;
+            Som.Tocar(Som.Efeito.Golo);
+            Som.Ligado = l; Som.Volume = v;
+        };
+        nb.Por(acess, new Rotulo { Texto = T("O tamanho vale para o texto das telas do jogo. Os efeitos tocam com \"Habilitar som\" (Geral) ligado."), Fonte = a11, Cor = W95.Cinzento }, 36, 136, 352, 44);
         // Controle
         if (ctrl != null)
         {
@@ -221,7 +274,7 @@ public static class TelaOpcoes
         var bok = j.Por(Dlg.BotaoGrande(T("OK"), "Botoes/BBOK.png"), 416, 62, 64, 64);
         var bc = j.Por(Dlg.BotaoGrande(T("Cancelar"), "Botoes/BBCANCEL.png"), 416, 130, 64, 64);
         CaixaDialogo? c = null;
-        void Cancelar() => d.Fechar(c!);
+        void Cancelar() { Acessibilidade.Aplicar(tamanhoAntes); d.Fechar(c!); }
         void Ok()
         {
             if (vel.Indice >= 0) op.Velocidade = (short)(vel.Indice + 1);
@@ -231,6 +284,10 @@ public static class TelaOpcoes
             op.MostrarChicotadas = (short)chic.Indice;
             op.VerPenaltisCPU = pen.Indice == 1;
             op.Som = som.Indice == 0;
+            op.ForcaPorFaixas = forca.Indice == 1;
+            if (tam.Indice >= 0) op.TamanhoTexto = Acessibilidade.Minimo + tam.Indice * Acessibilidade.Passo;
+            if (vol.Indice >= 0) op.Volume = vol.Indice * 10;
+            op.AplicarInterface();
             int ml = 0;
             foreach (var (bit, mk) in lances) if (mk.Marcado) ml |= bit;
             TelaJornada.LancesMostrados = ml;

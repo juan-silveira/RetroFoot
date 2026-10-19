@@ -7,7 +7,7 @@ Salvar	Gravar
 Registro	Registo
 # Jogo
 Nota e Risco de lesão, a tática 5-0-5, até 30 jogadores, desempate por vitórias e as regras que você escolher.	Nota e Risco de lesão, a táctica 5-0-5, até 30 jogadores, desempate por vitórias e as regras que escolher.
-8 equipas como no clássico: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 equipas como no clássico: 14 jornadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.
+8 equipas como no Retrô: 14 rodadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.	8 equipas como no Retrô: 14 jornadas; o jogo novo precisa de pelo menos {0} equipas nos países escolhidos.
 {0} equipas: {1} rodadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos	{0} equipas: {1} jornadas; o jogo novo precisa de pelo menos {2} equipas nos países escolhidos
 {0} equipas por divisão ({1} rodadas)	{0} equipas por divisão ({1} jornadas)
 {0} por divisão · {1} rodadas	{0} por divisão · {1} jornadas
@@ -19,11 +19,11 @@ Cartões amarelos e patrocínios só existem na versão Atual. A escolha fica gu
 Propostas e contratos de patrocínio master ao longo da temporada.	Propostas e contratos de patrocinador principal ao longo da época.
 Patrocínios (propostas de patrocínio master)	Patrocínios (propostas de patrocinador principal)
 Pontos, vitórias, saldo de golos e golos marcados.	Pontos, vitórias, diferença de golos e golos marcados.
-Pontos, saldo de golos e golos marcados (como no clássico).	Pontos, diferença de golos e golos marcados (como no clássico).
+Pontos, saldo de golos e golos marcados (como no Retrô).	Pontos, diferença de golos e golos marcados (como no Retrô).
 # Aparencia
 Como as telas são desenhadas. Muda na hora, mesmo com um jogo aberto.	Como os ecrãs são desenhados. Muda na hora, mesmo com um jogo aberto.
 Formato da tela	Formato do ecrã
-Como o clássico: as telas no formato de 800x600.	Como o original: os ecrãs no formato de 800x600.
+Como o Retrô: as telas no formato de 800x600.	Como o original: os ecrãs no formato de 800x600.
 Janela larga: a jornada com as divisões lado a lado e as telas aproveitando a largura.	Janela larga: a jornada com as divisões lado a lado e os ecrãs a aproveitar a largura.
 16:9: janela larga, as telas aproveitam a largura	16:9: janela larga, os ecrãs aproveitam a largura
 # Idioma

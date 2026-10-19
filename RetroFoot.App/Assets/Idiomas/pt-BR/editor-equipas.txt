@@ -7,7 +7,7 @@ O jogo não aceita esta equipa assim (abra para ver porquê)	O jogo não aceita 
 {0} equipas	{0} times
 Há alterações não gravadas nesta equipa. Descartá-las?	Este time tem alterações não salvas. Descartá-las?
 Escolha uma equipa na lista ou crie uma nova.	Escolha um time na lista ou crie um novo.
-As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato clássico .EFT.	Os times ficam na pasta de dados (teams/<país>/<time>.json). O jogo usa os times como estão; "Exportar .EFT" salva um time no formato clássico .EFT.
+As equipas ficam na pasta de dados (teams/<país>/<equipa>.json). O jogo usa-as como estão; "Exportar .EFT" grava uma equipa no formato Retrô .EFT.	Os times ficam na pasta de dados (teams/<país>/<time>.json). O jogo usa os times como estão; "Exportar .EFT" salva um time no formato Retrô .EFT.
 nova	novo
 Pronta para o jogo	Pronto para o jogo
 por gravar	não salvo
@@ -26,7 +26,7 @@ Erro ao apagar:	Erro ao excluir:
 O formato .EFT não aceita a equipa assim:	O formato .EFT não aceita o time assim:
 Equipa no formato .EFT	Time no formato .EFT
 Equipa exportada no formato .EFT:	Time exportado no formato .EFT:
-Para a usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.	Para usar no jogo clássico, copie o arquivo para a pasta EQUIPAS dele.
+Para a usar no jogo Retrô, copie o arquivo para a pasta EQUIPAS dele.	Para usar no jogo Retrô, copie o arquivo para a pasta EQUIPAS dele.
 Só esta equipa: {0}	Só este time: {0}
 As equipas de {0} ({1})	Os times de {0} ({1})
 Todas as equipas ({0})	Todos os times ({0})
@@ -45,9 +45,9 @@ Importar patch de equipas	Importar patch de times
 O logo que o jogo acha sozinho pelo país e nome (ou o escudo nas cores)	O logo que o jogo encontra sozinho pelo país e nome (ou o escudo nas cores)
 Copie a imagem para a pasta logos/ da pasta de dados e escolha-a aqui:	Copie a imagem para a pasta logos/ da pasta de dados e escolha aqui:
 Outra equipa	Outro time
-O visual Clássico não mostra logos: valem as cores da equipa.	O visual Clássico não mostra logos: valem as cores do time.
+O visual Retrô não mostra logos: valem as cores da equipa.	O visual Retrô não mostra logos: valem as cores do time.
 Visual Moderno (a Classificação e a tela da equipa)	Visual Moderno (a Classificação e a tela do time)
-O visual Clássico não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	O visual Clássico não mostra logos. O logo da liga aparece quando todos os times do jogo são do mesmo país.
+O visual Retrô não mostra logos. O logo da liga aparece quando todas as equipas do jogo são do mesmo país.	O visual Retrô não mostra logos. O logo da liga aparece quando todos os times do jogo são do mesmo país.
 Escolha as cores da equipa (letra sobre fundo), tiradas das 16 cores do jogo que mais aparecem no escudo:	Escolha as cores do time (letra sobre fundo), tiradas das 16 cores do jogo que mais aparecem no escudo:
 Os logos das divisões e da taça aparecem no visual Moderno quando todas as equipas do jogo são deste país. Mudanças gravadas na hora.	Os logos das divisões e da copa aparecem no visual Moderno quando todos os times do jogo são deste país. Mudanças salvas na hora.
 Tem demasiados jogadores (máximo {0})	Tem jogadores demais (máximo {0})

@@ -14,7 +14,7 @@ outro patch aplicado depois mexe nos mesmos arquivos	outro patch aplicado depois
 {0} arquivos com problema ficaram de fora:	{0} ficheiros com problemas ficaram de fora:
 {0} logos	{0} logótipos
 {0}: não tem nada que o RetroFoot use (equipas, países, árbitros, bandeiras, logos).	{0}: não tem nada que o RetroFoot use (equipas, países, árbitros, bandeiras, logótipos).
-Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe um patch .zip clássico (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logótipos exportado pelo Editor de Equipas.
+Importe um patch .zip Retrô (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logos exportado pelo Editor de Equipas.	Importe um patch .zip Retrô (pastas EQUIPAS, FLAGS, COUNTRY.TXE...) ou um patch de equipas e logótipos exportado pelo Editor de Equipas.
 1 arquivo (programa, imagem...)	1 ficheiro (programa, imagem...)
 Patch aplicado. Equipas: {0}; outros arquivos: {1}.	Patch aplicado. Equipas: {0}; outros ficheiros: {1}.
 Patch revertido. Arquivos repostos: {0}; apagados: {1}.	Patch revertido. Ficheiros repostos: {0}; apagados: {1}.

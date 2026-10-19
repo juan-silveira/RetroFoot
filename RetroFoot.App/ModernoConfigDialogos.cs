@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -40,7 +41,6 @@ static class OpcoesModernas
         geral.Children.Add(Linha(T("Mostrar demissões de treinadores"), chic));
         geral.Children.Add(Linha(T("Ver sorteio da copa"), sort));
         geral.Children.Add(Linha(T("Salvar o jogo"), grav));
-        geral.Children.Add(LinhaInterruptor(T("Habilitar som"), "", som));
 
         // Jogo
         int nPerfis = OpcoesDoJogo.PerfisDisponiveis();
@@ -64,9 +64,60 @@ static class OpcoesModernas
         jogo.Children.Add(Separador());
         jogo.Children.Add(LinhaInterruptor(T("Ver as disputas de pênaltis"), T("Também nos jogos sem treinadores humanos."), pen));
 
+        // Mercado (fora do original): a forca na pesquisa de jogadores
+        var forca = new EscolhaModerna(new (string, string?)[]
+        {
+            (T("Mínimo e máximo"), T("Duas caixas, de 1 a 50: escolha a força mínima, a máxima ou as duas.")),
+            (T("Faixas do Retrô"), T("Uma caixa só, com as faixas do jogo Retrô: 1-10, 5-15, 10-20, 20-30, 30-40 e 40-50.")),
+        }, op.ForcaPorFaixas ? 1 : 0, lado: true);
+        var mercado = new StackPanel { Spacing = 14 };
+        mercado.Children.Add(Linha(T("Força na pesquisa de jogadores"), forca, T("Como escolher a força na Lista de Jogadores (Jogador > Procurar).")));
+
+        // Acessibilidade (fora do original): o tamanho do texto e os efeitos sonoros
+        var tamanho = new Slider
+        {
+            Minimum = Acessibilidade.Minimo, Maximum = Acessibilidade.Maximo, TickFrequency = Acessibilidade.Passo,
+            IsSnapToTickEnabled = true, Value = Acessibilidade.Normalizar(op.TamanhoTexto), MinWidth = 260,
+        };
+        var tamanhoTxt = new TextBlock { FontSize = 14.5, FontWeight = FontWeight.SemiBold, Foreground = Amarelo, VerticalAlignment = VerticalAlignment.Center, MinWidth = 48 };
+        // o tamanho vale na hora (as telas por tras mudam enquanto o deslizante anda); o
+        // Cancelar volta ao de antes
+        int tamanhoAntes = Acessibilidade.Percentual;
+        void MostrarTamanho()
+        {
+            tamanhoTxt.Text = (int)tamanho.Value + "%";
+            Acessibilidade.Aplicar((int)tamanho.Value);
+        }
+        tamanho.PropertyChanged += (_, e) => { if (e.Property == RangeBase.ValueProperty) MostrarTamanho(); };
+        MostrarTamanho();
+        var linhaTamanho = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, Children = { tamanho, tamanhoTxt } };
+        var volume = new Slider { Minimum = 0, Maximum = 100, TickFrequency = 10, IsSnapToTickEnabled = true, Value = op.Volume, MinWidth = 260 };
+        var volumeTxt = new TextBlock { FontSize = 14.5, FontWeight = FontWeight.SemiBold, Foreground = Amarelo, VerticalAlignment = VerticalAlignment.Center, MinWidth = 48 };
+        void MostrarVolume() => volumeTxt.Text = (int)volume.Value + "%";
+        volume.PropertyChanged += (_, e) => { if (e.Property == RangeBase.ValueProperty) MostrarVolume(); };
+        MostrarVolume();
+        var testar = Botao(T("Testar"), false, () =>
+        {
+            // o som com o volume da tela (sem gravar ainda)
+            bool l = Som.Ligado; int v = Som.Volume;
+            Som.Ligado = true; Som.Volume = (int)volume.Value;
+            Som.Tocar(Som.Efeito.Golo);
+            Som.Ligado = l; Som.Volume = v;
+        });
+        testar.VerticalAlignment = VerticalAlignment.Center;
+        var linhaVolume = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, Children = { volume, volumeTxt, testar } };
+        var acess = new StackPanel { Spacing = 14 };
+        acess.Children.Add(Linha(T("Tamanho do texto"), linhaTamanho,
+            T("O texto das telas do jogo (equipa, jornada, classificação, listas, mercado), de 80% a 120%. O que não couber ganha a dica com o texto inteiro.")));
+        acess.Children.Add(Separador());
+        acess.Children.Add(LinhaInterruptor(T("Efeitos sonoros"), T("O apito do começo, do intervalo e do fim, o golo e o aviso de expulsão ou lesão nos jogos com treinador humano."), som));
+        acess.Children.Add(Linha(T("Volume"), linhaVolume));
+
         abas.Pagina(T("Geral"), geral);
         abas.Pagina(T("Jogo"), jogo);
-        var paginas = new Panel { Children = { geral, jogo } };
+        abas.Pagina(T("Mercado"), mercado);
+        abas.Pagina(T("Acessibilidade"), acess);
+        var paginas = new Panel { Children = { geral, jogo, mercado, acess } };
         // Controle (add-in 0x5C)
         if (Registo.AddIn(Registo.AddInPaginaControle))
         {
@@ -86,7 +137,7 @@ static class OpcoesModernas
         }
         c.Corpo.Children.Add(new Border { MinHeight = 250, Child = paginas });
 
-        void Cancelar() => d.Fechar(c);
+        void Cancelar() { Acessibilidade.Aplicar(tamanhoAntes); d.Fechar(c); }
         void Ok()
         {
             if (vel.Selecionado >= 0) op.Velocidade = (short)(vel.Selecionado + 1);
@@ -97,6 +148,10 @@ static class OpcoesModernas
             op.MostrarChicotadas = (short)chic.Selecionado;
             op.VerPenaltisCPU = pen.IsChecked == true;
             op.Som = som.IsChecked == true;
+            op.ForcaPorFaixas = forca.Selecionado == 1;
+            op.TamanhoTexto = (int)tamanho.Value;
+            op.Volume = (int)volume.Value;
+            op.AplicarInterface();
             d.Fechar(c);
             ok(op);
         }

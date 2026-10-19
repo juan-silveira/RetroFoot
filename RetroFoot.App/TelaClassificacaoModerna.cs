@@ -165,11 +165,18 @@ sealed class TelaClassificacaoModerna : UserControl
             Cursor = new Cursor(StandardCursorType.Hand), Child = _textoBotao, VerticalAlignment = VerticalAlignment.Center,
         };
         botao.PointerPressed += (_, a) => { a.Handled = true; Fechar(); };
-        var topo = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), Margin = new Thickness(0, 0, 0, 10) };
+        // 16:9: titulo, abas e Continuar numa linha; 4:3: as abas descem para a linha de baixo
+        // (numa linha so, com 5 divisoes, elas passavam por baixo do Continuar)
+        bool largo = Formato.Largo;
+        var topo = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), RowDefinitions = new RowDefinitions(largo ? "Auto" : "Auto,Auto"),
+            Margin = new Thickness(0, 0, 0, 10),
+        };
         topo.Children.Add(titulo);
-        Grid.SetColumn(_abas, 1);
-        _abas.HorizontalAlignment = HorizontalAlignment.Center;
         _abas.VerticalAlignment = VerticalAlignment.Center;
+        if (largo) { Grid.SetColumn(_abas, 1); _abas.HorizontalAlignment = HorizontalAlignment.Center; }
+        else { Grid.SetRow(_abas, 1); Grid.SetColumnSpan(_abas, 3); _abas.HorizontalAlignment = HorizontalAlignment.Left; _abas.Margin = new Thickness(0, 6, 0, 0); }
         topo.Children.Add(_abas);
         Grid.SetColumn(botao, 2);
         topo.Children.Add(botao);
@@ -190,16 +197,25 @@ sealed class TelaClassificacaoModerna : UserControl
         }
         var cab = new Border { BorderBrush = Linha, BorderThickness = new Thickness(0, 0, 0, 1), Child = cabecalho };
 
-        var rolagem = new ScrollViewer
+        // as linhas rolam so alem de 20 equipas (o Distrital, com dezenas): ate ai a tela inteira
+        // cabe sem rolagem (o Viewbox do fim encolhe o que for preciso) e o Distrital nao fica
+        // minusculo. A legenda fica fixa embaixo.
+        var lista = new ScrollViewer
         {
-            Content = new StackPanel { Children = { _linhas, Legenda() } }, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
+            Content = _linhas, MaxHeight = 20 * (AlturaLinha + 1) + 2,   // + a linha de baixo de cada uma
+            HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
         };
         // o cabecalho acompanha a folga da barra de rolagem (App.FolgaBarra): as colunas batem
-        rolagem.PropertyChanged += (_, e) =>
+        lista.PropertyChanged += (_, e) =>
         {
-            if (e.Property == ScrollViewer.PaddingProperty) cab.Padding = new Thickness(0, 0, rolagem.Padding.Right, 0);
+            if (e.Property == ScrollViewer.PaddingProperty) cab.Padding = new Thickness(0, 0, lista.Padding.Right, 0);
         };
+        var rolagem = new DockPanel();
+        var legenda = Legenda();
+        DockPanel.SetDock(legenda, Dock.Bottom);
+        rolagem.Children.Add(legenda);
+        rolagem.Children.Add(lista);
 
         // a tabela (cabecalho e linhas) num cartao, como os botoes do hub
         var tabela = new DockPanel();
@@ -211,13 +227,16 @@ sealed class TelaClassificacaoModerna : UserControl
             Background = TemaVerde.Cartao, BorderBrush = TemaVerde.Borda, BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(12), Padding = new Thickness(10, 4, 10, 10), Child = tabela, VerticalAlignment = VerticalAlignment.Top,
         };
-        var corpo = new DockPanel { MaxWidth = 1000, Margin = new Thickness(20, 16, 20, 12) };
+        var corpo = new DockPanel { Width = largo ? 1000 : 900, Margin = new Thickness(20, 16, 20, 12) };
         DockPanel.SetDock(topo, Dock.Top);
         corpo.Children.Add(topo);
         corpo.Children.Add(cartao);
+        // a tabela inteira (20 equipas e a legenda) sem rolagem: encolhe o que for preciso para
+        // caber na tela (no 4:3 com 20 equipas ficava cortada embaixo, com barra de rolagem)
         return new Avalonia.Controls.ThemeVariantScope
         {
-            RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark, Child = corpo,
+            RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark,
+            Child = new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, VerticalAlignment = VerticalAlignment.Top, Child = corpo },
         };
     }
 

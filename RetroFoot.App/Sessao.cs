@@ -99,10 +99,13 @@ public sealed class Sessao
             },
             // o original fecha a jornada sozinho quando o relogio passa de Fim + 5 (seg10:08DB);
             // aqui a tela final da jornada fica 3 s (PausaFimJornadaMs) e so entao vem a classificacao
+            // (o Enter, o clique ou o Continuar da tela pulam a espera; antes o "continuar" nao
+            // fazia nada e so os 3 s contavam)
             FimJornada = jn =>
             {
-                Dispatcher.UIThread.Invoke(() => jornada?.Fim(jn, () => { }));
-                if (PausaFimJornadaMs > 0) Thread.Sleep(PausaFimJornadaMs);
+                using var seguir = new ManualResetEventSlim();
+                Dispatcher.UIThread.Invoke(() => jornada?.Fim(jn, () => seguir.Set()));
+                if (PausaFimJornadaMs > 0) seguir.Wait(PausaFimJornadaMs);
             },
             // a proposta de patrocinio (Opcoes.Patrocinios): a janela de Sim/Nao do patch
             Patrocinio = p => EsperarDialogo<bool>(fim => new TelaPatrocinio(p, J.Op.Marcas, Moeda.DoSave(S), fim)),

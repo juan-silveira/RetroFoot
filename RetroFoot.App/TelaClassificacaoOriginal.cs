@@ -51,6 +51,9 @@ sealed class TelaClassificacaoOriginal : Control
 
     const int Linha = 16;                 // ItemHeight
     const double LarguraLista = 273;
+    // (fora do original) a posicao de cada equipa, pequena, a esquerda da lista: a janela
+    // ganha estes pontos de largura e as listas andam o mesmo para a direita
+    const double MargemPosicao = 8;
 
     public event Action? Fechou;
 
@@ -87,7 +90,7 @@ sealed class TelaClassificacaoOriginal : Control
         _alturaCliente = _paginas ? 41 + _alturaLista + 6 + 26 + 10
             : _lado ? 41 + _alturaLista + 24
             : 41 + 2 * _alturaLista + 46 + 24;
-        double larguraCliente = _lado ? 10 + 3 * 296 + LarguraLista + 10 : 588;
+        double larguraCliente = (_lado ? 10 + 3 * 296 + LarguraLista + 10 : 588) + MargemPosicao;
         double w = larguraCliente + 6, h = _alturaCliente + 6 + 19;
         _janela = new Rect(Math.Floor((L - w) / 2), Math.Floor((A - h) / 2), w, h);
         _cliente = new Rect(_janela.X + 3, _janela.Y + 3 + 19, larguraCliente, _alturaCliente);
@@ -125,20 +128,20 @@ sealed class TelaClassificacaoOriginal : Control
     Rect Lista(int k)
     {
         double x, y;
-        if (_paginas || _lado) { x = 10 + 296 * k; y = 41; }
-        else { x = 10 + 296 * (k / 2); y = 41 + (k % 2) * (_alturaLista + 46); }
+        if (_paginas || _lado) { x = 10 + MargemPosicao + 296 * k; y = 41; }
+        else { x = 10 + MargemPosicao + 296 * (k / 2); y = 41 + (k % 2) * (_alturaLista + 46); }
         return new Rect(_cliente.X + x, _cliente.Y + y, LarguraLista, _alturaLista);
     }
 
     int DivisaoDa(int k) => _paginas ? _pagina * 2 + k : k;
 
     // as setas do launcher (TLabel 30x26, Arial -21 negrito, fundo prateado)
-    Rect Seta(int i) => new(_cliente.X + 517 + 31 * i, _cliente.Y + 41 + _alturaLista + 6, 30, 26);
+    Rect Seta(int i) => new(_cliente.X + 517 + MargemPosicao + 31 * i, _cliente.Y + 41 + _alturaLista + 6, 30, 26);
 
     // ---------------------------------------------------------------- desenho
     static FormattedText Txt(string s, double tam, IBrush cor, bool negrito = false, FontFamily? fonte = null) =>
         new(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            new Typeface(fonte ?? Arial, FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam, cor);
+            new Typeface(fonte ?? Arial, FontStyle.Normal, negrito ? FontWeight.Bold : FontWeight.Normal), tam * Acessibilidade.Texto, cor);
 
     static void Escreve(DrawingContext dc, string s, double x, double y, double tam, IBrush cor, bool negrito = false, FontFamily? fonte = null) =>
         dc.DrawText(Txt(s, tam, cor, negrito, fonte), new Point(x, y));
@@ -202,12 +205,13 @@ sealed class TelaClassificacaoOriginal : Control
         Escreve(dc, T("{0}ª Divisão", d + 1), r.X + 1, r.Y - 24, 19, Amarelo, true);
         // o cabecalho das colunas, alinhado a direita como os numeros
         double cy = r.Y - 15;
-        Direita(dc, T("V"), r.X + 2 + 142, cy, 11, Amarelo);
-        Direita(dc, T("E"), r.X + 2 + 162, cy, 11, Amarelo);
-        Direita(dc, T("D"), r.X + 2 + 182, cy, 11, Amarelo);
-        Direita(dc, T("GM"), r.X + 2 + 212, cy, 11, Amarelo);
-        Direita(dc, T("GS"), r.X + 2 + 237, cy, 11, Amarelo);
-        Direita(dc, T("pontos:P"), r.X + 2 + 267, cy, 11, Amarelo);
+        // (fora do original) os pontos logo depois do nome, antes das vitorias
+        Direita(dc, T("pontos:P"), r.X + 2 + 145, cy, 11, Amarelo);
+        Direita(dc, T("V"), r.X + 2 + 167, cy, 11, Amarelo);
+        Direita(dc, T("E"), r.X + 2 + 187, cy, 11, Amarelo);
+        Direita(dc, T("D"), r.X + 2 + 207, cy, 11, Amarelo);
+        Direita(dc, T("GM"), r.X + 2 + 237, cy, 11, Amarelo);
+        Direita(dc, T("GS"), r.X + 2 + 264, cy, 11, Amarelo);
 
 
         // a lista (Ctl3D = False: borda preta de 1 ponto; ParentColor: fundo verde)
@@ -224,6 +228,10 @@ sealed class TelaClassificacaoOriginal : Control
                 y += Linha;
             }
         }
+        // as posicoes, fora da lista (no verde a esquerda dela)
+        double yp = dentro.Y + 2;
+        for (int i = 0; i < _s.Divisoes[d].Equipas.Count; i++, yp += Linha)
+            Direita(dc, (i + 1).ToString(), r.X - 2, yp, 8, Amarelo);
     }
 
     // seg14:0ad6: fundo na cor do fundo da equipa; as colunas a partir de x + 2, o texto no
@@ -238,13 +246,13 @@ sealed class TelaClassificacaoOriginal : Control
             Escreve(dc, Nome(e.NomeCurto), x, y, 11, letra, negrito);
         x += 120;
         void Col(string s, double larg) { Direita(dc, s, x + larg, y, 11, letra); x += larg; }
-        Col(EqW(e, EqVitorias).ToString(), 20);
+        Col(EqW(e, EqPontos).ToString(), 25);
+        Col(EqW(e, EqVitorias).ToString(), 22);
         Col(EqW(e, EqEmpates).ToString(), 20);
         Col(EqW(e, EqDerrotas).ToString(), 20);
         Col(EqW(e, EqGolosPro).ToString(), 30);
         Col(":", 10);
-        Col(EqW(e, EqGolosContra).ToString(), 15);
-        Col(EqW(e, EqPontos).ToString(), 30);
+        Col(EqW(e, EqGolosContra).ToString(), 17);
     }
 
     static string Nome(byte[] cifrado) =>
