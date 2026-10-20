@@ -210,7 +210,13 @@ public sealed partial class TelaEquipa
             var s = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(12, 10, 12, 4) };
             void Aba(string nome, Func<Control> conteudo)
             {
-                var b = new CUi.Botao(T(nome), false, () => AbrirGaveta(T(nome), conteudo()));
+                var b = new CUi.Botao(T(nome), false, () =>
+                {
+                    _naPagina = true;
+                    Control c;
+                    try { c = conteudo(); } finally { _naPagina = false; }
+                    AbrirGaveta(T(nome), c, cores: true);
+                });
                 b.MinHeight = 38;
                 b.Padding = new Thickness(16, 6);
                 s.Children.Add(b);
@@ -223,11 +229,18 @@ public sealed partial class TelaEquipa
             return new ScrollViewer { Content = s, HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden, VerticalScrollBarVisibility = ScrollBarVisibility.Disabled };
         }
 
+        // as paginas das abas no Retro ficam nas cores da equipa, como o painel da direita do
+        // computador (o texto na cor da letra sobre o fundo); o resto, nas cores do kit
+        bool _naPagina;
+        IBrush PT => CUi.Retro && _naPagina ? _corLetra : CUi.Texto;
+        IBrush PF => CUi.Retro && _naPagina ? _corLetra : CUi.Fraco;
+        TextBlock Secao(string s) => CUi.Retro && _naPagina ? CUi.Txt(s, 14, _corLetra, FontWeight.Bold) : CUi.SecaoFolha(s);
+
         Control Linha(string rotulo, string valor, IBrush? cor = null)
         {
             var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 30 };
-            g.Children.Add(CUi.Txt(rotulo, 14, CUi.Fraco));
-            var v = CUi.Txt(valor, 15, cor, FontWeight.SemiBold);
+            g.Children.Add(CUi.Txt(rotulo, 14, PF));
+            var v = CUi.Txt(valor, 15, cor ?? (CUi.Retro && _naPagina ? _corLetra : null), FontWeight.SemiBold);
             Grid.SetColumn(v, 1);
             g.Children.Add(v);
             return g;
@@ -245,7 +258,7 @@ public sealed partial class TelaEquipa
                 var m = _s.J.M;
                 if (jogo.Taca != 0 && m.DivisaoDa(adv) is var d && d >= 0) nome += " (" + Pascal(m.S.Divisoes[d].Nome, 20) + ")";
                 string lado = jogo.Casa == _e.ID ? T("CASA") : T("FORA");
-                p.Children.Add(CUi.SecaoFolha(T("Adversário")));
+                p.Children.Add(Secao(T("Adversário")));
                 p.Children.Add(CaixaAdversario(adv, nome, lado + " " + Br(Pascal(jogo.B04, 40))));
                 // o arbitro: tocar abre a ajuda do arbitro (a balanca, textRefereeClick)
                 if (jogo.Casa != 0 && jogo.Fora != 0 && _s.S.Arbitros.FindLast(x => x.ID == jogo.Arbitro) is { } arb)
@@ -256,23 +269,23 @@ public sealed partial class TelaEquipa
                         Spacing = 1,
                         Children =
                         {
-                            CUi.Txt(T("Árbitro"), 13, CUi.Fraco),
-                            CUi.Txt(Texto(arb.Nome) + " (" + NomePais(PaisDe(arb.Pais)) + ")", 15, null, FontWeight.Bold),
+                            CUi.Txt(T("Árbitro"), 13, PF),
+                            CUi.Txt(Texto(arb.Nome) + " (" + NomePais(PaisDe(arb.Pais)) + ")", 15, PT, FontWeight.Bold),
                         },
                     });
-                    var seta = CUi.Txt("⚖", 20, CUi.Destaque);
+                    var seta = CUi.Txt("⚖", 20, CUi.Retro ? PT : CUi.Destaque);
                     Grid.SetColumn(seta, 1);
                     g.Children.Add(seta);
                     var t = CUi.Toque(g, AbrirArbitro, 52);
                     t.Padding = new Thickness(0, 4);
                     p.Children.Add(t);
                 }
-                p.Children.Add(CUi.Txt(T("Moral do adversário"), 13, CUi.Fraco));
+                p.Children.Add(CUi.Txt(T("Moral do adversário"), 13, PF));
                 p.Children.Add(BarraMoral(adv));
             }
-            else p.Children.Add(CUi.Txt(T("Sem jogo nesta rodada."), 14, CUi.Fraco));
+            else p.Children.Add(CUi.Txt(T("Sem jogo nesta rodada."), 14, PF));
             p.Children.Add(Linha(T("Dinheiro em caixa"), _p.DinheiroCelular((int)_e.Dinheiro)));
-            p.Children.Add(CUi.Txt(T("Moral"), 13, CUi.Fraco));
+            p.Children.Add(CUi.Txt(T("Moral"), 13, PF));
             p.Children.Add(BarraMoral(_e));
             return p;
         }
@@ -352,6 +365,7 @@ public sealed partial class TelaEquipa
 
         Control PaginaFinancas()
         {
+            if (CUi.Retro) return FinancasRetro();
             var p = new StackPanel { Spacing = 6 };
             p.Children.Add(Linha(T("Dinheiro em caixa"), _p.DinheiroCelular((int)_e.Dinheiro), (int)_e.Dinheiro < 0 ? CUi.Erro : null));
             long folha = _e.Jogadores.Sum(j => (long)j.Salario);
@@ -370,6 +384,63 @@ public sealed partial class TelaEquipa
             return p;
         }
 
+        // a pagina Financas do computador (ListBoxBalance, TThreeBalances): a temporada, as
+        // receitas e os gastos, os totais e o saldo; o total de salarios, os juros do
+        // emprestimo, o dinheiro em caixa e o preco do ingresso (no launcher, o % com - e +)
+        Control FinancasRetro()
+        {
+            var p = new StackPanel { Spacing = 0 };
+            var b = MercadoJogo.Balanco(_e);
+            string[] rot = { "Temporada", "Receitas", "Bilheteria", "Jogadores vendidos", "Prêmios", "Gastos", "Salários",
+                "Jogadores comprados", "Arquibancadas", "Juros", "", "Receita total", "Gasto total", "Saldo" };
+            for (int i = 0; i < rot.Length; i++)
+            {
+                string v = i switch
+                {
+                    0 => _s.J.M.Ano.ToString(),
+                    2 or 3 or 4 => _p.DinheiroCelular(b[i - 2]),
+                    6 => _p.DinheiroCelular(b[4]),
+                    7 => _p.DinheiroCelular(b[3]),
+                    8 or 9 => _p.DinheiroCelular(b[i - 3]),
+                    11 => _p.DinheiroCelular((long)b[0] + b[1] + b[2]),
+                    12 => _p.DinheiroCelular((long)b[3] + b[4] + b[5] + b[6]),
+                    13 => _p.DinheiroCelular(b.Sum(x => (long)x)),
+                    _ => "",
+                };
+                bool neg = i is 0 or 1 or 5;
+                var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = rot[i].Length == 0 ? 10 : 24 };
+                g.Children.Add(CUi.Txt(T(rot[i]), 14, _corLetra, neg ? FontWeight.Bold : FontWeight.Normal));
+                var tv = CUi.Txt(v, 14, _corLetra, neg ? FontWeight.Bold : FontWeight.Normal);
+                Grid.SetColumn(tv, 1);
+                g.Children.Add(tv);
+                if (i is 2 or 3 or 4 or 6 or 7 or 8 or 9) g.Margin = new Thickness(10, 0, 0, 0);
+                p.Children.Add(g);
+            }
+            p.Children.Add(new Border { Height = 10 });
+            p.Children.Add(Linha(T("Total de salários"), _p.DinheiroCelular(MercadoJogo.FolhaSalarial(_e))));
+            p.Children.Add(Linha(T("Juros do empréstimo"), _p.DinheiroCelular(MercadoJogo.Juros((int)_e.D6D))));
+            p.Children.Add(Linha(T("Dinheiro em caixa"), _p.DinheiroCelular((int)_e.Dinheiro)));
+            if (_tela._jogo is { } jogo)
+            {
+                long preco = RetroFoot.Motor.Base.Ext.Bytes(jogo.B36.AsSpan(0, 10)).Round();
+                var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 44 };
+                g.Children.Add(CUi.Txt(T("Preço do ingresso") + "  " + _p.DinheiroCelular(preco), 14, _corLetra, FontWeight.SemiBold));
+                if (_s.J.M.Regras.CartoesAmarelos)
+                {
+                    // o % do preco de tabela nos jogos em casa (ingressos.py)
+                    var pct = CUi.Txt(Ingressos.Percentual(_e) + "%", 15, _corLetra, FontWeight.Bold);
+                    pct.Width = 52; pct.TextAlignment = TextAlignment.Center;
+                    var menos = new CUi.Botao("−", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) - Ingressos.Passo); pct.Text = Ingressos.Percentual(_e) + "%"; }) { Padding = new Thickness(14, 2) };
+                    var mais = new CUi.Botao("+", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) + Ingressos.Passo); pct.Text = Ingressos.Percentual(_e) + "%"; }) { Padding = new Thickness(14, 2) };
+                    var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, Children = { menos, pct, mais } };
+                    Grid.SetColumn(sp, 1);
+                    g.Children.Add(sp);
+                }
+                p.Children.Add(g);
+            }
+            return p;
+        }
+
         Control PaginaEscalacao()
         {
             var p = new StackPanel { Spacing = 8 };
@@ -384,10 +455,10 @@ public sealed partial class TelaEquipa
                 if (char.IsDigit(texto[0])) { b.MinWidth = 86; formacoes.Children.Add(b); }
                 else outros.Add(b);
             }
-            p.Children.Add(CUi.Txt(T("Formação"), 13, CUi.Fraco, FontWeight.SemiBold));
+            p.Children.Add(CUi.Txt(T("Formação"), 13, PF, FontWeight.SemiBold));
             p.Children.Add(formacoes);
             p.Children.Add(CUi.Botoes(outros.ToArray()));
-            p.Children.Add(CUi.Txt(T("Toque no ponto à esquerda de cada jogador para trocar entre titular, reserva e fora."), 13, CUi.Fraco, FontWeight.Normal, true));
+            p.Children.Add(CUi.Txt(T("Toque no ponto à esquerda de cada jogador para trocar entre titular, reserva e fora."), 13, PF, FontWeight.Normal, true));
             return p;
         }
 
@@ -445,23 +516,23 @@ public sealed partial class TelaEquipa
             var p = new StackPanel { Spacing = 6 };
             var marcas = _s.J.Op.Marcas;
             var mc = _e.MarcaMaster() != 0 ? marcas?.Registro(_e.MarcaMaster()) : null;
-            p.Children.Add(CUi.TituloSecao_(T("Patrocinador master")));
+            p.Children.Add(Secao(T("Patrocinador master")));
             if (mc != null)
             {
                 p.Children.Add(Linha(mc.Nome, _p.DinheiroCelular(_e.ValorMaster()) + " " + T("por temporada")));
                 int n = _e.EpocasMaster();
                 p.Children.Add(Linha(T("Restante"), T(n == 1 ? "{0} temporada restante" : "{0} temporadas restantes", (char)('0' + n))));
             }
-            else p.Children.Add(CUi.Txt(T("Sem patrocinador"), 14, CUi.Fraco));
+            else p.Children.Add(CUi.Txt(T("Sem patrocinador"), 14, PF));
             var mp = _e.JogosPontual() != 0 ? marcas?.Registro(_e.MarcaPontual()) : null;
-            p.Children.Add(CUi.TituloSecao_(T("Patrocínio pontual")));
+            p.Children.Add(Secao(T("Patrocínio pontual")));
             if (mp != null)
             {
                 int j = _e.JogosPontual();
                 p.Children.Add(Linha(mp.Nome, T("{0} por jogo", _p.DinheiroCelular(_e.ValorPontual()))));
                 p.Children.Add(Linha(T("Restante"), T(j == 1 ? "{0} jogo restante" : "{0} jogos restantes", (char)('0' + j))));
             }
-            else p.Children.Add(CUi.Txt(T("Nenhum no momento"), 14, CUi.Fraco));
+            else p.Children.Add(CUi.Txt(T("Nenhum no momento"), 14, PF));
             return p;
         }
 
@@ -850,6 +921,7 @@ public sealed partial class TelaEquipa
 
         Control Itens(List<(string Texto, Action? Acao, Func<bool>? Hab)> itens)
         {
+            if (CUi.Retro) return ItensRetro(itens);
             var p = new StackPanel { Spacing = 4 };
             foreach (var (texto, acao, hab) in itens)
             {
@@ -862,20 +934,56 @@ public sealed partial class TelaEquipa
             return p;
         }
 
+        // o menu do Windows 95 (o MainMenu do computador): as linhas na face cinza, sem moldura;
+        // o toque realca em azul-marinho; o separador e o fio gravado (cinza e branco);
+        // desligado, o texto cinza com o relevo branco
+        Control ItensRetro(List<(string Texto, Action? Acao, Func<bool>? Hab)> itens)
+        {
+            var p = new StackPanel();
+            foreach (var (texto, acao, hab) in itens)
+            {
+                if (texto == "-")
+                {
+                    p.Children.Add(new Border
+                    {
+                        Height = 2, Margin = new Thickness(2, 5), BorderBrush = W95.Branco, BorderThickness = new Thickness(0, 0, 0, 1),
+                        Background = W95.Cinzento,
+                    });
+                    continue;
+                }
+                var a = acao;
+                bool hab_ = a != null && (hab?.Invoke() ?? true);
+                var t = CUi.Txt(texto, 15, hab_ ? W95.Preto : W95.Cinzento);
+                var c = new Clicavel { Child = t, MinHeight = 44, Padding = new Thickness(14, 0), Background = Brushes.Transparent, CorFoco = null, Hover = W95.Marinho };
+                c.PointerEntered += (_, _) => { if (hab_) t.Foreground = W95.Branco; };
+                c.PointerExited += (_, _) => t.Foreground = hab_ ? W95.Preto : W95.Cinzento;
+                if (hab_) c.Clique += () => { FecharGaveta(); a?.Invoke(); Refazer(); };
+                else c.Cursor = Cursor.Default;
+                p.Children.Add(c);
+            }
+            return new Border
+            {
+                Background = W95.Face, Padding = new Thickness(2),
+                BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #DFDFDF, inset -1 -1 0 0 #000000, inset 2 2 0 0 #FFFFFF, inset -2 -2 0 0 #808080"),
+                Child = p,
+            };
+        }
+
         // ------------------------------------------------------------ a gaveta (de baixo)
-        void AbrirGaveta(string titulo, Control conteudo, Action? aoFechar = null)
+        void AbrirGaveta(string titulo, Control conteudo, Action? aoFechar = null, bool cores = false)
         {
             _aoFecharGaveta = aoFechar;
+            bool time = cores && CUi.Retro;
             var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(0, 0, 0, 10) };
-            cab.Children.Add(CUi.Txt(titulo, 18, null, FontWeight.Bold));
+            cab.Children.Add(CUi.Txt(titulo, 18, time ? _corLetra : null, FontWeight.Bold));
             var fechar = new CUi.Botao("✕", false, FecharGaveta) { Padding = new Thickness(14, 4), MinHeight = 38 };
             Grid.SetColumn(fechar, 1);
             cab.Children.Add(fechar);
             var folha = new Border
             {
-                Background = CUi.Retro ? W95.Face : TemaVerde.FundoTela, VerticalAlignment = VerticalAlignment.Bottom, MaxHeight = Math.Max(400, _raiz.Bounds.Height * 0.92),
+                Background = time ? _corFundo : CUi.Retro ? W95.Face : TemaVerde.FundoTela, VerticalAlignment = VerticalAlignment.Bottom, MaxHeight = Math.Max(400, _raiz.Bounds.Height * 0.92),
                 CornerRadius = new CornerRadius(CUi.Retro ? 0 : 22, CUi.Retro ? 0 : 22, 0, 0), Padding = new Thickness(16, 14, 16, 18),
-                BorderBrush = CUi.Retro ? W95.Preto : TemaVerde.Borda, BorderThickness = new Thickness(1, 1, 1, 0),
+                BorderBrush = time ? _corLetra : CUi.Retro ? W95.Preto : TemaVerde.Borda, BorderThickness = new Thickness(1, 1, 1, 0),
                 Child = new DockPanel
                 {
                     // (a folga a direita: a barra de rolagem fica por cima dos valores)
