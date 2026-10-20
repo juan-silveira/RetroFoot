@@ -38,7 +38,7 @@ sealed class TelaArbitros : UserControl
         public bool Ativo = true;
     }
 
-    const string Pacote = "avares://RetroFoot.App/Assets/Dados/" + PastaDados.Arbitros;
+    internal const string Pacote = "avares://RetroFoot.App/Assets/Dados/" + PastaDados.Arbitros;
 
     readonly Ferramentas.Contexto ctx;
     readonly EstiloFerramenta est = new();
@@ -126,7 +126,7 @@ sealed class TelaArbitros : UserControl
 
     string NomePais(string cod) => nomePais.TryGetValue(cod, out var n) ? n : TextosMercado.NomePais(cod);
 
-    static string Origem(string o) => o.ToLowerInvariant() switch
+    internal static string Origem(string o) => o.ToLowerInvariant() switch
     {
         "fifa" => "FIFA",
         "liga" => T("Liga"),
@@ -279,7 +279,7 @@ sealed class TelaArbitros : UserControl
         montando = false;
     }
 
-    static string SemAcento(string s) => new string(s.Normalize(NormalizationForm.FormD)
+    internal static string SemAcento(string s) => new string(s.Normalize(NormalizationForm.FormD)
         .Where(c => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark).ToArray());
 
     List<Item> Visiveis()

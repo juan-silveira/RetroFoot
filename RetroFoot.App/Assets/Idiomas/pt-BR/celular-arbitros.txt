@@ -1,0 +1,9 @@
+# A ferramenta Arbitros no celular (FerramentaArbitrosCelular) (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Novo árbitro	Novo árbitro
+Procurar país	Procurar país
+Nenhum árbitro encontrado.	Nenhum árbitro encontrado.
+{0} árbitros ativos em {1} países · {2} desativados	{0} árbitros ativos em {1} países · {2} desativados
+Mostrando {0} de {1}	Mostrando {0} de {1}
+Remover {0} da lista de árbitros?	Remover {0} da lista de árbitros?
+Mostrar	Mostrar
