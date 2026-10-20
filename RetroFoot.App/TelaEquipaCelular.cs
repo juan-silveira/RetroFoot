@@ -154,7 +154,11 @@ public sealed partial class TelaEquipa
                 : LugarNaDivisao(m.S.Divisoes[dv].Equipas.IndexOf(_e.ID) + 1, Pascal(m.S.Divisoes[dv].Nome, 20));
             string tecnico = _s.TreinadorDa(_e) is { } t ? Painel.TextoCelular(t.Nome) : "";
             var (letra, fundo) = Cores(_e);
-            Control escudo = (CUi.Retro ? null : Escudos.Controle(_e, 52)) ?? Circulo(fundo, letra, 44);
+            // no Retro, como no computador: a bandeira do pais da equipa (e o nome do pais)
+            string paisEq = PaisDe(_e.Pais);
+            Control escudo = CUi.Retro ? CUi.Bandeira(paisEq, 44) ?? Circulo(fundo, letra, 44)
+                : Escudos.Controle(_e, 52) ?? Circulo(fundo, letra, 44);
+            if (CUi.Retro) tecnico += (tecnico.Length > 0 ? " · " : "") + NomePais(paisEq);
             var nome = CUi.Txt(Painel.TextoCelular(_e.NomeCompleto), 19, TTexto, FontWeight.Bold);
             var sub = CUi.Txt(tecnico + (onde.Length > 0 ? " · " + onde : ""), 13, TFraco);
             var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,12,*") };
