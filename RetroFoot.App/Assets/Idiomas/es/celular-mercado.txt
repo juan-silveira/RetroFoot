@@ -1,0 +1,17 @@
+# As janelas do mercado no celular (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+A aguardar ofertas…	Esperando ofertas…
+A oferta é maior que o dinheiro em caixa.	La oferta supera el dinero en caja.
+Desistir	Pasar
+Licitar	Pujar
+Escolha os critérios e toque em Procurar.	Elige los criterios y toca Buscar.
+Mínimo	Mínimo
+Máximo	Máximo
+Mostrar mais ({0})	Mostrar más ({0})
+Nenhum jogador encontrado.	No se encontraron jugadores.
+Nenhum jogador sob observação.	Ningún jugador en observación.
+O jogador vai a leilão com este preço base.	El jugador sale a subasta con este precio base.
+País da minha equipa	País de mi equipo
+Sem filtro	Sin filtro
+Sem limite	Sin límite
+A observar	En observación

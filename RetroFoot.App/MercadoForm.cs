@@ -59,9 +59,26 @@ internal abstract class MercadoForm : Control
 
     public Control Raiz => _raiz;
 
+    // no celular (Celular.cs): a versao propria da janela (null = este desenho, ampliado)
+    protected virtual Control? VersaoCelular() => null;
+    Control? _celular;
+    // a versao do celular se refaz quando o desenho daqui se refaria (Redesenhar)
+    protected Action? AoRedesenhar;
+    protected void Redesenhar()
+    {
+        InvalidateVisual();
+        AoRedesenhar?.Invoke();
+    }
+
     // abre na Sessao (na thread da interface)
     public void Mostrar()
     {
+        if (Celular.Ativo && VersaoCelular() is { } c)
+        {
+            _celular = c;
+            S.AbrirDialogo(c);
+            return;
+        }
         S.AbrirDialogo(_raiz);
         Avalonia.Threading.Dispatcher.UIThread.Post(() => (_foco ?? (Control)this).Focus(), Avalonia.Threading.DispatcherPriority.Loaded);
     }
@@ -70,7 +87,7 @@ internal abstract class MercadoForm : Control
     {
         if (_fechado) return;
         _fechado = true;
-        S.FecharDialogo(_raiz);
+        S.FecharDialogo(_celular ?? _raiz);
         Fechou?.Invoke();
     }
 

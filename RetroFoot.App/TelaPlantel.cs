@@ -20,7 +20,7 @@ namespace RetroFoot.App;
 // Larguras do launcher (larguras.py): a lista 16 pontos mais larga e tudo a direita dela
 // 16 pontos para la. Com as regras do launcher, a ficha do jogador tem Nota e Risco de
 // lesao (ficha.py) e o Historial a linha dos amarelos (historial.py).
-public static class TelaPlantel
+public static partial class TelaPlantel
 {
     // Ganchos para as janelas que nao sao do mercado (o integrador liga): null = o botao
     // fica desligado (Calendario, Balanco) ou escondido (Emprestimo). Recebem a sessao e a
@@ -45,7 +45,7 @@ public static class TelaPlantel
         Abrir(s, outra, e);
     });
 
-    sealed class Form : MercadoForm
+    sealed partial class Form : MercadoForm
     {
         const double B = 16;    // larguras.py
         readonly bool _launcher;
@@ -91,13 +91,13 @@ public static class TelaPlantel
             {
                 R = new Rect(412 + d, 32, 64, 64), Texto = T("Balanço"), Glifo = "Mercado/TPlantelDlg.balanceBtn.png",
                 Visivel = () => Balanco != null,
-                Clique = () => { if (Mostrada() is { } m) Balanco?.Invoke(S, m, InvalidateVisual); },
+                Clique = () => { if (Mostrada() is { } m) Balanco?.Invoke(S, m, Redesenhar); },
             });
             Comps.Add(new Botao
             {
                 R = new Rect(516 + d, 32, 64, 64), Texto = T("Calendário"), Glifo = "Mercado/TPlantelDlg.calendarBtn.png",
                 Habilitado = () => Calendario != null,
-                Clique = () => { if (Mostrada() is { } m) Calendario?.Invoke(S, m, InvalidateVisual); },
+                Clique = () => { if (Mostrada() is { } m) Calendario?.Invoke(S, m, Redesenhar); },
             });
             // FirstUpdate: o Procurar so com o add-in dos observados e uma equipa que compra
             Comps.Add(new Botao
@@ -116,7 +116,7 @@ public static class TelaPlantel
             {
                 R = new Rect(532 + d, 316, 64, 64), Texto = T("Empréstimo"), Glifo = "Mercado/TPlantelDlg.loanBtn.png",
                 Visivel = () => PodeComprarAqui() && Emprestimo != null,
-                Clique = () => { if (Compradora() is { } c) Emprestimo?.Invoke(S, c, () => { AtualizarCompra(); InvalidateVisual(); }); },
+                Clique = () => { if (Compradora() is { } c) Emprestimo?.Invoke(S, c, () => { AtualizarCompra(); Redesenhar(); }); },
             });
             _observado = new Botao
             {
@@ -203,7 +203,7 @@ public static class TelaPlantel
                 }
             }
             AtualizarCompra();
-            InvalidateVisual();
+            Redesenhar();
         }
 
         // ListBoxOfPlayersClick (10:1fa7): o jogador escolhido, a ficha e o Observado
@@ -214,7 +214,7 @@ public static class TelaPlantel
             _sel = e.Jogadores[i].ID;
             _observadoLigado = true;
             AtualizarCompra();
-            InvalidateVisual();
+            Redesenhar();
         }
 
         // UpdateBuyBtn (10:1939): o preco (3:63fa, com a equipa que compra) e o Comprar so se
@@ -253,7 +253,7 @@ public static class TelaPlantel
                 return;
             }
             if (MercadoJogo.ObservarJogador(S.S, c.Treinador, _sel))
-                TelaObservados.Abrir(S, c, MostrarJogador, InvalidateVisual);
+                TelaObservados.Abrir(S, c, MostrarJogador, Redesenhar);
         }
 
         // ------------------------------------------------------------ desenho

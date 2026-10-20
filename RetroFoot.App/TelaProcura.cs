@@ -23,7 +23,7 @@ namespace RetroFoot.App;
 //
 // Como no original, a janela guarda os criterios e a lista de uma vez para a outra enquanto
 // o treinador for o mesmo.
-public static class TelaProcura
+public static partial class TelaProcura
 {
     // Abre a Lista de Jogadores para a equipa humana e (na thread da interface, com o motor
     // parado: da TelaEquipa). escolher recebe o jogador do "Equipa..." (null = abre o
@@ -73,7 +73,7 @@ public static class TelaProcura
     static string[] NotasLauncher => new[] { T("Qualquer"), "10" }.Concat(Enumerable.Range(2, 8).Reverse().Select(n => T("{0} ou mais", n))).ToArray();
     static string[] RiscosLauncher => new[] { T("Qualquer"), "0" }.Concat(Enumerable.Range(1, 9).Select(n => T("Até {0}", n))).ToArray();
 
-    sealed class Form : MercadoForm
+    sealed partial class Form : MercadoForm
     {
         readonly SEquipa _e;
         readonly Action<ushort> _escolher;
@@ -206,13 +206,13 @@ public static class TelaProcura
                 if (t == _nome) return;
                 _nome = t;
                 _procurar = true;
-                InvalidateVisual();
+                Redesenhar();
             });
             _caixaNome.Text = _nome;
         }
 
         Botao Pequeno(Rect r, string nome, Action clique) =>
-            new() { R = r, Glifo = $"Mercado/TcheckPlayerDlg.{nome}.png", Clique = () => { clique(); InvalidateVisual(); } };
+            new() { R = r, Glifo = $"Mercado/TcheckPlayerDlg.{nome}.png", Clique = () => { clique(); Redesenhar(); } };
 
         Combo Caixa(Rect r, Func<IReadOnlyList<string>> itens, Func<int> indice, Action<int> escolher) => new()
         {
@@ -224,7 +224,7 @@ public static class TelaProcura
         void Alterado()
         {
             _procurar = true;
-            InvalidateVisual();
+            Redesenhar();
         }
 
         void TrocarNaoMinha()
@@ -281,7 +281,7 @@ public static class TelaProcura
             // LBS_SORT: lstrcmpi (sem diferenciar maiusculas, acentos so no fim)
             var cmp = StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, ignoreCase: true);
             _achados = itens.OrderBy(x => x.Chave, cmp).Select(x => x.Id).ToList();
-            InvalidateVisual();
+            Redesenhar();
         }
 
         // a funcao aninhada 10:3223 (+ filtros.asm do launcher)
@@ -338,7 +338,7 @@ public static class TelaProcura
             int preco = S.Mercado.PrecoParaComprar(_e, eq, p);
             if (preco <= 0) return;
             S.Mercado.Comprar(_e, eq, eq.Jogadores.IndexOf(p), preco, registado: S.J.Op.Registrado);
-            InvalidateVisual();
+            Redesenhar();
         }
 
         // ------------------------------------------------------------ desenho
