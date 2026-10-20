@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -72,6 +73,12 @@ public sealed partial class TelaJornada
         // (no Retro, poucos jogos ficam no alto, como no computador)
         if (CUi.Retro) _listaCel.VerticalAlignment = VerticalAlignment.Top;
         var rolar = new ScrollViewer { Content = _listaCel, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
+        // no Retro a tela abre na divisao do humano (uma vez; depois o jogador rola a vontade)
+        if (CUi.Retro)
+            rolar.AttachedToVisualTree += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                if (_listaCel != null) rolar.Offset = new Vector(0, _listaCel.InicioHumano());
+            }, Avalonia.Threading.DispatcherPriority.Loaded);
         _continuarCel = new CUi.Botao(T("Continuar"), true, Seguir) { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 48, IsVisible = false };
         var rodape = new Border { Padding = new Thickness(12, 6), Child = _continuarCel };
         var d = new DockPanel { Background = CUi.Fundo };
@@ -158,86 +165,113 @@ public sealed partial class TelaJornada
             }
         }
 
-        // ------------------------------------------------ o Retro: a jornada do computador
-        // Cada jogo em duas linhas sobre o verde, dentro da moldura azul-marinho: as caixas das
-        // equipas nas cores delas com os golos em amarelo no meio; embaixo o publico e o ultimo
-        // lance em amarelo ("Nome 58'", com o cartao ou a cruz da lesao antes). As divisoes
-        // atravessam a moldura com o nome em amarelo, como na tela do computador.
-        const double RCab = 32, RJogo = 30, RLance = 20, RPasso = RJogo + RLance + 8, RTopo = 12;
-        static readonly IBrush RAmarelo = W95.Amarelo, RMarinho = W95.Marinho, RVerde = W95.Verde;
+        // ------------------------------------------------ o Retro: como a classificacao
+        // No verde, cada divisao com o nome em amarelo e os jogos numa linha so: a caixa do
+        // mandante nas cores dele, o placar em amarelo e a caixa do visitante; compacto, para
+        // caberem duas divisoes por tela. A divisao do humano fica numa moldura amarela (e a
+        // tela abre nela); nos jogos do humano, o ultimo lance embaixo. Tocar abre os detalhes.
+        const double RCab = 30, RJogo = 25, RLance = 19, RTopo = 6, RFim = 8;
+        static readonly IBrush RAmarelo = W95.Amarelo, RVerde = W95.Verde;
+
+        // os blocos (o cabecalho e os jogos dele) e se o humano joga ali
+        List<(Linha? Cab, List<Linha> Jogos, bool Humano)> Blocos()
+        {
+            var r = new List<(Linha?, List<Linha>, bool)>();
+            Linha? cab = null;
+            var jogos = new List<Linha>();
+            void Fechar() { if (cab != null || jogos.Count > 0) r.Add((cab, jogos, jogos.Exists(x => x.Humanos > 0))); }
+            foreach (var l in t.linhas)
+            {
+                if (l.Cabecalho != null) { Fechar(); cab = l; jogos = new List<Linha>(); }
+                else if (!l.Vazia) jogos.Add(l);
+            }
+            Fechar();
+            return r;
+        }
+
+        static double AlturaJogo(Linha l) => RJogo + (l.Humanos > 0 && l.LanceTipo != 0 ? RLance : 0) + 2;
 
         double AlturaRetro()
         {
             double h = RTopo;
-            foreach (var l in t.linhas)
-                if (l.Cabecalho != null) h += RCab;
-                else if (!l.Vazia) h += RPasso;
-            return h + 14;
+            foreach (var (cab, jogos, _) in Blocos())
+            {
+                if (cab != null) h += RCab;
+                foreach (var l in jogos) h += AlturaJogo(l);
+                h += RFim;
+            }
+            return h + 10;
+        }
+
+        // onde comeca a divisao do humano (a tela abre nela)
+        public double InicioHumano()
+        {
+            if (!CUi.Retro) return 0;
+            double y = RTopo;
+            foreach (var (cab, jogos, humano) in Blocos())
+            {
+                if (humano) return Math.Max(0, y - 4);
+                if (cab != null) y += RCab;
+                foreach (var l in jogos) y += AlturaJogo(l);
+                y += RFim;
+            }
+            return 0;
         }
 
         // o jogo na altura y (o toque)
         Linha? JogoRetro(double py)
         {
             double y = RTopo;
-            foreach (var l in t.linhas)
+            foreach (var (cab, jogos, _) in Blocos())
             {
-                if (l.Cabecalho != null) { y += RCab; continue; }
-                if (l.Vazia) continue;
-                if (py >= y && py < y + RPasso) return l;
-                y += RPasso;
+                if (cab != null) y += RCab;
+                foreach (var l in jogos)
+                {
+                    double h = AlturaJogo(l);
+                    if (py >= y && py < y + h) return l;
+                    y += h;
+                }
+                y += RFim;
             }
             return null;
         }
 
         void RenderRetro(DrawingContext dc)
         {
-            double w = Bounds.Width, xm = 6, xd = w - 7, y = RTopo;
-            double x0 = xm + 6, wl = xd - 6 - x0;
-            double meio = x0 + wl / 2, bw = (wl - 52) / 2;
-            double topoMoldura = -1, primeira = -1;
-            foreach (var l in t.linhas)
+            double w = Bounds.Width, x0 = 8, xd = w - 8, y = RTopo;
+            double larg = xd - x0, ws = 46, bw = (larg - ws) / 2;
+            foreach (var (cab, jogos, humano) in Blocos())
             {
-                if (l.Cabecalho != null)
+                double ini = y;
+                if (cab != null)
                 {
-                    // a linha da moldura atravessa e o nome vem por cima, no fundo verde
-                    double ym = y + RCab / 2;
-                    if (topoMoldura < 0) topoMoldura = ym;
-                    dc.FillRectangle(RMarinho, new Rect(xm, ym, xd - xm + 1, 1));
-                    var tc = Txt(TituloNoIdioma(l.Cabecalho), 14, RAmarelo, true);
-                    double xt = x0 + 24;
-                    if (l.LogoCabecalho != null)
+                    var tc = Txt(TituloNoIdioma(cab.Cabecalho!).Trim(), 17, humano ? W95.Preto : RAmarelo, true);
+                    double xt = x0 + 4;
+                    if (humano) dc.FillRectangle(RAmarelo, new Rect(x0 - 4, y + 2, larg + 8, RCab - 4));
+                    if (cab.LogoCabecalho != null)
                     {
-                        dc.FillRectangle(RVerde, new Rect(xt - 2, y + 4, RCab - 4, RCab - 8));
-                        TelaJornada.Imagem(dc, l.LogoCabecalho, new Rect(xt, y + 5, RCab - 10, RCab - 10));
+                        TelaJornada.Imagem(dc, cab.LogoCabecalho, new Rect(xt, y + 5, RCab - 10, RCab - 10));
                         xt += RCab - 4;
                     }
-                    dc.FillRectangle(RVerde, new Rect(xt - 3, ym - tc.Height / 2, tc.Width + 6, tc.Height));
-                    dc.DrawText(tc, new Point(xt, ym - tc.Height / 2));
+                    dc.DrawText(tc, new Point(xt, y + (RCab - tc.Height) / 2));
                     y += RCab;
-                    continue;
                 }
-                if (l.Vazia) continue;
-                // (uma coluna que comeca por um jogo, a Taca: a linha de cima da moldura)
-                if (topoMoldura < 0) { topoMoldura = y - 6; primeira = topoMoldura; }
-                Caixa(dc, new Rect(x0, y, bw, RJogo - 2), l.Casa, l.LetraCasa, l.FundoCasa, Humano(l, Lado.Casa));
-                var gc = Txt(l.GC.ToString(), 16, RAmarelo, true);
-                var gf = Txt(l.GF.ToString(), 16, RAmarelo, true);
-                dc.DrawText(gc, new Point(meio - 13 - gc.Width / 2, y + (RJogo - 2 - gc.Height) / 2));
-                dc.DrawText(gf, new Point(meio + 13 - gf.Width / 2, y + (RJogo - 2 - gf.Height) / 2));
-                Caixa(dc, new Rect(xd - 6 - bw, y, bw, RJogo - 2), l.Fora, l.LetraFora, l.FundoFora, Humano(l, Lado.Visit));
-                // o publico (sob a caixa da casa) e o ultimo lance (a partir do meio)
-                double yl = y + RJogo;
-                var pub = Txt(FormatoDinheiro.Numero(l.Publico), 13, RAmarelo);
-                dc.DrawText(pub, new Point(x0 + 2, yl + (RLance - pub.Height) / 2));
-                LanceRetro(dc, l, new Rect(meio - 40, yl, xd - 6 - (meio - 40), RLance));
-                y += RPasso;
+                foreach (var l in jogos)
+                {
+                    bool hc = Humano(l, Lado.Casa), hf = Humano(l, Lado.Visit);
+                    Caixa(dc, new Rect(x0, y, bw, RJogo - 1), l.Casa, l.LetraCasa, l.FundoCasa, hc);
+                    var pl = Txt(l.GC + " - " + l.GF, 15, RAmarelo, true);
+                    dc.DrawText(pl, new Point(x0 + bw + (ws - pl.Width) / 2, y + (RJogo - 1 - pl.Height) / 2));
+                    Caixa(dc, new Rect(xd - bw, y, bw, RJogo - 1), l.Fora, l.LetraFora, l.FundoFora, hf);
+                    double h = AlturaJogo(l);
+                    if (l.Humanos > 0 && l.LanceTipo != 0)
+                        LanceRetro(dc, l, new Rect(x0 + 4, y + RJogo, larg - 8, RLance));
+                    y += h;
+                }
+                // a moldura amarela da divisao do humano
+                if (humano) dc.DrawRectangle(new Pen(RAmarelo, 2), new Rect(x0 - 4, ini + 2, larg + 8, y - ini));
+                y += RFim;
             }
-            if (topoMoldura < 0) return;
-            double baixo = y + 2;
-            if (primeira >= 0) dc.FillRectangle(RMarinho, new Rect(xm, primeira, xd - xm + 1, 1));
-            dc.FillRectangle(RMarinho, new Rect(xm, topoMoldura, 1, baixo - topoMoldura));
-            dc.FillRectangle(RMarinho, new Rect(xd, topoMoldura, 1, baixo - topoMoldura));
-            dc.FillRectangle(RMarinho, new Rect(xm, baixo, xd - xm + 1, 1));
         }
 
         // a caixa da equipa nas cores dela (no verde da tela, o contorno na cor da letra)
@@ -246,7 +280,8 @@ public sealed partial class TelaJornada
             var bl = new SolidColorBrush(letra);
             dc.FillRectangle(new SolidColorBrush(fundo), r);
             if (fundo == Color.FromRgb(0, 128, 0)) dc.DrawRectangle(new Pen(bl, 1), r.Deflate(0.5));
-            var tn = Txt(nome, 14.5, bl, humano);
+            var tn = Txt(nome, 13.5, bl, true);
+            if (humano) dc.FillRectangle(W95.Amarelo, new Rect(r.X, r.Bottom - 3, r.Width, 3));
             using (dc.PushClip(r.Deflate(2)))
                 dc.DrawText(tn, new Point(r.X + 5, r.Center.Y - tn.Height / 2));
         }
