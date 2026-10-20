@@ -815,6 +815,8 @@ public sealed partial class TelaEquipa
         Control BarraJogar()
         {
             _jogar = new CUi.Botao(T("Jogar"), true, () => _p.JogarCelular());
+            // no Retro, o do computador: o visto verde ligado, cinza desligado
+            if (CUi.Retro) _jogar.ComIcone("Imagens/jogar.png", "Imagens/jogar-desab.png");
             _jogar.HorizontalAlignment = HorizontalAlignment.Stretch;
             _jogar.MinHeight = 48;
             return new Border { Padding = new Thickness(12, 6, 12, 6), Background = TFundo, Child = _jogar };

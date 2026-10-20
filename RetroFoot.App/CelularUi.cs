@@ -46,6 +46,11 @@ public static class CUi
     // o relevo do Windows 95 (para fora: luz em cima e a esquerda; para dentro: o contrario)
     static readonly BoxShadows Saltado = BoxShadows.Parse("inset 1 1 0 0 #FFFFFF, inset -1 -1 0 0 #6A6A6A");
     static readonly BoxShadows Afundado = BoxShadows.Parse("inset 1 1 0 0 #6A6A6A, inset -1 -1 0 0 #FFFFFF");
+    // os botoes do Windows 95: a face cinza #C0C0C0 com o relevo de duas linhas (branco e
+    // cinza-claro em cima, preto e cinza-escuro embaixo); premido, o contrario
+    static readonly IBrush RBotao = H("#C0C0C0"), RDesligado = H("#808080");
+    static readonly BoxShadows BotaoSolto = BoxShadows.Parse("inset 1 1 0 0 #FFFFFF, inset -1 -1 0 0 #000000, inset 2 2 0 0 #DFDFDF, inset -2 -2 0 0 #808080");
+    static readonly BoxShadows BotaoPremido = BoxShadows.Parse("inset 1 1 0 0 #000000, inset -1 -1 0 0 #FFFFFF, inset 2 2 0 0 #808080, inset -2 -2 0 0 #DFDFDF");
 
     // ---------------------------------------------------------------- texto
     public static TextBlock Txt(string s, double tam = 15, IBrush? cor = null, FontWeight peso = FontWeight.Normal, bool quebra = false) => new()
@@ -168,10 +173,11 @@ public static class CUi
             HorizontalAlignment = HorizontalAlignment.Left;
             if (Retro)
             {
-                Background = RCartao;
+                Background = RBotao;
+                // o botao padrao (principal) tem o contorno preto a mais, como no Windows 95
                 BorderBrush = W95.Preto;
-                BorderThickness = new Thickness(principal ? 2 : 1);
-                BoxShadow = Saltado; Solto = Saltado; Premido = Afundado;
+                BorderThickness = new Thickness(principal ? 1 : 0);
+                BoxShadow = BotaoSolto; Solto = BotaoSolto; Premido = BotaoPremido;
                 _t.Foreground = RTexto;
             }
             else
@@ -188,6 +194,31 @@ public static class CUi
 
         public string Texto { get => _t.Text ?? ""; set => _t.Text = value; }
         public bool Habilitado { get => IsEnabled; set => IsEnabled = value; }
+
+        // no Retro o desligado e o do Windows 95: o texto (e o icone) cinza, sem apagar o botao
+        Image? _icone;
+        Avalonia.Media.Imaging.Bitmap? _icLigado, _icDesligado;
+        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        {
+            base.OnPropertyChanged(change);
+            if (change.Property != IsEffectivelyEnabledProperty || !Retro) return;
+            Opacity = 1;
+            _t.Foreground = IsEffectivelyEnabled ? RTexto : RDesligado;
+            if (_icone != null) _icone.Source = IsEffectivelyEnabled ? _icLigado : _icDesligado ?? _icLigado;
+        }
+
+        // um icone antes do texto (Assets/<ligado>.png e, desligado, <desligado>.png), como os
+        // TBitBtn do computador (o Jogar com o visto verde)
+        public Botao ComIcone(string ligado, string? desligado = null, double tam = 24)
+        {
+            _icLigado = W95.Imagem(ligado);
+            _icDesligado = desligado != null ? W95.Imagem(desligado) : null;
+            if (_icLigado == null) return this;
+            _icone = new Image { Width = tam, Height = tam, Source = IsEffectivelyEnabled ? _icLigado : _icDesligado ?? _icLigado, VerticalAlignment = VerticalAlignment.Center };
+            Child = null;
+            Child = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Center, Children = { _icone, _t } };
+            return this;
+        }
     }
 
     // uma linha que se toca (jogos gravados, paises, jogadores...): Marcar(true) a destaca
@@ -358,9 +389,9 @@ public static class CUi
                 var t = (TextBlock)b.Child!;
                 if (Retro)
                 {
-                    b.Background = m ? W95.Marinho : RCartao;
+                    b.Background = m ? W95.Marinho : RBotao;
                     t.Foreground = m ? W95.Branco : RTexto;
-                    b.BoxShadow = m ? Afundado : Saltado;
+                    b.BoxShadow = m ? BotaoPremido : BotaoSolto;
                 }
                 else
                 {
@@ -437,9 +468,9 @@ public static class CUi
                 var t = (TextBlock)bs[i].Child!;
                 if (Retro)
                 {
-                    bs[i].Background = m ? W95.Marinho : RCartao;
+                    bs[i].Background = m ? W95.Marinho : RBotao;
                     t.Foreground = m ? W95.Branco : RTexto;
-                    bs[i].BoxShadow = m ? Afundado : Saltado;
+                    bs[i].BoxShadow = m ? BotaoPremido : BotaoSolto;
                 }
                 else
                 {
