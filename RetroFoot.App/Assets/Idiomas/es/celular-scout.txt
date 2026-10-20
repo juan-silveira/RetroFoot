@@ -1,0 +1,9 @@
+# O Scout no celular (FerramentaScoutCelular.cs) (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Ordenar	Ordenar
+Padrão	Predeterminado
+Juntar colunas	Sumar columnas
+Cada toque junta a coluna como mais um critério; outro toque inverte, o terceiro tira.	Cada toque suma la columna como otro criterio; otro toque la invierte, el tercero la quita.
+Abrir arquivo…	Abrir archivo…
+Ver {0}	Ver {0}
+{0} de {1} jogadores	{0} de {1} jugadores
