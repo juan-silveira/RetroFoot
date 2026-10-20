@@ -136,6 +136,7 @@ static class Dlg
     // o MessageBox com Sim e Nao (MB_YESNO)
     public static void Perguntar(Dialogos d, string titulo, string texto, Action sim, Action? nao = null)
     {
+        if (Celular.Ativo) { ClubeCelular.Perguntar(d, titulo, texto, sim, nao); return; }
         if (Visual.Moderno) { PerguntarModerno(d, titulo, texto, sim, nao); return; }
         double w = Math.Max(240, Math.Ceiling(W95.Txt(texto, W95.MsSans11, W95.Preto).Width) + 60);
         var j = new Janela(titulo, w, 96, W95.Face);
@@ -154,6 +155,7 @@ static class Dlg
     // a caixa e ecUpperCase (DFM), aqui aceita maiusculas e minusculas (o nome como se escreve)
     public static void PedirTexto(Dialogos d, string titulo, string rotulo, string inicial, int maximo, Action<string> ok)
     {
+        if (Celular.Ativo) { ClubeCelular.PedirTexto(d, titulo, rotulo, inicial, maximo, ok); return; }
         if (Visual.Moderno) { PedirTextoModerno(d, titulo, rotulo, inicial, maximo, ok); return; }
         var j = new Janela(titulo, 388, 132, W95.Face);
         j.Por(new Bevel(), 8, 8, 281, 105);

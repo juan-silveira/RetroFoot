@@ -204,6 +204,7 @@ public static class Ui
     // uma mensagem com OK
     public static Control Caixa(string titulo, string texto, Action ok)
     {
+        if (Celular.Ativo) return ClubeCelular.Caixa(titulo, texto, ok);
         var corpo = new StackPanel { Spacing = 14, Margin = new Thickness(18, 14), Width = 380 };
         corpo.Children.Add(Txt(texto, 13.5));
         var b = Botao(Idioma.T("OK"), ok, true);
