@@ -20,6 +20,8 @@ static class OpcoesCelular
 {
     public static void Abrir(Dialogos d, OpcoesDoJogo op, Jogo98? save, Mundo? m, Action<OpcoesDoJogo> ok)
     {
+        // no Retro, a janela do computador com as abas (TelaOpcoesCelularRetro.cs)
+        if (CUi.Retro) { OpcoesCelularRetro.Abrir(d, op, save, m, ok); return; }
         // as escolhas (os mesmos indices das caixas do computador)
         int chic = Math.Clamp((int)op.MostrarChicotadas, 0, 2);
         int sort = Math.Clamp((int)op.VerSorteio, -1, 2);
@@ -170,7 +172,7 @@ static class OpcoesCelular
 
     // o exemplo do tamanho do texto: o nome de uma equipa e os primeiros jogadores dela (sem
     // jogo, o nome e o lema do jogo), feitos de novo a cada passo do deslizador
-    static Control ExemploTexto(Jogo98? save)
+    internal static Control ExemploTexto(Jogo98? save)
     {
         var p = new StackPanel { Spacing = 4 };
         var e = save?.Equipas.FirstOrDefault(x => x.Jogadores.Count >= 3);
