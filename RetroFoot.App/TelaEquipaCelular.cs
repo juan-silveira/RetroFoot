@@ -1,0 +1,518 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Threading;
+using RetroFoot.Motor.Mercado;
+using RetroFoot.Motor.Patrocinio;
+using RetroFoot.Motor.Rodada;
+using Mem = RetroFoot.Motor.Partida.Memoria;
+using SEquipa = RetroFoot.Motor.Save.Equipa;
+using SJogador = RetroFoot.Motor.Save.Jogador;
+using static RetroFoot.App.Idioma;
+
+namespace RetroFoot.App;
+
+// A tela da equipa no celular (Celular.cs), em pe e ao toque, nas duas peles do kit
+// (CelularUi.cs), no desenho do esboco: o topo com o escudo, o tecnico, a divisao, o dinheiro e
+// a moral; as abas do time em pilulas (abrem na gaveta); o elenco por setor, uma linha por
+// jogador (o ponto da esquerda troca titular / reserva / fora; o resto da linha abre a ficha);
+// o Jogar embaixo; e a barra com os menus do jogo, que abrem na gaveta.
+// A logica e a da tela do computador: o Painel (TelaEquipa.cs) fica como controlador, sem ser
+// mostrado (menus, escalacao, vender, renovar, gravar, jogar), e esta tela so o desenha.
+public sealed partial class TelaEquipa
+{
+    // o que a tela do celular usa do Painel
+    sealed partial class Painel
+    {
+        internal IEnumerable<(string Menu, List<(string Texto, Action? Acao, Func<bool>? Hab)> Itens)> MenusCelular =>
+            _menus.Select(m => (m.Texto, m.Itens.Select(i => (i.Texto, i.Acao, i.Habilitado)).ToList()));
+        internal List<SJogador> OrdemCelular() => Ordem();
+        internal void AlternarCelular(SJogador p) => Alternar(p);
+        internal void VenderCelular(SJogador p) { _sel = p; Vender(); }
+        internal void RenovarCelular(SJogador p) { _sel = p; Renovar(); }
+        internal bool PodeJogar => JogarHabilitado();
+        internal void JogarCelular() => Jogar();
+        internal void VoltarCelular() => Voltar();
+        internal SEquipa? Adversario => _adv;
+        internal string DinheiroCelular(long v) => Dinheiro(v);
+        internal static double MoralCelular(SEquipa e) => Moral(e);
+        internal static string NomeCelular(SJogador p) => NomeJogador(p);
+        internal static string PaisCelular(SJogador p) => PaisDe(p.Pais);
+        internal static string TextoCelular(byte[] b) => Texto(b);
+        internal static int AmarelosCelular(SJogador p) => Amarelos(p);
+        internal int HistCelular(SJogador p, int qual) => Hist(p, qual);
+        // a mensagem que o Painel mostraria na pagina Mensagem (Gravar, Vender...), uma vez
+        internal string? TirarMensagem()
+        {
+            if (_pagina != PgMensagem) return null;
+            _pagina = PaginaInicial;
+            return _mensagem;
+        }
+
+    internal sealed class EquipaCelular : UserControl
+    {
+        readonly TelaEquipa _tela;
+        readonly Painel _p;
+        readonly Sessao _s;
+        readonly SEquipa _e;
+        readonly Grid _raiz = new();
+        readonly ContentControl _topo = new(), _elenco = new();
+        readonly Panel _gaveta = new() { IsVisible = false };
+        CUi.Botao? _jogar;
+        Action? _aoFecharGaveta;
+
+        static readonly string[] Siglas = { "FP", "COR", "CAV", "CAN", "CAC", "SAR" };
+        static readonly string[] Setores = { "Goleiros", "Defensores", "Meio-campistas", "Atacantes" };
+        static readonly string[] NomePosicao = { "Goleiro", "Defensor", "Meio-campista", "Atacante" };
+
+        public EquipaCelular(TelaEquipa tela, Painel p, Sessao s, SEquipa e)
+        {
+            _tela = tela; _p = p; _s = s; _e = e;
+            Background = CUi.Fundo;
+            FontFamily = CUi.Fonte;
+            _raiz.RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto");
+            _raiz.Children.Add(_topo);
+            var abas = Abas();
+            Grid.SetRow(abas, 1);
+            _raiz.Children.Add(abas);
+            Grid.SetRow(_elenco, 2);
+            _raiz.Children.Add(_elenco);
+            var jogar = BarraJogar();
+            Grid.SetRow(jogar, 3);
+            _raiz.Children.Add(jogar);
+            var nav = Navegacao();
+            Grid.SetRow(nav, 4);
+            _raiz.Children.Add(nav);
+            Grid.SetRowSpan(_gaveta, 5);
+            _raiz.Children.Add(_gaveta);
+            Content = _raiz;
+            Refazer();
+            AttachedToVisualTree += (_, _) =>
+            {
+                _s.SemDialogos -= DepoisDeJanela;
+                _s.SemDialogos += DepoisDeJanela;
+                if (TopLevel.GetTopLevel(this) is { } tl) { tl.BackRequested -= Voltar; tl.BackRequested += Voltar; }
+            };
+            DetachedFromVisualTree += (_, _) =>
+            {
+                _s.SemDialogos -= DepoisDeJanela;
+                if (TopLevel.GetTopLevel(this) is { } tl) tl.BackRequested -= Voltar;
+            };
+        }
+
+        // o Voltar do Android fecha a gaveta antes de qualquer coisa
+        void Voltar(object? o, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            if (_gaveta.IsVisible) { FecharGaveta(); e.Handled = true; }
+        }
+
+        // uma janela do jogo fechou (o elenco, o dinheiro e a escalacao podem ter mudado)
+        void DepoisDeJanela()
+        {
+            _p.VoltarCelular();
+            Refazer();
+        }
+
+        // depois de cada acao: o topo, o elenco, o Jogar e a mensagem do Painel
+        void Refazer()
+        {
+            _topo.Content = Topo();
+            _elenco.Content = Elenco();
+            if (_jogar != null) _jogar.Habilitado = _p.PodeJogar;
+            if (_p.TirarMensagem() is { Length: > 0 } m) Aviso(m);
+        }
+
+        // ------------------------------------------------------------ o topo
+        Control Topo()
+        {
+            var m = _s.J.M;
+            int dv = m.DivisaoDa(_e);
+            string onde = dv < 0 ? "" : dv >= 4 ? T("Distrital")
+                : LugarNaDivisao(m.S.Divisoes[dv].Equipas.IndexOf(_e.ID) + 1, Pascal(m.S.Divisoes[dv].Nome, 20));
+            string tecnico = _s.TreinadorDa(_e) is { } t ? Painel.TextoCelular(t.Nome) : "";
+            var (letra, fundo) = Cores(_e);
+            Control escudo = (CUi.Retro ? null : Escudos.Controle(_e, 52)) ?? Circulo(fundo, letra, 44);
+            var nome = CUi.Txt(Painel.TextoCelular(_e.NomeCompleto), 19, CUi.TextoBarra, FontWeight.Bold);
+            var sub = CUi.Txt(tecnico + (onde.Length > 0 ? " · " + onde : ""), 13, CUi.FracoBarra);
+            var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,12,*") };
+            escudo.VerticalAlignment = VerticalAlignment.Center;
+            cab.Children.Add(escudo);
+            var nomes = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center, Children = { nome, sub } };
+            Grid.SetColumn(nomes, 2);
+            cab.Children.Add(nomes);
+            var numeros = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*,*"), Margin = new Thickness(0, 12, 0, 0) };
+            Control Num(string r, Control v, int c)
+            {
+                var s = new StackPanel { Spacing = 2, Children = { CUi.Txt(r, 12, CUi.FracoBarra), v } };
+                Grid.SetColumn(s, c);
+                return s;
+            }
+            numeros.Children.Add(Num(T("Temporada"), CUi.Txt(m.Ano.ToString(), 16, CUi.TextoBarra, FontWeight.Bold), 0));
+            numeros.Children.Add(Num(T("Em caixa"), CUi.Txt(_p.DinheiroCelular((int)_e.Dinheiro), 16, CUi.TextoBarra, FontWeight.Bold), 1));
+            double moral = Math.Clamp(Math.Round(Painel.MoralCelular(_e) * 10, MidpointRounding.ToEven) / 20, 0, 1);
+            var barra = new ProgressBar
+            {
+                Minimum = 0, Maximum = 1, Value = moral, Height = 8, MinHeight = 8, MinWidth = 0, Margin = new Thickness(0, 6, 8, 0),
+                Foreground = CUi.Retro ? W95.Amarelo : TemaVerde.Destaque, Background = CUi.Retro ? W95.Cinzento : TemaVerde.Alfa(Colors.White, 0.2),
+                CornerRadius = new CornerRadius(CUi.Retro ? 0 : 4),
+            };
+            numeros.Children.Add(Num(T("Moral"), barra, 2));
+            return new Border
+            {
+                Background = CUi.Barra, Padding = new Thickness(16, 14, 16, 14), Child = new StackPanel { Children = { cab, numeros } },
+                CornerRadius = new CornerRadius(0, 0, CUi.Retro ? 0 : 22, CUi.Retro ? 0 : 22),
+                BorderBrush = CUi.Retro ? W95.Preto : null, BorderThickness = new Thickness(0, 0, 0, CUi.Retro ? 1 : 0),
+            };
+        }
+
+        static (IBrush Letra, IBrush Fundo) Cores(SEquipa e)
+        {
+            IBrush C(byte[] b, IBrush padrao) => b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+            return (C(e.CorLetra, Brushes.Black), C(e.CorFundo, Brushes.White));
+        }
+
+        // sem logo (ou no Retro): o circulo nas cores da equipa
+        static Control Circulo(IBrush fundo, IBrush aro, double tam) => new Border
+        {
+            Width = tam, Height = tam, CornerRadius = new CornerRadius(tam / 2), Background = fundo, BorderBrush = aro, BorderThickness = new Thickness(3),
+        };
+
+        // ------------------------------------------------------------ as abas (pilulas)
+        Control Abas()
+        {
+            var s = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(12, 10, 12, 4) };
+            void Aba(string nome, Func<Control> conteudo)
+            {
+                var b = new CUi.Botao(T(nome), false, () => AbrirGaveta(T(nome), conteudo()));
+                b.MinHeight = 38;
+                b.Padding = new Thickness(16, 6);
+                s.Children.Add(b);
+            }
+            Aba("Jogo", PaginaJogo);
+            Aba("Escalação", PaginaEscalacao);
+            Aba("Finanças", PaginaFinancas);
+            if (_p.Adversario != null) Aba("Adversário", PaginaAdversario);
+            if (_s.J.Op.Patrocinios) Aba("Patrocínio", PaginaPatrocinio);
+            return new ScrollViewer { Content = s, HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden, VerticalScrollBarVisibility = ScrollBarVisibility.Disabled };
+        }
+
+        Control Linha(string rotulo, string valor, IBrush? cor = null)
+        {
+            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 30 };
+            g.Children.Add(CUi.Txt(rotulo, 14, CUi.Fraco));
+            var v = CUi.Txt(valor, 15, cor, FontWeight.SemiBold);
+            Grid.SetColumn(v, 1);
+            g.Children.Add(v);
+            return g;
+        }
+
+        Control PaginaJogo()
+        {
+            var p = new StackPanel { Spacing = 6 };
+            var adv = _p.Adversario;
+            var jogo = _tela._jogo;
+            if (adv != null && jogo != null)
+            {
+                bool casa = jogo.Casa == _e.ID;
+                p.Children.Add(Linha(T("Próximo jogo"), Painel.TextoCelular(adv.NomeCurto)));
+                p.Children.Add(Linha(T("Local"), casa ? T("Em casa") : T("Fora")));
+                if (jogo.Taca != 0) p.Children.Add(Linha(T("Competição"), T("Taça")));
+                if (_s.S.Arbitros.FindLast(x => x.ID == jogo.Arbitro) is { } arb)
+                    p.Children.Add(Linha(T("Árbitro"), Texto(arb.Nome) + " (" + NomePais(PaisDe(arb.Pais)) + ")"));
+                p.Children.Add(Linha(T("Moral do adversário"), (Math.Round(Painel.MoralCelular(adv) * 10) / 2).ToString("0.#")));
+            }
+            else p.Children.Add(CUi.Txt(T("Sem jogo nesta rodada."), 14, CUi.Fraco));
+            p.Children.Add(Linha(T("Dinheiro em caixa"), _p.DinheiroCelular((int)_e.Dinheiro)));
+            return p;
+        }
+
+        Control PaginaFinancas()
+        {
+            var p = new StackPanel { Spacing = 6 };
+            p.Children.Add(Linha(T("Dinheiro em caixa"), _p.DinheiroCelular((int)_e.Dinheiro), (int)_e.Dinheiro < 0 ? CUi.Erro : null));
+            long folha = _e.Jogadores.Sum(j => (long)j.Salario);
+            p.Children.Add(Linha(T("Salários por jogo"), _p.DinheiroCelular(folha)));
+            p.Children.Add(Linha(T("Jogadores"), _e.Jogadores.Count.ToString()));
+            var botoes = new StackPanel { Spacing = 8, Margin = new Thickness(0, 8, 0, 0) };
+            foreach (var (menu, itens) in _p.MenusCelular)
+                foreach (var (texto, acao, hab) in itens)
+                    if (acao != null && (texto.Contains(T("Estádio...")) || texto.Contains(T("Pedir / pagar empréstimo..."))))
+                    {
+                        var b = new CUi.Botao(texto.TrimEnd('.'), false, () => { FecharGaveta(); acao(); });
+                        b.HorizontalAlignment = HorizontalAlignment.Stretch;
+                        botoes.Children.Add(b);
+                    }
+            p.Children.Add(botoes);
+            return p;
+        }
+
+        Control PaginaEscalacao()
+        {
+            var p = new StackPanel { Spacing = 8 };
+            var escalar = _p.MenusCelular.Skip(1).FirstOrDefault().Itens ?? new();
+            var formacoes = new WrapPanel { ItemSpacing = 8, LineSpacing = 8 };
+            var outros = new List<CUi.Botao>();
+            foreach (var (texto, acao, hab) in escalar)
+            {
+                if (texto == "-" || acao == null) continue;
+                var b = new CUi.Botao(texto, texto == T("Automático"), () => { acao(); FecharGaveta(); Refazer(); });
+                b.Habilitado = hab?.Invoke() ?? true;
+                if (char.IsDigit(texto[0])) { b.MinWidth = 86; formacoes.Children.Add(b); }
+                else outros.Add(b);
+            }
+            p.Children.Add(CUi.Txt(T("Formação"), 13, CUi.Fraco, FontWeight.SemiBold));
+            p.Children.Add(formacoes);
+            p.Children.Add(CUi.Botoes(outros.ToArray()));
+            p.Children.Add(CUi.Txt(T("Toque no ponto à esquerda de cada jogador para trocar entre titular, reserva e fora."), 13, CUi.Fraco, FontWeight.Normal, true));
+            return p;
+        }
+
+        Control PaginaAdversario()
+        {
+            var adv = _p.Adversario!;
+            var p = new StackPanel { Spacing = 4 };
+            p.Children.Add(Linha(T("Time"), Painel.TextoCelular(adv.NomeCompleto)));
+            foreach (var j in adv.Jogadores.OrderBy(x => x.Posicao).ThenByDescending(x => x.Forca))
+            {
+                var g = new Grid { ColumnDefinitions = new ColumnDefinitions("30,*,Auto"), MinHeight = 28 };
+                g.Children.Add(CUi.Txt(Posicao(Math.Min((int)j.Posicao, 3)), 13, CUi.Fraco, FontWeight.Bold));
+                var n = CUi.Txt(Painel.NomeCelular(j), 14);
+                Grid.SetColumn(n, 1);
+                g.Children.Add(n);
+                var f = CUi.Txt(j.Forca.ToString(), 14, null, FontWeight.Bold);
+                Grid.SetColumn(f, 2);
+                g.Children.Add(f);
+                p.Children.Add(g);
+            }
+            return p;
+        }
+
+        Control PaginaPatrocinio()
+        {
+            var p = new StackPanel { Spacing = 6 };
+            var marcas = _s.J.Op.Marcas;
+            var mc = _e.MarcaMaster() != 0 ? marcas?.Registro(_e.MarcaMaster()) : null;
+            p.Children.Add(CUi.TituloSecao_(T("Patrocinador master")));
+            if (mc != null)
+            {
+                p.Children.Add(Linha(mc.Nome, _p.DinheiroCelular(_e.ValorMaster()) + " " + T("por temporada")));
+                int n = _e.EpocasMaster();
+                p.Children.Add(Linha(T("Restante"), T(n == 1 ? "{0} temporada restante" : "{0} temporadas restantes", (char)('0' + n))));
+            }
+            else p.Children.Add(CUi.Txt(T("Sem patrocinador"), 14, CUi.Fraco));
+            var mp = _e.JogosPontual() != 0 ? marcas?.Registro(_e.MarcaPontual()) : null;
+            p.Children.Add(CUi.TituloSecao_(T("Patrocínio pontual")));
+            if (mp != null)
+            {
+                int j = _e.JogosPontual();
+                p.Children.Add(Linha(mp.Nome, T("{0} por jogo", _p.DinheiroCelular(_e.ValorPontual()))));
+                p.Children.Add(Linha(T("Restante"), T(j == 1 ? "{0} jogo restante" : "{0} jogos restantes", (char)('0' + j))));
+            }
+            else p.Children.Add(CUi.Txt(T("Nenhum no momento"), 14, CUi.Fraco));
+            return p;
+        }
+
+        // ------------------------------------------------------------ o elenco
+        Control Elenco()
+        {
+            var lista = new StackPanel { Spacing = 6, Margin = new Thickness(12, 4, 12, 12) };
+            foreach (var grupo in _p.OrdemCelular().GroupBy(j => Math.Min((int)j.Posicao, 3)))
+            {
+                var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("*,44,44"), Margin = new Thickness(4, 10, 8, 2) };
+                cab.Children.Add(CUi.TituloSecao_(T(Setores[grupo.Key]) + "  ·  " + grupo.Count()));
+                var c1 = CUi.Txt(T("Comp"), 11.5, CUi.TituloSecao, FontWeight.SemiBold); c1.HorizontalAlignment = HorizontalAlignment.Center;
+                var c2 = CUi.Txt(T("Força"), 11.5, CUi.TituloSecao, FontWeight.SemiBold); c2.HorizontalAlignment = HorizontalAlignment.Center;
+                Grid.SetColumn(c1, 1); Grid.SetColumn(c2, 2);
+                cab.Children.Add(c1); cab.Children.Add(c2);
+                lista.Children.Add(cab);
+                var cartao = new StackPanel();
+                foreach (var j in grupo) cartao.Children.Add(LinhaJogador(j));
+                lista.Children.Add(new Border
+                {
+                    Background = CUi.Retro ? W95.Branco : TemaVerde.CartaoHub, CornerRadius = new CornerRadius(CUi.Retro ? 0 : 14),
+                    BorderBrush = CUi.Linha, BorderThickness = new Thickness(1), ClipToBounds = true, Child = cartao,
+                });
+            }
+            return new ScrollViewer { Content = lista, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
+        }
+
+        Control LinhaJogador(SJogador j)
+        {
+            int esc = Mem.Escalacao(j);
+            bool fora = j.JogosLesao > 0 || j.Suspensao > 0;
+            // o ponto da escalacao (toque troca): titular cheio, reserva anel, fora apagado
+            var ponto = new Border
+            {
+                Width = 14, Height = 14, CornerRadius = new CornerRadius(7),
+                Background = esc == Mem.EscTitular ? CUi.Bom : Brushes.Transparent,
+                BorderBrush = esc == Mem.EscReserva ? (CUi.Retro ? W95.Marinho : TemaVerde.Destaque) : esc == Mem.EscTitular ? CUi.Bom : CUi.Linha,
+                BorderThickness = new Thickness(esc == Mem.EscReserva ? 2.5 : 1.5),
+                HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
+            };
+            var alvoPonto = new Clicavel { Width = 40, MinHeight = 40, Background = Brushes.Transparent, Child = ponto, CorFoco = null };
+            alvoPonto.Clique += () => { _p.AlternarCelular(j); Refazer(); };
+            var pos = CUi.Txt(Posicao(Math.Min((int)j.Posicao, 3)), 12.5, CUi.Retro ? W95.Marinho : TemaVerde.Destaque, FontWeight.Bold);
+            pos.Width = 18;
+            var meio = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
+            if (W95.Imagem($"Bandeiras/{Painel.PaisCelular(j)}.png") is { } bb)
+                meio.Children.Add(new Image { Source = bb, Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center });
+            var nome = CUi.Txt(Painel.NomeCelular(j), 15, fora ? CUi.Fraco : CUi.Retro ? W95.Preto : null, FontWeight.Medium);
+            meio.Children.Add(nome);
+            foreach (var sel in Selos(j)) meio.Children.Add(sel);
+            var comp = CUi.Txt(j.Comportamento < Siglas.Length ? Siglas[j.Comportamento] : "", 11.5, CUi.Fraco, FontWeight.Bold);
+            comp.HorizontalAlignment = HorizontalAlignment.Center;
+            var forca = CUi.Txt(j.Forca.ToString(), 16, CUi.Retro ? W95.Marinho : TemaVerde.Destaque, FontWeight.Bold);
+            forca.HorizontalAlignment = HorizontalAlignment.Center;
+            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,Auto,*,44,44"), MinHeight = 40 };
+            g.Children.Add(alvoPonto);
+            Grid.SetColumn(pos, 1); g.Children.Add(pos);
+            var corpo = new Clicavel { Background = Brushes.Transparent, Child = meio, CorFoco = null, Padding = new Thickness(6, 0, 0, 0) };
+            corpo.Clique += () => AbrirFicha(j);
+            Grid.SetColumn(corpo, 2); g.Children.Add(corpo);
+            Grid.SetColumn(comp, 3); g.Children.Add(comp);
+            Grid.SetColumn(forca, 4); g.Children.Add(forca);
+            return new Border { BorderBrush = CUi.Linha, BorderThickness = new Thickness(0, 0, 0, 0.5), Child = g };
+        }
+
+        // ao lado do nome: amarelos (1 ou 2 sobrepostos), suspensao e lesao
+        IEnumerable<Control> Selos(SJogador j)
+        {
+            Control Selo(string t, IBrush fundo, IBrush letra) => new Border
+            {
+                Background = fundo, CornerRadius = new CornerRadius(CUi.Retro ? 0 : 5), Padding = new Thickness(4, 0), VerticalAlignment = VerticalAlignment.Center,
+                Child = CUi.Txt(t, 11.5, letra, FontWeight.Bold),
+            };
+            if (j.Suspensao > 0) yield return Selo("⊘" + j.Suspensao, new SolidColorBrush(Color.Parse("#FFE4E1")), new SolidColorBrush(Color.Parse("#C62828")));
+            else if (_s.J.M.Regras.CartoesAmarelos && Painel.AmarelosCelular(j) is int a && a > 0)
+                yield return Selo(a == 1 ? "▮" : "▮▮", Brushes.Transparent, new SolidColorBrush(Color.Parse("#F5B400")));
+            if (j.JogosLesao > 0) yield return Selo("✚" + j.JogosLesao, Brushes.White, new SolidColorBrush(Color.Parse("#D32F2F")));
+        }
+
+        // a ficha do jogador, com as acoes
+        void AbrirFicha(SJogador j)
+        {
+            var p = new StackPanel { Spacing = 6 };
+            int pos = Math.Min((int)j.Posicao, 3);
+            p.Children.Add(Linha(T("Posição"), T(NomePosicao[pos])));
+            p.Children.Add(Linha(T("País"), Painel.PaisCelular(j)));
+            p.Children.Add(Linha(T("Força"), j.Forca.ToString()));
+            p.Children.Add(Linha(T("Salário"), _p.DinheiroCelular(j.Salario)));
+            if (_s.J.M.Regras.CartoesAmarelos)
+            {
+                p.Children.Add(Linha(T("Nota"), j.Nota.ToString()));
+                p.Children.Add(Linha(T("Risco de lesão"), j.Lesao.ToString()));
+            }
+            p.Children.Add(Linha(T("Jogos"), _p.HistCelular(j, Mem.HistJogos).ToString()));
+            p.Children.Add(Linha(T("Gols"), _p.HistCelular(j, Mem.HistGolos).ToString()));
+            p.Children.Add(Linha(T("Gols na temporada"), Mem.Golos14(j).ToString()));
+            if (j.JogosLesao > 0) p.Children.Add(Linha(T("Lesionado"), T(j.JogosLesao == 1 ? "Lesionado por 1 jogo" : "Lesionado por {0} jogos", j.JogosLesao), CUi.Erro));
+            if (j.Suspensao > 0) p.Children.Add(Linha(T("Suspenso"), T(j.Suspensao == 1 ? "Suspenso por 1 jogo" : "Suspenso por {0} jogos", j.Suspensao), CUi.Erro));
+            var vender = new CUi.Botao(T("Vender"), true, () => { FecharGaveta(); _p.VenderCelular(j); Refazer(); });
+            var renovar = new CUi.Botao(T("Renovar contrato"), false, () => { FecharGaveta(); _p.RenovarCelular(j); Refazer(); });
+            renovar.Habilitado = MercadoJogo.PodeMudarSalario(j);
+            p.Children.Add(new Border { Height = 6 });
+            p.Children.Add(CUi.Botoes(renovar, vender));
+            AbrirGaveta(Painel.NomeCelular(j), p);
+        }
+
+        // ------------------------------------------------------------ jogar e os menus
+        Control BarraJogar()
+        {
+            _jogar = new CUi.Botao(T("Jogar"), true, () => _p.JogarCelular());
+            _jogar.HorizontalAlignment = HorizontalAlignment.Stretch;
+            _jogar.MinHeight = 48;
+            return new Border { Padding = new Thickness(12, 6, 12, 6), Background = CUi.Fundo, Child = _jogar };
+        }
+
+        Control Navegacao()
+        {
+            var g = new UniformGrid { Rows = 1 };
+            string[] icones = { "ajustes", "escudo", "escudo", "lupa", "trofeu", "info" };
+            int k = 0;
+            foreach (var (menu, itens) in _p.MenusCelular)
+            {
+                var m = menu; var lista = itens; int i = k++;
+                var conteudo = new StackPanel
+                {
+                    Spacing = 2, HorizontalAlignment = HorizontalAlignment.Center,
+                    Children =
+                    {
+                        Ui.Icone(icones[Math.Min(i, icones.Length - 1)], 20, CUi.TextoBarra),
+                        new TextBlock { Text = m, FontFamily = CUi.Fonte, FontSize = 10.5, Foreground = CUi.TextoBarra, HorizontalAlignment = HorizontalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis },
+                    },
+                };
+                var b = new Clicavel { Background = Brushes.Transparent, Child = conteudo, MinHeight = 56, Padding = new Thickness(2, 6), CorFoco = null };
+                b.Clique += () => AbrirGaveta(m, Itens(lista));
+                g.Children.Add(b);
+            }
+            return new Border { Background = CUi.Barra, Child = g, BorderBrush = CUi.Linha, BorderThickness = new Thickness(0, 1, 0, 0) };
+        }
+
+        Control Itens(List<(string Texto, Action? Acao, Func<bool>? Hab)> itens)
+        {
+            var p = new StackPanel { Spacing = 4 };
+            foreach (var (texto, acao, hab) in itens)
+            {
+                if (texto == "-") { p.Children.Add(new Border { Height = 1, Background = CUi.Linha, Margin = new Thickness(0, 4) }); continue; }
+                var a = acao;
+                var it = new CUi.Item(CUi.Txt(texto, 15), () => { FecharGaveta(); a?.Invoke(); Refazer(); });
+                it.IsEnabled = a != null && (hab?.Invoke() ?? true);
+                p.Children.Add(it);
+            }
+            return p;
+        }
+
+        // ------------------------------------------------------------ a gaveta (de baixo)
+        void AbrirGaveta(string titulo, Control conteudo, Action? aoFechar = null)
+        {
+            _aoFecharGaveta = aoFechar;
+            var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(0, 0, 0, 10) };
+            cab.Children.Add(CUi.Txt(titulo, 18, null, FontWeight.Bold));
+            var fechar = new CUi.Botao("✕", false, FecharGaveta) { Padding = new Thickness(14, 4), MinHeight = 38 };
+            Grid.SetColumn(fechar, 1);
+            cab.Children.Add(fechar);
+            var folha = new Border
+            {
+                Background = CUi.Retro ? W95.Face : TemaVerde.FundoTela, VerticalAlignment = VerticalAlignment.Bottom, MaxHeight = 620,
+                CornerRadius = new CornerRadius(CUi.Retro ? 0 : 22, CUi.Retro ? 0 : 22, 0, 0), Padding = new Thickness(16, 14, 16, 18),
+                BorderBrush = CUi.Retro ? W95.Preto : TemaVerde.Borda, BorderThickness = new Thickness(1, 1, 1, 0),
+                Child = new DockPanel
+                {
+                    Children = { cab, new ScrollViewer { Content = conteudo, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled } },
+                },
+            };
+            DockPanel.SetDock(cab, Dock.Top);
+            var veu = new Border { Background = TemaVerde.Veu };
+            veu.PointerPressed += (_, e) => { e.Handled = true; FecharGaveta(); };
+            _gaveta.Children.Clear();
+            _gaveta.Children.Add(veu);
+            _gaveta.Children.Add(folha);
+            _gaveta.IsVisible = true;
+        }
+
+        void FecharGaveta()
+        {
+            _gaveta.IsVisible = false;
+            _gaveta.Children.Clear();
+            var f = _aoFecharGaveta;
+            _aoFecharGaveta = null;
+            f?.Invoke();
+        }
+
+        // um aviso curto (Gravar, Vender...) numa caixa
+        void Aviso(string texto)
+        {
+            var caixa = CUi.Caixa_(TelaAcerca.Nome, CUi.Txt(texto, 15, null, FontWeight.Normal, true), new CUi.Botao(T("OK"), true, FecharGaveta));
+            _gaveta.Children.Clear();
+            _gaveta.Children.Add(caixa);
+            _gaveta.IsVisible = true;
+        }
+    }
+    }
+}

@@ -67,6 +67,13 @@ public sealed partial class TelaEquipa : UserControl
     void Montar()
     {
         var p = _painel = new Painel(this, _s, _e, _jogo);
+        // no celular: a tela em pe do kit (TelaEquipaCelular.cs), com o Painel de controlador
+        if (Celular.Ativo)
+        {
+            Background = CUi.Fundo;
+            Content = new Painel.EquipaCelular(this, p, _s, _e);
+            return;
+        }
         // as sobras quando a janela do sistema tem outra proporcao
         Background = p.Moderno ? Painel.MFundo : Brushes.Black;
         // so a janela da equipa (sem o verde em volta), ampliada mantendo a proporcao dela
