@@ -599,8 +599,12 @@ public static class CUi
             DetachedFromVisualTree += (_, _) => Abertas.Remove(this);
         }
 
-        // troca o corpo (uma janela que muda de passo: o leilao, os penaltis)
-        public void Rodape(Control? c) => _rodape.Content = c;
+        // troca o rodape (uma janela que muda de passo: o leilao, os penaltis); null o esconde
+        public void Rodape(Control? c)
+        {
+            _rodape.Content = c;
+            if (_rodape.Parent is Border b) b.IsVisible = c != null;
+        }
 
         // as folhas abertas (a de cima recebe o Voltar)
         internal static readonly List<Folha> Abertas = new();
