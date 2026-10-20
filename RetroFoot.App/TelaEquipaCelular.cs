@@ -525,7 +525,8 @@ public sealed partial class TelaEquipa
             var cor = _corFundo;
             var g = new Grid
             {
-                ColumnDefinitions = new ColumnDefinitions(Atual ? "34,20,*,28,30,28,18,14,84" : "34,20,*,30,20,16,90"),
+                // (nota, risco de lesao e comportamento ficam no deslizante: a linha nao aperta)
+                ColumnDefinitions = new ColumnDefinitions("34,22,*,32,22,22,92"),
                 MinHeight = titulos ? 26 : 34,
             };
             void Por(string t, int col, HorizontalAlignment h = HorizontalAlignment.Left)
@@ -540,13 +541,8 @@ public sealed partial class TelaEquipa
             Por(titulos ? "P" : Posicao(Math.Min((int)j!.Posicao, 3)), c++);
             Por(titulos ? T("Nome") : Painel.NomeCelular(j!), c++);
             Por(titulos ? "F" : j!.Forca.ToString(), c++, HorizontalAlignment.Right);
-            if (Atual)
-            {
-                Por(titulos ? "N" : j!.Nota.ToString(), c++, HorizontalAlignment.Right);
-                Por(titulos ? "RL" : j!.Lesao.ToString(), c++, HorizontalAlignment.Right);
-            }
             Por(titulos ? "S" : S(j!), c++, HorizontalAlignment.Center);
-            Por(titulos ? "L" : j!.JogosLesao != 0 ? "L" : "", c++);
+            Por(titulos ? "L" : j!.JogosLesao != 0 ? "L" : "", c++, HorizontalAlignment.Center);
             Por(titulos ? T("Salário") : _p.DinheiroCelular(j!.Salario) + (MercadoJogo.PodeMudarSalario(j) ? " " : "+"), c, HorizontalAlignment.Right);
             return g;
         }
@@ -708,6 +704,7 @@ public sealed partial class TelaEquipa
                 c.Children.Add(a); c.Children.Add(b);
                 s.Children.Add(c);
             }
+            if (!salario) Cel(CUi.SiglaComp(j), T("Comp"));
             if (_s.J.M.Regras.CartoesAmarelos) { Cel(j.Nota.ToString(), T("Nota")); Cel(j.Lesao.ToString(), "RL"); }
             Cel(_p.HistCelular(j, Mem.HistJogos).ToString(), T("Jogos"));
             Cel(_p.HistCelular(j, Mem.HistGolos).ToString(), T("Gols"));
