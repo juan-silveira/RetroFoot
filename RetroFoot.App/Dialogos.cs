@@ -269,9 +269,9 @@ static class Formatado
     // folga entre o fim do texto e a barra de rolagem
     public const double Folga = 6;
 
-    record struct Coluna(bool Negrito, bool Italico, bool Vermelho, bool Direita, bool Mais10, int W, string Txt, Bitmap? Logo = null);
+    internal record struct Coluna(bool Negrito, bool Italico, bool Vermelho, bool Direita, bool Mais10, int W, string Txt, Bitmap? Logo = null);
 
-    static List<Coluna> Ler(byte[] s, bool negrito)
+    internal static List<Coluna> Ler(byte[] s, bool negrito)
     {
         var l = new List<Coluna>();
         bool direita = false, mais10 = false, italico = false, vermelho = false;

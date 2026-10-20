@@ -34,6 +34,8 @@ public static class TelaTreinadores
 
     public static void Gestao(Dialogos d, Sessao s, Action? fechou = null)
     {
+        // o celular: as folhas do kit (TreinadoresCelular.cs), com as mesmas regras
+        if (Celular.Ativo) { TreinadoresCelular.Gestao(d, s, fechou); return; }
         if (Visual.Moderno) { TreinadoresModernos.Gestao(d, s, fechou); return; }
         var m = s.J.M;
         var humanos = new List<Treinador>();
@@ -151,6 +153,7 @@ public static class TelaTreinadores
     public static void Perfil(Dialogos d, Treinador? t, Action? ok = null)
     {
         if (t == null) return;
+        if (Celular.Ativo) { TreinadoresCelular.Perfil(d, t, ok); return; }
         if (Visual.Moderno) { TreinadoresModernos.Perfil(d, t, ok); return; }
         var j = new Janela(T("Perfil de {0}", Dlg.Texto(t.Nome)), 434, 273, W95.Face);
         var nb = j.Por(new Notebook { FonteAbas = Dlg.MsSans12, TopoPagina = 26, AbasPorLinha = 3 }, 0, 0, 434, 273);
@@ -198,6 +201,7 @@ public static class TelaTreinadores
 
     internal static Control JanelaConvite(Treinador t, Equipa e, Action<bool> fim)
     {
+        if (Celular.Ativo) return TreinadoresCelular.Convite(t, e, fim);
         if (Visual.Moderno) return TreinadoresModernos.Convite(t, e, fim);
         var j = new Janela(T("Convite"), 360, 201, Dlg.VerdeClaro);
         j.Por(new Bevel(), 8, 8, 345, 97);

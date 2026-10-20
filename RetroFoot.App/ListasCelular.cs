@@ -1,0 +1,507 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
+using RetroFoot.Motor.Partida;
+using RetroFoot.Motor.Save;
+using Chicotada = RetroFoot.Motor.Rodada.Chicotada;
+using static RetroFoot.App.Idioma;
+
+namespace RetroFoot.App;
+
+// As listas dos menus Campeonato e Tecnico no celular (Celular.cs), nas folhas do kit
+// (CelularUi.cs): a tela toda, com a seta de voltar, e uma linha por item, feita para o
+// celular (o calendario com o adversario e o resultado, os artilheiros com a bandeira, as
+// transferencias em duas linhas...). Os dados e as regras sao os de TelaListas (o computador);
+// estas so desenham. As listas sem versao propria (Generica) vem das mesmas linhas formatadas
+// (Formatado), em letra legivel e com a coluna larga a encolher.
+static class ListasCelular
+{
+    // ---------------------------------------------------------------- a folha
+    // abre a lista: titulo, as linhas (rolam) e o voltar (que chama fechou); fim = rola ate o
+    // ultimo item (OpUltimo); inteira = false: a folha de baixo com o OK (as chicotadas)
+    internal static (CUi.Folha Folha, Action Fechar, Action Tirar) Abrir(Dialogos d, string titulo, string? sub, Control corpo,
+        Action? fechou, bool fim = false, bool inteira = true, Control? icone = null)
+    {
+        CUi.Folha? f = null;
+        bool fechado = false;
+        // Tirar: so fecha (o toque que abre o plantel, como o duplo clique do computador)
+        void Tirar() { if (fechado) return; fechado = true; d.Fechar(f!); }
+        void Fechar() { if (fechado) return; Tirar(); fechou?.Invoke(); }
+        Control? rodape = null;
+        if (!inteira)
+        {
+            var ok = new CUi.Botao(T("OK"), true, Fechar) { HorizontalAlignment = HorizontalAlignment.Stretch };
+            rodape = ok;
+        }
+        f = new CUi.Folha(titulo, corpo, rodape, sub, icone, inteira: inteira, fechar: Fechar);
+        if (fim)
+            f.AttachedToVisualTree += (_, _) => Dispatcher.UIThread.Post(() =>
+            {
+                if (corpo.FindAncestorOfType<ScrollViewer>() is { } sv) sv.ScrollToEnd();
+            }, DispatcherPriority.Background);
+        d.Abrir(f);
+        return (f, Fechar, Tirar);
+    }
+
+    // as linhas num grupo (com o fio entre elas); toque(i) != null: a linha se toca
+    internal static Control Grupo(int n, Func<int, Control> linha, Func<int, Action?>? toque = null, double altura = 44)
+    {
+        if (n == 0) return new TextBlock { Text = T("Nada a mostrar."), FontFamily = CUi.Fonte, FontSize = 14 * Acessibilidade.Texto, Foreground = CUi.Retro ? W95.Branco : CUi.Fraco, VerticalAlignment = VerticalAlignment.Top };
+        var ls = new List<Control>(n);
+        for (int i = 0; i < n; i++)
+        {
+            var t = CUi.Toque(linha(i), toque?.Invoke(i), altura);
+            t.Padding = new Thickness(10, 4);
+            ls.Add(t);
+        }
+        var g = CUi.Grupo(ls);
+        g.VerticalAlignment = VerticalAlignment.Top;
+        return g;
+    }
+
+    // ---------------------------------------------------------------- pecas
+    // uma grade com as colunas dadas e os controles nelas (null = coluna vazia)
+    internal static Grid Grade(string colunas, params Control?[] cs)
+    {
+        var g = new Grid { ColumnDefinitions = new ColumnDefinitions(colunas), VerticalAlignment = VerticalAlignment.Center };
+        for (int i = 0; i < cs.Length; i++)
+        {
+            if (cs[i] is not { } c) continue;
+            c.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetColumn(c, i);
+            g.Children.Add(c);
+        }
+        return g;
+    }
+
+    // um numero (ou texto curto) numa coluna, a direita
+    internal static TextBlock Num(string s, double tam = 14, IBrush? cor = null, bool negrito = false)
+    {
+        var t = CUi.Txt(s, tam, cor, negrito ? FontWeight.Bold : FontWeight.Normal);
+        t.HorizontalAlignment = HorizontalAlignment.Right;
+        t.TextAlignment = TextAlignment.Right;
+        return t;
+    }
+
+    // a equipa: no Retro a caixa nas cores dela (como as listas do classico); no Moderno o
+    // logo (ou o circulo nas cores) e o nome, que encolhe com reticencias
+    internal static Control Eq(Equipa? e, double tam = 14, bool negrito = false)
+    {
+        if (e == null) return CUi.Txt("—", tam, CUi.Fraco);
+        string nome = TelaDinheiro.Texto(e.NomeCurto);
+        if (CUi.Retro) return CUi.NomeEquipa(e, nome, tam, negrito);
+        var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*"), VerticalAlignment = VerticalAlignment.Center };
+        var esc = CUi.Escudo(e, tam + 8);
+        esc.Margin = new Thickness(0, 0, 7, 0);
+        g.Children.Add(esc);
+        var t = CUi.Txt(nome, tam, null, negrito ? FontWeight.Bold : FontWeight.Medium);
+        Grid.SetColumn(t, 1);
+        g.Children.Add(t);
+        return g;
+    }
+
+    // a cor do numero que se destaca (a forca, os golos, o ano)
+    internal static IBrush Forte => CUi.Retro ? W95.Marinho : TemaVerde.Destaque;
+
+    // o cabecalho das colunas, por cima do grupo (sobre o fundo verde)
+    internal static Control Cabecalho(string colunas, params string?[] nomes)
+    {
+        var cs = nomes.Select((n, i) =>
+        {
+            if (n == null) return (Control?)null;
+            var t = CUi.Txt(n, 11.5, CUi.TituloSecao, FontWeight.Bold);
+            if (i > 0 && i == nomes.Length - 1 || (i > 1 && colunas.Split(',')[i] != "*")) { t.HorizontalAlignment = HorizontalAlignment.Right; t.TextAlignment = TextAlignment.Right; }
+            return t;
+        }).ToArray();
+        var g = Grade(colunas, cs);
+        g.Margin = new Thickness(11, 0, 11, 4);
+        return g;
+    }
+
+    static StackPanel Pilha(params Control[] cs)
+    {
+        var p = new StackPanel { Spacing = 8 };
+        foreach (var c in cs) p.Children.Add(c);
+        return p;
+    }
+
+    // ---------------------------------------------------------------- generica
+    // TelaListas.Lista no celular: as linhas formatadas (Formatado) em letra de 14,5, cada coluna
+    // no tamanho do texto; a larga (o nome: a mais larga alinhada a esquerda, fora a ultima)
+    // fica com o que sobra e encolhe com reticencias. Os mesmos codigos: negrito, italico,
+    // vermelho, a direita, o logo.
+    internal static void Generica(Dialogos d, string titulo, int n, Func<int, byte[]> linha, int opcoes, Action<int>? duplo, Action? fechou)
+    {
+        bool numerada = (opcoes & TelaListas.OpNumerada) != 0;
+        bool toca = (opcoes & TelaListas.OpDuplo) != 0 && duplo != null;
+        Action Tirar = () => { };
+        var corpo = Grupo(n, i => LinhaFormatada(Formatado.Ler(numerada ? TelaListas.Numerada(i, linha(i)) : linha(i), false)),
+            toca ? i => () => { Tirar(); duplo!(i); } : null, 40);
+        (_, _, Tirar) = Abrir(d, titulo, null, corpo, fechou, (opcoes & TelaListas.OpUltimo) != 0);
+    }
+
+    static Control LinhaFormatada(List<Formatado.Coluna> l)
+    {
+        int k = -1;
+        for (int j = 0; j < l.Count - 1; j++)
+            if (!l[j].Direita && l[j].W >= 60 && (k < 0 || l[j].W > l[k].W)) k = j;
+        if (k < 0) k = l.Count - 1;
+        var g = new Grid { ColumnSpacing = 8, VerticalAlignment = VerticalAlignment.Center };
+        for (int j = 0; j < l.Count; j++)
+        {
+            var c = l[j];
+            g.ColumnDefinitions.Add(new ColumnDefinition(j == k ? GridLength.Star : GridLength.Auto));
+            string txt = c.Txt;
+            if (txt.Length > 0 && txt[0] == 'ÿ') txt = "•";
+            else if (txt.Length > 0 && txt[0] == 'þ') txt = "–";
+            else if (txt.Length > 0 && txt[0] == 'ý') txt = "";
+            txt = txt.Trim();
+            if (txt.Length == 0 && c.Logo == null) continue;
+            var t = CUi.Txt(txt, 14.5, c.Vermelho ? CUi.Erro : null, c.Negrito ? FontWeight.Bold : FontWeight.Normal);
+            if (c.Italico) t.FontStyle = FontStyle.Italic;
+            Control cel = t;
+            if (c.Direita) { t.HorizontalAlignment = HorizontalAlignment.Right; t.TextAlignment = TextAlignment.Right; }
+            if (c.Logo is { } lg)
+            {
+                var p = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
+                p.Children.Add(new Image { Source = lg, Width = 20, Height = 20, Margin = new Thickness(0, 0, 6, 0), VerticalAlignment = VerticalAlignment.Center });
+                Grid.SetColumn(t, 1);
+                p.Children.Add(t);
+                cel = p;
+            }
+            cel.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetColumn(cel, j);
+            g.Children.Add(cel);
+        }
+        return g;
+    }
+
+    // ---------------------------------------------------------------- Campeonato
+    // o calendario: a jornada, o local (C/F/N: cheio em casa; vermelho na Copa, como as cores
+    // do original), o adversario, o resultado (verde ganhou, vermelho perdeu) e embaixo dele o
+    // prolongamento / os penaltis e o publico. toque(i): o plantel do adversario (compra directa).
+    internal static void Calendario(Dialogos d, Sessao s, List<EntradaCalendario> cal, Action<int>? toque, Action? fechou, string sub)
+    {
+        Action Tirar = () => { };
+        var corpo = Grupo(cal.Count, i => LinhaCalendario(s, cal[i]), toque == null ? null : i => () => { Tirar(); toque(i); }, 46);
+        (_, _, Tirar) = Abrir(d, T("Calendário"), sub, corpo, fechou);
+    }
+
+    static Control LinhaCalendario(Sessao s, EntradaCalendario c)
+    {
+        var adv = s.Equipa(c.W08);
+        bool taca = c.B07 == 1;
+        int local = Math.Min((int)c.W0E, 2);
+        IBrush cor = local == 2 ? CUi.Fraco : taca ? (CUi.Retro ? W95.Vermelho : TemaVerde.Vermelho) : (CUi.Retro ? W95.Azul : TemaVerde.Azul);
+        var jn = Num((short)c.W04 > 0 ? c.W04.ToString() : "", 13, CUi.Fraco, true);
+        var letra = CUi.Txt(TelaListas.Local("CFN"[local]), 12.5, local == 0 ? (CUi.Retro ? W95.Branco : TemaVerde.FundoTela) : cor, FontWeight.Bold);
+        letra.HorizontalAlignment = HorizontalAlignment.Center;
+        letra.Tag = "fixo";
+        var marca = new Border
+        {
+            Width = 26, Height = 24, CornerRadius = new CornerRadius(CUi.Retro ? 0 : 7), Background = local == 0 ? cor : Brushes.Transparent,
+            BorderBrush = cor, BorderThickness = new Thickness(1.5), Child = letra, Margin = new Thickness(8, 0, 10, 0),
+        };
+        var nome = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+        var eq = Eq(adv, 14.5);
+        Control meio = eq;
+        if (taca)
+        {
+            var gm = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,Auto") };
+            gm.Children.Add(eq);
+            var et = CUi.Etiqueta(T("Copa"), CUi.Retro ? W95.Branco : TemaVerde.FundoTela, cor);
+            et.Margin = new Thickness(6, 0, 0, 0);
+            Grid.SetColumn(et, 1);
+            gm.Children.Add(et);
+            meio = gm;
+            eq.MaxWidth = 170;
+        }
+        Control? res = null;
+        if ((short)c.W0A >= 0)
+        {
+            short gp = (short)c.W0A, gc = (short)c.W0C;
+            var placar = Num(gp + " : " + gc, 16, gp > gc ? CUi.Bom : gp < gc ? CUi.Erro : CUi.Texto, true);
+            string extra = (c.B06 switch { 1 => T("  a. p."), 2 => T("  v. pen."), 3 => T("  d. pen."), _ => "" }).Trim();
+            string pub = ((int)c.D10).ToString();
+            var baixo = Num(extra.Length > 0 ? extra + " · " + pub : pub, 11.5, CUi.Fraco);
+            res = new StackPanel { Spacing = 0, Children = { placar, baixo } };
+        }
+        return Grade("22,Auto,*,Auto", jn, marca, meio, res);
+    }
+
+    // os artilheiros (TelaListas.MelhoresMarcadores): o lugar, a bandeira, o nome, a equipa e
+    // os golos
+    internal static void Marcadores(Dialogos d, string titulo, List<(Jogador P, Equipa E, int Golos)> ms)
+    {
+        var corpo = Pilha(Cabecalho("26,*,Auto,40", "#", T("Jogador"), T("Time"), T("Gols")),
+            Grupo(ms.Count, i =>
+            {
+                var (p, e, g) = ms[i];
+                var nome = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
+                if (CUi.Bandeira(TextosMercado.PaisDe(p.Pais)) is { } b) { b.Margin = new Thickness(0, 0, 6, 0); nome.Children.Add(b); }
+                var n = CUi.Txt(TextosMercado.NomeJogador(p), 14.5, null, FontWeight.Medium);
+                Grid.SetColumn(n, 1);
+                nome.Children.Add(n);
+                var eq = Eq(e, 12.5);
+                eq.MaxWidth = 130;
+                eq.Margin = new Thickness(8, 0, 0, 0);
+                return Grade("26,*,Auto,40", Num((i + 1).ToString(), 13, CUi.Fraco, true), Margem(nome, 8), eq, Num(g.ToString(), 16, Forte, true));
+            }));
+        Abrir(d, titulo, null, corpo, null);
+    }
+
+    static Control Margem(Control c, double esq) { c.Margin = new Thickness(esq, 0, 0, 0); return c; }
+
+    // os ultimos vencedores: o ano e, embaixo um do outro, o campeao (a taca dourada) e o
+    // vencedor da Copa (a prateada), cada um com o treinador embaixo (em negrito o humano)
+    internal static void UltimosVencedores(Dialogos d, Sessao s, IReadOnlyList<ushort[]> cs)
+    {
+        Control Sub(bool copa, ushort eq, ushort tr)
+        {
+            var t = s.J.M.Treinador(tr);
+            var nt = CUi.Txt(t != null ? Dlg.Texto(t.Nome) : "", 12.5, CUi.Fraco, t != null && t.Humano != 0 ? FontWeight.Bold : FontWeight.Normal);
+            var p = new StackPanel { Spacing = 1, Children = { Eq(s.Equipa(eq), 14), nt } };
+            var ic = Taca(20, copa);
+            ic.Margin = new Thickness(0, 2, 8, 0);
+            ic.VerticalAlignment = VerticalAlignment.Top;
+            var g = Grade("Auto,*", ic, p);
+            ic.VerticalAlignment = VerticalAlignment.Top;
+            return g;
+        }
+        var corpo = Pilha(Legenda(), Grupo(cs.Count, i =>
+        {
+            var w = cs[i];
+            var ano = CUi.Txt(w[0].ToString(), 16, Forte, FontWeight.Bold);
+            ano.VerticalAlignment = VerticalAlignment.Top;
+            var p = new StackPanel { Spacing = 8, Margin = new Thickness(0, 4), Children = { Sub(false, w[1], w[2]), Sub(true, w[3], w[4]) } };
+            var g = Grade("54,*", ano, p);
+            ano.VerticalAlignment = VerticalAlignment.Top;
+            ano.Margin = new Thickness(0, 6, 0, 0);
+            return g;
+        }, null, 60));
+        Abrir(d, T("Últimos campeões"), T("Campeões do campeonato e da copa"), corpo, null, fim: true);
+    }
+
+    // as duas tacas (campeonato e copa) e o que querem dizer, sobre o fundo
+    static Control Legenda()
+    {
+        var p = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(4, 0, 0, 0) };
+        foreach (var (copa, nome) in new[] { (false, T("Campeonato")), (true, T("Copa")) })
+        {
+            p.Children.Add(Taca(16, copa, true));
+            var t = CUi.Txt(nome, 12.5, CUi.TituloSecao, FontWeight.Bold);
+            t.Margin = new Thickness(0, 0, 10, 0);
+            p.Children.Add(t);
+        }
+        return p;
+    }
+
+    // as ultimas transferencias, em duas linhas: a posicao, a bandeira, o nome (vermelho na
+    // compra directa) e a forca na hora; embaixo a equipa compradora e o preco
+    internal static void UltimasTransferencias(Dialogos d, Sessao s, List<Transferencia> tr, Action<int>? toque)
+    {
+        Action Tirar = () => { };
+        var corpo = Grupo(tr.Count, i =>
+        {
+            var t = tr[i];
+            var (eq, k) = s.J.M.EquipaDoJogador(t.W06);
+            IBrush? cor = t.B04 != 0 ? CUi.Erro : null;
+            Control cima;
+            if (eq != null)
+            {
+                var p = eq.Jogadores[k];
+                var pos = CUi.Txt(Idioma.Posicao(Math.Min((int)p.Posicao, 3)), 12.5, Forte, FontWeight.Bold);
+                var nome = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
+                if (CUi.Bandeira(TextosMercado.PaisDe(p.Pais)) is { } b) { b.Margin = new Thickness(0, 0, 6, 0); nome.Children.Add(b); }
+                var n = CUi.Txt(TextosMercado.NomeJogador(p), 15, cor, FontWeight.SemiBold);
+                Grid.SetColumn(n, 1);
+                nome.Children.Add(n);
+                cima = Grade("22,*,Auto", pos, nome, Num(((short)t.W08).ToString(), 16, Forte, true));
+            }
+            else cima = CUi.Txt("—", 15, CUi.Fraco);
+            var seta = CUi.Txt("→", 13, CUi.Fraco);
+            var preco = Num(FormatoDinheiro.Valor(s.S, (int)t.D0C), 14, cor, true);
+            preco.Margin = new Thickness(8, 0, 0, 0);
+            var baixo = Grade("22,*,Auto", seta, Eq(s.Equipa(t.W0A), 13), preco);
+            return new StackPanel { Spacing = 4, Children = { cima, baixo } };
+        }, toque == null ? null : i => () => { Tirar(); toque(i); }, 60);
+        (_, _, Tirar) = Abrir(d, T("Últimas transferências"), null, corpo, null, fim: true);
+    }
+
+    // ---------------------------------------------------------------- Time e Jogador
+    // o historico da equipa: o ano, o titulo e o treinador (em negrito o humano)
+    internal static void HistoricoEquipa(Dialogos d, Sessao s, Equipa e, List<EventoEquipa> ev, Action? fechou)
+    {
+        var corpo = Grupo(ev.Count, i =>
+        {
+            var v = ev[i];
+            var t = s.J.M.Treinador(v.W09);
+            bool humano = t != null && t.Humano != 0;
+            string tit = v.B04 switch { 1 => T("Campeonato"), 2 => T("Copa"), 3 => T("DOBRADINHA"), 4 => T("2º lugar"), 5 => T("3º lugar"), _ => "" };
+            var nt = CUi.Txt(t != null ? Dlg.Texto(t.Nome) : "", 13, humano ? null : CUi.Fraco, humano ? FontWeight.Bold : FontWeight.Normal);
+            nt.MaxWidth = 170;
+            nt.Margin = new Thickness(8, 0, 0, 0);
+            return Grade("54,*,Auto", CUi.Txt(((int)v.D05).ToString(), 15, Forte, FontWeight.Bold),
+                CUi.Txt(tit, 14.5, null, v.B04 is 1 or 2 or 3 ? FontWeight.Bold : FontWeight.Medium), nt);
+        });
+        Abrir(d, Dlg.Texto(e.NomeCompleto), null, corpo, fechou, fim: true);
+    }
+
+    // os jogadores adquiridos (as compras que ainda nao chegaram): a linha do elenco com a
+    // equipa de onde vem
+    internal static void Contratacoes(Dialogos d, List<(Jogador P, Equipa E)> ps, Action? fechou)
+    {
+        var corpo = Grupo(ps.Count, i =>
+        {
+            var eq = Eq(ps[i].E, 12.5);
+            eq.MaxWidth = 120;
+            return CUi.LinhaJogador(ps[i].P, extra: eq, comp: false);
+        });
+        Abrir(d, T("Jogadores adquiridos"), null, corpo, fechou);
+    }
+
+    // ---------------------------------------------------------------- Tecnico
+    // a historia do treinador: o ano e o texto do evento, com a equipa (os titulos em negrito)
+    internal static void HistoriaTreinador(Dialogos d, Sessao s, Treinador t, List<EventoTreinador> ev)
+    {
+        var corpo = Grupo(ev.Count, i =>
+        {
+            var v = ev[i];
+            var e = s.Equipa(v.W09);
+            bool titulo = v.B04 is 3 or 4 or 8;
+            string txt = v.B04 switch
+            {
+                1 => T("Contratado pelo "), 2 => T("Despedido"), 3 => T("VENCEDOR DO CAMPEONATO"), 4 => T("VENCEDOR DA COPA"),
+                5 => T("Entrada no "), 6 => T("Rebaixado para o "), 7 => T("Promovido para o "), 8 => T("DOBRADINHA"),
+                9 => T("2º lugar"), 10 => T("3º lugar"), _ => "",
+            };
+            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
+            var tx = CUi.Txt(txt.TrimEnd(), 14, v.B04 == 6 ? CUi.Erro : v.B04 == 7 ? CUi.Bom : null, titulo ? FontWeight.Bold : FontWeight.Normal);
+            g.Children.Add(tx);
+            if (v.B04 is 1 or 5 or 6 or 7)
+            {
+                var eq = Eq(e, 13.5);
+                eq.Margin = new Thickness(6, 0, 0, 0);
+                Grid.SetColumn(eq, 1);
+                g.Children.Add(eq);
+            }
+            return Grade("54,*", CUi.Txt(((int)v.D05).ToString(), 15, Forte, FontWeight.Bold), g);
+        });
+        Abrir(d, Dlg.Texto(t.Nome), null, corpo, null, fim: true);
+    }
+
+    // as chicotadas depois da jornada: a folha de baixo com o OK; o escudo da equipa e o texto
+    // da TLash (em negrito o humano)
+    internal static void Chicotadas(Dialogos d, Sessao s, IReadOnlyList<Chicotada> l, Action? fechou)
+    {
+        var linhas = new List<(Equipa? E, string Texto, bool Humano)>();
+        foreach (var c in l)
+        {
+            var t = s.J.M.Treinador(c.Treinador);
+            var e = s.Equipa(c.Equipa);
+            string nome = t != null ? Dlg.Texto(t.Nome) : "", eq = e != null ? TelaDinheiro.Texto(e.NomeCurto) : "";
+            string txt;
+            if (c.Tipo != 0) txt = nome + T(" foi demitido do ") + eq;
+            else if (t == null) continue;
+            else if (e == null) txt = T("Para o seu lugar foi contratado ") + nome;
+            else txt = T("Troca com ") + nome + " (" + eq + ")";
+            linhas.Add((e, txt, t != null && t.Humano != 0));
+        }
+        var corpo = Grupo(linhas.Count, i =>
+        {
+            var (e, txt, h) = linhas[i];
+            var esc = CUi.Escudo(e, 28);
+            esc.Margin = new Thickness(0, 0, 10, 0);
+            return Grade("Auto,*", e != null ? esc : null, CUi.Txt(txt, 14.5, null, h ? FontWeight.Bold : FontWeight.Normal, true));
+        });
+        Abrir(d, T("Demissões de Técnicos"), null, corpo, fechou, inteira: false);
+    }
+
+    // o ranking dos treinadores (ja ordenado): o lugar, o nome (negrito o humano) e a equipa
+    // embaixo, os titulos (campeonatos + copas e a soma) e, com o add-in, os pontos
+    internal static void RankingTreinadores(Dialogos d, Sessao s, List<Treinador> tr, bool pontos)
+    {
+        string cols = pontos ? "34,*,Auto,52" : "34,*,Auto";
+        var cab = pontos ? Cabecalho(cols, "#", T("Treinador"), T("Títulos"), T("Pontos")) : Cabecalho(cols, "#", T("Treinador"), T("Títulos"));
+        var corpo = Pilha(cab, Grupo(tr.Count, i =>
+        {
+            var t = tr[i];
+            var nome = CUi.Txt(Dlg.Texto(t.Nome), 15, null, t.Humano != 0 ? FontWeight.Bold : FontWeight.Medium);
+            var eq = Eq(s.J.M.EquipaDoTreinador(t.ID), 12.5);
+            var meio = new StackPanel { Spacing = 3, Children = { nome, eq }, Margin = new Thickness(4, 0, 0, 0) };
+            short c = (short)t.D16, ta = (short)(t.D16 >> 16);
+            var tit = new StackPanel { Spacing = 0, Margin = new Thickness(8, 0, 0, 0), Children = { Num((c + ta).ToString(), 16, Forte, true), Num(c + " + " + ta, 11.5, CUi.Fraco) } };
+            return pontos
+                ? Grade(cols, Num((i + 1).ToString(), 13, CUi.Fraco, true), meio, tit, Num(((int)t.D0E).ToString(), 15, null, true))
+                : Grade(cols, Num((i + 1).ToString(), 13, CUi.Fraco, true), meio, tit);
+        }, null, 56));
+        Abrir(d, T("Ranking de Treinadores"), null, corpo, null);
+    }
+
+    // ---------------------------------------------------------------- Titulos
+    // os titulos: as abas dos ultimos campeoes (por ano), do total (o que o classico mostra:
+    // campeonato, copa e a soma) e do ranking de cada competicao. O Retro abre no total (a lista
+    // do classico); o Moderno nos ultimos campeoes (como no computador).
+    internal static void Titulos(Dialogos d, List<TelaTitulos.Ano> anos)
+    {
+        var area = new ContentControl();
+        var abas = new[] { T("Últimos campeões"), T("Total"), T("Campeonato"), T("Copa") };
+        Control Pagina(int k)
+        {
+            if (anos.Count == 0) return CUi.Txt(T("Ainda não há campeões: os títulos aparecem no fim da primeira temporada."), 14, CUi.Retro ? W95.Branco : CUi.Fraco, FontWeight.Normal, true);
+            switch (k)
+            {
+                case 0:
+                    return Pilha(Cabecalho("54,*,*", T("Ano"), T("Campeonato"), T("Copa")), Grupo(anos.Count, i =>
+                    {
+                        var a = anos[i];
+                        var c1 = Eq(a.Campeao, 13.5); c1.Margin = new Thickness(0, 0, 6, 0);
+                        return Grade("54,*,*", CUi.Txt(a.Valor.ToString(), 15, Forte, FontWeight.Bold), c1, Eq(a.Taca, 13.5));
+                    }));
+                case 1:
+                {
+                    var ids = anos.SelectMany(a => new[] { a.Campeao, a.Taca }).Where(e => e != null).Select(e => e!).DistinctBy(e => e.ID).ToList();
+                    var ls = ids.Select(e => (E: e, C: anos.Count(a => a.Campeao?.ID == e.ID), T: anos.Count(a => a.Taca?.ID == e.ID)))
+                        .OrderByDescending(x => x.C + x.T).ThenByDescending(x => x.C).ToList();
+                    const string cols = "*,52,52,52";
+                    return Pilha(Cabecalho(cols, T("Time"), T("Camp."), T("Copa"), T("Total")), Grupo(ls.Count, i =>
+                        Grade(cols, Eq(ls[i].E, 14), Num(ls[i].C.ToString(), 15), Num(ls[i].T.ToString(), 15), Num((ls[i].C + ls[i].T).ToString(), 16, Forte, true))));
+                }
+                default:
+                {
+                    var r = TelaTitulos.Ranking(anos, k == 2 ? a => a.Campeao : a => a.Taca);
+                    return Grupo(r.Count, i =>
+                    {
+                        var tacas = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 1, Margin = new Thickness(8, 0) };
+                        for (int x = 0; x < Math.Min(r[i].N, 5); x++) tacas.Children.Add(Taca(18, k == 3));
+                        return Grade("*,Auto,36", Eq(r[i].E, 14), tacas, Num(r[i].N.ToString(), 17, Forte, true));
+                    });
+                }
+            }
+        }
+        int inicial = CUi.Retro ? 1 : 0;
+        var (fila, _) = CUi.Abas(abas, k => area.Content = Pagina(k), inicial);
+        fila.Margin = new Thickness(-14, -6, -14, 0);
+        area.Content = Pagina(inicial);
+        var corpo = new StackPanel { Spacing = 8, Children = { fila, area } };
+        Abrir(d, T("Títulos"), anos.Count == 0 ? null : T("Campeões do campeonato e da copa"), corpo, null);
+    }
+
+    // a taca (o "trophy" do Lucide, ISC), na cor do destaque
+    // (copa: a prateada; sobreFundo: no Retro, sobre o verde, a dourada fica amarela)
+    internal static Control Taca(double tam, bool copa = false, bool sobreFundo = false) => new Path
+    {
+        Data = Geometry.Parse("M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"),
+        Stroke = copa ? (CUi.Retro ? (sobreFundo ? W95.Branco : W95.Cinzento) : TemaVerde.Prata)
+            : CUi.Retro ? (sobreFundo ? W95.Amarelo : W95.Marinho) : TemaVerde.Ouro,
+        StrokeThickness = 1.8, StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round,
+        Width = tam, Height = tam, Stretch = Stretch.Uniform, VerticalAlignment = VerticalAlignment.Center,
+    };
+}
