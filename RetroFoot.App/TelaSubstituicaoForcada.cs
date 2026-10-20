@@ -38,6 +38,14 @@ public sealed class TelaSubstituicaoForcada : UserControl
     {
         _e = e; _saiu = saiu;
         Focusable = true;
+        if (Celular.Ativo)
+        {
+            // o celular (PartidaCelular.cs), com as mesmas regras
+            var c = new SubstituicaoForcadaCelular(e, saiu);
+            c.Fechou += () => { if (_fechou) return; _fechou = true; Fechou?.Invoke(); };
+            Content = c;
+            return;
+        }
         if (Visual.Moderno)
         {
             // o visual Moderno (PartidaDialogosModernos.cs), com as mesmas regras

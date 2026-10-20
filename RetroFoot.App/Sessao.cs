@@ -226,7 +226,16 @@ public sealed class Sessao
         // no celular (em pe) o quadro de 800x600 deixava a janela com menos da metade do
         // tamanho: ela e ampliada pelo tamanho dela mesma, ate a largura da tela (enquanto as
         // janelas nao tem a versao propria do celular)
-        if (Celular.Ativo)
+        if (Celular.Ativo && CUi.FolhaDe(dialogo) is { } folha)
+        {
+            // a janela feita para o celular: na largura da tela, de baixo (ou a tela toda)
+            quadro.Children.Clear();
+            dialogo.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch;
+            dialogo.VerticalAlignment = folha.Inteira ? Avalonia.Layout.VerticalAlignment.Stretch : Avalonia.Layout.VerticalAlignment.Bottom;
+            camada.Children.Add(dialogo);
+            camada.SizeChanged += (_, e) => { if (!folha.Inteira) dialogo.MaxHeight = e.NewSize.Height * 0.92; };
+        }
+        else if (Celular.Ativo)
         {
             quadro.Children.Clear();
             camada.Children.Add(new Viewbox { Stretch = Avalonia.Media.Stretch.Uniform, Margin = new Avalonia.Thickness(8), Child = dialogo });

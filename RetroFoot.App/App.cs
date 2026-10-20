@@ -50,6 +50,13 @@ public class App : Application
             _ when celular => new TelaInicio(Mostrar),
             _ => TelaInicio.ComSobre(Mostrar),
         };
+        // o Voltar do Android (e o Esc da previa): primeiro a janela do celular de cima
+        if (celular)
+            raiz.AttachedToVisualTree += (_, _) =>
+            {
+                if (TopLevel.GetTopLevel(raiz) is { } tl)
+                    tl.BackRequested += (_, e) => { if (!e.Handled && CUi.Folha.Voltar()) e.Handled = true; };
+            };
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             bool retrato = Environment.GetEnvironmentVariable("RETROFOOT_RETRATO") == "1";

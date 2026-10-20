@@ -109,7 +109,7 @@ public sealed partial class TelaEquipa
         // o Voltar do Android fecha a gaveta antes de qualquer coisa
         void Voltar(object? o, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            if (_gaveta.IsVisible) { FecharGaveta(); e.Handled = true; }
+            if (!e.Handled && _gaveta.IsVisible) { FecharGaveta(); e.Handled = true; }
         }
 
         // uma janela do jogo fechou (o elenco, o dinheiro e a escalacao podem ter mudado)

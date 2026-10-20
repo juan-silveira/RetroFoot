@@ -45,7 +45,16 @@ public sealed class Configuracoes
     // os lances que aparecem ao lado do placar na jornada (bits de TelaJornada.Mostra*;
     // padrao: todos, como no classico)
     public int LancesNaJornada { get; set; } = 0x1F;
-    public string Idioma { get; set; } = IdiomaPT;
+    public string Idioma { get; set; } = IdiomaInicial();
+
+    // sem Configuracoes gravadas: o pt-PT do original; no Android, o idioma do telefone
+    static string IdiomaInicial()
+    {
+        if (!OperatingSystem.IsAndroid()) return IdiomaPT;
+        var c = System.Globalization.CultureInfo.CurrentUICulture;
+        return c.Name.StartsWith("pt-BR", StringComparison.OrdinalIgnoreCase) ? IdiomaBR
+            : c.TwoLetterISOLanguageName switch { "pt" => IdiomaPT, "es" => IdiomaES, "en" => IdiomaEN, _ => IdiomaEN };
+    }
     // Liberado: todos os paises do COUNTRY.TXE na lista Bosman (sem limite de estrangeiros)
     public bool EstrangeirosLiberados { get; set; }
     // o formato da janela: 4:3 (padrao, o visual do original) ou 16:9 (telas largas)

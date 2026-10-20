@@ -28,13 +28,16 @@ public static class DemoDialogos
         if (s == null) return new TextBlock { Text = "Demo: não achei o save (RETROFOOT_SAVE)", Foreground = Brushes.White };
         // a tela de baixo (um quadro de 800x600) e a camada dos dialogos por cima
         var quadro = new Canvas { Width = 800, Height = 600, Background = W95.Verde };
-        var dlg = new Dialogos(c =>
+        // no celular, as janelas abrem na camada da Sessao (as folhas do celular)
+        var dlg = Celular.Ativo ? (Dialogos)s : new Dialogos(c =>
         {
             Canvas.SetLeft(c, Math.Floor((800 - c.Width) / 2));
             Canvas.SetTop(c, Math.Floor((600 - c.Height) / 2));
             quadro.Children.Add(c);
         }, c => quadro.Children.Remove(c));
         var humano = s.S.Equipas.FirstOrDefault(e => Mem.Humano(s.TreinadorDa(e))) ?? s.S.Equipas[0];
+        // (as janelas da partida precisam do time escalado: titulares e reservas)
+        if (!humano.Jogadores.Any(j => Mem.Escalacao(j) == Mem.EscTitular)) RetroFoot.Motor.Rodada.Escalacao.Automatico(s.J.R, humano);
         var acoes = new (string Nome, Action Abrir)[]
         {
             ("calendario", () => TelaListas.Calendario(dlg, s, humano)),
@@ -82,12 +85,37 @@ public static class DemoDialogos
                 Mostrar(c);
             }),
             ("extras", () => TelaAcerca.Extras(dlg)),
+            ("lesao", () =>
+            {
+                Control? c = null;
+                var saiu = humano.Jogadores.First(j => Mem.Escalacao(j) == Mem.EscTitular && j.Posicao != 0);
+                var t = new TelaSubstituicaoForcada(humano, saiu);
+                t.Fechou += () => dlg.Fechar(t);
+                c = t;
+                Mostrar(c);
+            }),
         };
+        // as janelas do celular de cada grupo (DemoCelular*.cs)
+        var extras = new System.Collections.Generic.List<(string Nome, Action Abrir)>();
+        DemoCelular.Entradas(extras, dlg, s, humano, c => Mostrar(c));
+        acoes = acoes.Concat(extras).ToArray();
         void Mostrar(Control c)
         {
+            if (Celular.Ativo) { s.AbrirDialogo(c); return; }
             Canvas.SetLeft(c, Math.Floor((800 - c.Width) / 2));
             Canvas.SetTop(c, Math.Floor((600 - c.Height) / 2));
             quadro.Children.Add(c);
+        }
+        if (Celular.Ativo)
+        {
+            // o celular: os botoes numa pagina do kit, por baixo das janelas da Sessao
+            var w = new WrapPanel { ItemSpacing = 8, LineSpacing = 8 };
+            foreach (var a in acoes) w.Children.Add(new CUi.Botao(a.Nome, false, a.Abrir));
+            s.Mostrar(CUi.Pagina(CUi.BarraTopo("Demo", "as janelas no celular"), w));
+            var ab = Environment.GetEnvironmentVariable("RETROFOOT_DIALOGO");
+            if (!string.IsNullOrEmpty(ab))
+                Dispatcher.UIThread.Post(() => acoes.FirstOrDefault(a => a.Nome == ab).Abrir?.Invoke(), DispatcherPriority.Loaded);
+            return raiz;
         }
         // os botoes do demo, em duas colunas a esquerda
         for (int i = 0; i < acoes.Length; i++)
