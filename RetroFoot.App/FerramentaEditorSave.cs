@@ -135,7 +135,7 @@ public sealed class TelaEditorSave : UserControl
         return g;
     }
 
-    static readonly string[] CoresPosicao = { "#D99A00", "#1E6FD0", "#2E9E44", "#D23A2F" };
+    internal static readonly string[] CoresPosicao = { "#D99A00", "#1E6FD0", "#2E9E44", "#D23A2F" };
 
     static Border Selo(int posicao, double largura = 22) => new()
     {
@@ -148,8 +148,8 @@ public sealed class TelaEditorSave : UserControl
         },
     };
 
-    static string Num(long v) => FormatoDinheiro.Numero(v);
-    static string Dec(double v) => v.ToString("0.#", Atual == EN ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo("pt-PT"));
+    internal static string Num(long v) => FormatoDinheiro.Numero(v);
+    internal static string Dec(double v) => v.ToString("0.#", Atual == EN ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo("pt-PT"));
 
     // ---------------------------------------------------------------- a pagina
     void Montar()
@@ -266,9 +266,9 @@ public sealed class TelaEditorSave : UserControl
         return l;
     }
 
-    static string Comportamento(int c) => c is >= 0 and < 6 ? T(LimitesSave.Comportamentos[c]) : "?";
+    internal static string Comportamento(int c) => c is >= 0 and < 6 ? T(LimitesSave.Comportamentos[c]) : "?";
 
-    static string Situacao(JogadorEditavel j) =>
+    internal static string Situacao(JogadorEditavel j) =>
         ((j.Suspensao > 0 ? "S" + j.Suspensao : j.AmarelosAcumulados > 0 ? "A" + j.AmarelosAcumulados : "") + (j.JogosLesionado > 0 ? " L" + j.JogosLesionado : "")).Trim();
 
     Grid Linha(string[] textos, bool cabecalho, IBrush? cor = null)
@@ -524,16 +524,16 @@ public sealed class TelaEditorSave : UserControl
     }
 
     // ---------------------------------------------------------------- aplicar e gravar
-    static bool LerInteiro(string? s, long min, long max, out long v)
+    internal static bool LerInteiro(string? s, long min, long max, out long v)
     {
         var t = new string((s ?? "").Where(c => !char.IsWhiteSpace(c) && c is not ('.' or ',')).ToArray());
         return long.TryParse(t, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out v) && v >= min && v <= max;
     }
 
-    static bool LerReal(string? s, double min, double max, out double v) =>
+    internal static bool LerReal(string? s, double min, double max, out double v) =>
         double.TryParse((s ?? "").Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out v) && v >= min && v <= max;
 
-    static string Faixa(string nome, string min, string max) => T("{0}: use um valor de {1} a {2}.", nome, min, max);
+    internal static string Faixa(string nome, string min, string max) => T("{0}: use um valor de {1} a {2}.", nome, min, max);
 
     // passa os campos do jogo e do clube para o save em memoria; o erro, ou null
     string? Aplicar()
@@ -715,31 +715,9 @@ public sealed class TelaEditorSave : UserControl
 
         Janelinha(j.Nome, p, T("OK"), () =>
         {
-            string? erro = null;
-            long f = 0, sal = 0, n = 0, l = 0, su = 0, am = 0, le = 0;
-            if (!LerInteiro(forca.Text, LimitesSave.ForcaMin, LimitesSave.ForcaMax, out f)) erro = Faixa(T("Força"), "1", Num(LimitesSave.ForcaMax));
-            else if (!LerInteiro(salario.Text, LimitesSave.SalarioMin, LimitesSave.SalarioMax, out sal)) erro = Faixa(T("Salário"), Num(LimitesSave.SalarioMin), Num(LimitesSave.SalarioMax));
-            else if (!LerInteiro(nota.Text, 1, 10, out n)) erro = Faixa(T("Nota"), "1", "10");
-            else if (!LerInteiro(lesao.Text, 0, 10, out l)) erro = Faixa(T("Lesão"), "0", "10");
-            else if (!LerInteiro(susp.Text, 0, LimitesSave.SuspensaoMax, out su)) erro = Faixa(T("Suspenso (S)"), "0", LimitesSave.SuspensaoMax.ToString());
-            else if (!LerInteiro(amar.Text, 0, LimitesSave.AmarelosAcumuladosMax, out am)) erro = Faixa(T("Amarelos (A)"), "0", LimitesSave.AmarelosAcumuladosMax.ToString());
-            else if (!LerInteiro(lesionado.Text, 0, LimitesSave.JogosLesionadoMax, out le)) erro = Faixa(T("Lesionado (L)"), "0", LimitesSave.JogosLesionadoMax.ToString());
-            bool est = n != j.Nota ? LimitesSave.TemEstrela(j.Posicao, (int)n) : j.Estrela;
-            if (erro == null && (f != j.Forca || n != j.Nota))
-            {
-                var (qual, valor, max) = LimitesSave.Estouro(eq.Jogadores, j, (int)f, (int)n, est);
-                if (qual != LimitesSave.Limite.Nenhum)
-                {
-                    int fm = LimitesSave.ForcaMaximaNoElenco(eq.Jogadores, j, (int)n, est);
-                    erro = qual switch
-                    {
-                        LimitesSave.Limite.ForcaJogador => T("Com nota {0}, acima de força {1} o jogo calcula errado e ele nunca marca golo.", n, Num(max)),
-                        LimitesSave.Limite.SomaPesos => T("Os pesos de golo do plantel somariam {0} (máximo {1}): os golos sairiam sempre do mesmo jogador, ou a equipa deixaria de marcar.", Num(valor), Num(max)),
-                        LimitesSave.Limite.SomaForca => T("A força do plantel somaria {0} (máximo {1}): o público dos jogos sairia errado.", Num(valor), Num(max)),
-                        _ => T("A melhor escalação somaria {0} (máximo {1}): a força das equipas na partida sairia errada.", Num(valor), Num(max)),
-                    } + " " + (fm >= 1 ? T("Força máxima neste plantel: {0}", Num(fm)) : "");
-                }
-            }
+            var erro = ValidarFicha(eq, j, forca.Text, salario.Text, nota.Text, lesao.Text, susp.Text, amar.Text, lesionado.Text, out var v);
+            long f = v.Forca, sal = v.Salario, n = v.Nota, l = v.Lesao, su = v.Suspensao, am = v.Amarelos, le = v.Lesionado;
+            bool est = v.Estrela;
             if (erro != null) { erroTxt.Text = erro; return false; }
             bool mudou = f != j.Forca || sal != j.Salario || n != j.Nota || l != j.Lesao || su != j.Suspensao || am != j.AmarelosAcumulados
                 || le != j.JogosLesionado || comp.SelectedIndex != Math.Clamp(j.Comportamento, 0, 5);
@@ -752,6 +730,42 @@ public sealed class TelaEditorSave : UserControl
             MostrarPlantel(j);
             return true;
         }, ctx.Largo ? 560 : 520, forca);
+    }
+
+    // os valores da ficha (o texto das caixas) conferidos com os limites do jogo e do plantel
+    // (LimitesSave): o erro, ou null. Serve a ficha do computador e a do celular
+    internal readonly record struct ValoresFicha(int Forca, long Salario, int Nota, int Lesao, int Suspensao, int Amarelos, int Lesionado, bool Estrela);
+
+    internal static string? ValidarFicha(EquipaEditavel eq, JogadorEditavel j, string? forca, string? salario, string? nota, string? lesao,
+        string? susp, string? amar, string? lesionado, out ValoresFicha valores)
+    {
+        string? erro = null;
+        long f = 0, sal = 0, n = 0, l = 0, su = 0, am = 0, le = 0;
+        if (!LerInteiro(forca, LimitesSave.ForcaMin, LimitesSave.ForcaMax, out f)) erro = Faixa(T("Força"), "1", Num(LimitesSave.ForcaMax));
+        else if (!LerInteiro(salario, LimitesSave.SalarioMin, LimitesSave.SalarioMax, out sal)) erro = Faixa(T("Salário"), Num(LimitesSave.SalarioMin), Num(LimitesSave.SalarioMax));
+        else if (!LerInteiro(nota, 1, 10, out n)) erro = Faixa(T("Nota"), "1", "10");
+        else if (!LerInteiro(lesao, 0, 10, out l)) erro = Faixa(T("Lesão"), "0", "10");
+        else if (!LerInteiro(susp, 0, LimitesSave.SuspensaoMax, out su)) erro = Faixa(T("Suspenso (S)"), "0", LimitesSave.SuspensaoMax.ToString());
+        else if (!LerInteiro(amar, 0, LimitesSave.AmarelosAcumuladosMax, out am)) erro = Faixa(T("Amarelos (A)"), "0", LimitesSave.AmarelosAcumuladosMax.ToString());
+        else if (!LerInteiro(lesionado, 0, LimitesSave.JogosLesionadoMax, out le)) erro = Faixa(T("Lesionado (L)"), "0", LimitesSave.JogosLesionadoMax.ToString());
+        bool est = n != j.Nota ? LimitesSave.TemEstrela(j.Posicao, (int)n) : j.Estrela;
+        if (erro == null && (f != j.Forca || n != j.Nota))
+        {
+            var (qual, valor, max) = LimitesSave.Estouro(eq.Jogadores, j, (int)f, (int)n, est);
+            if (qual != LimitesSave.Limite.Nenhum)
+            {
+                int fm = LimitesSave.ForcaMaximaNoElenco(eq.Jogadores, j, (int)n, est);
+                erro = qual switch
+                {
+                    LimitesSave.Limite.ForcaJogador => T("Com nota {0}, acima de força {1} o jogo calcula errado e ele nunca marca golo.", n, Num(max)),
+                    LimitesSave.Limite.SomaPesos => T("Os pesos de golo do plantel somariam {0} (máximo {1}): os golos sairiam sempre do mesmo jogador, ou a equipa deixaria de marcar.", Num(valor), Num(max)),
+                    LimitesSave.Limite.SomaForca => T("A força do plantel somaria {0} (máximo {1}): o público dos jogos sairia errado.", Num(valor), Num(max)),
+                    _ => T("A melhor escalação somaria {0} (máximo {1}): a força das equipas na partida sairia errada.", Num(valor), Num(max)),
+                } + " " + (fm >= 1 ? T("Força máxima neste plantel: {0}", Num(fm)) : "");
+            }
+        }
+        valores = new ValoresFicha((int)f, sal, (int)n, (int)l, (int)su, (int)am, (int)le, est);
+        return erro;
     }
 
     // ---------------------------------------------------------------- janelinhas por cima
