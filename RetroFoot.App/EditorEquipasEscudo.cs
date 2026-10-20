@@ -29,13 +29,13 @@ namespace RetroFoot.App;
 public sealed partial class TelaEditorEquipas
 {
     // a previa do visual Classico do jogo: a Arial e o relevo do Win95 (W95 em TelaInicio.cs)
-    static readonly FontFamily Arial = new("avares://RetroFoot.App/Assets/Fontes#Liberation Sans");
-    static readonly BoxShadows Relevo = BoxShadows.Parse("inset 1 1 0 0 #A6A6A6, inset -1 -1 0 0 #9E9E9E, inset 2 2 0 0 #FFFFFF, inset -2 -2 0 0 #A6A6A6");
-    static readonly BoxShadows RelevoAfundado = BoxShadows.Parse("inset 1 1 0 0 #6A6A6A, inset -1 -1 0 0 #6A6A6A, inset 2 2 0 0 #A6A6A6, inset -2 -2 0 0 #F5F5F5");
+    internal static readonly FontFamily Arial = new("avares://RetroFoot.App/Assets/Fontes#Liberation Sans");
+    internal static readonly BoxShadows Relevo = BoxShadows.Parse("inset 1 1 0 0 #A6A6A6, inset -1 -1 0 0 #9E9E9E, inset 2 2 0 0 #FFFFFF, inset -2 -2 0 0 #A6A6A6");
+    internal static readonly BoxShadows RelevoAfundado = BoxShadows.Parse("inset 1 1 0 0 #6A6A6A, inset -1 -1 0 0 #6A6A6A, inset 2 2 0 0 #A6A6A6, inset -2 -2 0 0 #F5F5F5");
 
-    enum TipoEscudo { Automatico, Nenhum, Imagem, Colecao }
+    internal enum TipoEscudo { Automatico, Nenhum, Imagem, Colecao }
 
-    sealed class EscolhaEscudo
+    internal sealed class EscolhaEscudo
     {
         public TipoEscudo Tipo;
         public Rgba? Imagem;              // 256x256 (Imagem)
@@ -45,7 +45,7 @@ public sealed partial class TelaEditorEquipas
 
     EscolhaEscudo? escudoPendente;
 
-    static string Requisitos => T("Qualquer imagem PNG, JPG, WEBP, SVG ou BMP. O ideal: quadrada ou quase, fundo transparente, pelo menos 128 px. O RetroFoot corta as sobras, pode tirar um fundo de cor única e centra o escudo num quadrado de 256 px, como os do jogo.");
+    internal static string Requisitos => T("Qualquer imagem PNG, JPG, WEBP, SVG ou BMP. O ideal: quadrada ou quase, fundo transparente, pelo menos 128 px. O RetroFoot corta as sobras, pode tirar um fundo de cor única e centra o escudo num quadrado de 256 px, como os do jogo.");
 
     // ---------------------------------------------------------------- aba Escudo
     Control AbaEscudo()
@@ -96,9 +96,12 @@ public sealed partial class TelaEditorEquipas
     }
 
     // o escudo que vale agora (o escolhido e ainda nao gravado, ou o da pasta/jogo) e de onde vem
-    (Bitmap? Bmp, string Origem) EscudoAtual(EquipaEditavel e)
+    (Bitmap? Bmp, string Origem) EscudoAtual(EquipaEditavel e) => EscudoAtual(raiz, escudoPendente, e);
+
+    // (tambem o do celular: FerramentaEditorEquipasCelular.cs)
+    internal static (Bitmap? Bmp, string Origem) EscudoAtual(string raiz, EscolhaEscudo? pendente, EquipaEditavel e)
     {
-        if (escudoPendente is { } p)
+        if (pendente is { } p)
             return p.Tipo switch
             {
                 TipoEscudo.Imagem => (p.Bitmap, T("Imagem nova, adaptada")),
@@ -115,7 +118,7 @@ public sealed partial class TelaEditorEquipas
         return b != null ? (b, T("Automático: da coleção do jogo")) : (null, T("Automático: sem logo (o jogo desenha o escudo nas cores)"));
     }
 
-    static Bitmap? PacoteDe(EquipaEditavel e) =>
+    internal static Bitmap? PacoteDe(EquipaEditavel e) =>
         Escudos.ArquivoDoPacote(e.Pais, e.NomeCompleto, e.NomeAbreviado) is { } a ? Escudos.DoPacote(a) : null;
 
     void Escolher(EscolhaEscudo es)
@@ -287,7 +290,7 @@ public sealed partial class TelaEditorEquipas
         AbrirModal(titulo, new ScrollViewer { Content = p, MaxHeight = 520 }, largo ? 900 : 760);
     }
 
-    static Rgba Reduzida(Rgba img, int lado)
+    internal static Rgba Reduzida(Rgba img, int lado)
     {
         // reduz mantendo a proporcao (so para mostrar a original)
         double esc = (double)lado / Math.Max(img.Largura, img.Altura);
@@ -354,7 +357,7 @@ public sealed partial class TelaEditorEquipas
         return g;
     }
 
-    static Control LinhaModerna(string pos, Control logo, string nome, string pts, bool zebra)
+    internal static Control LinhaModerna(string pos, Control logo, string nome, string pts, bool zebra)
     {
         var g = new Grid { ColumnDefinitions = new ColumnDefinitions("22,Auto,*,30"), Height = 26, Background = zebra ? Ui.Hex("#25262a") : Brushes.Transparent };
         g.Children.Add(new TextBlock { Text = pos, FontFamily = ConfigEstilo.Inter, FontSize = 12, Foreground = ConfigEstilo.TextoFraco, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center });
@@ -370,7 +373,7 @@ public sealed partial class TelaEditorEquipas
         return g;
     }
 
-    static Control LinhaClassica(string pos, string nome, string pts, IBrush fundo, IBrush letra)
+    internal static Control LinhaClassica(string pos, string nome, string pts, IBrush fundo, IBrush letra)
     {
         var g = new Grid { ColumnDefinitions = new ColumnDefinitions("20,*,30"), Height = 18 };
         g.Children.Add(new TextBlock { Text = pos, FontFamily = Arial, FontSize = 12, Foreground = Brushes.Black, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center });
@@ -480,7 +483,10 @@ public sealed partial class TelaEditorEquipas
 
     // ---------------------------------------------------------------- gravar
     // grava a escolha pendente (ou leva a linha do logo junto, se a equipa mudou de nome/pais)
-    void AplicarEscudo(EquipaEditavel? antes, EquipaEditavel depois)
+    void AplicarEscudo(EquipaEditavel? antes, EquipaEditavel depois) => GravarEscudo(raiz, escudoPendente, antes, depois);
+
+    // (tambem o do celular: FerramentaEditorEquipasCelular.cs)
+    internal static void GravarEscudo(string raiz, EscolhaEscudo? pendente, EquipaEditavel? antes, EquipaEditavel depois)
     {
         var logos = Path.Combine(raiz, PastaDados.Logos);
         var velhos = antes == null ? Array.Empty<string>() : new[] { antes.NomeCompleto, antes.NomeAbreviado };
@@ -488,7 +494,7 @@ public sealed partial class TelaEditorEquipas
         var paisVelho = antes?.Pais ?? depois.Pais;
         bool mudou = antes != null && (antes.Pais.Trim().ToUpperInvariant() != depois.Pais.Trim().ToUpperInvariant()
             || antes.NomeCompleto != depois.NomeCompleto || antes.NomeAbreviado != depois.NomeAbreviado);
-        var p = escudoPendente;
+        var p = pendente;
         if (p == null)
         {
             if (!mudou) return;
@@ -541,7 +547,7 @@ public sealed partial class TelaEditorEquipas
     }
 
     // ---------------------------------------------------------------- ligas
-    static readonly (string Nivel, string Nome)[] NiveisLiga = { ("1", "1ª Divisão"), ("2", "2ª Divisão"), ("3", "3ª Divisão"), ("4", "4ª Divisão"), ("T", "Taça") };
+    internal static readonly (string Nivel, string Nome)[] NiveisLiga = { ("1", "1ª Divisão"), ("2", "2ª Divisão"), ("3", "3ª Divisão"), ("4", "4ª Divisão"), ("T", "Taça") };
 
     void AbrirLigas(string? pais = null)
     {
@@ -605,22 +611,30 @@ public sealed partial class TelaEditorEquipas
     {
         try
         {
-            var arq = LogosDados.ArquivoLiga(pais, nivel);
-            var cam = Path.Combine(raiz, PastaDados.Logos, arq);
-            if (img != null) EscudoArquivo.GravarPng(img, cam);
-            else if (colecao != null)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(cam)!);
-                using var s = AssetLoader.Open(new Uri("avares://RetroFoot.App/Assets/Escudos/" + colecao));
-                using var f = File.Create(cam);
-                s.CopyTo(f);
-            }
-            else return;
-            LogosDados.Definir(raiz, LogosDados.Ligas, pais, nivel, arq);
-            Escudos.Recarregar();
+            if (!GravarLogoLiga(raiz, pais, nivel, img, colecao)) return;
             AbrirLigas(pais);
         }
         catch (Exception x) { Mensagem(T("Erro ao gravar:") + "\n" + x.Message); }
+    }
+
+    // grava o logo de uma liga (a imagem adaptada ou o da colecao) e a linha no leagues.tsv
+    // (tambem o do celular: FerramentaEditorEquipasCelular.cs)
+    internal static bool GravarLogoLiga(string raiz, string pais, string nivel, Rgba? img, string? colecao)
+    {
+        var arq = LogosDados.ArquivoLiga(pais, nivel);
+        var cam = Path.Combine(raiz, PastaDados.Logos, arq);
+        if (img != null) EscudoArquivo.GravarPng(img, cam);
+        else if (colecao != null)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(cam)!);
+            using var s = AssetLoader.Open(new Uri("avares://RetroFoot.App/Assets/Escudos/" + colecao));
+            using var f = File.Create(cam);
+            s.CopyTo(f);
+        }
+        else return false;
+        LogosDados.Definir(raiz, LogosDados.Ligas, pais, nivel, arq);
+        Escudos.Recarregar();
+        return true;
     }
 }
 

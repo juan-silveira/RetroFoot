@@ -234,7 +234,7 @@ public sealed partial class TelaEditorEquipas : UserControl
         return sp;
     }
 
-    static Control Bandeira(string? cod, double w, double h)
+    internal static Control Bandeira(string? cod, double w, double h)
     {
         var b = cod == null ? null : W95.Imagem($"Bandeiras/{cod.Trim().ToUpperInvariant()}.png");
         return b != null
@@ -640,7 +640,7 @@ public sealed partial class TelaEditorEquipas : UserControl
         return g;
     }
 
-    static IBrush CorPosicao(int p) => p switch
+    internal static IBrush CorPosicao(int p) => p switch
     {
         0 => Ui.Hex("#E0A000"), 1 => Ui.Hex("#2E7D32"), 2 => Ui.Hex("#1565C0"), _ => Ui.Hex("#C62828"),
     };

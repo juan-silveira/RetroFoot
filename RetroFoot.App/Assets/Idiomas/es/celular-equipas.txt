@@ -1,0 +1,3 @@
+# O Editor de Equipas no celular (FerramentaEditorEquipasCelular) (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Procurar país…	Buscar país…
