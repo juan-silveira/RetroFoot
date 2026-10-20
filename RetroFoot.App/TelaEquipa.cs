@@ -405,9 +405,14 @@ public sealed partial class TelaEquipa : UserControl
             ConferirEscalacao();
             InvalidateVisual();
             Focus();
+            Redesenhou?.Invoke();
         }
 
-        void DinheiroMudou(SEquipa e) => InvalidateVisual();
+        // a tela do celular (TelaEquipaCelular.cs), que nao e o Painel, se refaz junto: a
+        // renovacao de contrato termina depois de a janela fechar (o + do salario revisto)
+        internal Action? Redesenhou;
+
+        void DinheiroMudou(SEquipa e) { InvalidateVisual(); Redesenhou?.Invoke(); }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {

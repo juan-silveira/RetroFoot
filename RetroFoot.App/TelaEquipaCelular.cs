@@ -109,6 +109,8 @@ public sealed partial class TelaEquipa
             Grid.SetRowSpan(_gaveta, 5);
             _raiz.Children.Add(_gaveta);
             Content = _raiz;
+            // o Painel avisa quando algo mudou (o fim de uma janela, a renovacao, o dinheiro)
+            _p.Redesenhou = () => Dispatcher.UIThread.Post(Refazer);
             Refazer();
             AttachedToVisualTree += (_, _) =>
             {
@@ -130,11 +132,7 @@ public sealed partial class TelaEquipa
         }
 
         // uma janela do jogo fechou (o elenco, o dinheiro e a escalacao podem ter mudado)
-        void DepoisDeJanela()
-        {
-            _p.VoltarCelular();
-            Refazer();
-        }
+        void DepoisDeJanela() => _p.VoltarCelular();
 
         // depois de cada acao: o topo, o elenco, o Jogar e a mensagem do Painel
         void Refazer()
