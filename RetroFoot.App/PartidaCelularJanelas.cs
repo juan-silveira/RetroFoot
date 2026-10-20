@@ -213,6 +213,8 @@ sealed class SubstituicaoCelular : UserControl
     public SubstituicaoCelular(JogoAtual jg, int lado, int motivo, Opcoes op, bool cartoesAmarelos, bool completa, bool pode)
     {
         _jg = jg; _e = jg.Equipa[lado]!; _motivo = motivo; _op = op; _pode = pode; _completa = completa;
+        // no Retro, a janela do computador adaptada (PartidaCelularRetro.cs)
+        if (CUi.Retro) { Content = new SubstituicaoRetro(jg, lado, motivo, op, cartoesAmarelos, completa, pode, Fechar); return; }
         var casa = jg.Equipa[Lado.Casa]; var fora = jg.Equipa[Lado.Visit];
         string momento = T(motivo switch { 4 => "Intervalo", 3 => "Guarda-redes expulso", _ => "Em jogo" });
 
@@ -404,11 +406,20 @@ sealed class PenaltiCelular : UserControl
     readonly StackPanel _cena;
     readonly TextBlock _nome, _espera, _resultado;
     readonly CUi.Botao? _chutar;
+    readonly PenaltiRetro? _r;
     int _sel = -1;
 
     public PenaltiCelular(SEquipa atacante, string treinador, List<SJogador> titulares, bool humano)
     {
         _titulares = titulares;
+        // no Retro, a janela do computador adaptada (PartidaCelularRetro.cs)
+        if (CUi.Retro)
+        {
+            Content = _r = new PenaltiRetro(atacante, treinador, titulares, humano);
+            _r.Chutou += b => Chutou?.Invoke(b);
+            _folha = null!; _cena = null!; _nome = _espera = _resultado = null!;
+            return;
+        }
         var corpo = new StackPanel { Spacing = 12 };
         _cena = new StackPanel { Spacing = 6, IsVisible = !humano, Margin = new Thickness(0, 18, 0, 22), MinHeight = 170 };
         var marcador = CUi.SecaoFolha(T("MARCADOR"));
@@ -452,6 +463,7 @@ sealed class PenaltiCelular : UserControl
     // o batedor na cena (o humano: logo ao chutar; o computador: no 1o tique)
     public void MostrarBatedor(SJogador b)
     {
+        if (_r != null) { _r.MostrarBatedor(b); return; }
         if (_escolha != null) _escolha.IsVisible = false;
         if (_chutar != null) _chutar.IsVisible = false;
         _folha.Rodape(null);
@@ -461,6 +473,7 @@ sealed class PenaltiCelular : UserControl
 
     public void MostrarResultado(int r)
     {
+        if (_r != null) { _r.MostrarResultado(r); return; }
         _espera.IsVisible = false;
         _resultado.Text = r == ResultadoPenalti.Gol ? T("GOLO!") : P98.Resultado(r);
         _resultado.Foreground = r == ResultadoPenalti.Gol ? CUi.Bom : CUi.Erro;
@@ -478,10 +491,13 @@ sealed class PenaltisCelular : UserControl
     readonly StackPanel _linhas = new() { Spacing = 0 };
     readonly ScrollViewer _rolar;
     readonly TextBlock _placar, _estado;
+    readonly PenaltisRetro? _r;
 
     public PenaltisCelular(JogoAtual jg)
     {
         _jg = jg;
+        // no Retro, a janela do computador adaptada (PartidaCelularRetro.cs)
+        if (CUi.Retro) { Content = _r = new PenaltisRetro(jg); _rolar = null!; _placar = _estado = null!; return; }
         var casa = jg.Equipa[Lado.Casa]; var fora = jg.Equipa[Lado.Visit];
         var topo = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,*") };
         topo.Children.Add(PC.Equipa(casa));
@@ -513,6 +529,7 @@ sealed class PenaltisCelular : UserControl
 
     public void Atualizar(List<(SJogador? Bat, int Res)[]> pares, int[] golos)
     {
+        if (_r != null) { _r.Atualizar(pares, golos); return; }
         _placar.Text = $"{golos[Lado.Casa]} - {golos[Lado.Visit]}";
         var ls = new List<Control>();
         for (int i = 0; i < pares.Count; i++)
@@ -551,6 +568,8 @@ sealed class PenaltisCelular : UserControl
 
     public void Fim(bool passaVisitante)
     {
+        // (o original so fecha depois de 3 s, sem texto)
+        if (_r != null) return;
         var e = _jg.Equipa[passaVisitante ? Lado.Visit : Lado.Casa];
         _estado.Text = T("{0} passa à próxima fase", P98.NomeEquipa(e));
         _estado.Foreground = CUi.Bom;
@@ -570,10 +589,13 @@ sealed class SorteioCelular : UserControl
     readonly ContentControl _casa = new(), _fora = new(), _jogos = new();
     readonly WrapPanel _listaPote = new() { ItemSpacing = 10, LineSpacing = 8 };
     readonly TextBlock _titPote, _titJogos;
+    readonly SorteioRetro? _r;
 
     public SorteioCelular(RetroFoot.Motor.Save.Jogo98 s, List<SEquipa> pote, int jogos)
     {
         _pote = pote; _total = jogos;
+        // no Retro, a janela do computador adaptada (PartidaCelularRetro.cs)
+        if (CUi.Retro) { Content = _r = new SorteioRetro(pote); _titPote = _titJogos = null!; return; }
         var vagas = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,*") };
         vagas.Children.Add(_casa);
         var x = CUi.Txt("×", 22, CUi.Fraco, FontWeight.Bold);
@@ -675,8 +697,8 @@ sealed class SorteioCelular : UserControl
     }
 
     // a casa sorteada (limpa o visitante) ou o visitante; a equipa sai do pote
-    public void Casa(SEquipa? e) { Vaga(_fora, null); Vaga(_casa, e); Tirar(e); }
-    public void Fora(SEquipa? e) { Vaga(_fora, e); Tirar(e); }
+    public void Casa(SEquipa? e) { if (_r != null) { _r.Casa(e); return; } Vaga(_fora, null); Vaga(_casa, e); Tirar(e); }
+    public void Fora(SEquipa? e) { if (_r != null) { _r.Fora(e); return; } Vaga(_fora, e); Tirar(e); }
 
     void Tirar(SEquipa? e)
     {
@@ -686,6 +708,7 @@ sealed class SorteioCelular : UserControl
 
     public void Jogo(SEquipa? casa, SEquipa? fora)
     {
+        if (_r != null) { _r.Jogo(casa, fora); return; }
         _feitos.Add((casa, fora));
         Jogos();
     }
@@ -781,6 +804,8 @@ static class PatrocinioCelular
 {
     public static CUi.Folha Folha(Proposta p, Marcas? marcas, Moeda moeda, Action<bool> responder)
     {
+        // no Retro, a janela do computador adaptada (PartidaCelularRetro.cs)
+        if (CUi.Retro) return PatrocinioRetro.Folha(p, marcas, moeda, responder);
         string Ext(long v) => FormatoDinheiro.Valor(moeda, v);
         var corpo = new StackPanel { Spacing = 14 };
         var topo = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,14,*") };

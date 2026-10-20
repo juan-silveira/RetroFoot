@@ -22,6 +22,18 @@ sealed class SubstituicaoForcadaCelular : UserControl
 
     public SubstituicaoForcadaCelular(SEquipa e, SJogador saiu)
     {
+        // no Retro, a janela do computador adaptada (PartidaCelularRetro.cs)
+        if (CUi.Retro)
+        {
+            Content = LesaoRetro.Folha(e, saiu, entra =>
+            {
+                if (_fechou) return;
+                _fechou = true;
+                TelaSubstituicaoForcada.Confirmar(e, saiu, entra);
+                Fechou?.Invoke();
+            });
+            return;
+        }
         var res = e.Jogadores.Where(p => Mem.Escalacao(p) == Mem.EscReserva).ToList();
         int goleiros = res.Count(p => p.Posicao == 0);
         bool algum = res.Exists(p => TelaSubstituicaoForcada.Elegivel(saiu, p, goleiros));
