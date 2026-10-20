@@ -183,7 +183,7 @@ public static class LigacaoPartida
         if (jn != null) s.AtualizarJornada(jn);
     }
 
-    static Control DetalhesModernos(Sessao s, JogoAtual jg, int lado, int minuto, int acrescimo, bool noIntervalo, Action fim)
+    internal static Control DetalhesModernos(Sessao s, JogoAtual jg, int lado, int minuto, int acrescimo, bool noIntervalo, Action fim)
     {
         bool completa = P98.Humano(jg, lado) || VerEscalacaoDosOutros;
         Func<Control>? escalacao = completa ? () =>
@@ -289,12 +289,56 @@ public static class LigacaoPartida
         return new Viewbox { Stretch = Stretch.Uniform, Child = q };
     }
 
-    static Control Dialogo(Sessao sessao, string qual)
+    internal static Control Dialogo(Sessao sessao, string qual)
     {
         var m = sessao.J.M;
         var r = sessao.J.R;
         if (qual == "sorteio") return TelaSorteio.Demo(m.S, m);
-        // um jogo do humano, com as duas equipas escaladas e uns lances
+        var (jg, lado) = JogoDemo(sessao);
+        var tit = (int l) => jg.Equipa[l]!.Jogadores.Where(p => Mem.Escalacao(p) == Mem.EscTitular).ToList();
+        var eh = jg.Equipa[lado]!;
+        switch (qual)
+        {
+            case "lesao":
+            {
+                var saiu = tit(lado)[3];
+                Mem.MudarEscalacao(saiu, Mem.EscFora);
+                return new TelaSubstituicaoForcada(eh, saiu);
+            }
+            case "penalti":
+            {
+                var def = jg.Equipa[1 - lado]!;
+                return new TelaPenalti(eh, sessao.TreinadorDa(eh) is { } t ? P98.Texto(t.Nome) : "", tit(lado), null,
+                    b => Penaltis.Goleiro(def) is { } gk ? Penaltis.CobrarPenalti(new Aleatorio(r.Semente), gk, b) : 0);
+            }
+            case "penaltis":
+            {
+                var d = Penaltis.DesempateTaca(r, jg, true, 1, 14);
+                return new TelaPenaltis(jg, d);
+            }
+            case "goleiro":
+            {
+                var gk = tit(lado).First(p => p.Posicao == 0);
+                Mem.MudarEscalacao(gk, Mem.EscFora);
+                Jornada.OrdenarPorPosicaoNome(eh);
+                return new TelaSubstituicao(jg, lado, 3, sessao.J.Op, m.Regras.CartoesAmarelos);
+            }
+            case "detalhes":
+                Jornada.OrdenarPorPosicaoNome(jg.Equipa[1 - lado]!);
+                if (Visual.Moderno) return DetalhesModernos(sessao, jg, 1 - lado, 60, 0, false, () => Console.WriteLine("RETROFOOT-DETALHES fechou"));
+                return new TelaSubstituicao(jg, 1 - lado, 1, sessao.J.Op, m.Regras.CartoesAmarelos);
+            default:
+                Jornada.OrdenarPorPosicaoNome(eh);
+                return new TelaSubstituicao(jg, lado, 4, sessao.J.Op, m.Regras.CartoesAmarelos);
+        }
+    }
+
+    // so as demos: um jogo do humano, com as duas equipas escaladas e uns lances (e os extras
+    // da linha do tempo); devolve o jogo e o lado do humano
+    internal static (JogoAtual Jogo, int Lado) JogoDemo(Sessao sessao)
+    {
+        var m = sessao.J.M;
+        var r = sessao.J.R;
         var hum = m.S.Equipas.First(e => Mem.Humano(m.TreinadorDa(e)));
         var dados = m.S.Jogos.FirstOrDefault(j => j.Casa == hum.ID || j.Fora == hum.ID);
         if (dados == null)
@@ -336,40 +380,6 @@ public static class LigacaoPartida
             jg.Extras.Add(new LanceExtra { Lado = Lado.Visit, Minuto = 45, Ordem = 7, Intervalo = true, Tipo = TipoExtra.Substituicao, Saiu = tit(Lado.Visit)[^1], Entrou = res(Lado.Visit)[^1] });
         jg.Extras.Add(new LanceExtra { Lado = Lado.Visit, Minuto = 52, Ordem = 7, Tipo = TipoExtra.PenaltiFalhado,
             Batedor = tit(Lado.Visit)[^2], Goleiro = tit(Lado.Casa)[0], Resultado = ResultadoPenalti.Poste });
-        var eh = jg.Equipa[lado]!;
-        switch (qual)
-        {
-            case "lesao":
-            {
-                var saiu = tit(lado)[3];
-                Mem.MudarEscalacao(saiu, Mem.EscFora);
-                return new TelaSubstituicaoForcada(eh, saiu);
-            }
-            case "penalti":
-            {
-                var def = jg.Equipa[1 - lado]!;
-                return new TelaPenalti(eh, sessao.TreinadorDa(eh) is { } t ? P98.Texto(t.Nome) : "", tit(lado), null,
-                    b => Penaltis.Goleiro(def) is { } gk ? Penaltis.CobrarPenalti(new Aleatorio(r.Semente), gk, b) : 0);
-            }
-            case "penaltis":
-            {
-                var d = Penaltis.DesempateTaca(r, jg, true, 1, 14);
-                return new TelaPenaltis(jg, d);
-            }
-            case "goleiro":
-            {
-                var gk = tit(lado).First(p => p.Posicao == 0);
-                Mem.MudarEscalacao(gk, Mem.EscFora);
-                Jornada.OrdenarPorPosicaoNome(eh);
-                return new TelaSubstituicao(jg, lado, 3, sessao.J.Op, m.Regras.CartoesAmarelos);
-            }
-            case "detalhes":
-                Jornada.OrdenarPorPosicaoNome(jg.Equipa[1 - lado]!);
-                if (Visual.Moderno) return DetalhesModernos(sessao, jg, 1 - lado, 60, 0, false, () => Console.WriteLine("RETROFOOT-DETALHES fechou"));
-                return new TelaSubstituicao(jg, 1 - lado, 1, sessao.J.Op, m.Regras.CartoesAmarelos);
-            default:
-                Jornada.OrdenarPorPosicaoNome(eh);
-                return new TelaSubstituicao(jg, lado, 4, sessao.J.Op, m.Regras.CartoesAmarelos);
-        }
+        return (jg, lado);
     }
 }

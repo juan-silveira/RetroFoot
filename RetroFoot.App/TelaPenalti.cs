@@ -31,6 +31,7 @@ public sealed class TelaPenalti : UserControl
     readonly Func<SJogador, int> _cobrar;
     readonly Etiqueta _escolha = null!, _resultado = null!;
     readonly PenaltiModerno? _m;
+    readonly PenaltiCelular? _c;
     readonly Lista? _lista;
     readonly Bevel? _quadro;
     readonly Botao? _chutar;
@@ -45,6 +46,22 @@ public sealed class TelaPenalti : UserControl
         _titulares = titulares; _cobrar = cobrar;
         Focusable = true;
         _relogio.Tick += (_, _) => Tique();
+        if (Celular.Ativo)
+        {
+            // o celular (PartidaCelularJanelas.cs): o mesmo relogio
+            _c = new PenaltiCelular(atacante, treinador, titulares, batedorCpu == null);
+            _c.Chutou += b =>
+            {
+                if (_relogio.IsEnabled || _batedor != null) return;
+                _batedor = b;
+                _c.MostrarBatedor(b);
+                _relogio.Start();
+            };
+            if (batedorCpu == null) _tiques = 1;
+            else { _batedor = batedorCpu; _relogio.Start(); }
+            Content = _c;
+            return;
+        }
         if (Visual.Moderno)
         {
             // o visual Moderno (PartidaDialogosModernos.cs): o mesmo relogio
@@ -118,13 +135,14 @@ public sealed class TelaPenalti : UserControl
         _tiques++;
         if (_tiques == 1)
         {
-            if (_m != null) _m.MostrarBatedor(_batedor!); else _escolha.IsVisible = true;
+            if (_m != null) _m.MostrarBatedor(_batedor!); else if (_c != null) _c.MostrarBatedor(_batedor!); else _escolha.IsVisible = true;
             return;
         }
         if (_tiques == 3)
         {
             int r = _cobrar(_batedor!);
             if (_m != null) { _m.MostrarResultado(r); return; }
+            if (_c != null) { _c.MostrarResultado(r); return; }
             _resultado.Mudar(P98.Resultado(r));
             _resultado.IsVisible = true;
             return;
@@ -147,7 +165,7 @@ public sealed class TelaPenalti : UserControl
     {
         base.OnAttachedToVisualTree(e);
         // (a lista so entra na arvore depois do pai: o foco vai depois, como na substituicao forcada)
-        if (_m == null) Dispatcher.UIThread.Post(() => { if (_lista is { IsVisible: true }) _lista.Focus(); else Focus(); }, DispatcherPriority.Loaded);
+        if (_m == null && _c == null) Dispatcher.UIThread.Post(() => { if (_lista is { IsVisible: true }) _lista.Focus(); else Focus(); }, DispatcherPriority.Loaded);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

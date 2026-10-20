@@ -25,6 +25,7 @@ public sealed class TelaPenaltis : UserControl
     readonly Lista _lista = null!;
     readonly Etiqueta _placar = null!;
     readonly PenaltisModerno? _m;
+    readonly PenaltisCelular? _c;
     readonly DispatcherTimer _timer1 = new(), _timer2 = new() { Interval = TimeSpan.FromMilliseconds(3000) };
     readonly int[] _golos = new int[2];
     int _mostradas;
@@ -39,6 +40,13 @@ public sealed class TelaPenaltis : UserControl
         _timer1.Interval = TimeSpan.FromMilliseconds(humano ? 3000 : 1000);
         _timer1.Tick += (_, _) => Proxima();
         _timer2.Tick += (_, _) => Fechar();
+        if (Celular.Ativo)
+        {
+            // o celular (PartidaCelularJanelas.cs): os mesmos relogios
+            Content = _c = new PenaltisCelular(jg);
+            if (d.Cobrancas.Count == 0) Acabou(); else _timer1.Start();
+            return;
+        }
         if (Visual.Moderno)
         {
             // o visual Moderno (PartidaDialogosModernos.cs): os mesmos relogios
@@ -89,6 +97,7 @@ public sealed class TelaPenaltis : UserControl
             _pares.Add(new (SJogador?, int)[] { (null, 0), (null, 0) });
         _pares[^1][c.Lado] = (c.Batedor, c.Resultado);
         if (_m != null) _m.Atualizar(_pares, _golos);
+        else if (_c != null) _c.Atualizar(_pares, _golos);
         else
         {
             _lista.Sel = _pares.Count - 1;
@@ -102,6 +111,7 @@ public sealed class TelaPenaltis : UserControl
         _timer1.Stop();
         _timer2.Start();
         _m?.Fim(_d.PassaVisitante);
+        _c?.Fim(_d.PassaVisitante);
     }
 
     // 11:144f com o texto de 11:15ab

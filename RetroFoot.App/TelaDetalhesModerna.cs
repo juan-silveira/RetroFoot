@@ -40,9 +40,16 @@ public sealed class TelaDetalhesModerna : UserControl
     // acrescimo: o n de "45'+n'" do jogo agora; noIntervalo: o relogio parado no intervalo
     public TelaDetalhesModerna(JogoAtual jg, int minuto, int acrescimo, bool noIntervalo, Func<Control>? escalacao)
     {
+        Focusable = true;
+        if (Celular.Ativo)
+        {
+            // o celular (PartidaCelularJanelas.cs): a tela toda; Escalacao troca para a substituicao
+            Content = DetalhesCelular.Folha(jg, minuto, acrescimo, noIntervalo, Itens(jg, minuto, noIntervalo),
+                escalacao == null ? null : () => { var t = escalacao(); Content = t; t.Focus(); }, Fechar);
+            return;
+        }
         Width = 580;
         Height = 540;
-        Focusable = true;
         FontFamily = Inter;
         var casa = jg.Equipa[Lado.Casa]; var fora = jg.Equipa[Lado.Visit];
         int gc = casa == null ? 0 : Mem.Golos(casa), gf = fora == null ? 0 : Mem.Golos(fora);
@@ -161,11 +168,11 @@ public sealed class TelaDetalhesModerna : UserControl
 
     // um lance (Tipo > 0) ou um marcador no centro (Tipo = 0: Texto); Substituicao: Nome =
     // quem entra, Detalhe = quem sai
-    sealed record Item(int Tipo, int Lado, int Minuto, string Nome, string Detalhe, bool SegundoAmarelo, int Acrescimo = 0);
+    internal sealed record Item(int Tipo, int Lado, int Minuto, string Nome, string Detalhe, bool SegundoAmarelo, int Acrescimo = 0);
 
-    const int Substituicao = 101, PenaltiFalhado = 102;
+    internal const int Substituicao = 101, PenaltiFalhado = 102;
 
-    static List<Item> Itens(JogoAtual jg, int minuto, bool noIntervalo)
+    internal static List<Item> Itens(JogoAtual jg, int minuto, bool noIntervalo)
     {
         var r = new List<Item>();
         int gc = 0, gf = 0;

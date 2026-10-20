@@ -66,6 +66,14 @@ public sealed class TelaSubstituicao : UserControl
         bool completa = humano || (motivo == 1 && verOutros);
         bool pode = humano && Mem.Substituicoes(_e) > 0 && (motivo == 3 || motivo == 4 || podeDuranteJogo);
         Focusable = true;
+        if (Celular.Ativo)
+        {
+            // o celular (PartidaCelularJanelas.cs), com as mesmas regras
+            var c = new SubstituicaoCelular(jg, lado, motivo, op, cartoesAmarelos, completa, pode);
+            c.Fechou += Fechar;
+            Content = c;
+            return;
+        }
         if (Visual.Moderno)
         {
             // o visual Moderno (SubstituicaoModerna.cs), com as mesmas regras
@@ -236,6 +244,6 @@ public sealed class TelaSubstituicao : UserControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        if (Content is not SubstituicaoModerna) Focus();
+        if (Content is not SubstituicaoModerna and not SubstituicaoCelular) Focus();
     }
 }
