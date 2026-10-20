@@ -338,6 +338,7 @@ public sealed partial class TelaEquipa
         // ------------------------------------------------------------ o elenco
         Control Elenco()
         {
+            if (CUi.Retro) return ElencoRetro();
             var lista = new StackPanel { Spacing = 6, Margin = new Thickness(12, 4, 12, 12) };
             foreach (var grupo in _p.OrdemCelular().GroupBy(j => Math.Min((int)j.Posicao, 3)))
             {
@@ -357,6 +358,63 @@ public sealed partial class TelaEquipa
                 });
             }
             return new ScrollViewer { Content = lista, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
+        }
+
+        // o Retro: a lista do computador (ListBoxOfPlayersDrawItem) ao toque: uma caixa afundada
+        // nas cores da equipa trocadas (fundo na cor da letra), texto em negrito, uma linha por
+        // jogador (a marca de titular / reserva, a posicao, o nome, a forca, S, L e o salario
+        // com o + se ja revisto) e o traco no fim de cada posicao. Tocar na marca troca titular /
+        // reserva / fora; no resto da linha, a ficha
+        Control ElencoRetro()
+        {
+            var lista = new StackPanel { Background = _corLetra };
+            var o = _p.OrdemCelular();
+            for (int i = 0; i < o.Count; i++)
+            {
+                bool fim = i == o.Count - 1 || Math.Min((int)o[i].Posicao, 3) != Math.Min((int)o[i + 1].Posicao, 3);
+                lista.Children.Add(LinhaRetro(o[i], fim && i < o.Count - 1));
+            }
+            var caixa = new Border
+            {
+                Margin = new Thickness(10, 6, 10, 10), Padding = new Thickness(2), Background = _corLetra,
+                BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #6A6A6A, inset 2 2 0 0 #000000, inset -1 -1 0 0 #FFFFFF, inset -2 -2 0 0 #E3E3E3"),
+                Child = new ScrollViewer { Content = lista, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled },
+            };
+            return caixa;
+        }
+
+        Control LinhaRetro(SJogador j, bool traco)
+        {
+            var cor = _corFundo;
+            TextBlock T_(string t, HorizontalAlignment h = HorizontalAlignment.Left)
+            {
+                var x = CUi.Txt(t, 14, cor, FontWeight.Bold);
+                x.HorizontalAlignment = h;
+                return x;
+            }
+            int esc = Mem.Escalacao(j);
+            // a marca do original: titular um quadradinho, reserva um traco
+            var marca = new Border
+            {
+                Width = esc == Mem.EscReserva ? 10 : 6, Height = esc == Mem.EscReserva ? 2 : 6,
+                Background = esc == Mem.EscFora ? Brushes.Transparent : cor,
+                HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
+            };
+            var alvo = new Clicavel { Width = 34, Background = Brushes.Transparent, Child = marca, CorFoco = null };
+            alvo.Clique += () => { _p.AlternarCelular(j); Refazer(); };
+            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,20,*,30,20,16,86,12"), MinHeight = 34 };
+            g.Children.Add(alvo);
+            void Por(Control c, int col) { Grid.SetColumn(c, col); g.Children.Add(c); }
+            Por(T_(Posicao(Math.Min((int)j.Posicao, 3))), 1);
+            Por(T_(Painel.NomeCelular(j)), 2);
+            Por(T_(j.Forca.ToString(), HorizontalAlignment.Right), 3);
+            Por(T_(j.Suspensao != 0 ? "S" : _s.J.M.Regras.CartoesAmarelos && Painel.AmarelosCelular(j) > 0 ? "A" : "", HorizontalAlignment.Center), 4);
+            Por(T_(j.JogosLesao != 0 ? "L" : ""), 5);
+            Por(T_(_p.DinheiroCelular(j.Salario), HorizontalAlignment.Right), 6);
+            Por(T_(MercadoJogo.PodeMudarSalario(j) ? "" : "+"), 7);
+            var corpo = new Clicavel { Background = Brushes.Transparent, Child = g, CorFoco = null, Padding = new Thickness(0, 0, 4, 0) };
+            corpo.Clique += () => AbrirFicha(j);
+            return new Border { Child = corpo, BorderBrush = cor, BorderThickness = new Thickness(0, 0, 0, traco ? 1 : 0), Margin = new Thickness(0, 0, 0, traco ? 4 : 0) };
         }
 
         Control LinhaJogador(SJogador j)
