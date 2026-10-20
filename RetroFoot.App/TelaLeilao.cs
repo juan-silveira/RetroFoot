@@ -58,6 +58,8 @@ sealed class TelaLeilao : DialogoMercado
     SEquipa? comprador;
     Control? logoComprador;
     Action<(int, bool)>? resposta;
+    // no celular (Celular.cs): a folha do leilao (TelaLeilaoCelular.cs); a logica fica aqui
+    readonly LeilaoCelular? cel;
 
     // vendedor, jogador, preco base (null = desconhecido: so o gancho do lance sem a janela
     // do leilao aberta) e o salario pretendido (Salario com o +0x79 do vendedor)
@@ -92,6 +94,15 @@ sealed class TelaLeilao : DialogoMercado
         }
         ok.Clique += Ok;
         AoEnter = () => { if (painel.IsVisible) Ok(); };
+        if (Celular.Ativo)
+        {
+            // a mesma janela, desenhada pela folha: o texto do lance vai para a caixa daqui
+            cel = new LeilaoCelular(s, v, p, preco, salario, s.J.M.Regras.CartoesAmarelos);
+            cel.Mudou += t => oferta.Texto = t;
+            cel.Licitou += () => { Ok(); if (painel.IsVisible) cel.Excedeu(); };
+            Content = cel;
+            Width = Height = double.NaN;
+        }
     }
 
     C PorNoPainel<C>(C c, double x, double y, double w, double h) where C : Control
@@ -123,6 +134,13 @@ sealed class TelaLeilao : DialogoMercado
         if (logoComprador != null) PorNoPainel(logoComprador, 488, 8, 56, 56);
         painel.IsVisible = true;
         Foco = oferta;
+        if (cel != null)
+        {
+            // (no celular a caixa nao pega o foco sozinha: o teclado cobria a folha)
+            cel.MostrarPainel(c, coachName.Texto, cash.Texto, oferta.Senha);
+            Foco = null;
+            return;
+        }
         Focar();
     }
 
@@ -136,6 +154,7 @@ sealed class TelaLeilao : DialogoMercado
         painel.IsVisible = false;
         Foco = null;
         Focus();
+        cel?.EsconderPainel();
         var r = resposta;
         resposta = null; comprador = null;
         r((m, valido));
@@ -154,6 +173,7 @@ sealed class TelaLeilao : DialogoMercado
         ficha.Transferido = r.Texto;
         ficha.Comprador = r.Comprador;
         ficha.InvalidateVisual();
+        cel?.MostrarResultado(r.Texto, r.Comprador);
     }
 
     // ------------------------------------------------------------ o ciclo do leilao
@@ -261,7 +281,7 @@ sealed class TelaLeilao : DialogoMercado
             else AvisoMercado.Abrir(s, Texto(e), txt);
             return;
         }
-        var pag = new PaginaVender(s, e);
+        var pag = new PaginaVender(s, e, p);
         pag.Cancelou += () => { s.FecharDialogo(pag); fim?.Invoke(ResultadoVenda.Cancelado); };
         pag.Vender += preco =>
         {
@@ -644,7 +664,8 @@ sealed class PaginaVender : DialogoMercado
     public event Action? Cancelou;
     internal readonly CampoMercado Preco;
 
-    public PaginaVender(Sessao s, SEquipa e)
+    // (p: o jogador a vender, so para a folha do celular mostrar quem e)
+    public PaginaVender(Sessao s, SEquipa e, SJogador? p = null)
         : base(T.Texto(e.NomeCompleto), 273, 329, T.Cores(e).Fundo, logo: Escudos.Escudo(e))
     {
         var (letra, _) = T.Cores(e);
@@ -661,6 +682,13 @@ sealed class PaginaVender : DialogoMercado
         AoEnter = ClicarVender;
         AoEsc = () => Cancelou?.Invoke();
         Foco = Preco;
+        if (Celular.Ativo)
+        {
+            // no celular: a folha (MercadoFormsCelular.cs), com a caixa ligada a esta
+            Content = MercadoFormsCelular.Vender(s, e, p, t => Preco.Texto = t, ClicarVender, () => Cancelou?.Invoke());
+            Width = Height = double.NaN;
+            Foco = null;
+        }
     }
 
     // sellBtnClick (4:455a): vazio = 0; Val com erro: nada
@@ -685,6 +713,11 @@ sealed class AvisoMercado : DialogoMercado
         J.AoFechar = fechar;
         AoEnter = fechar;
         AoEsc = fechar;
+        if (Celular.Ativo)
+        {
+            Content = CUi.Pergunta(titulo, texto, new (string, bool, Action)[] { (Idioma.T("OK"), true, fechar) }, fechar);
+            Width = Height = double.NaN;
+        }
     }
 
     public static void Abrir(Sessao s, string titulo, string texto)

@@ -57,6 +57,15 @@ sealed class TelaPedidoSalario : DialogoMercado
             AoEnter = () => fim(true);
         }
         J.AoFechar = () => fim(false);
+        if (Celular.Ativo)
+        {
+            // no celular: a pergunta numa folha (o Voltar e o fechar da janela: Nao)
+            var botoes = soOk
+                ? new (string, bool, Action)[] { (Idioma.T("OK"), true, () => fim(true)) }
+                : new (string, bool, Action)[] { (Idioma.T("Não"), false, () => fim(false)), (Idioma.T("Sim"), true, () => fim(true)) };
+            Content = MercadoFormsCelular.Pedido(e, T.NomeTreinador(s.J.M.TreinadorDa(e)), msg, botoes, () => fim(false));
+            Width = Height = double.NaN;
+        }
     }
 
     static Botao BotaoSim(string texto) =>

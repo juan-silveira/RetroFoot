@@ -45,6 +45,14 @@ sealed class TelaNovoSalario : DialogoMercado
         AoEnter = ClicarPropor;
         AoEsc = () => Cancelou?.Invoke();
         Foco = Spin.Campo;
+        if (Celular.Ativo)
+        {
+            // no celular: a folha (MercadoFormsCelular.cs); o valor continua no Spin daqui
+            // (o minimo, o maximo e o passo dele)
+            Content = MercadoFormsCelular.Salario(s, e, p, Spin, ClicarPropor, () => Cancelou?.Invoke());
+            Width = Height = double.NaN;
+            Foco = null;
+        }
     }
 
     internal void ClicarPropor() => Propor?.Invoke(Spin.Valor);

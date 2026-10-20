@@ -19,7 +19,7 @@ namespace RetroFoot.App;
 // clique) fecha e entrega o jogador escolhido.
 //
 // Larguras do launcher (larguras.py): lista 16 pontos mais larga, janela e Fechar tambem.
-public static class TelaObservados
+public static partial class TelaObservados
 {
     // Abre os observados do treinador da equipa e (na thread da interface, com o motor
     // parado). escolher recebe o jogador do "Equipa..." (null = abre o plantel da equipa
@@ -46,7 +46,7 @@ public static class TelaObservados
         Abrir(s, e);
     });
 
-    sealed class Form : MercadoForm
+    sealed partial class Form : MercadoForm
     {
         readonly SEquipa _e;
         readonly ushort _tr;

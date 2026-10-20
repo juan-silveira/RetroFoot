@@ -1,0 +1,6 @@
+# As janelas do mercado no celular (pt-BR). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+A aguardar ofertas…	Aguardando ofertas…
+Licitar	Dar lance
+País da minha equipa	País do meu time
+A observar	Observando

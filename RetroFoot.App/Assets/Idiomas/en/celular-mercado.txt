@@ -1,0 +1,17 @@
+# As janelas do mercado no celular (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+A aguardar ofertas…	Waiting for bids…
+A oferta é maior que o dinheiro em caixa.	The bid is more than the cash available.
+Desistir	Pass
+Licitar	Bid
+Escolha os critérios e toque em Procurar.	Choose the criteria and tap Search.
+Mínimo	Minimum
+Máximo	Maximum
+Mostrar mais ({0})	Show more ({0})
+Nenhum jogador encontrado.	No players found.
+Nenhum jogador sob observação.	No players on the watch list.
+O jogador vai a leilão com este preço base.	The player goes to auction with this base price.
+País da minha equipa	My team's country
+Sem filtro	No filter
+Sem limite	No limit
+A observar	Watching
