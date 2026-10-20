@@ -33,6 +33,16 @@ public class Application : AvaloniaAndroidApplication<RetroFoot.App.App>
             RetroFoot.App.TelaCelular.Cenario = r.ReadToEnd().Trim() == "1";
         }
         catch { }
+        // testes da atualizacao: "adb shell setprop debug.retrofoot.ota <url>" troca a lista de
+        // releases (a RETROFOOT_OTA_URL do computador; o Android nao tem variaveis de ambiente)
+        try
+        {
+            using var p = Java.Lang.Runtime.GetRuntime()!.Exec("getprop debug.retrofoot.ota");
+            using var r = new System.IO.StreamReader(p!.InputStream!);
+            var ota = r.ReadToEnd().Trim();
+            if (ota.Length > 0) Environment.SetEnvironmentVariable("RETROFOOT_OTA_URL", ota);
+        }
+        catch { }
         AndroidRenderingMode[]? modos = modo switch
         {
             "egl" => new[] { AndroidRenderingMode.Egl },

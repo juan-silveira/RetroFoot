@@ -141,7 +141,8 @@ public static class Atualizacao
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine("atualizacao: " + ex.Message);
+            // (no Android o stderr nao vai para o logcat: o stdout vai)
+            Console.WriteLine("atualizacao: " + ex.Message);
             return null;
         }
     }

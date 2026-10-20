@@ -21,11 +21,12 @@ public class MainActivity : AvaloniaMainActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)
     {
-        base.OnCreate(savedInstanceState);
         // a atualizacao (RetroFoot.App/Atualizacao.cs): o APK vai para o cache (a pasta do
-        // FileProvider, Resources/xml/caminhos.xml) e e entregue ao instalador do Android
+        // FileProvider, Resources/xml/caminhos.xml) e e entregue ao instalador do Android.
+        // Antes do base.OnCreate: e nele que a tela inicial e montada e procura a versao nova
         RetroFoot.App.Atualizacao.PastaApk = System.IO.Path.Combine(CacheDir!.AbsolutePath, "atualizacao");
         RetroFoot.App.Atualizacao.InstalarApk = InstalarApk;
+        base.OnCreate(savedInstanceState);
     }
 
     // false: falta a permissao de instalar apps do RetroFoot (abre a tela dela; ao voltar, o

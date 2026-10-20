@@ -142,6 +142,7 @@ public sealed partial class TelaInicio
             }
             catch (Exception ex)
             {
+                Console.WriteLine("atualizacao: " + ex);
                 estado.Text = T("Não consegui atualizar: {0}", ex.Message);
                 baixando = false;
                 agora.Habilitado = depois.Habilitado = true;
