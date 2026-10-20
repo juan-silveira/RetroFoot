@@ -18,8 +18,9 @@ namespace RetroFoot.App;
 // nas duas peles: o estadio, o emprestimo, o balanco, as perguntas Sim/Nao e o pedido de um
 // texto (Dlg.Perguntar / PedirTexto), a mensagem com OK (Ui.Caixa) e o Sobre com os Extras.
 // As regras continuam as das janelas do computador (MercadoJogo, Banco...): aqui so se mostra
-// e se recolhe o toque. Enter e Esc continuam a valer com teclado.
-static class ClubeCelular
+// e se recolhe o toque. Enter e Esc continuam a valer com teclado. O Retro, que segue as janelas
+// do computador, fica em ClubeCelularRetro.cs.
+static partial class ClubeCelular
 {
     // ---------------------------------------------------------------- pecas
     // a folha recebe Enter (o botao principal) e Esc (fechar) como as janelas do computador
@@ -98,6 +99,7 @@ static class ClubeCelular
     // embaixo. Construir so liga com MercadoJogo.PodeConstruir (dinheiro e menos de 24).
     public static void Estadio(Sessao s, SEquipa e, bool registado, Action? fechou, Action<Control>? abrir, Action<Control>? fechar)
     {
+        if (CUi.Retro) { EstadioRetro(s, e, registado, fechou, abrir, fechar); return; }
         var mc = s.Mercado;
         Control desenho;
         if (CUi.Retro)
@@ -187,6 +189,7 @@ static class ClubeCelular
     // jogo e o dinheiro; Pagar e Pedir (um passo cada) embaixo; as explicacoes do original
     public static void Emprestimo(Sessao s, SEquipa e, Action? fechou, Action<Control>? abrir, Action<Control>? fechar)
     {
+        if (CUi.Retro) { EmprestimoRetro(s, e, fechou, abrir, fechar); return; }
         var mc = s.Mercado;
         var banco = mc.AbrirBanco(e);
         string passo = FormatoDinheiro.Valor(s.S, mc.PassoEmprestimo);
@@ -271,6 +274,7 @@ static class ClubeCelular
     // (tocar numa mostra-a)
     public static void Balanco(Sessao s, SEquipa e, ReadOnlyMemory<byte>[] t, Action? fechou, Action<Control>? abrir, Action<Control>? fechar)
     {
+        if (CUi.Retro) { BalancoRetro(s, e, t, fechou, abrir, fechar); return; }
         int ano = s.S.Cabecalho.Ano;
         long V(int k, int slot) => BinaryPrimitives.ReadInt32LittleEndian(t[k].Span.Slice(4 * slot));
         long Soma(int k, params int[] slots) { long x = 0; foreach (var sl in slots) x += V(k, sl); return x; }
@@ -351,6 +355,7 @@ static class ClubeCelular
     // o MessageBox Sim/Nao: Voltar e Esc = Nao, Enter = Sim
     public static void Perguntar(Dialogos d, string titulo, string texto, Action sim, Action? nao)
     {
+        if (CUi.Retro) { PerguntarRetro(d, titulo, texto, sim, nao); return; }
         CUi.Folha? f = null;
         bool respondeu = false;
         void Responder(bool s)
@@ -371,6 +376,7 @@ static class ClubeCelular
     // nao aceita vazio
     public static void PedirTexto(Dialogos d, string titulo, string rotulo, string inicial, int maximo, Action<string> ok, bool apara = false)
     {
+        if (CUi.Retro) { PedirTextoRetro(d, titulo, rotulo, inicial, maximo, ok, apara); return; }
         CUi.Folha? f = null;
         bool fechou = false;
         var caixa = CUi.Caixa(inicial, maximo);
@@ -405,6 +411,7 @@ static class ClubeCelular
     // a mensagem com OK (Ui.Caixa): a folha sobre o veu, num controle que quem chama poe por cima
     public static Control Caixa(string titulo, string texto, Action ok)
     {
+        if (CUi.Retro) return CaixaRetro(titulo, texto, ok);
         var f = CUi.Pergunta(titulo, texto, new (string, bool, Action)[] { (T("OK"), true, ok) }, ok);
         Teclas(f, ok, ok);
         return new Panel { Background = TemaVerde.Veu, Children = { f } };
@@ -414,6 +421,7 @@ static class ClubeCelular
     // o logo, o slogan e a versao; os extras ativos num toque (a TAddInsDlg)
     public static void Sobre(Dialogos d, Action? fechou)
     {
+        if (CUi.Retro) { SobreRetro(d, fechou); return; }
         CUi.Folha? f = null;
         bool fechado = false;
         void Fechar()
@@ -462,6 +470,7 @@ static class ClubeCelular
     // TAddInsDlg: os add-ins ativos, por nome (Sorted)
     public static void Extras(Dialogos d)
     {
+        if (CUi.Retro) { ExtrasRetro(d); return; }
         var nomes = Nomes();
         CUi.Folha? f = null;
         void Fechar() => d.Fechar(f!);
