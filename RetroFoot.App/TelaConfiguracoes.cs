@@ -27,7 +27,7 @@ namespace RetroFoot.App;
 // Com um jogo em curso (RetroFoot > Configuracoes... na tela da equipa), um aviso mostra as
 // regras desse jogo: o N vem do save e o resto das opcoes com que foi aberto; o que mudar
 // aqui vale da proxima vez que um jogo for aberto.
-public sealed class TelaConfiguracoes : UserControl
+public sealed partial class TelaConfiguracoes : UserControl
 {
     // true = salvou (o config.json foi gravado); false = cancelou
     public event Action<bool>? Fechou;
@@ -72,10 +72,12 @@ public sealed class TelaConfiguracoes : UserControl
         _idiomaInicial = idiomaInicial ?? Idioma.Atual;
         Focusable = true;
         FocusAdorner = null;
+        AttachedToVisualTree += (_, _) => Dispatcher.UIThread.Post(() => Focus(), DispatcherPriority.Loaded);
+        // no celular: a lista das secoes e uma pagina por secao (TelaConfiguracoesCelular.cs)
+        if (Celular.Ativo) { MontarCelular(idiomaInicial != null ? 3 : -1); return; }
         if (Visual.Moderno) MontarModerno(); else MontarClassico();
         _atualizar?.Invoke();
         if (idiomaInicial != null) { if (_nb != null) _nb.Atual = 3; else Secao(3); }
-        AttachedToVisualTree += (_, _) => Dispatcher.UIThread.Post(() => Focus(), DispatcherPriority.Loaded);
     }
 
     // RETROFOOT_TELA=configuracoes: a tela sozinha (Salvar grava no config.json de verdade)
@@ -689,6 +691,8 @@ public sealed class TelaConfiguracoes : UserControl
     {
         base.OnKeyDown(e);
         if (e.Handled) return;
+        // no celular o Esc e o Voltar: a pagina da secao volta a lista; a lista cancela
+        if (Celular.Ativo) { if (e.Key == Key.Escape) e.Handled = CUi.Folha.Voltar(); return; }
         // a lista de um Combo aberta: Enter / Esc fecham a lista
         if (_combos.Find(c => c.Aberto) is { } aberto && e.Key is Key.Enter or Key.Escape) { aberto.Fechar(); e.Handled = true; return; }
         if (e.Key == Key.Escape) { e.Handled = true; if (_janela != null) _janela.AoFechar!(); else Fechar(false); }

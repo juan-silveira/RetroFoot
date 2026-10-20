@@ -181,6 +181,8 @@ public static class TelaOpcoes
     // sem jogo (s = null): a pagina Controle fica sem inflacao e sem as listas
     public static void Abrir(Dialogos d, OpcoesDoJogo op, Jogo98? save, Mundo? m, Action<OpcoesDoJogo> ok)
     {
+        // no celular: a tela toda com as abas em pilulas (TelaOpcoesCelular.cs), nas duas peles
+        if (Celular.Ativo) { OpcoesCelular.Abrir(d, op, save, m, ok); return; }
         if (Visual.Moderno) { OpcoesModernas.Abrir(d, op, save, m, ok); return; }
         var j = new Janela(T("Opções"), 508, 282, W95.Face);
         var a11 = W95.Arial11;
