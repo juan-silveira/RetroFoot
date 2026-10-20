@@ -20,6 +20,7 @@ namespace RetroFoot.App;
 // o mesmo fluxo do computador (TelaInicio.cs) com as paginas uma embaixo da outra:
 //   inicio      os jogos gravados (tocar escolhe; Continuar abre) e o jogo novo;
 //   jogo novo   Paises (a lista com as bandeiras) -> Moeda -> Treinadores -> a Sessao.
+// No Retro, as janelas do computador adaptadas (TelaInicioCelularRetro.cs).
 public sealed partial class TelaInicio
 {
     void MontarCelular()
@@ -41,14 +42,20 @@ public sealed partial class TelaInicio
     void MensagemCelular(string titulo, string texto, Action? depois)
     {
         void Fim() { Sobrepor(null); depois?.Invoke(); }
-        SobreporCelular(CUi.Caixa_(titulo, CUi.Txt(texto, 15, null, FontWeight.Normal, true), new CUi.Botao(T("OK"), true, Fim)));
+        // (no Retro, os TBitBtn do computador: o OK com o visto, o Sim e o Nao com os glifos)
+        SobreporCelular(CUi.Caixa_(titulo, CUi.Txt(texto, 15, null, FontWeight.Normal, true),
+            CUi.Retro ? CR95.Botao(T("OK"), "Botoes/BBOK.png", true, Fim, false) : new CUi.Botao(T("OK"), true, Fim)));
     }
 
     void ConfirmarCelular(string titulo, string texto, Action sim)
     {
         void Sim() { Sobrepor(null); sim(); }
-        SobreporCelular(CUi.Caixa_(titulo, CUi.Txt(texto, 15, null, FontWeight.Normal, true),
-            new CUi.Botao(T("Não"), false, () => Sobrepor(null)), new CUi.Botao(T("Sim"), true, Sim)));
+        void Nao() => Sobrepor(null);
+        var corpo = CUi.Txt(texto, 15, null, FontWeight.Normal, true);
+        // (no Retro, o Sim primeiro, como na janela do computador)
+        SobreporCelular(CUi.Retro
+            ? CUi.Caixa_(titulo, corpo, CR95.Botao(T("Sim"), "Botoes/BBYES.png", true, Sim, false), CR95.Botao(T("Não"), "Botoes/BBNO.png", false, Nao, false))
+            : CUi.Caixa_(titulo, corpo, new CUi.Botao(T("Não"), false, Nao), new CUi.Botao(T("Sim"), true, Sim)));
     }
 
     // a caixa do kit ja traz o veu
@@ -59,12 +66,22 @@ public sealed partial class TelaInicio
         _sobreM.IsVisible = true;
     }
 
-    static Control PreparandoCelular(string texto) => CUi.Caixa_(T("Jogo novo"), new StackPanel
+    static Control PreparandoCelular(string texto)
     {
-        // o texto em cima (quebra a linha) e a barra embaixo, na largura da caixa
-        Spacing = 12,
-        Children = { CUi.Txt(texto, 14, null, FontWeight.Normal, true), new ProgressBar { IsIndeterminate = true, HorizontalAlignment = HorizontalAlignment.Stretch, MinWidth = 0 } },
-    });
+        var barra = new ProgressBar { IsIndeterminate = true, HorizontalAlignment = HorizontalAlignment.Stretch, MinWidth = 0 };
+        // no Retro, a barra do computador: o fundo branco afundado e o azul-marinho, sem cantos
+        if (CUi.Retro)
+        {
+            barra.Foreground = W95.Marinho; barra.Background = W95.Branco; barra.BorderBrush = W95.Escura;
+            barra.BorderThickness = new Thickness(1); barra.CornerRadius = new CornerRadius(0); barra.MinHeight = barra.Height = 18;
+        }
+        return CUi.Caixa_(T("Jogo novo"), new StackPanel
+        {
+            // o texto em cima (quebra a linha) e a barra embaixo, na largura da caixa
+            Spacing = 12,
+            Children = { CUi.Txt(texto, 14, null, FontWeight.Normal, true), barra },
+        });
+    }
 
     // o passo do jogo novo, no subtitulo
     static string PassoCelular(int k) => T("Jogo novo") + " · " + (k + 1) + "/3 · " + new[] { T("Países"), T("Moeda"), T("Treinadores") }[k];
@@ -72,6 +89,7 @@ public sealed partial class TelaInicio
     // ---------------------------------------------------------------- inicio
     void EscolherJogoCelular()
     {
+        if (CUi.Retro) { EscolherJogoRetro(); return; }
         var jogos = ListarJogos();
         int sel = jogos.Count > 0 ? 0 : -1;
         var itens = new List<CUi.Item>();
@@ -188,6 +206,7 @@ public sealed partial class TelaInicio
     void SelecionarPaisesCelular(Dados d, SelecaoPaises sel, string arquivo)
     {
         Sobrepor(null);
+        if (CUi.Retro) { SelecionarPaisesRetro(d, sel, arquivo); return; }
         var itens = new List<(CUi.Item I, TextBlock Check, Pais P)>();
         var lista = new StackPanel { Spacing = 6 };
         var resumo = CUi.Txt("", 14, null, FontWeight.SemiBold, true);
@@ -254,6 +273,7 @@ public sealed partial class TelaInicio
     // ---------------------------------------------------------------- moeda
     void EscolherMoedaCelular(Dados d, string arquivo)
     {
+        if (CUi.Retro) { EscolherMoedaRetro(d, arquivo); return; }
         var moedas = Tabelas.MoedasDoJogoNovo;
         int sel = 0;
         var itens = new List<CUi.Item>();
@@ -279,6 +299,7 @@ public sealed partial class TelaInicio
     // ---------------------------------------------------------------- treinadores
     void EscolherTreinadoresCelular(Dados d, int moeda, string arquivo)
     {
+        if (CUi.Retro) { EscolherTreinadoresRetro(d, moeda, arquivo); return; }
         var nomes = new TextBox[6];
         var equipas = new ContentControl[6];
         var linhas = new StackPanel { Spacing = 10 };

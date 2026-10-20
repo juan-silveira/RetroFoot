@@ -20,6 +20,8 @@ public sealed partial class TelaConfiguracoes
 {
     void MontarCelular(int secao)
     {
+        // no Retro, a janela com as abas do computador (TelaConfiguracoesCelularRetro.cs)
+        if (CUi.Retro) { RetroCelular(Math.Max(0, secao)); return; }
         Background = CUi.Fundo;
         FontFamily = CUi.Fonte;
         if (secao >= 0) SecaoCelular(secao); else ListaCelular();
