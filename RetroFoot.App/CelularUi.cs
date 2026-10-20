@@ -20,14 +20,15 @@ public static class CUi
 
     // ---------------------------------------------------------------- as cores
     static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
-    static readonly IBrush RFundo = W95.Verde, RBarra = W95.Marinho, RCartao = W95.Face, RTexto = W95.Preto,
+    static readonly IBrush RFundo = W95.Verde, RBarra = W95.TituloCor, RCartao = W95.Face, RTexto = W95.Preto,
         RFraco = H("#404040"), RLinha = H("#808080"), RSelecao = W95.Marinho, RSobreSelecao = W95.Branco,
         RTitulo = W95.Amarelo, RCampo = W95.Branco;
 
     public static IBrush Fundo => Retro ? RFundo : TemaVerde.FundoTela;
     public static IBrush Barra => Retro ? RBarra : TemaVerde.BarraHub;
-    public static IBrush TextoBarra => Retro ? W95.Branco : TemaVerde.Texto;
-    public static IBrush FracoBarra => Retro ? H("#C8C8FF") : TemaVerde.TextoFraco;
+    // (no Retro, a barra de titulo das janelas do computador: azul-claro com o texto preto)
+    public static IBrush TextoBarra => Retro ? W95.Preto : TemaVerde.Texto;
+    public static IBrush FracoBarra => Retro ? H("#202020") : TemaVerde.TextoFraco;
     public static IBrush Cartao => Retro ? RCartao : TemaVerde.CartaoHub;
     public static IBrush Texto => Retro ? RTexto : TemaVerde.Texto;
     public static IBrush Fraco => Retro ? RFraco : TemaVerde.TextoFraco;
@@ -63,7 +64,7 @@ public static class CUi
     // o titulo de uma secao sobre o fundo ("GOLEIROS · 4")
     public static TextBlock TituloSecao_(string s) => Txt(s.ToUpperInvariant(), 12.5, TituloSecao, FontWeight.Bold);
     // o mesmo dentro de uma folha ou cartao (no Retro, o fundo e cinza: azul-marinho)
-    public static TextBlock SecaoFolha(string s) => Txt(s.ToUpperInvariant(), 12.5, Retro ? W95.Marinho : TemaVerde.TextoFraco, FontWeight.Bold);
+    public static TextBlock SecaoFolha(string s) => Txt(s.ToUpperInvariant(), 12.5, Retro ? W95.Preto : TemaVerde.TextoFraco, FontWeight.Bold);
 
     // ---------------------------------------------------------------- pecas
     // a pagina: o cabecalho em cima, o corpo (que rola) e o rodape fixo embaixo
@@ -137,7 +138,7 @@ public static class CUi
         if (titulo != null)
         {
             var barra = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-            barra.Children.Add(Txt(titulo, 14, W95.Branco, FontWeight.Bold));
+            barra.Children.Add(Txt(titulo, 14, W95.Preto, FontWeight.Bold));
             if (direita != null) { Grid.SetColumn(direita, 1); barra.Children.Add(direita); }
             janela.Children.Add(new Border { Background = RBarra, Padding = new Thickness(8, 4), Child = barra });
         }
@@ -323,12 +324,19 @@ public static class CUi
         bool primeira = true;
         foreach (var l in linhas)
         {
+            // (no Retro, a TListBox do computador: sem fio entre as linhas)
             p.Children.Add(new Border
             {
-                BorderBrush = Linha, BorderThickness = new Thickness(0, primeira ? 0 : 0.5, 0, 0), Child = l,
+                BorderBrush = Linha, BorderThickness = new Thickness(0, primeira || Retro ? 0 : 0.5, 0, 0), Child = l,
             });
             primeira = false;
         }
+        if (Retro)
+            return new Border
+            {
+                Background = W95.Branco, Padding = new Thickness(2), ClipToBounds = true, Child = p,
+                BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #808080, inset 2 2 0 0 #000000, inset -1 -1 0 0 #FFFFFF, inset -2 -2 0 0 #DFDFDF"),
+            };
         return new Border
         {
             Background = Retro ? W95.Branco : TemaVerde.CartaoHub, CornerRadius = new CornerRadius(Retro ? 0 : 14),
@@ -575,8 +583,8 @@ public static class CUi
                 var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto") };
                 if (icone != null) { icone.Margin = new Thickness(0, 0, 10, 0); icone.VerticalAlignment = VerticalAlignment.Center; g.Children.Add(icone); }
                 var t = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-                t.Children.Add(Txt(titulo, Retro ? 15 : 18, Retro ? W95.Branco : Texto, FontWeight.Bold));
-                if (!string.IsNullOrEmpty(sub)) t.Children.Add(Txt(sub, 12.5, Retro ? H("#C8C8FF") : Fraco, FontWeight.Normal, true));
+                t.Children.Add(Txt(titulo, Retro ? 15 : 18, Texto, FontWeight.Bold));
+                if (!string.IsNullOrEmpty(sub)) t.Children.Add(Txt(sub, 12.5, Retro ? H("#202020") : Fraco, FontWeight.Normal, true));
                 Grid.SetColumn(t, 1);
                 g.Children.Add(t);
                 if (fechar != null)
@@ -740,4 +748,34 @@ public static class CUi
             case Decorator d: PintarTexto(d.Child, cor); break;
         }
     }
+
+    // ---------------------------------------------------------------- pecas do Retro do computador
+    // a moldura de grupo (TGroupBox): o fio duplo com o titulo em cima, a esquerda
+    public static Control GrupoRetro(string? titulo, Control conteudo)
+    {
+        var moldura = new Border
+        {
+            Margin = new Thickness(0, titulo != null ? 8 : 0, 0, 0), Padding = new Thickness(10, titulo != null ? 14 : 10, 10, 10),
+            BorderBrush = H("#808080"), BorderThickness = new Thickness(1),
+            BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #FFFFFF"), Child = conteudo,
+        };
+        if (titulo == null) return moldura;
+        var rot = new Border
+        {
+            Background = RCartao, Padding = new Thickness(4, 0), Margin = new Thickness(8, 0, 0, 0),
+            HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top,
+            Child = Txt(titulo, 13, RTexto, FontWeight.Bold),
+        };
+        return new Panel { Children = { moldura, rot } };
+    }
+
+    // a barra de medidor (TBiGauge / TProgressBar do computador): o fundo branco afundado e a
+    // barra na cor dada, de 0 a max
+    public static Control Medidor(double valor, double max, IBrush cor, double altura = 18) => new ProgressBar
+    {
+        Minimum = 0, Maximum = max, Value = Math.Clamp(valor, 0, max), Height = altura, MinHeight = altura,
+        Foreground = cor, Background = Retro ? W95.Branco : TemaVerde.Alfa(Colors.White, 0.15),
+        BorderBrush = Retro ? W95.Escura : null, BorderThickness = new Thickness(Retro ? 1 : 0),
+        CornerRadius = new CornerRadius(Retro ? 0 : 6),
+    };
 }
