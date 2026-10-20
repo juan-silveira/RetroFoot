@@ -25,9 +25,10 @@ static class ListasCelular
 {
     // ---------------------------------------------------------------- a folha
     // abre a lista: titulo, as linhas (rolam) e o voltar (que chama fechou); fim = rola ate o
-    // ultimo item (OpUltimo); inteira = false: a folha de baixo com o OK (as chicotadas)
+    // ultimo item (OpUltimo); as listas abrem na gaveta (a folha de baixo, com o X), como os
+    // menus da tela da equipa; inteira = a tela toda; ok = o botao OK embaixo (as chicotadas)
     internal static (CUi.Folha Folha, Action Fechar, Action Tirar) Abrir(Dialogos d, string titulo, string? sub, Control corpo,
-        Action? fechou, bool fim = false, bool inteira = true, Control? icone = null)
+        Action? fechou, bool fim = false, bool inteira = false, Control? icone = null, bool ok = false)
     {
         CUi.Folha? f = null;
         bool fechado = false;
@@ -35,10 +36,10 @@ static class ListasCelular
         void Tirar() { if (fechado) return; fechado = true; d.Fechar(f!); }
         void Fechar() { if (fechado) return; Tirar(); fechou?.Invoke(); }
         Control? rodape = null;
-        if (!inteira)
+        if (ok)
         {
-            var ok = new CUi.Botao(T("OK"), true, Fechar) { HorizontalAlignment = HorizontalAlignment.Stretch };
-            rodape = ok;
+            var botaoOk = new CUi.Botao(T("OK"), true, Fechar) { HorizontalAlignment = HorizontalAlignment.Stretch };
+            rodape = botaoOk;
         }
         f = new CUi.Folha(titulo, corpo, rodape, sub, icone, inteira: inteira, fechar: Fechar);
         if (fim)
@@ -53,7 +54,7 @@ static class ListasCelular
     // as linhas num grupo (com o fio entre elas); toque(i) != null: a linha se toca
     internal static Control Grupo(int n, Func<int, Control> linha, Func<int, Action?>? toque = null, double altura = 44)
     {
-        if (n == 0) return new TextBlock { Text = T("Nada a mostrar."), FontFamily = CUi.Fonte, FontSize = 14 * Acessibilidade.Texto, Foreground = CUi.Retro ? W95.Branco : CUi.Fraco, VerticalAlignment = VerticalAlignment.Top };
+        if (n == 0) return new TextBlock { Text = T("Nada a mostrar."), FontFamily = CUi.Fonte, FontSize = 14 * Acessibilidade.Texto, Foreground = CUi.Fraco, VerticalAlignment = VerticalAlignment.Top };
         var ls = new List<Control>(n);
         for (int i = 0; i < n; i++)
         {
@@ -421,7 +422,7 @@ static class ListasCelular
             esc.Margin = new Thickness(0, 0, 10, 0);
             return Grade("Auto,*", e != null ? esc : null, CUi.Txt(txt, 14.5, null, h ? FontWeight.Bold : FontWeight.Normal, true));
         });
-        Abrir(d, T("Demissões de Técnicos"), null, corpo, fechou, inteira: false);
+        Abrir(d, T("Demissões de Técnicos"), null, corpo, fechou, ok: true);
     }
 
     // o ranking dos treinadores (ja ordenado): o lugar, o nome (negrito o humano) e a equipa
