@@ -86,7 +86,9 @@ public sealed partial class TelaInicio
             int k = i;
             var g = jogos[i];
             var grade = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,12,*") };
-            Control escudo = g.Equipa is { } eq ? new ConfigEstilo.Escudo(eq) { Width = 34, Height = 34 }
+            // no Retro, a bandeira do pais da equipa (como no topo da tela do time); no Moderno, o logo
+            Control escudo = g.Equipa is { } eq
+                ? (CUi.Retro ? CUi.Bandeira(TextosMercado.PaisDe(eq.Pais), 34) : null) ?? new ConfigEstilo.Escudo(eq) { Width = 34, Height = 34 }
                 : CUi.Txt("E98", 12, CUi.Destaque, FontWeight.Bold);
             escudo.VerticalAlignment = VerticalAlignment.Center;
             grade.Children.Add(escudo);

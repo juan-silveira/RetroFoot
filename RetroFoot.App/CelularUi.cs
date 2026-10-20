@@ -155,7 +155,8 @@ public static class CUi
         Background = fundo ?? (Retro ? W95.Amarelo : TemaVerde.DestaqueFundo),
         CornerRadius = new CornerRadius(Retro ? 0 : 9), Padding = new Thickness(7, 2),
         BorderBrush = Retro ? W95.Preto : null, BorderThickness = new Thickness(Retro ? 1 : 0),
-        Child = Txt(s, 11.5, cor ?? (Retro ? W95.Preto : TemaVerde.Destaque), FontWeight.SemiBold),
+        // (fixo: o realce da linha escolhida no Retro nao pinta o texto de branco sobre o amarelo)
+        Child = new Func<TextBlock>(() => { var t = Txt(s, 11.5, cor ?? (Retro ? W95.Preto : TemaVerde.Destaque), FontWeight.SemiBold); t.Tag = "fixo"; return t; })(),
         VerticalAlignment = VerticalAlignment.Center,
     };
 
