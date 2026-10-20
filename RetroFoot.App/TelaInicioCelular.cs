@@ -61,8 +61,9 @@ public sealed partial class TelaInicio
 
     static Control PreparandoCelular(string texto) => CUi.Caixa_(T("Jogo novo"), new StackPanel
     {
-        Orientation = Orientation.Horizontal, Spacing = 12,
-        Children = { new ProgressBar { IsIndeterminate = true, Width = 70, VerticalAlignment = VerticalAlignment.Center }, CUi.Txt(texto, 14, null, FontWeight.Normal, true) },
+        // o texto em cima (quebra a linha) e a barra embaixo, na largura da caixa
+        Spacing = 12,
+        Children = { CUi.Txt(texto, 14, null, FontWeight.Normal, true), new ProgressBar { IsIndeterminate = true, HorizontalAlignment = HorizontalAlignment.Stretch, MinWidth = 0 } },
     });
 
     // o passo do jogo novo, no subtitulo

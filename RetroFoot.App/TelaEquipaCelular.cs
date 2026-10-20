@@ -573,8 +573,13 @@ public sealed partial class TelaEquipa
             var g = ColunasRetro(false, j);
             g.Children.Add(alvo);
             var corpo = new Clicavel { Background = Brushes.Transparent, Child = g, CorFoco = null, Padding = new Thickness(0, 0, 4, 0) };
-            corpo.Clique += () => AbrirFicha(j);
-            return new Border { Child = corpo, BorderBrush = cor, BorderThickness = new Thickness(0, 0, 0, traco ? 1 : 0), Margin = new Thickness(0, 0, 0, traco ? 4 : 0) };
+            corpo.Clique += () => { if (!_arrastou) AbrirFicha(j); };
+            var frente = new Border { Child = corpo, Background = _corLetra };
+            return new Border
+            {
+                Child = Deslizante(frente, Tras(j, _corFundo, _corLetra, false)), BorderBrush = cor,
+                BorderThickness = new Thickness(0, 0, 0, traco ? 1 : 0), Margin = new Thickness(0, 0, 0, traco ? 4 : 0),
+            };
         }
 
         Control LinhaJogador(SJogador j)
@@ -609,11 +614,113 @@ public sealed partial class TelaEquipa
             g.Children.Add(alvoPonto);
             Grid.SetColumn(pos, 1); g.Children.Add(pos);
             var corpo = new Clicavel { Background = Brushes.Transparent, Child = meio, CorFoco = null, Padding = new Thickness(6, 0, 0, 0) };
-            corpo.Clique += () => AbrirFicha(j);
+            corpo.Clique += () => { if (!_arrastou) AbrirFicha(j); };
             Grid.SetColumn(corpo, 2); g.Children.Add(corpo);
             Grid.SetColumn(comp, 3); g.Children.Add(comp);
             Grid.SetColumn(forca, 4); g.Children.Add(forca);
-            return new Border { BorderBrush = LLinha, BorderThickness = new Thickness(0, 0, 0, 0.5), Child = g };
+            var frente = new Border { Background = TemaVerde.CartaoHub, Child = g };
+            return new Border
+            {
+                BorderBrush = LLinha, BorderThickness = new Thickness(0, 0, 0, 0.5),
+                Child = Deslizante(frente, Tras(j, TemaVerde.Selecao, TemaVerde.Texto, true)),
+            };
+        }
+
+        // ------------------------------------------------------------ deslizar a linha
+        // Deslizar a linha de um jogador para a esquerda mostra por tras os outros dados dele
+        // (sem abrir a ficha), como na prova do celular; soltar na metade abre ou fecha, e uma
+        // so linha fica aberta. O toque depois de arrastar nao abre a ficha
+        Control? _linhaAberta;
+        bool _arrastou;
+
+        Control Deslizante(Control frente, Control tras)
+        {
+            var linha = new Grid { ClipToBounds = true };
+            tras.HorizontalAlignment = HorizontalAlignment.Right;
+            // (escondido com a linha fechada: no Moderno o cartao e meio transparente)
+            tras.Opacity = 0;
+            linha.Children.Add(tras);
+            linha.Children.Add(frente);
+            double ini = double.NaN, iniY = 0, desloc = 0;
+            bool arrastando = false;
+            double Largura() => Math.Max(tras.Bounds.Width, tras.DesiredSize.Width);
+            void Mover(double x, bool animar)
+            {
+                frente.Transitions = animar ? new Avalonia.Animation.Transitions
+                {
+                    new Avalonia.Animation.TransformOperationsTransition
+                    {
+                        Property = RenderTransformProperty, Duration = TimeSpan.FromMilliseconds(200), Easing = new Avalonia.Animation.Easings.CubicEaseOut(),
+                    },
+                } : null;
+                frente.RenderTransform = Avalonia.Media.Transformation.TransformOperations.Parse($"translateX({x:0}px)");
+                desloc = x;
+                if (x < 0) tras.Opacity = 1;
+                else if (!animar) tras.Opacity = 0;
+                else DispatcherTimer.RunOnce(() => { if (desloc == 0) tras.Opacity = 0; }, TimeSpan.FromMilliseconds(220));
+            }
+            linha.Tag = (Action)(() => Mover(0, true));
+            linha.AddHandler(PointerPressedEvent, (_, e) =>
+            {
+                ini = e.GetPosition(linha).X - desloc; iniY = e.GetPosition(linha).Y; arrastando = false; _arrastou = false;
+            }, Avalonia.Interactivity.RoutingStrategies.Tunnel | Avalonia.Interactivity.RoutingStrategies.Bubble, true);
+            linha.AddHandler(PointerMovedEvent, (_, e) =>
+            {
+                if (double.IsNaN(ini)) return;
+                var pt = e.GetPosition(linha);
+                double dx = pt.X - ini;
+                if (!arrastando)
+                {
+                    if (Math.Abs(dx - desloc) < 12 || Math.Abs(dx - desloc) < Math.Abs(pt.Y - iniY)) return;
+                    arrastando = _arrastou = true;
+                    e.Pointer.Capture(linha);
+                    if (_linhaAberta != null && _linhaAberta != linha && _linhaAberta.Tag is Action f) f();
+                }
+                Mover(Math.Clamp(dx, -Largura(), 0), false);
+            }, Avalonia.Interactivity.RoutingStrategies.Tunnel | Avalonia.Interactivity.RoutingStrategies.Bubble, true);
+            linha.AddHandler(PointerReleasedEvent, (_, e) =>
+            {
+                if (arrastando)
+                {
+                    e.Pointer.Capture(null);
+                    bool abre = desloc < -Largura() / 2;
+                    Mover(abre ? -Largura() : 0, true);
+                    _linhaAberta = abre ? linha : null;
+                    e.Handled = true;
+                }
+                ini = double.NaN;
+                arrastando = false;
+            }, Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+            return linha;
+        }
+
+        // o que fica por tras: nota e risco de lesao (versao Atual), jogos, gols, gols na
+        // temporada e (salario = true) o salario com "acertado" (o + da lista do computador)
+        Control Tras(SJogador j, IBrush fundo, IBrush cor, bool salario)
+        {
+            var s = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+            void Cel(string v, string rotulo)
+            {
+                var c = new StackPanel { Width = 42, VerticalAlignment = VerticalAlignment.Center };
+                var a = CUi.Txt(v, 15, cor, FontWeight.Bold); a.HorizontalAlignment = HorizontalAlignment.Center;
+                var b = CUi.Txt(rotulo, 10, cor); b.HorizontalAlignment = HorizontalAlignment.Center; b.Opacity = 0.8;
+                a.Tag = b.Tag = "fixo";
+                c.Children.Add(a); c.Children.Add(b);
+                s.Children.Add(c);
+            }
+            if (_s.J.M.Regras.CartoesAmarelos) { Cel(j.Nota.ToString(), T("Nota")); Cel(j.Lesao.ToString(), "RL"); }
+            Cel(_p.HistCelular(j, Mem.HistJogos).ToString(), T("Jogos"));
+            Cel(_p.HistCelular(j, Mem.HistGolos).ToString(), T("Gols"));
+            Cel(Mem.Golos14(j).ToString(), T("Temp."));
+            if (salario)
+            {
+                bool acertado = !MercadoJogo.PodeMudarSalario(j);
+                var v = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0) };
+                v.Children.Add(CUi.Txt(_p.DinheiroCelular(j.Salario), 14, cor, FontWeight.Bold));
+                v.Children.Add(CUi.Txt(T(acertado ? "Salário acertado" : "Não acertado"), 10.5, cor));
+                s.Children.Add(v);
+            }
+            return new Border { Background = fundo, Padding = new Thickness(6, 0, 12, 0), Child = s };
         }
 
         // ao lado do nome: amarelos (1 ou 2 sobrepostos), suspensao e lesao
