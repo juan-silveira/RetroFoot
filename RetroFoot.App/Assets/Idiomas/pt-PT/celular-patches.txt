@@ -1,0 +1,3 @@
+# Ferramenta Patches no celular (pt-PT). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Toque em Importar e escolha os .zip guardados no celular.	Toque em Importar e escolha os .zip guardados no telemóvel.
