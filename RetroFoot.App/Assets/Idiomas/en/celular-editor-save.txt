@@ -1,0 +1,4 @@
+# Editor de Save no celular (RetroFoot.App/FerramentaEditorSaveCelular.cs) (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Nenhuma equipa	No teams
+Toque num jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).	Tap a player to edit. S = suspended, A = yellow cards, L = injured (matches).
