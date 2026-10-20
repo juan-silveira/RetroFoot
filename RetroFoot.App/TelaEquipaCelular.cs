@@ -565,11 +565,11 @@ public sealed partial class TelaEquipa
                 HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
             };
             var alvo = new Clicavel { Background = Brushes.Transparent, Child = marca, CorFoco = null };
-            alvo.Clique += () => { _p.AlternarCelular(j); Refazer(); };
+            alvo.Clique += () => { if (FecharAberta()) return; _p.AlternarCelular(j); Refazer(); };
             var g = ColunasRetro(false, j);
             g.Children.Add(alvo);
             var corpo = new Clicavel { Background = Brushes.Transparent, Child = g, CorFoco = null, Padding = new Thickness(0, 0, 4, 0) };
-            corpo.Clique += () => { if (!_arrastou) AbrirFicha(j); };
+            corpo.Clique += () => { if (!_arrastou && !FecharAberta()) AbrirFicha(j); };
             var frente = new Border { Child = corpo, Background = _corLetra };
             return new Border
             {
@@ -593,7 +593,7 @@ public sealed partial class TelaEquipa
                 HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
             };
             var alvoPonto = new Clicavel { Width = 40, MinHeight = 40, Background = Brushes.Transparent, Child = ponto, CorFoco = null };
-            alvoPonto.Clique += () => { _p.AlternarCelular(j); Refazer(); };
+            alvoPonto.Clique += () => { if (FecharAberta()) return; _p.AlternarCelular(j); Refazer(); };
             var pos = CUi.Txt(Posicao(Math.Min((int)j.Posicao, 3)), 12.5, LForte, FontWeight.Bold);
             pos.Width = 18;
             var meio = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
@@ -610,7 +610,7 @@ public sealed partial class TelaEquipa
             g.Children.Add(alvoPonto);
             Grid.SetColumn(pos, 1); g.Children.Add(pos);
             var corpo = new Clicavel { Background = Brushes.Transparent, Child = meio, CorFoco = null, Padding = new Thickness(6, 0, 0, 0) };
-            corpo.Clique += () => { if (!_arrastou) AbrirFicha(j); };
+            corpo.Clique += () => { if (!_arrastou && !FecharAberta()) AbrirFicha(j); };
             Grid.SetColumn(corpo, 2); g.Children.Add(corpo);
             Grid.SetColumn(comp, 3); g.Children.Add(comp);
             Grid.SetColumn(forca, 4); g.Children.Add(forca);
@@ -628,6 +628,15 @@ public sealed partial class TelaEquipa
         // so linha fica aberta. O toque depois de arrastar nao abre a ficha
         Control? _linhaAberta;
         bool _arrastou;
+
+        // com uma linha aberta, o toque (na lista ou nos botoes) so a fecha, como na prova
+        bool FecharAberta()
+        {
+            if (_linhaAberta?.Tag is not Action f) return false;
+            f();
+            _linhaAberta = null;
+            return true;
+        }
 
         Control Deslizante(Control frente, Control tras)
         {
@@ -748,6 +757,8 @@ public sealed partial class TelaEquipa
             if (j.B35 == 1) p.Children.Add(CUi.Txt(T("Não é considerado jogador estrangeiro, ao abrigo da Lei Bosman"), 12.5, CUi.Fraco, FontWeight.Normal, true));
             if (j.JogosLesao > 0) p.Children.Add(CUi.Txt(T(j.JogosLesao == 1 ? "Lesionado por 1 jogo" : "Lesionado por {0} jogos", j.JogosLesao), 14, CUi.Erro, FontWeight.Bold));
             if (j.Suspensao > 0) p.Children.Add(CUi.Txt(T(j.Suspensao == 1 ? "Suspenso por 1 jogo" : "Suspenso por {0} jogos", j.Suspensao), 14, CUi.Erro, FontWeight.Bold));
+            else if (_s.J.M.Regras.CartoesAmarelos && Painel.AmarelosCelular(j) is int am && am > 0)
+                p.Children.Add(CUi.Txt(T("{0} amarelos acumulados", am), 14, CUi.Retro ? W95.Preto : TemaVerde.Destaque, FontWeight.Bold));
             // os dados dois por linha
             var dados = new List<(string, string)>
             {
@@ -866,6 +877,23 @@ public sealed partial class TelaEquipa
                 },
             };
             DockPanel.SetDock(cab, Dock.Top);
+            // arrastar o topo da gaveta para baixo a fecha (mais de 80 pontos), como na prova
+            double arrasteY = double.NaN;
+            cab.Background = Brushes.Transparent;
+            cab.PointerPressed += (_, e) => { arrasteY = e.GetPosition(_raiz).Y; e.Pointer.Capture(cab); };
+            cab.PointerMoved += (_, e) =>
+            {
+                if (double.IsNaN(arrasteY)) return;
+                folha.RenderTransform = new TranslateTransform(0, Math.Max(0, e.GetPosition(_raiz).Y - arrasteY));
+            };
+            cab.PointerReleased += (_, e) =>
+            {
+                if (double.IsNaN(arrasteY)) return;
+                double d = e.GetPosition(_raiz).Y - arrasteY;
+                arrasteY = double.NaN;
+                e.Pointer.Capture(null);
+                if (d > 80) FecharGaveta(); else folha.RenderTransform = null;
+            };
             var veu = new Border { Background = TemaVerde.Veu };
             veu.PointerPressed += (_, e) => { e.Handled = true; FecharGaveta(); };
             _gaveta.Children.Clear();
