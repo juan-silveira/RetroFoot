@@ -48,7 +48,9 @@ public sealed partial class TelaInicio : UserControl
         pastaJogos = Environment.GetEnvironmentVariable("RETROFOOT_JOGOS") is { Length: > 0 } j ? j : DadosJogo.Saves;
         // Moderno: a tela escura (TelaInicioModerna.cs); Original: o verde do original, mais
         // largo em 16:9 (as janelas no centro)
-        if (Visual.Moderno) MontarModerno();
+        // no celular: as paginas em pe do kit (TelaInicioCelular.cs), nos dois visuais
+        if (Celular.Ativo) MontarCelular();
+        else if (Visual.Moderno) MontarModerno();
         else
         {
             Background = W95.Verde;
@@ -108,7 +110,7 @@ public sealed partial class TelaInicio : UserControl
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        Dispatcher.UIThread.Post(() => { if (Visual.Moderno) FocarModerno(); else if (pilha.Count > 0) pilha[^1].Focar(); else Focus(); });
+        Dispatcher.UIThread.Post(() => { if (Visual.Moderno || Celular.Ativo) FocarModerno(); else if (pilha.Count > 0) pilha[^1].Focar(); else Focus(); });
     }
 
     // ---------------------------------------------------------------- pastas
@@ -171,6 +173,7 @@ public sealed partial class TelaInicio : UserControl
     // TInputDlg sem a caixa de texto (como o Mensagem do Go)
     void Mensagem(string titulo, string texto, Action? depois = null)
     {
+        if (Celular.Ativo) { MensagemCelular(titulo, texto, depois); return; }
         if (Visual.Moderno) { MensagemModerna(titulo, texto, depois); return; }
         var j = new Janela(titulo, 388, 132, W95.Face);
         j.Por(new Bevel(), 8, 8, 281, 105);
@@ -185,6 +188,7 @@ public sealed partial class TelaInicio : UserControl
     // Sim/Nao no visual da tela (o Sim chama sim)
     void Confirmar(string titulo, string texto, Action sim)
     {
+        if (Celular.Ativo) { ConfirmarCelular(titulo, texto, sim); return; }
         if (Visual.Moderno) { ConfirmarModerno(titulo, texto, sim); return; }
         var j = new Janela(titulo, 388, 132, W95.Face);
         j.Por(new Bevel(), 8, 8, 281, 105);
@@ -309,6 +313,7 @@ public sealed partial class TelaInicio : UserControl
 
     void EscolherJogo()
     {
+        if (Celular.Ativo) { EscolherJogoCelular(); return; }
         if (Visual.Moderno) { EscolherJogoModerno(); return; }
         var jogos = ListarJogos();
         bool novo = jogos.Count == 0;
@@ -459,6 +464,7 @@ public sealed partial class TelaInicio : UserControl
     {
         // o minimo do N das Configuracoes (4N + as que sobem do Distrital)
         sel.Minimo = cfg.RegrasDoJogoNovo.MinimoEquipas;
+        if (Celular.Ativo) { SelecionarPaisesCelular(d, sel, arquivo); return; }
         if (Visual.Moderno) { SelecionarPaisesModerno(d, sel, arquivo); return; }
         var j = new Janela(T("Seleção de Países"), 632, 453, W95.Verde);
         j.Por(new Bevel(), 8, 8, 369, 421);
@@ -553,6 +559,7 @@ public sealed partial class TelaInicio : UserControl
     // TcurrencyDlg
     void EscolherMoeda(Dados d, string arquivo)
     {
+        if (Celular.Ativo) { EscolherMoedaCelular(d, arquivo); return; }
         if (Visual.Moderno) { EscolherMoedaModerno(d, arquivo); return; }
         var j = new Janela(T("Dinheiro"), 388, 166, W95.Cor(255, 255, 128));   // Color = $80FFFF
         j.Por(new Bevel(), 8, 8, 285, 145);
@@ -572,6 +579,7 @@ public sealed partial class TelaInicio : UserControl
     // cada um; o botao vira "Continuar" e comeca
     void EscolherTreinadores(Dados d, int moeda, string arquivo)
     {
+        if (Celular.Ativo) { EscolherTreinadoresCelular(d, moeda, arquivo); return; }
         if (Visual.Moderno) { EscolherTreinadoresModerno(d, moeda, arquivo); return; }
         var j = new Janela(T("Jogadores"), 411, 295, W95.Face);
         j.Por(new Bevel(), 8, 8, 393, 201);

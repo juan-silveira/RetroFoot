@@ -283,7 +283,7 @@ public static class Tema
 // um Border que se clica (rato, toque, Enter/Espaco com o foco): cartoes, botoes e linhas.
 // Hover = o fundo com o rato em cima; Solto/Premido = a sombra solta e premida (se houver);
 // CorFoco = a borda com o foco do teclado
-public sealed class Clicavel : Border
+public class Clicavel : Border
 {
     public event Action? Clique;
     public IBrush? Hover { get; set; }

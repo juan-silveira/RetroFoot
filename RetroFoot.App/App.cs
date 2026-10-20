@@ -25,7 +25,7 @@ public class App : Application
         // RETROFOOT_CELULAR=1 mostra a do celular no computador, para comparar.
         // o idioma das Configuracoes (e a traducao do motor) antes da 1a tela
         _ = Idioma.Atual;
-        bool celular = OperatingSystem.IsAndroid() || Environment.GetEnvironmentVariable("RETROFOOT_CELULAR") == "1";
+        bool celular = Celular.Ativo;
         if (!celular) FolgaDaBarra();
         // o texto inteiro numa dica onde ficou cortado (so com o rato)
         if (!OperatingSystem.IsAndroid()) Dicas.Ligar();
@@ -44,7 +44,10 @@ public class App : Application
             "partida" => LigacaoPartida.Demo(),
             "dialogos" => DemoDialogos.Demo(),
             "hub" => new TelaHub(Mostrar),
-            _ when celular => new TelaCelular(),
+            "inicio" => new TelaInicio(Mostrar),
+            // a prova antiga da tela da equipa no celular (so para consulta)
+            "celular" => new TelaCelular(),
+            _ when celular => new TelaInicio(Mostrar),
             _ => TelaInicio.ComSobre(Mostrar),
         };
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
