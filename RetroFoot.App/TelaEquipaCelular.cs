@@ -367,20 +367,62 @@ public sealed partial class TelaEquipa
         // reserva / fora; no resto da linha, a ficha
         Control ElencoRetro()
         {
-            var lista = new StackPanel { Background = _corLetra };
+            var lista = new StackPanel { Background = _corLetra, Margin = new Thickness(0, 0, 8, 0) };
             var o = _p.OrdemCelular();
             for (int i = 0; i < o.Count; i++)
             {
                 bool fim = i == o.Count - 1 || Math.Min((int)o[i].Posicao, 3) != Math.Min((int)o[i + 1].Posicao, 3);
                 lista.Children.Add(LinhaRetro(o[i], fim && i < o.Count - 1));
             }
+            // o cabecalho das colunas fica fixo em cima (TitulosElenco do computador)
+            var cab = new Border { Child = ColunasRetro(true, null), BorderBrush = _corFundo, BorderThickness = new Thickness(0, 0, 0, 1), Padding = new Thickness(0, 0, 8, 0) };
+            var d = new DockPanel();
+            DockPanel.SetDock(cab, Dock.Top);
+            d.Children.Add(cab);
+            d.Children.Add(new ScrollViewer { Content = lista, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled });
             var caixa = new Border
             {
                 Margin = new Thickness(10, 6, 10, 10), Padding = new Thickness(2), Background = _corLetra,
                 BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #6A6A6A, inset 2 2 0 0 #000000, inset -1 -1 0 0 #FFFFFF, inset -2 -2 0 0 #E3E3E3"),
-                Child = new ScrollViewer { Content = lista, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled },
+                Child = d,
             };
             return caixa;
+        }
+
+        // nota e risco de lesao so na versao Atual (as regras do launcher), como no computador
+        bool Atual => _s.J.M.Regras.CartoesAmarelos;
+
+        // as colunas da lista (titulos ou um jogador): marca, P, nome, forca, [nota, RL], S, L,
+        // salario (com o + de ja revisto)
+        Grid ColunasRetro(bool titulos, SJogador? j)
+        {
+            var cor = _corFundo;
+            var g = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitions(Atual ? "34,20,*,28,30,28,18,14,84" : "34,20,*,30,20,16,90"),
+                MinHeight = titulos ? 26 : 34,
+            };
+            void Por(string t, int col, HorizontalAlignment h = HorizontalAlignment.Left)
+            {
+                var x = CUi.Txt(t, titulos ? 11.5 : 14, cor, titulos ? FontWeight.Normal : FontWeight.Bold);
+                x.HorizontalAlignment = h;
+                Grid.SetColumn(x, col);
+                g.Children.Add(x);
+            }
+            string S(SJogador p) => p.Suspensao != 0 ? "S" : Atual && Painel.AmarelosCelular(p) > 0 ? "A" : "";
+            int c = 1;
+            Por(titulos ? "P" : Posicao(Math.Min((int)j!.Posicao, 3)), c++);
+            Por(titulos ? T("Nome") : Painel.NomeCelular(j!), c++);
+            Por(titulos ? "F" : j!.Forca.ToString(), c++, HorizontalAlignment.Right);
+            if (Atual)
+            {
+                Por(titulos ? "N" : j!.Nota.ToString(), c++, HorizontalAlignment.Right);
+                Por(titulos ? "RL" : j!.Lesao.ToString(), c++, HorizontalAlignment.Right);
+            }
+            Por(titulos ? "S" : S(j!), c++, HorizontalAlignment.Center);
+            Por(titulos ? "L" : j!.JogosLesao != 0 ? "L" : "", c++);
+            Por(titulos ? T("Salário") : _p.DinheiroCelular(j!.Salario) + (MercadoJogo.PodeMudarSalario(j) ? " " : "+"), c, HorizontalAlignment.Right);
+            return g;
         }
 
         Control LinhaRetro(SJogador j, bool traco)
@@ -400,18 +442,10 @@ public sealed partial class TelaEquipa
                 Background = esc == Mem.EscFora ? Brushes.Transparent : cor,
                 HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
             };
-            var alvo = new Clicavel { Width = 34, Background = Brushes.Transparent, Child = marca, CorFoco = null };
+            var alvo = new Clicavel { Background = Brushes.Transparent, Child = marca, CorFoco = null };
             alvo.Clique += () => { _p.AlternarCelular(j); Refazer(); };
-            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,20,*,30,20,16,86,12"), MinHeight = 34 };
+            var g = ColunasRetro(false, j);
             g.Children.Add(alvo);
-            void Por(Control c, int col) { Grid.SetColumn(c, col); g.Children.Add(c); }
-            Por(T_(Posicao(Math.Min((int)j.Posicao, 3))), 1);
-            Por(T_(Painel.NomeCelular(j)), 2);
-            Por(T_(j.Forca.ToString(), HorizontalAlignment.Right), 3);
-            Por(T_(j.Suspensao != 0 ? "S" : _s.J.M.Regras.CartoesAmarelos && Painel.AmarelosCelular(j) > 0 ? "A" : "", HorizontalAlignment.Center), 4);
-            Por(T_(j.JogosLesao != 0 ? "L" : ""), 5);
-            Por(T_(_p.DinheiroCelular(j.Salario), HorizontalAlignment.Right), 6);
-            Por(T_(MercadoJogo.PodeMudarSalario(j) ? "" : "+"), 7);
             var corpo = new Clicavel { Background = Brushes.Transparent, Child = g, CorFoco = null, Padding = new Thickness(0, 0, 4, 0) };
             corpo.Clique += () => AbrirFicha(j);
             return new Border { Child = corpo, BorderBrush = cor, BorderThickness = new Thickness(0, 0, 0, traco ? 1 : 0), Margin = new Thickness(0, 0, 0, traco ? 4 : 0) };
@@ -476,17 +510,23 @@ public sealed partial class TelaEquipa
             var p = new StackPanel { Spacing = 6 };
             int pos = Math.Min((int)j.Posicao, 3);
             p.Children.Add(Linha(T("Posição"), T(NomePosicao[pos])));
-            p.Children.Add(Linha(T("País"), Painel.PaisCelular(j)));
+            p.Children.Add(Linha(T("País"), NomePais(Painel.PaisCelular(j))));
+            if (j.B35 == 1) p.Children.Add(CUi.Txt(T("Não é considerado jogador estrangeiro, ao abrigo da Lei Bosman"), 13, CUi.Fraco, FontWeight.Normal, true));
             p.Children.Add(Linha(T("Força"), j.Forca.ToString()));
             p.Children.Add(Linha(T("Salário"), _p.DinheiroCelular(j.Salario)));
+            p.Children.Add(Linha(T("Comportamento"), j.Comportamento < Comportamentos.Length ? T(Comportamentos[j.Comportamento]) : j.Comportamento.ToString()));
             if (_s.J.M.Regras.CartoesAmarelos)
             {
                 p.Children.Add(Linha(T("Nota"), j.Nota.ToString()));
                 p.Children.Add(Linha(T("Risco de lesão"), j.Lesao.ToString()));
             }
+            p.Children.Add(Linha(T("Gols na Temporada"), Mem.Golos14(j).ToString()));
+            p.Children.Add(CUi.SecaoFolha(T("Histórico")));
             p.Children.Add(Linha(T("Jogos"), _p.HistCelular(j, Mem.HistJogos).ToString()));
             p.Children.Add(Linha(T("Gols"), _p.HistCelular(j, Mem.HistGolos).ToString()));
-            p.Children.Add(Linha(T("Gols na temporada"), Mem.Golos14(j).ToString()));
+            if (_s.J.M.Regras.CartoesAmarelos) p.Children.Add(Linha(T("Cartões amarelos"), Painel.AmarelosCelular(j).ToString()));
+            p.Children.Add(Linha(T("Cartões vermelhos"), _p.HistCelular(j, Mem.HistVermelhos).ToString()));
+            p.Children.Add(Linha(T("Lesões"), _p.HistCelular(j, Mem.HistLesoes).ToString()));
             if (j.JogosLesao > 0) p.Children.Add(Linha(T("Lesionado"), T(j.JogosLesao == 1 ? "Lesionado por 1 jogo" : "Lesionado por {0} jogos", j.JogosLesao), CUi.Erro));
             if (j.Suspensao > 0) p.Children.Add(Linha(T("Suspenso"), T(j.Suspensao == 1 ? "Suspenso por 1 jogo" : "Suspenso por {0} jogos", j.Suspensao), CUi.Erro));
             var vender = new CUi.Botao(T("Vender"), true, () => { FecharGaveta(); _p.VenderCelular(j); Refazer(); });
@@ -560,7 +600,8 @@ public sealed partial class TelaEquipa
                 BorderBrush = CUi.Retro ? W95.Preto : TemaVerde.Borda, BorderThickness = new Thickness(1, 1, 1, 0),
                 Child = new DockPanel
                 {
-                    Children = { cab, new ScrollViewer { Content = conteudo, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled } },
+                    // (a folga a direita: a barra de rolagem fica por cima dos valores)
+                    Children = { cab, new ScrollViewer { Content = new Border { Padding = new Thickness(0, 0, 12, 0), Child = conteudo }, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled } },
                 },
             };
             DockPanel.SetDock(cab, Dock.Top);
