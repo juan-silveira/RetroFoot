@@ -68,13 +68,30 @@ public sealed partial class TelaEquipa
         Action? _aoFecharGaveta;
 
         static readonly string[] Siglas = { "FP", "COR", "CAV", "CAN", "CAC", "SAR" };
+
+        // no Retro a tela segue as cores da equipa, como a do classico: o fundo e o topo na cor
+        // de fundo, os textos na cor da letra, e a lista de jogadores invertida (fundo na cor da
+        // letra, nomes na cor do fundo). No Moderno, o tema do kit
+        IBrush _corLetra = Brushes.Black, _corFundo = Brushes.White;
+        static IBrush Alfa(IBrush b, double o) => new SolidColorBrush(((ISolidColorBrush)b).Color, o);
+        IBrush TFundo => CUi.Retro ? _corFundo : CUi.Fundo;
+        IBrush TBarra => CUi.Retro ? _corFundo : CUi.Barra;
+        IBrush TTexto => CUi.Retro ? _corLetra : CUi.TextoBarra;
+        IBrush TFraco => CUi.Retro ? Alfa(_corLetra, 0.75) : CUi.FracoBarra;
+        IBrush TSecao => CUi.Retro ? _corLetra : CUi.TituloSecao;
+        IBrush LFundo => CUi.Retro ? _corLetra : TemaVerde.CartaoHub;
+        IBrush? LTexto => CUi.Retro ? _corFundo : null;
+        IBrush LFraco => CUi.Retro ? Alfa(_corFundo, 0.7) : CUi.Fraco;
+        IBrush LForte => CUi.Retro ? _corFundo : TemaVerde.Destaque;
+        IBrush LLinha => CUi.Retro ? Alfa(_corFundo, 0.35) : CUi.Linha;
         static readonly string[] Setores = { "Goleiros", "Defensores", "Meio-campistas", "Atacantes" };
         static readonly string[] NomePosicao = { "Goleiro", "Defensor", "Meio-campista", "Atacante" };
 
         public EquipaCelular(TelaEquipa tela, Painel p, Sessao s, SEquipa e)
         {
             _tela = tela; _p = p; _s = s; _e = e;
-            Background = CUi.Fundo;
+            (_corLetra, _corFundo) = Cores(e);
+            Background = TFundo;
             FontFamily = CUi.Fonte;
             _raiz.RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto");
             _raiz.Children.Add(_topo);
@@ -138,8 +155,8 @@ public sealed partial class TelaEquipa
             string tecnico = _s.TreinadorDa(_e) is { } t ? Painel.TextoCelular(t.Nome) : "";
             var (letra, fundo) = Cores(_e);
             Control escudo = (CUi.Retro ? null : Escudos.Controle(_e, 52)) ?? Circulo(fundo, letra, 44);
-            var nome = CUi.Txt(Painel.TextoCelular(_e.NomeCompleto), 19, CUi.TextoBarra, FontWeight.Bold);
-            var sub = CUi.Txt(tecnico + (onde.Length > 0 ? " · " + onde : ""), 13, CUi.FracoBarra);
+            var nome = CUi.Txt(Painel.TextoCelular(_e.NomeCompleto), 19, TTexto, FontWeight.Bold);
+            var sub = CUi.Txt(tecnico + (onde.Length > 0 ? " · " + onde : ""), 13, TFraco);
             var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,12,*") };
             escudo.VerticalAlignment = VerticalAlignment.Center;
             cab.Children.Add(escudo);
@@ -149,25 +166,25 @@ public sealed partial class TelaEquipa
             var numeros = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*,*"), Margin = new Thickness(0, 12, 0, 0) };
             Control Num(string r, Control v, int c)
             {
-                var s = new StackPanel { Spacing = 2, Children = { CUi.Txt(r, 12, CUi.FracoBarra), v } };
+                var s = new StackPanel { Spacing = 2, Children = { CUi.Txt(r, 12, TFraco), v } };
                 Grid.SetColumn(s, c);
                 return s;
             }
-            numeros.Children.Add(Num(T("Temporada"), CUi.Txt(m.Ano.ToString(), 16, CUi.TextoBarra, FontWeight.Bold), 0));
-            numeros.Children.Add(Num(T("Em caixa"), CUi.Txt(_p.DinheiroCelular((int)_e.Dinheiro), 16, CUi.TextoBarra, FontWeight.Bold), 1));
+            numeros.Children.Add(Num(T("Temporada"), CUi.Txt(m.Ano.ToString(), 16, TTexto, FontWeight.Bold), 0));
+            numeros.Children.Add(Num(T("Em caixa"), CUi.Txt(_p.DinheiroCelular((int)_e.Dinheiro), 16, TTexto, FontWeight.Bold), 1));
             double moral = Math.Clamp(Math.Round(Painel.MoralCelular(_e) * 10, MidpointRounding.ToEven) / 20, 0, 1);
             var barra = new ProgressBar
             {
                 Minimum = 0, Maximum = 1, Value = moral, Height = 8, MinHeight = 8, MinWidth = 0, Margin = new Thickness(0, 6, 8, 0),
-                Foreground = CUi.Retro ? W95.Amarelo : TemaVerde.Destaque, Background = CUi.Retro ? W95.Cinzento : TemaVerde.Alfa(Colors.White, 0.2),
+                Foreground = CUi.Retro ? _corLetra : TemaVerde.Destaque, Background = CUi.Retro ? Alfa(_corLetra, 0.3) : TemaVerde.Alfa(Colors.White, 0.2),
                 CornerRadius = new CornerRadius(CUi.Retro ? 0 : 4),
             };
             numeros.Children.Add(Num(T("Moral"), barra, 2));
             return new Border
             {
-                Background = CUi.Barra, Padding = new Thickness(16, 14, 16, 14), Child = new StackPanel { Children = { cab, numeros } },
+                Background = TBarra, Padding = new Thickness(16, 14, 16, 14), Child = new StackPanel { Children = { cab, numeros } },
                 CornerRadius = new CornerRadius(0, 0, CUi.Retro ? 0 : 22, CUi.Retro ? 0 : 22),
-                BorderBrush = CUi.Retro ? W95.Preto : null, BorderThickness = new Thickness(0, 0, 0, CUi.Retro ? 1 : 0),
+                BorderBrush = CUi.Retro ? _corLetra : null, BorderThickness = new Thickness(0, 0, 0, CUi.Retro ? 1 : 0),
             };
         }
 
@@ -325,9 +342,9 @@ public sealed partial class TelaEquipa
             foreach (var grupo in _p.OrdemCelular().GroupBy(j => Math.Min((int)j.Posicao, 3)))
             {
                 var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("*,44,44"), Margin = new Thickness(4, 10, 8, 2) };
-                cab.Children.Add(CUi.TituloSecao_(T(Setores[grupo.Key]) + "  ·  " + grupo.Count()));
-                var c1 = CUi.Txt(T("Comp"), 11.5, CUi.TituloSecao, FontWeight.SemiBold); c1.HorizontalAlignment = HorizontalAlignment.Center;
-                var c2 = CUi.Txt(T("Força"), 11.5, CUi.TituloSecao, FontWeight.SemiBold); c2.HorizontalAlignment = HorizontalAlignment.Center;
+                cab.Children.Add(CUi.Txt((T(Setores[grupo.Key]) + "  ·  " + grupo.Count()).ToUpperInvariant(), 12.5, TSecao, FontWeight.Bold));
+                var c1 = CUi.Txt(T("Comp"), 11.5, TSecao, FontWeight.SemiBold); c1.HorizontalAlignment = HorizontalAlignment.Center;
+                var c2 = CUi.Txt(T("Força"), 11.5, TSecao, FontWeight.SemiBold); c2.HorizontalAlignment = HorizontalAlignment.Center;
                 Grid.SetColumn(c1, 1); Grid.SetColumn(c2, 2);
                 cab.Children.Add(c1); cab.Children.Add(c2);
                 lista.Children.Add(cab);
@@ -335,8 +352,8 @@ public sealed partial class TelaEquipa
                 foreach (var j in grupo) cartao.Children.Add(LinhaJogador(j));
                 lista.Children.Add(new Border
                 {
-                    Background = CUi.Retro ? W95.Branco : TemaVerde.CartaoHub, CornerRadius = new CornerRadius(CUi.Retro ? 0 : 14),
-                    BorderBrush = CUi.Linha, BorderThickness = new Thickness(1), ClipToBounds = true, Child = cartao,
+                    Background = LFundo, CornerRadius = new CornerRadius(CUi.Retro ? 0 : 14),
+                    BorderBrush = CUi.Retro ? _corLetra : CUi.Linha, BorderThickness = new Thickness(1), ClipToBounds = true, Child = cartao,
                 });
             }
             return new ScrollViewer { Content = lista, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
@@ -350,24 +367,25 @@ public sealed partial class TelaEquipa
             var ponto = new Border
             {
                 Width = 14, Height = 14, CornerRadius = new CornerRadius(7),
-                Background = esc == Mem.EscTitular ? CUi.Bom : Brushes.Transparent,
-                BorderBrush = esc == Mem.EscReserva ? (CUi.Retro ? W95.Marinho : TemaVerde.Destaque) : esc == Mem.EscTitular ? CUi.Bom : CUi.Linha,
+                Background = esc == Mem.EscTitular ? (CUi.Retro ? _corFundo : CUi.Bom) : Brushes.Transparent,
+                BorderBrush = CUi.Retro ? (esc == Mem.EscFora ? LLinha : _corFundo)
+                    : esc == Mem.EscReserva ? TemaVerde.Destaque : esc == Mem.EscTitular ? CUi.Bom : CUi.Linha,
                 BorderThickness = new Thickness(esc == Mem.EscReserva ? 2.5 : 1.5),
                 HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
             };
             var alvoPonto = new Clicavel { Width = 40, MinHeight = 40, Background = Brushes.Transparent, Child = ponto, CorFoco = null };
             alvoPonto.Clique += () => { _p.AlternarCelular(j); Refazer(); };
-            var pos = CUi.Txt(Posicao(Math.Min((int)j.Posicao, 3)), 12.5, CUi.Retro ? W95.Marinho : TemaVerde.Destaque, FontWeight.Bold);
+            var pos = CUi.Txt(Posicao(Math.Min((int)j.Posicao, 3)), 12.5, LForte, FontWeight.Bold);
             pos.Width = 18;
             var meio = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
             if (W95.Imagem($"Bandeiras/{Painel.PaisCelular(j)}.png") is { } bb)
                 meio.Children.Add(new Image { Source = bb, Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center });
-            var nome = CUi.Txt(Painel.NomeCelular(j), 15, fora ? CUi.Fraco : CUi.Retro ? W95.Preto : null, FontWeight.Medium);
+            var nome = CUi.Txt(Painel.NomeCelular(j), 15, fora ? LFraco : LTexto, FontWeight.Medium);
             meio.Children.Add(nome);
             foreach (var sel in Selos(j)) meio.Children.Add(sel);
-            var comp = CUi.Txt(j.Comportamento < Siglas.Length ? Siglas[j.Comportamento] : "", 11.5, CUi.Fraco, FontWeight.Bold);
+            var comp = CUi.Txt(j.Comportamento < Siglas.Length ? Siglas[j.Comportamento] : "", 11.5, LFraco, FontWeight.Bold);
             comp.HorizontalAlignment = HorizontalAlignment.Center;
-            var forca = CUi.Txt(j.Forca.ToString(), 16, CUi.Retro ? W95.Marinho : TemaVerde.Destaque, FontWeight.Bold);
+            var forca = CUi.Txt(j.Forca.ToString(), 16, LForte, FontWeight.Bold);
             forca.HorizontalAlignment = HorizontalAlignment.Center;
             var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,Auto,*,44,44"), MinHeight = 40 };
             g.Children.Add(alvoPonto);
@@ -377,7 +395,7 @@ public sealed partial class TelaEquipa
             Grid.SetColumn(corpo, 2); g.Children.Add(corpo);
             Grid.SetColumn(comp, 3); g.Children.Add(comp);
             Grid.SetColumn(forca, 4); g.Children.Add(forca);
-            return new Border { BorderBrush = CUi.Linha, BorderThickness = new Thickness(0, 0, 0, 0.5), Child = g };
+            return new Border { BorderBrush = LLinha, BorderThickness = new Thickness(0, 0, 0, 0.5), Child = g };
         }
 
         // ao lado do nome: amarelos (1 ou 2 sobrepostos), suspensao e lesao
@@ -427,7 +445,7 @@ public sealed partial class TelaEquipa
             _jogar = new CUi.Botao(T("Jogar"), true, () => _p.JogarCelular());
             _jogar.HorizontalAlignment = HorizontalAlignment.Stretch;
             _jogar.MinHeight = 48;
-            return new Border { Padding = new Thickness(12, 6, 12, 6), Background = CUi.Fundo, Child = _jogar };
+            return new Border { Padding = new Thickness(12, 6, 12, 6), Background = TFundo, Child = _jogar };
         }
 
         Control Navegacao()
@@ -443,15 +461,15 @@ public sealed partial class TelaEquipa
                     Spacing = 2, HorizontalAlignment = HorizontalAlignment.Center,
                     Children =
                     {
-                        Ui.Icone(icones[Math.Min(i, icones.Length - 1)], 20, CUi.TextoBarra),
-                        new TextBlock { Text = m, FontFamily = CUi.Fonte, FontSize = 10.5, Foreground = CUi.TextoBarra, HorizontalAlignment = HorizontalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis },
+                        Ui.Icone(icones[Math.Min(i, icones.Length - 1)], 20, TTexto),
+                        new TextBlock { Text = m, FontFamily = CUi.Fonte, FontSize = 10.5, Foreground = TTexto, HorizontalAlignment = HorizontalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis },
                     },
                 };
                 var b = new Clicavel { Background = Brushes.Transparent, Child = conteudo, MinHeight = 56, Padding = new Thickness(2, 6), CorFoco = null };
                 b.Clique += () => AbrirGaveta(m, Itens(lista));
                 g.Children.Add(b);
             }
-            return new Border { Background = CUi.Barra, Child = g, BorderBrush = CUi.Linha, BorderThickness = new Thickness(0, 1, 0, 0) };
+            return new Border { Background = TBarra, Child = g, BorderBrush = CUi.Retro ? _corLetra : CUi.Linha, BorderThickness = new Thickness(0, 1, 0, 0) };
         }
 
         Control Itens(List<(string Texto, Action? Acao, Func<bool>? Hab)> itens)
