@@ -1,0 +1,2 @@
+# as janelas da partida no celular (PartidaCelularJanelas.cs)
+Toque em quem sai e depois em quem entra	Toca a quien sale y después a quien entra

@@ -30,6 +30,8 @@ public sealed class TelaPatrocinio : UserControl
     {
         this.fim = fim;
         Focusable = true;
+        // o celular (PartidaCelularJanelas.cs): a folha com a mesma resposta
+        if (Celular.Ativo) { Content = PatrocinioCelular.Folha(p, marcas, moeda, Responder); return; }
         if (Visual.Moderno) { Moderna(p, marcas, moeda); return; }
         var fundoArq = marcas?.CaminhoFundo();
         var fundo = Logo(fundoArq);

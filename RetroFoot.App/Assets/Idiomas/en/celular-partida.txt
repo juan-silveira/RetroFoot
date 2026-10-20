@@ -1,0 +1,2 @@
+# as janelas da partida no celular (PartidaCelularJanelas.cs)
+Toque em quem sai e depois em quem entra	Tap the player coming off, then the one coming on

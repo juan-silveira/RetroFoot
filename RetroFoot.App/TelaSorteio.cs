@@ -34,6 +34,7 @@ public sealed class TelaSorteio : UserControl
     readonly Lista _listaJogos = null!;
     readonly Etiqueta _casa = null!, _fora = null!;
     readonly SorteioModerno? _m;
+    readonly SorteioCelular? _c;
     readonly DispatcherTimer _relogio = new();
     int _indice, _fase, _humanos;
     bool _fechou;
@@ -50,6 +51,14 @@ public sealed class TelaSorteio : UserControl
         _humanos = taca.Count(humano);
         _relogio.Interval = TimeSpan.FromMilliseconds(_humanos > 0 ? 1500 : 400);
         _relogio.Tick += (_, _) => Tique();
+        if (Celular.Ativo)
+        {
+            // o celular (PartidaCelularJanelas.cs): o mesmo relogio
+            var pote = taca.OrderBy(P98.NomeEquipa, StringComparer.OrdinalIgnoreCase).ToList();
+            Content = _c = new SorteioCelular(s, pote!, _jogos.Count);
+            _relogio.Start();
+            return;
+        }
         if (Visual.Moderno)
         {
             // o visual Moderno (PartidaDialogosModernos.cs): o mesmo relogio
@@ -92,6 +101,7 @@ public sealed class TelaSorteio : UserControl
             if (_humanos == 0) _relogio.Interval = TimeSpan.FromMilliseconds(400);
             if (_humano(casa)) _humanos--;
             if (_m != null) _m.Casa(casa);
+            else if (_c != null) _c.Casa(casa);
             else
             {
                 Mostrar(_fora, null);
@@ -103,6 +113,7 @@ public sealed class TelaSorteio : UserControl
         if (_humano(fora)) _humanos--;
         _feitos.Add(P98.NomeEquipa(casa) + " - " + P98.NomeEquipa(fora));
         if (_m != null) { _m.Fora(fora); _m.Jogo(casa, fora); }
+        else if (_c != null) { _c.Fora(fora); _c.Jogo(casa, fora); }
         else
         {
             Mostrar(_fora, fora);
