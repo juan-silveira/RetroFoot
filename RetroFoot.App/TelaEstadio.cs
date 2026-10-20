@@ -24,6 +24,7 @@ public static class TelaEstadio
 
     internal static void Abrir(Sessao s, SEquipa e, bool registado, Action? fechou, Action<Control>? abrir, Action<Control>? fechar)
     {
+        if (Celular.Ativo) { ClubeCelular.Estadio(s, e, registado, fechou, abrir, fechar); return; }
         if (Visual.Moderno) { AbrirModerno(s, e, registado, fechou, abrir, fechar); return; }
         var mc = s.Mercado;
         var j = new Janela(T("Estádio"), 474, 372, W95.Cor(128, 255, 128));   // Color = $80FF80
@@ -184,7 +185,7 @@ public static class TelaEstadio
     // senao Pie: um setor de 2t centrado no topo (do ponto em sen t a direita ao espelho a
     // esquerda, no sentido anti-horario).
     // (Moderno: as mesmas formas nas cores do tema escuro)
-    sealed class Desenho(Func<int> bancadas, bool moderno = false) : Control
+    internal sealed class Desenho(Func<int> bancadas, bool moderno = false) : Control
     {
         static readonly IBrush CinzaO = W95.Cor(128, 128, 128), VerdeO = W95.Cor(0, 128, 0);
         static readonly IBrush CinzaM = TemaVerde.Linha, VerdeM = TemaVerde.VerdeForte;

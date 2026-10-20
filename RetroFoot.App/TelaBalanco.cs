@@ -30,6 +30,7 @@ public static class TelaBalanco
 
     internal static void Abrir(Sessao s, SEquipa e, Action? fechou, Action<Control>? abrir, Action<Control>? fechar)
     {
+        if (Celular.Ativo) { ClubeCelular.Balanco(s, e, Temporadas(e), fechou, abrir, fechar); return; }
         if (Visual.Moderno) { AbrirModerno(s, e, fechou, abrir, fechar); return; }
         var (letra, fundo) = TelaDinheiro.Cores(e);
         var j = new Janela(TelaDinheiro.Texto(e.NomeCompleto), 471, 343, fundo);

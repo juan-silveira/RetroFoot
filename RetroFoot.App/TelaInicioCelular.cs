@@ -130,7 +130,7 @@ public sealed partial class TelaInicio
         var acoes = new StackPanel
         {
             Orientation = Orientation.Horizontal, Spacing = 10,
-            Children = { new CUi.Botao(T("Configurações"), false, AbrirConfiguracoes), new CUi.Botao(T("Sobre"), false, () => TelaAcerca.Abrir(new Dialogos(c => SobreporCelular(new Panel { Background = TemaVerde.Veu, Children = { new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, Child = c } } }), _ => Sobrepor(null)))) },
+            Children = { new CUi.Botao(T("Configurações"), false, AbrirConfiguracoes), new CUi.Botao(T("Sobre"), false, () => TelaAcerca.Abrir(new Dialogos(c => SobreporCelular(CUi.FolhaDe(c) != null ? new Panel { Background = TemaVerde.Veu, Children = { c } } : new Panel { Background = TemaVerde.Veu, Children = { new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, Child = c } } }), _ => Sobrepor(null)))) },
         };
 
         bool valido = false;

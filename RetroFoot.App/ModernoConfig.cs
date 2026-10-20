@@ -197,6 +197,7 @@ static class ConfigEstilo
     // pergunta Sim / Nao (Dlg.Perguntar no Moderno)
     public static void Perguntar(Dialogos d, string titulo, string texto, Action sim, Action? nao = null)
     {
+        if (Celular.Ativo) { ClubeCelular.Perguntar(d, titulo, texto, sim, nao); return; }
         CaixaModerna? c = null;
         c = new CaixaModerna(titulo, 420);
         c.Corpo.Children.Add(new TextBlock { Text = texto, FontSize = 15, Foreground = Texto, TextWrapping = TextWrapping.Wrap });
@@ -209,6 +210,7 @@ static class ConfigEstilo
     // um texto (Dlg.PedirTexto no Moderno)
     public static void PedirTexto(Dialogos d, string titulo, string rotulo, string inicial, int maximo, Action<string> ok)
     {
+        if (Celular.Ativo) { ClubeCelular.PedirTexto(d, titulo, rotulo, inicial, maximo, ok, apara: true); return; }
         CaixaModerna? c = null;
         c = new CaixaModerna(titulo, 420);
         var caixa = CaixaTexto(inicial, maximo);

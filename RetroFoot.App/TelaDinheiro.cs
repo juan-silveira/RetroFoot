@@ -112,6 +112,13 @@ public static class TelaDinheiro
         if (int.TryParse(Environment.GetEnvironmentVariable("RETROFOOT_BANCADAS"), out var banc)) e.Estadio = (byte)banc;
         void AbrirC(Control c)
         {
+            // no celular, as folhas (ClubeCelular) na largura da tela, de baixo, sobre o veu
+            if (Celular.Ativo && CUi.FolhaDe(c) != null)
+            {
+                c.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom;
+                raiz.Children.Add(new Panel { Background = TemaVerde.Veu, Children = { c }, Tag = c });
+                return;
+            }
             var quadro = new Grid { Width = 800, Height = 600 };
             c.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center;
             c.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;

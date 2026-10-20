@@ -25,6 +25,7 @@ public static class TelaEmprestimo
 
     internal static void Abrir(Sessao s, SEquipa e, Action? fechou, Action<Control>? abrir, Action<Control>? fechar)
     {
+        if (Celular.Ativo) { ClubeCelular.Emprestimo(s, e, fechou, abrir, fechar); return; }
         if (Visual.Moderno) { AbrirModerno(s, e, fechou, abrir, fechar); return; }
         var mc = s.Mercado;
         var banco = mc.AbrirBanco(e);

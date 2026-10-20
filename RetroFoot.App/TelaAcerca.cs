@@ -66,6 +66,7 @@ public static class TelaAcerca
     // o logo, o slogan, a versao e OK
     public static void Abrir(Dialogos d, Action? fechou = null)
     {
+        if (Celular.Ativo) { ClubeCelular.Sobre(d, fechou); return; }
         if (Visual.Moderno) { AcercaModerna.Abrir(d, fechou); return; }
         var verde = W95.Verde;
         var j = new Janela(T("Sobre"), 513, 148, verde);
@@ -91,6 +92,7 @@ public static class TelaAcerca
     // TAddInsDlg ("Extras"): os add-ins ativos, por nome (Sorted)
     public static void Extras(Dialogos d)
     {
+        if (Celular.Ativo) { ClubeCelular.Extras(d); return; }
         if (Visual.Moderno) { AcercaModerna.Extras(d); return; }
         var nomes = Registo.AddIns.Where(a => Registo.AddIn(a.Id)).Select(a => T(a.Nome))
             .OrderBy(n => n, StringComparer.Ordinal).ToList();
