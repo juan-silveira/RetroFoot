@@ -155,7 +155,7 @@ public sealed class TelaPatches : UserControl
         Escolheu();
     }
 
-    static string Resumo(BibliotecaPatches.Info p)
+    internal static string Resumo(BibliotecaPatches.Info p)
     {
         if (p.Erro == "sem-zip") return T("O .zip saiu da biblioteca");
         if (p.Erro != null) return T("Zip com erro");
@@ -310,12 +310,12 @@ public sealed class TelaPatches : UserControl
         detalhe.Child = Cartao(d, new Thickness(14, 12));
     }
 
-    static CultureInfo Cultura()
+    internal static CultureInfo Cultura()
     {
         try { return CultureInfo.GetCultureInfo(Idioma.Atual); } catch { return CultureInfo.InvariantCulture; }
     }
 
-    static string Tamanho(long b) => b >= 1 << 20 ? $"{b / 1048576.0:0.0} MB" : $"{Math.Max(1, b / 1024)} KB";
+    internal static string Tamanho(long b) => b >= 1 << 20 ? $"{b / 1048576.0:0.0} MB" : $"{Math.Max(1, b / 1024)} KB";
 
     // uma faixa colorida com icone e texto (avisos e estado)
     // (o fundo da barra com a cor a esquerda)
@@ -381,6 +381,16 @@ public sealed class TelaPatches : UserControl
     async void ImportarArquivos(IReadOnlyList<IStorageFile> arqs)
     {
         if (ocupado || arqs.Count == 0) return;
+        var (ok, erros) = await ImportarPara(raiz, arqs);
+        if (ok.Count > 0) escolhido = ok[^1];
+        Recarregar();
+        if (erros.Count > 0) ctx.Mensagem(string.Join("\n", erros));
+    }
+
+    // poe os .zip escolhidos na biblioteca (tambem a versao do celular): os nomes que entraram
+    // e os erros, um por arquivo
+    internal static async Task<(List<string> Ok, List<string> Erros)> ImportarPara(string raiz, IReadOnlyList<IStorageFile> arqs)
+    {
         var ok = new List<string>();
         var erros = new List<string>();
         foreach (var f in arqs)
@@ -405,49 +415,61 @@ public sealed class TelaPatches : UserControl
             catch (Exception e) { erros.Add($"{f.Name}: {e.Message}"); }
             finally { if (tmp != null) try { Directory.Delete(Path.GetDirectoryName(tmp)!, true); } catch { } }
         }
-        if (ok.Count > 0) escolhido = ok[^1];
-        Recarregar();
-        if (erros.Count > 0) ctx.Mensagem(string.Join("\n", erros));
+        return (ok, erros);
     }
 
     void Aplicar(BibliotecaPatches.Info p, BibliotecaPatches.Analise? an)
     {
+        bool todas = substituirTodas;
+        Confirmar(T("Aplicar patch"), PerguntaAplicar(p, an, todas), T("Aplicar"), () => Trabalhar(T("A aplicar o patch..."),
+            () => BibliotecaPatches.Aplicar(raiz, p.Nome, todas), MensagemAplicado));
+    }
+
+    // os textos das acoes (tambem a versao do celular)
+    internal static string PerguntaAplicar(BibliotecaPatches.Info p, BibliotecaPatches.Analise? an, bool todas)
+    {
         var avisos = new List<string>();
         if (an != null)
         {
-            if (substituirTodas && an.EquipasRetiradas > 0) avisos.Add(T("{0} equipas que o patch não traz saem do jogo (voltam ao reverter).", an.EquipasRetiradas));
+            if (todas && an.EquipasRetiradas > 0) avisos.Add(T("{0} equipas que o patch não traz saem do jogo (voltam ao reverter).", an.EquipasRetiradas));
             foreach (var c in an.Conflitos) avisos.Add(T("Passa por cima do patch \"{1}\" ({0} em comum).", c.Comuns, c.Titulo));
         }
         var texto = T("Aplicar \"{0}\" na pasta de dados? Os arquivos substituídos ficam guardados para reverter.", p.Titulo);
         if (avisos.Count > 0) texto += "\n\n" + string.Join("\n", avisos);
-        bool todas = substituirTodas;
-        Confirmar(T("Aplicar patch"), texto, T("Aplicar"), () => Trabalhar(T("A aplicar o patch..."),
-            () => BibliotecaPatches.Aplicar(raiz, p.Nome, todas),
-            r => r.Ok
-                ? T("Patch aplicado. Equipas: {0}; outros arquivos: {1}.", r.Equipas, r.Arquivos)
-                    + (r.Retirados > 0 ? "\n" + T("{0} equipas saíram (voltam ao reverter).", r.Retirados) : "")
-                    + (r.Avisos.Count > 0 ? "\n\n" + T("{0} arquivos com problema ficaram de fora:", r.Avisos.Count) + "\n" + string.Join("\n", r.Avisos.Take(6)) : "")
-                    + "\n\n" + T("Vale para os jogos novos; os jogos gravados continuam como estavam.")
-                : T("O patch não foi aplicado (nada mudou): {0}", Erro(r.Erro))));
+        return texto;
+    }
+
+    internal static string MensagemAplicado(BibliotecaPatches.Resultado r) => r.Ok
+        ? T("Patch aplicado. Equipas: {0}; outros arquivos: {1}.", r.Equipas, r.Arquivos)
+            + (r.Retirados > 0 ? "\n" + T("{0} equipas saíram (voltam ao reverter).", r.Retirados) : "")
+            + (r.Avisos.Count > 0 ? "\n\n" + T("{0} arquivos com problema ficaram de fora:", r.Avisos.Count) + "\n" + string.Join("\n", r.Avisos.Take(6)) : "")
+            + "\n\n" + T("Vale para os jogos novos; os jogos gravados continuam como estavam.")
+        : T("O patch não foi aplicado (nada mudou): {0}", Erro(r.Erro));
+
+    internal static string MensagemRevertido(BibliotecaPatches.Resultado r) => r.Ok
+        ? T("Patch revertido. Arquivos repostos: {0}; apagados: {1}.", r.Restaurados, r.Apagados)
+            + (r.CopiaDasMudancas != null ? "\n\n" + T("Arquivos mudados depois do patch foram guardados em:\n{0}", r.CopiaDasMudancas) : "")
+        : T("Não foi possível reverter: {0}", Erro(r.Erro));
+
+    internal static string TextoBloqueado(IEnumerable<BibliotecaPatches.RegistoPatch> bloq) =>
+        T("Reverta antes \"{0}\" (aplicado depois e mexe nos mesmos arquivos).", string.Join("\", \"", bloq.Select(b => b.Titulo)));
+
+    internal static string PerguntaRemover(BibliotecaPatches.Info p)
+    {
+        var texto = T("Tirar \"{0}\" da biblioteca? O .zip é apagado da pasta patches.", p.Titulo);
+        if (p.Aplicado) texto += "\n\n" + T("O patch continua aplicado e pode ser revertido depois.");
+        return texto;
     }
 
     void Reverter(BibliotecaPatches.Info p)
     {
         var bloq = BibliotecaPatches.Bloqueadores(raiz, p.Nome);
-        if (bloq.Count > 0)
-        {
-            ctx.Mensagem(T("Reverta antes \"{0}\" (aplicado depois e mexe nos mesmos arquivos).", string.Join("\", \"", bloq.Select(b => b.Titulo))));
-            return;
-        }
+        if (bloq.Count > 0) { ctx.Mensagem(TextoBloqueado(bloq)); return; }
         Confirmar(T("Reverter patch"), T("Voltar a pasta de dados a como estava antes de \"{0}\"?", p.Titulo), T("Reverter"), () => Trabalhar(T("A reverter o patch..."),
-            () => BibliotecaPatches.Reverter(raiz, p.Nome),
-            r => r.Ok
-                ? T("Patch revertido. Arquivos repostos: {0}; apagados: {1}.", r.Restaurados, r.Apagados)
-                    + (r.CopiaDasMudancas != null ? "\n\n" + T("Arquivos mudados depois do patch foram guardados em:\n{0}", r.CopiaDasMudancas) : "")
-                : T("Não foi possível reverter: {0}", Erro(r.Erro))));
+            () => BibliotecaPatches.Reverter(raiz, p.Nome), MensagemRevertido));
     }
 
-    static string Erro(string e) => e switch
+    internal static string Erro(string e) => e switch
     {
         "aplicado" => T("o patch já está aplicado"),
         "zip" => T("o .zip não está na biblioteca"),
@@ -458,9 +480,7 @@ public sealed class TelaPatches : UserControl
 
     void Remover(BibliotecaPatches.Info p)
     {
-        var texto = T("Tirar \"{0}\" da biblioteca? O .zip é apagado da pasta patches.", p.Titulo);
-        if (p.Aplicado) texto += "\n\n" + T("O patch continua aplicado e pode ser revertido depois.");
-        Confirmar(T("Remover da biblioteca"), texto, T("Remover"), () =>
+        Confirmar(T("Remover da biblioteca"), PerguntaRemover(p), T("Remover"), () =>
         {
             try { BibliotecaPatches.Remover(raiz, p.Nome); }
             catch (Exception e) { ctx.Mensagem(e.Message); }

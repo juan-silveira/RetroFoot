@@ -1,0 +1,6 @@
+# Ferramenta Patches no celular (en). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Toque em Importar e escolha os .zip guardados no celular.	Tap Import and pick the .zip files saved on your phone.
+Ver tudo	Show all
+Ver menos	Show less
+A importar o patch...	Importing the patch...
