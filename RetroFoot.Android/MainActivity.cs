@@ -26,7 +26,22 @@ public class MainActivity : AvaloniaMainActivity
         // Antes do base.OnCreate: e nele que a tela inicial e montada e procura a versao nova
         RetroFoot.App.Atualizacao.PastaApk = System.IO.Path.Combine(CacheDir!.AbsolutePath, "atualizacao");
         RetroFoot.App.Atualizacao.InstalarApk = InstalarApk;
+        // os efeitos sonoros (RetroFoot.App/Som.cs): o .wav gerado pelo jogo no MediaPlayer
+        RetroFoot.App.Som.TocarAndroid = Tocar;
         base.OnCreate(savedInstanceState);
+    }
+
+    static void Tocar(string arquivo)
+    {
+        try
+        {
+            var mp = new global::Android.Media.MediaPlayer();
+            mp.SetDataSource(arquivo);
+            mp.Completion += (_, _) => mp.Release();
+            mp.Prepare();
+            mp.Start();
+        }
+        catch (System.Exception ex) { System.Console.WriteLine("som: " + ex.Message); }
     }
 
     // false: falta a permissao de instalar apps do RetroFoot (abre a tela dela; ao voltar, o

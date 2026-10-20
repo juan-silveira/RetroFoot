@@ -442,9 +442,18 @@ static class Icones
         dc.DrawRectangle(cor, new Pen(Escuro, 0.8), new Rect(c.X - w / 2 + dx, c.Y - h / 2 + dx * 0.6, w, h), 1.5, 1.5);
     }
 
-    // a bola: circulo com o pentagono escuro no meio
+    // a bola do golo: a da marca do RetroFoot (Assets/Marca/bola-256.png, a do launcher); no
+    // golo anulado (cor cinza), apagada. Sem a imagem, o circulo com o pentagono
     static void Bola(DrawingContext dc, Rect r, IBrush cor)
     {
+        if (Logotipo.Bola is { } img)
+        {
+            double t = Math.Min(r.Width, r.Height) + 2;
+            var q = new Rect(r.Center.X - t / 2, r.Center.Y - t / 2, t, t);
+            using (dc.PushOpacity(cor == Cinza ? 0.45 : 1))
+                dc.DrawImage(img, q);
+            return;
+        }
         var c = r.Center;
         double raio = Math.Min(r.Width, r.Height) / 2 - 0.5;
         dc.DrawEllipse(cor, new Pen(Escuro, 1), c, raio, raio);

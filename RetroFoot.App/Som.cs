@@ -10,12 +10,18 @@ namespace RetroFoot.App;
 // Os efeitos sonoros (Opcoes > Acessibilidade: "Efeitos sonoros" e o volume). O jogo classico
 // so tocava o aviso do Windows nos lances dos times humanos (a opcao "Habilitar som",
 // DS:2C6C); aqui os sons sao gerados no proprio jogo (nenhum arquivo de fora): o apito do
-// comeco e do intervalo, o apito final, o golo e o aviso (expulsao ou lesao num time humano).
+// comeco e do intervalo, o apito final, o golo, o aviso (expulsao ou lesao num time humano),
+// a compra (um time humano leva o jogador no leilao) e o sorteio (um time humano sai no sorteio
+// da Taca).
 // Cada som vira um .wav na pasta temporaria (um por volume) e toca com o que o sistema tem:
-// PlaySound (Windows), afplay (macOS), paplay / pw-play / aplay (Linux). Sem player, nada.
+// PlaySound (Windows), afplay (macOS), paplay / pw-play / aplay (Linux); no Android, o
+// TocarAndroid (o MediaPlayer, ligado pela MainActivity). Sem player, nada.
 public static class Som
 {
-    public enum Efeito { Apito, ApitoFinal, Golo, Aviso }
+    public enum Efeito { Apito, ApitoFinal, Golo, Aviso, Compra, Sorteio }
+
+    // no Android (MainActivity): toca o .wav
+    public static Action<string>? TocarAndroid;
 
     public static bool Ligado { get; set; } = OpcoesDoJogo.Ler()?.Som ?? true;
     // 0 a 100
@@ -26,7 +32,7 @@ public static class Som
 
     public static void Tocar(Efeito e)
     {
-        if (!Ligado || Volume <= 0 || Mudo || OperatingSystem.IsAndroid()) return;
+        if (!Ligado || Volume <= 0 || Mudo || (OperatingSystem.IsAndroid() && TocarAndroid == null)) return;
         int vol = Volume;
         Task.Run(() =>
         {
@@ -71,6 +77,16 @@ public static class Som
                 // um arpejo subindo (do, mi, sol, do), o ultimo mais longo
                 foreach (var (f, d) in new[] { (523.25, 0.11), (659.25, 0.11), (783.99, 0.11), (1046.5, 0.45) })
                     Nota(s, f, d);
+                break;
+            case Efeito.Compra:
+                // a caixa registradora: o "ka" seco e o "ching" agudo que soa
+                Nota(s, 1318.5, 0.06, decaimento: 30);
+                Nota(s, 2637, 0.5, decaimento: 6);
+                break;
+            case Efeito.Sorteio:
+                // a fanfarra curta (sol, do, mi, sol e o do agudo longo)
+                foreach (var (f, d) in new[] { (392.0, 0.09), (523.25, 0.09), (659.25, 0.09), (783.99, 0.16), (1046.5, 0.5) })
+                    Nota(s, f, d, decaimento: 2.5);
                 break;
             case Efeito.Aviso:
                 // o "ding" curto, como o aviso do sistema
@@ -144,6 +160,7 @@ public static class Som
 
     static void TocarArquivo(string arq)
     {
+        if (OperatingSystem.IsAndroid()) { TocarAndroid?.Invoke(arq); return; }
         if (OperatingSystem.IsWindows()) { PlaySound(arq, IntPtr.Zero, SndAsync | SndNoDefault | SndFilename); return; }
         string? p;
         lock (_trava)

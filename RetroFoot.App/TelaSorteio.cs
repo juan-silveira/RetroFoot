@@ -99,7 +99,7 @@ public sealed class TelaSorteio : UserControl
         if (_fase == 0)
         {
             if (_humanos == 0) _relogio.Interval = TimeSpan.FromMilliseconds(400);
-            if (_humano(casa)) _humanos--;
+            if (_humano(casa)) { _humanos--; Som.Tocar(Som.Efeito.Sorteio); }
             if (_m != null) _m.Casa(casa);
             else if (_c != null) _c.Casa(casa);
             else
@@ -110,7 +110,7 @@ public sealed class TelaSorteio : UserControl
             _fase = 1;
             return;
         }
-        if (_humano(fora)) _humanos--;
+        if (_humano(fora)) { _humanos--; Som.Tocar(Som.Efeito.Sorteio); }
         _feitos.Add(P98.NomeEquipa(casa) + " - " + P98.NomeEquipa(fora));
         if (_m != null) { _m.Fora(fora); _m.Jogo(casa, fora); }
         else if (_c != null) { _c.Fora(fora); _c.Jogo(casa, fora); }

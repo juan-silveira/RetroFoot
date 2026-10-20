@@ -174,6 +174,8 @@ sealed class TelaLeilao : DialogoMercado
         ficha.Comprador = r.Comprador;
         ficha.InvalidateVisual();
         cel?.MostrarResultado(r.Texto, r.Comprador);
+        // o jogador foi para um time humano: o som da compra
+        if (r.Comprador != null && Mem.Humano(s.TreinadorDa(r.Comprador))) Som.Tocar(Som.Efeito.Compra);
     }
 
     // ------------------------------------------------------------ o ciclo do leilao
