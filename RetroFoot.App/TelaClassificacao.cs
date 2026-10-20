@@ -30,7 +30,15 @@ public sealed class TelaClassificacao : UserControl
 
     TelaClassificacao(Jogo98 s, int rodada, bool relogio, TRegras regras)
     {
-        if (Visual.Moderno)
+        // o celular: a tabela em pe, nas duas peles (ClassificacaoCelular.cs)
+        if (Celular.Ativo)
+        {
+            var c = new TelaClassificacaoCelular(s, rodada, relogio, regras);
+            c.Fechou += () => Fechou?.Invoke();
+            _tela = c;
+            Content = c;
+        }
+        else if (Visual.Moderno)
         {
             var m = new TelaClassificacaoModerna(s, rodada, relogio, regras);
             m.Fechou += () => Fechou?.Invoke();

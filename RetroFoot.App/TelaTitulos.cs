@@ -20,16 +20,16 @@ namespace RetroFoot.App;
 //    ranking de cada competicao (escudo, o numero e uma taca por titulo).
 static class TelaTitulos
 {
-    sealed record Ano(int Valor, Equipa? Campeao, Equipa? Taca);
+    internal sealed record Ano(int Valor, Equipa? Campeao, Equipa? Taca);
 
-    static List<Ano> Anos(Sessao s) =>
+    internal static List<Ano> Anos(Sessao s) =>
         s.S.Campeoes.Select(c => new Ano(c.W[0], s.Equipa(c.W[1]), s.Equipa(c.W[3])))
             .OrderByDescending(a => a.Valor).ToList();
 
     static string Nome(Equipa e) => TelaDinheiro.Texto(e.NomeCurto);
 
     // (equipa, titulos) do maior para o menor; empate: o titulo mais recente primeiro
-    static List<(Equipa E, int N)> Ranking(List<Ano> anos, Func<Ano, Equipa?> qual) =>
+    internal static List<(Equipa E, int N)> Ranking(List<Ano> anos, Func<Ano, Equipa?> qual) =>
         anos.Where(a => qual(a) != null).GroupBy(a => qual(a)!.ID)
             .Select(g => (E: qual(g.First())!, N: g.Count(), Ultimo: g.Max(a => a.Valor)))
             .OrderByDescending(x => x.N).ThenByDescending(x => x.Ultimo)
@@ -40,6 +40,7 @@ static class TelaTitulos
     public static void Abrir(Dialogos d, Sessao s)
     {
         var anos = Anos(s);
+        if (Celular.Ativo) { ListasCelular.Titulos(d, anos); return; }
         if (Visual.Moderno) { Moderno(d, anos); return; }
         // classico: as duas contagens numa lista larga
         var ids = anos.SelectMany(a => new[] { a.Campeao, a.Taca }).Where(e => e != null).Select(e => e!).DistinctBy(e => e.ID).ToList();

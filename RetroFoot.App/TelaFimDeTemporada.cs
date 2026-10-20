@@ -39,6 +39,8 @@ public static class TelaFimDeTemporada
 
     internal static Control Janela(Sessao s, Resultado r, Action fechar)
     {
+        // o celular: a folha da tela toda (FimDeTemporadaCelular.cs)
+        if (Celular.Ativo) return FimDeTemporadaCelular.Janela(s, r, fechar);
         if (Visual.Moderno) return JanelaModerna(s, r, fechar);
         var camp = s.Equipa(r.Campeao);
         var taca = s.Equipa(r.VencedorTaca);
@@ -118,7 +120,7 @@ public static class TelaFimDeTemporada
     }
 
     // o melhor marcador: o maximo de +0x14 (com sinal, comecando em 0) e cada jogador com ele
-    static (int Max, List<(string Nome, Equipa E)> Lista) Marcadores(Sessao s)
+    internal static (int Max, List<(string Nome, Equipa E)> Lista) Marcadores(Sessao s)
     {
         int max = 0;
         var todos = new List<(Jogador P, Equipa E)>();
@@ -287,6 +289,7 @@ public static class TelaFimDeTemporada
     // (acrescimo) as subidas e descidas da temporada que acabou, na TPrintListDlg
     internal static Control SubidasEDescidas(Sessao s, Resultado r, Action fechar)
     {
+        if (Celular.Ativo) return FimDeTemporadaCelular.SubidasEDescidas(s, r, fechar);
         if (Visual.Moderno) return SubidasModerna(s, r, fechar);
         var linhas = new List<byte[]>();
         string Div(int d) => d < 4 ? T("{0}ª Divisão", d + 1) : T("Distrital");

@@ -32,6 +32,8 @@ public static class TelaListas
     internal static void Lista(Dialogos d, string titulo, int n, Func<int, byte[]> linha, int opcoes,
         Action<int>? duplo = null, Action<DrawingContext, int, Rect, bool>? desenhar = null, Action? fechou = null)
     {
+        // o celular: a lista na tela toda, em letra legivel (ListasCelular.cs)
+        if (Celular.Ativo) { ListasCelular.Generica(d, titulo, n, linha, opcoes, duplo, fechou); return; }
         bool larga = (opcoes & OpLarga) != 0, numerada = (opcoes & OpNumerada) != 0;
         if (Visual.Moderno) { ListaModernaDlg(d, titulo, n, linha, opcoes, duplo, desenhar, fechou); return; }
         double cw = 374 + (larga ? 200 : 0), ch = 297;
@@ -109,7 +111,7 @@ public static class TelaListas
     }
 
     // o numero (a direita em 20) antes da linha (OpNumerada)
-    static byte[] Numerada(int i, byte[] b)
+    internal static byte[] Numerada(int i, byte[] b)
     {
         var p = new List<byte> { 6, 0x14 };
         p.AddRange(Dlg.Latin1((i + 1).ToString()));
@@ -139,6 +141,15 @@ public static class TelaListas
     {
         var cal = e.Calendario.ToList();
         int op = Registo.AddIn(Registo.AddInCompraDirecta) ? OpDuplo : 0;
+        if (Celular.Ativo)
+        {
+            ListasCelular.Calendario(d, s, cal, op != 0 ? i =>
+            {
+                if (s.Equipa(cal[i].W08) is { } adv) AbrirPlantel?.Invoke(adv, 0);
+                fechou?.Invoke();
+            } : null, fechou, Dlg.Texto(e.NomeCurto));
+            return;
+        }
         Lista(d, T("Calendário"), cal.Count, i => LinhaCalendario(s, cal[i]), op, i =>
         {
             if (s.Equipa(cal[i].W08) is { } adv) AbrirPlantel?.Invoke(adv, 0);
@@ -197,6 +208,7 @@ public static class TelaListas
     {
         var ms = MelhoresMarcadores(s, deSempre);
         if (ms.Count == 0) return;
+        if (Celular.Ativo) { ListasCelular.Marcadores(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms); return; }
         Lista(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms.Count, i =>
         {
             var (p, e, g) = ms[i];
@@ -250,6 +262,7 @@ public static class TelaListas
     public static void UltimosVencedores(Dialogos d, Sessao s)
     {
         var cs = s.S.Campeoes.ToList();
+        if (Celular.Ativo) { ListasCelular.UltimosVencedores(d, s, cs.Select(c => c.W).ToList()); return; }
         Lista(d, T("Últimos vencedores do campeonato e da copa"), cs.Count, i =>
         {
             var w = cs[i].W;
@@ -281,6 +294,14 @@ public static class TelaListas
         var tr = s.S.Transferencias.ToList();
         int op = OpLarga | OpUltimo;
         if (Registo.AddIn(Registo.AddInCompraDirecta)) op |= OpDuplo;
+        if (Celular.Ativo)
+        {
+            ListasCelular.UltimasTransferencias(d, s, tr, (op & OpDuplo) != 0 ? i =>
+            {
+                if (s.J.M.EquipaDoJogador(tr[i].W06).E is { } e) AbrirPlantel?.Invoke(e, tr[i].W06);
+            } : null);
+            return;
+        }
         Lista(d, T("Últimas transferências"), tr.Count, i => LinhaTransferencia(s, tr[i]), op, i =>
         {
             if (s.J.M.EquipaDoJogador(tr[i].W06).E is { } e) AbrirPlantel?.Invoke(e, tr[i].W06);
@@ -325,6 +346,7 @@ public static class TelaListas
     public static void HistoricoEquipa(Dialogos d, Sessao s, Equipa e, Action? fechou = null)
     {
         var ev = e.Eventos.ToList();
+        if (Celular.Ativo) { ListasCelular.HistoricoEquipa(d, s, e, ev, fechou); return; }
         Lista(d, Dlg.Texto(e.NomeCompleto), ev.Count, i =>
         {
             var v = ev[i];
@@ -348,6 +370,7 @@ public static class TelaListas
     {
         var ps = new List<(Jogador P, Equipa E)>();
         s.J.M.TodosJogadores((eq, p) => { if (p.W36 == e.ID) ps.Add((p, eq)); });
+        if (Celular.Ativo) { ListasCelular.Contratacoes(d, ps, fechou); return; }
         Lista(d, T("Jogadores adquiridos"), ps.Count, i =>
         {
             var (p, eq) = ps[i];
@@ -372,6 +395,7 @@ public static class TelaListas
     {
         if (t == null) return;
         var ev = t.Eventos.ToList();
+        if (Celular.Ativo) { ListasCelular.HistoriaTreinador(d, s, t, ev); return; }
         Lista(d, Dlg.Texto(t.Nome), ev.Count, i => LinhaEventoTreinador(s, ev[i]), OpUltimo);
     }
 
@@ -402,8 +426,11 @@ public static class TelaListas
 
     // 5:025a: a janela "Chicotadas Psicologicas" ("Demissoes de Tecnicos" no pt-BR) com a
     // lista DS:2716 (13:2c32 direto, opcoes 1). Chamar na thread da interface.
-    public static void Chicotadas(Dialogos d, Sessao s, IReadOnlyList<Chicotada> l, Action? fechou = null) =>
+    public static void Chicotadas(Dialogos d, Sessao s, IReadOnlyList<Chicotada> l, Action? fechou = null)
+    {
+        if (Celular.Ativo) { ListasCelular.Chicotadas(d, s, l, fechou); return; }
         Lista(d, T("Demissões de Técnicos"), l.Count, i => LinhaChicotada(s, l[i]), 0, fechou: fechou);
+    }
 
     // TLash.Formatar (3:b2c8): negrito (2) se o treinador e humano; uma coluna so (largura 0):
     // tipo 1 "<treinador> foi despedido do <equipa>"; sem treinador, linha vazia; sem
@@ -440,6 +467,7 @@ public static class TelaListas
         s.J.M.Reindexar();
         int flags = 0x2B | (Registo.AddIn(Registo.AddInPontuacaoTreinador) ? 4 : 0);
         var tr = s.S.Treinadores.ToList();
+        if (Celular.Ativo) { ListasCelular.RankingTreinadores(d, s, tr, (flags & 4) != 0); return; }
         Lista(d, T("Ranking de Treinadores"), tr.Count, i => LinhaTreinador(s, tr[i], flags), OpNumerada | OpLarga);
     }
 
@@ -471,7 +499,7 @@ public static class TelaListas
         return b.ToArray();
     }
     // C/F/N (casa, fora, neutro) do calendario: a letra traduzida (chave "local:C"...) ou a do original
-    static string Local(char c) { var k = "local:" + c; var t = T(k); return t == k ? c.ToString() : t; }
+    internal static string Local(char c) { var k = "local:" + c; var t = T(k); return t == k ? c.ToString() : t; }
 
     internal static byte[] LinhaTreinador(Sessao s, Treinador t, int flags) => LinhaTreinador(s, t, (uint)flags);
 }

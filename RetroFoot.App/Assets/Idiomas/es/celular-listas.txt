@@ -1,0 +1,14 @@
+# As listas, a classificacao e o fim de temporada no celular (ListasCelular, ClassificacaoCelular, FimDeTemporadaCelular, TreinadoresCelular) (es). Formato: chave<TAB>traducao (RetroFoot.App/Idioma.cs).
+
+Nada a mostrar.	Nada que mostrar.
+Tabela	Tabla
+J	PJ
+Pts	Pts
+Últimos campeões	Últimos campeones
+Campeões do campeonato e da copa	Campeones de liga y copa
+Títulos	Títulos
+Pontos	Puntos
+Total	Total
+Camp.	Liga
+Ano	Año
+Ainda não há campeões: os títulos aparecem no fim da primeira temporada.	Aún no hay campeones: los títulos aparecen al final de la primera temporada.
