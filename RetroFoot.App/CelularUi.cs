@@ -77,7 +77,8 @@ public static class CUi
             DockPanel.SetDock(r, Dock.Bottom);
             d.Children.Add(r);
         }
-        var miolo = new Border { Padding = new Thickness(12, 12, 12, 16), Child = corpo };
+        // (rolando, o corpo fica no alto: sem isto o ultimo cartao esticava ate o fim da tela)
+        var miolo = new Border { Padding = new Thickness(12, 12, 12, 16), Child = corpo, VerticalAlignment = rolar ? VerticalAlignment.Top : VerticalAlignment.Stretch };
         d.Children.Add(rolar
             ? new ScrollViewer { Content = miolo, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled }
             : miolo);
