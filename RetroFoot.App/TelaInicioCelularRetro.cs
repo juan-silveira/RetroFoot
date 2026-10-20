@@ -196,7 +196,10 @@ public sealed partial class TelaInicio
             Spacing = 10,
             Children = { CR95.Bevel(novoP), CR95.Bevel(contP) },
         };
-        PaginaRetro(TelaAcerca.Nome, null, corpo, CUi.Botoes(ok, configurar, excluir), W95.Verde, Ok, null, null, sobre);
+        // as ferramentas do hub do computador (Scout, Patches, editores) ao lado do Sobre
+        var ferramentas = new CUi.Botao(T("Ferramentas"), false, AbrirFerramentasCelular) { Padding = new Thickness(12, 2), MinHeight = 34 };
+        var direita = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Children = { ferramentas, sobre } };
+        PaginaRetro(TelaAcerca.Nome, null, corpo, CUi.Botoes(ok, configurar, excluir), W95.Verde, Ok, null, null, direita);
     }
 
     // ---------------------------------------------------------------- TselectCountriesDlg

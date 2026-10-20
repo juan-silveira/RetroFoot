@@ -25,7 +25,12 @@ namespace RetroFoot.App;
 public static class Ferramentas
 {
     public sealed record Ferramenta(string Id, string Titulo, string Descricao, string Icone,
-        Func<Contexto, Control>? Criar, int Ordem);
+        Func<Contexto, Control>? Criar, int Ordem)
+    {
+        // a versao do celular (RegistrarCelular): a pagina em pe, ao toque, nas duas peles do
+        // kit (CelularUi.cs); sem ela, a ferramenta aparece "Em breve" no celular
+        public Func<Contexto, Control>? CriarCelular { get; init; }
+    }
 
     // o que a pagina de uma ferramenta recebe
     public sealed class Contexto
@@ -60,7 +65,22 @@ public static class Ferramentas
         lock (_trava)
         {
             int o = ordem ?? (_lista.TryGetValue(id, out var velha) ? velha.Ordem : 100 + _lista.Count);
-            _lista[id] = new Ferramenta(id, titulo, descricao, icone, criar, o);
+            _lista[id] = new Ferramenta(id, titulo, descricao, icone, criar, o) { CriarCelular = _celular.GetValueOrDefault(id) };
+        }
+        Mudou?.Invoke();
+    }
+
+    // a versao do celular de uma ferramenta (num arquivo proprio, FerramentaXCelular.cs, com o
+    // seu ModuleInitializer): a pagina inteira em pe, que o celular poe sob a barra com o
+    // titulo e o voltar (TelaInicioCelular, AbrirFerramentasCelular)
+    static readonly Dictionary<string, Func<Contexto, Control>> _celular = new();
+
+    public static void RegistrarCelular(string id, Func<Contexto, Control> criar)
+    {
+        lock (_trava)
+        {
+            _celular[id] = criar;
+            if (_lista.TryGetValue(id, out var f)) _lista[id] = f with { CriarCelular = criar };
         }
         Mudou?.Invoke();
     }

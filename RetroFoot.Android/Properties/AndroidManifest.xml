@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto">
-	<application android:label="RetroFoot (prova)" android:icon="@drawable/Icon" />
+	<!-- a atualizacao (Atualizacao.cs): procurar as releases e instalar o APK novo -->
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+	<application android:icon="@drawable/Icon">
+		<!-- o APK baixado (no cache do app) entregue ao instalador do Android -->
+		<provider android:name="androidx.core.content.FileProvider"
+			android:authorities="${applicationId}.arquivos"
+			android:exported="false"
+			android:grantUriPermissions="true">
+			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/caminhos" />
+		</provider>
+	</application>
 </manifest>

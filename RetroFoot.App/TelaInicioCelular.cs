@@ -29,6 +29,125 @@ public sealed partial class TelaInicio
         _sobreM.IsVisible = false;
         Content = new Panel { Children = { _paginaM, _sobreM } };
         AddHandler(KeyDownEvent, TeclaModerna, Avalonia.Interactivity.RoutingStrategies.Bubble);
+        ProcurarAtualizacaoCelular();
+    }
+
+    // ---------------------------------------------------------------- ferramentas
+    // as ferramentas do hub do computador (Ferramentas.cs: Editor de Equipas, Editor de Save,
+    // Scout, Patches, Arbitros) numa lista; cada uma abre na tela toda, com a barra do titulo e o
+    // voltar (o do Android tambem). Sem a versao do celular (RegistrarCelular): "Em breve"
+    void AbrirFerramentasCelular()
+    {
+        var linhas = new List<Control>();
+        foreach (var f in Ferramentas.Todas)
+        {
+            var ff = f;
+            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,12,*,Auto") };
+            var ic = Ui.Icone(f.Icone, 24, CUi.Retro ? W95.Marinho : TemaVerde.Destaque);
+            ic.VerticalAlignment = VerticalAlignment.Center;
+            g.Children.Add(ic);
+            var t = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
+            t.Children.Add(CUi.Txt(T(f.Titulo), 16, null, FontWeight.Bold));
+            t.Children.Add(CUi.Txt(f.CriarCelular != null ? T(f.Descricao) : T("Em breve no celular"), 13, CUi.Fraco, FontWeight.Normal, true));
+            Grid.SetColumn(t, 2);
+            g.Children.Add(t);
+            var seta = CUi.Txt("›", 22, CUi.Fraco);
+            Grid.SetColumn(seta, 3);
+            g.Children.Add(seta);
+            var linha = CUi.Toque(g, f.CriarCelular != null ? () => AbrirFerramentaCelular(ff) : null, 60);
+            if (f.CriarCelular == null) linha.Opacity = 0.55;
+            linhas.Add(linha);
+        }
+        void Voltar() { CUi.Folha.VoltarPagina = null; EscolherJogo(); }
+        CUi.Folha.VoltarPagina = () => { Voltar(); return true; };
+        PaginaCelular(CUi.BarraTopo(T("Ferramentas"), null, Voltar), CUi.Grupo(linhas), null, null, Voltar, null);
+    }
+
+    void AbrirFerramentaCelular(Ferramentas.Ferramenta f)
+    {
+        void Voltar() => AbrirFerramentasCelular();
+        var ctx = new Ferramentas.Contexto
+        {
+            RaizDados = DadosJogo.Preparar(),
+            Voltar = Voltar,
+            Mensagem = t => MensagemCelular(T(f.Titulo), t, null),
+        };
+        Control conteudo;
+        try { conteudo = f.CriarCelular!(ctx); }
+        catch (Exception ex) { conteudo = CUi.Txt(T("Não foi possível abrir: {0}", ex.Message), 14, CUi.Erro, FontWeight.Normal, true); }
+        CUi.Folha.VoltarPagina = () => { Voltar(); return true; };
+        // a ferramenta ocupa o corpo inteiro (ela mesma rola o que precisar)
+        _paginaM.Children.Clear();
+        var d = new DockPanel { Background = CUi.Fundo };
+        var barra = CUi.BarraTopo(T(f.Titulo), null, Voltar);
+        DockPanel.SetDock(barra, Dock.Top);
+        d.Children.Add(barra);
+        d.Children.Add(conteudo);
+        _paginaM.Children.Add(d);
+        _enterM = null; _escM = Voltar; _focoM = null; _setasM = null;
+    }
+
+    // ---------------------------------------------------------------- atualizacao (OTA)
+    // uma vez por execucao, como no hub do computador: havendo um APK de versao maior nas
+    // releases, pergunta; "Atualizar agora" baixa e entrega ao instalador do Android (que pede a
+    // confirmacao; na 1a vez, a permissao de instalar apps do RetroFoot)
+    static bool _procurouAtualizacao;
+
+    void ProcurarAtualizacaoCelular()
+    {
+        if (_procurouAtualizacao || !Atualizacao.Suportada) return;
+        _procurouAtualizacao = true;
+        System.Threading.Tasks.Task.Run(Atualizacao.Procurar).ContinueWith(t =>
+        {
+            if (t.Result is { } nova) Dispatcher.UIThread.Post(() => OferecerAtualizacaoCelular(nova));
+        });
+    }
+
+    void OferecerAtualizacaoCelular(Atualizacao.Nova nova)
+    {
+        // (sem atrapalhar uma janela ja aberta: espera ela fechar)
+        if (_sobreM.IsVisible) { DispatcherTimer.RunOnce(() => OferecerAtualizacaoCelular(nova), TimeSpan.FromSeconds(2)); return; }
+        var texto = CUi.Txt(T("A versão {0} do RetroFoot está disponível (você tem a {1}). Seus saves, equipas e configurações ficam como estão.",
+            nova.Versao.ToString(3), Atualizacao.Atual.ToString(3)), 15, null, FontWeight.Normal, true);
+        var estado = CUi.Txt("", 13.5, CUi.Fraco, FontWeight.Normal, true);
+        bool baixando = false;
+        string? apk = null;
+        CUi.Botao? depois = null, agora = null;
+        void Instalar()
+        {
+            if (apk == null) return;
+            if (Atualizacao.InstalarApk!(apk)) estado.Text = T("Confirme a instalação na janela do Android.");
+            else
+            {
+                // o Android abriu a tela da permissao: ao voltar, tocar de novo
+                estado.Text = T("Permita que o RetroFoot instale atualizações e toque em Instalar.");
+                agora!.Texto = T("Instalar");
+            }
+            agora!.Habilitado = depois!.Habilitado = true;
+        }
+        depois = new CUi.Botao(T("Depois"), false, () => { if (!baixando) Sobrepor(null); });
+        agora = new CUi.Botao(T("Atualizar agora"), true, async () =>
+        {
+            if (baixando) return;
+            if (apk != null) { Instalar(); return; }
+            baixando = true;
+            agora!.Habilitado = depois.Habilitado = false;
+            var prog = new Progress<double>(f => estado.Text = T("Baixando... {0}%", (int)Math.Round(f * 100)));
+            try
+            {
+                estado.Text = T("Baixando... {0}%", 0);
+                apk = await Atualizacao.Instalar(nova, prog);
+                baixando = false;
+                Instalar();
+            }
+            catch (Exception ex)
+            {
+                estado.Text = T("Não consegui atualizar: {0}", ex.Message);
+                baixando = false;
+                agora.Habilitado = depois.Habilitado = true;
+            }
+        });
+        SobreporCelular(CUi.Caixa_(T("Nova versão do RetroFoot"), new StackPanel { Spacing = 10, Children = { texto, estado } }, depois, agora));
     }
 
     void PaginaCelular(Control cabecalho, Control corpo, Control? rodape, Action? enter, Action? esc, Control? foco)
@@ -148,11 +267,10 @@ public sealed partial class TelaInicio
             Spacing = 14,
             Children = { CUi.Cartao_(T("Continuar um jogo"), jogosGravados, jogos.Count > 0 ? CUi.Etiqueta(jogos.Count == 1 ? T("1 jogo") : T("{0} jogos", jogos.Count)) : null), CUi.Cartao_(T("Jogo novo"), novo) },
         };
-        var acoes = new StackPanel
-        {
-            Orientation = Orientation.Horizontal, Spacing = 10,
-            Children = { new CUi.Botao(T("Configurações"), false, AbrirConfiguracoes), new CUi.Botao(T("Sobre"), false, () => TelaAcerca.Abrir(new Dialogos(c => SobreporCelular(CUi.FolhaDe(c) != null ? new Panel { Background = TemaVerde.Veu, Children = { c } } : new Panel { Background = TemaVerde.Veu, Children = { new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, Child = c } } }), _ => Sobrepor(null)))) },
-        };
+        // os tres na largura da tela (o Sobre ficava cortado), o texto menor para caber
+        var bAcoes = new[] { new CUi.Botao(T("Configurações"), false, AbrirConfiguracoes), new CUi.Botao(T("Ferramentas"), false, AbrirFerramentasCelular), new CUi.Botao(T("Sobre"), false, () => TelaAcerca.Abrir(new Dialogos(c => SobreporCelular(CUi.FolhaDe(c) != null ? new Panel { Background = TemaVerde.Veu, Children = { c } } : new Panel { Background = TemaVerde.Veu, Children = { new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, Child = c } } }), _ => Sobrepor(null)))) };
+        foreach (var b in bAcoes) { b.Padding = new Thickness(6, 6); if (b.Child is TextBlock tb) tb.FontSize = 13.5 * Acessibilidade.Texto; }
+        var acoes = CUi.Botoes(bAcoes);
 
         bool valido = false;
         void Atualizar()

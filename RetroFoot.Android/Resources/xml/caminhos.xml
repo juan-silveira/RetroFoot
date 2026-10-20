@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- o que o FileProvider pode entregar: a pasta da atualizacao no cache do app -->
+<paths>
+	<cache-path name="atualizacao" path="atualizacao/" />
+</paths>

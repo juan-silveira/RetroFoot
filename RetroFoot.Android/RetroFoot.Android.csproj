@@ -4,15 +4,34 @@
     <TargetFramework>net10.0-android</TargetFramework>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
-    <ApplicationId>io.github.juansilveira.retrofoot.prova</ApplicationId>
-    <ApplicationTitle>RetroFoot (prova)</ApplicationTitle>
-    <ApplicationVersion>1</ApplicationVersion>
-    <ApplicationDisplayVersion>0.1</ApplicationDisplayVersion>
+    <!-- a versao: a mesma do jogo (RetroFoot.App.csproj <Version>); o codigo da versao do
+         Android (inteiro, so cresce) = maior x 10000 + menor x 100 + correcao (0.1.1 = 101).
+         Mudar os dois a cada release, senao o Android nao instala a atualizacao -->
+    <ApplicationDisplayVersion>0.1.1</ApplicationDisplayVersion>
+    <ApplicationVersion>101</ApplicationVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <!-- AOT: o codigo vai compilado para o processador no APK (sem JIT ao abrir cada tela) -->
     <RunAOTCompilation>true</RunAOTCompilation>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <!-- Debug: a prova (instala ao lado do jogo de verdade, com os dados dela) -->
+  <PropertyGroup Condition="'$(Configuration)' != 'Release'">
+    <ApplicationId>io.github.juansilveira.retrofoot.prova</ApplicationId>
+    <ApplicationTitle>RetroFoot (prova)</ApplicationTitle>
+  </PropertyGroup>
+  <!-- Release: o RetroFoot, assinado sempre com a mesma chave (fora do repositorio, em
+       ~/.config/retrofoot): sem ela o Android recusa as atualizacoes por cima. Os 32 bits
+       (android-arm) tambem, para os celulares mais antigos -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <ApplicationId>io.github.juansilveira.retrofoot</ApplicationId>
+    <ApplicationTitle>RetroFoot</ApplicationTitle>
+    <RuntimeIdentifiers>android-arm64;android-arm;android-x64</RuntimeIdentifiers>
+    <AndroidKeyStore>true</AndroidKeyStore>
+    <AndroidSigningKeyStore>$(HOME)/.config/retrofoot/retrofoot-android.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>retrofoot</AndroidSigningKeyAlias>
+    <AndroidSigningStorePass>file:$(HOME)/.config/retrofoot/retrofoot-android.senha</AndroidSigningStorePass>
+    <AndroidSigningKeyPass>file:$(HOME)/.config/retrofoot/retrofoot-android.senha</AndroidSigningKeyPass>
   </PropertyGroup>
   <ItemGroup>
     <AndroidResource Include="Icon.png">

@@ -22,7 +22,11 @@ namespace RetroFoot.App;
 //     abre-o e fecha. Na abertura seguinte o .new que sobrou e apagado (LimparAntigo).
 // A pasta data (saves, equipas, configuracoes) nao e tocada.
 // So vale para o executavel publicado (RetroFoot / RetroFoot.exe numa pasta com escrita);
-// rodando pelo dotnet (desenvolvimento) ou no Android, nada.
+// rodando pelo dotnet (desenvolvimento), nada.
+// No Android o pacote e o APK (android.apk): o jogo o baixa para a PastaApk e o entrega ao
+// instalador do sistema (InstalarApk, ligado pelo projeto Android), que pede a confirmacao;
+// na 1a vez o Android pede tambem a permissao de instalar apps vindos do RetroFoot. O APK novo
+// tem a mesma assinatura e substitui este, com os dados (saves, configuracoes) intactos.
 // RETROFOOT_OTA_URL: outra lista de releases (o mesmo JSON do GitHub), para testes.
 public static class Atualizacao
 {
@@ -54,9 +58,16 @@ public static class Atualizacao
         }
     }
 
-    static string? Pacote => OperatingSystem.IsLinux() ? "linux-x64.tar.gz" : OperatingSystem.IsWindows() ? "windows-x64.zip" : null;
+    static string? Pacote => OperatingSystem.IsAndroid() ? "android.apk"
+        : OperatingSystem.IsLinux() ? "linux-x64.tar.gz" : OperatingSystem.IsWindows() ? "windows-x64.zip" : null;
 
-    public static bool Suportada => Executavel != null && Pacote != null;
+    public static bool Suportada => OperatingSystem.IsAndroid() ? InstalarApk != null && PastaApk != null : Executavel != null && Pacote != null;
+
+    // no Android (MainActivity): a pasta do APK baixado (o cache do app, a do FileProvider) e
+    // quem o abre no instalador do sistema; false = falta a permissao de instalar apps (o
+    // Android abriu a tela dela: depois de permitir, chamar de novo)
+    public static string? PastaApk;
+    public static Func<string, bool>? InstalarApk;
 
     const string ArgConcluir = "--retrofoot-concluir";
 
@@ -139,6 +150,7 @@ public static class Atualizacao
     // Reabrir. O executavel em uso nao e tocado. Progresso de 0 a 1
     public static async Task<string> Instalar(Nova n, IProgress<double>? progresso, CancellationToken ct = default)
     {
+        if (OperatingSystem.IsAndroid()) return await BaixarApk(n, progresso, ct);
         var exe = Executavel ?? throw new InvalidOperationException("sem executável publicado");
         var pasta = Path.GetDirectoryName(exe)!;
         var baixado = Path.Combine(pasta, ".retrofoot-atualizacao" + (n.Arquivo.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) ? ".zip" : ".tar.gz"));
@@ -196,6 +208,40 @@ public static class Atualizacao
         finally
         {
             try { File.Delete(baixado); } catch { }
+        }
+    }
+
+    // o Android: o APK baixado na PastaApk (o caminho dele, para o InstalarApk)
+    static async Task<string> BaixarApk(Nova n, IProgress<double>? progresso, CancellationToken ct)
+    {
+        var pasta = PastaApk ?? throw new InvalidOperationException("sem pasta para o APK");
+        Directory.CreateDirectory(pasta);
+        var apk = Path.Combine(pasta, "retrofoot-atualizacao.apk");
+        try
+        {
+            using var c = Cliente();
+            using var resp = await c.GetAsync(n.Url, HttpCompletionOption.ResponseHeadersRead, ct);
+            resp.EnsureSuccessStatusCode();
+            long total = resp.Content.Headers.ContentLength ?? n.Tamanho;
+            await using (var origem = await resp.Content.ReadAsStreamAsync(ct))
+            await using (var destino = File.Create(apk))
+            {
+                var buf = new byte[81920];
+                long lido = 0;
+                for (int k; (k = await origem.ReadAsync(buf, ct)) > 0;)
+                {
+                    await destino.WriteAsync(buf.AsMemory(0, k), ct);
+                    lido += k;
+                    if (total > 0) progresso?.Report(Math.Min(1, (double)lido / total));
+                }
+            }
+            if (new FileInfo(apk).Length < 1_000_000) throw new InvalidDataException("o APK baixado está incompleto");
+            return apk;
+        }
+        catch
+        {
+            try { if (File.Exists(apk)) File.Delete(apk); } catch { }
+            throw;
         }
     }
 

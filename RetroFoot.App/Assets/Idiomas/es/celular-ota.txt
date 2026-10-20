@@ -1,0 +1,3 @@
+Confirme a instalação na janela do Android.	Confirme la instalación en la ventana de Android.
+Permita que o RetroFoot instale atualizações e toque em Instalar.	Permita que RetroFoot instale actualizaciones y toque en Instalar.
+Instalar	Instalar

@@ -649,10 +649,13 @@ public static class CUi
         // as folhas abertas (a de cima recebe o Voltar)
         internal static readonly List<Folha> Abertas = new();
 
-        // o Voltar do Android (App liga): a folha de cima responde; sem AoVoltar, fica
+        // o Voltar do Android (App liga): a folha de cima responde; sem AoVoltar, fica; sem
+        // folha, a pagina que pediu (VoltarPagina: as ferramentas, por exemplo)
+        public static Func<bool>? VoltarPagina;
+
         public static bool Voltar()
         {
-            if (Abertas.Count == 0) return false;
+            if (Abertas.Count == 0) return VoltarPagina?.Invoke() ?? false;
             Abertas[^1].AoVoltar?.Invoke();
             return true;
         }
