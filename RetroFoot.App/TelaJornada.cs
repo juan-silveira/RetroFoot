@@ -75,6 +75,8 @@ public sealed partial class TelaJornada : UserControl
         Background = new SolidColorBrush(Verde);
         Focusable = true;
         Fotografar(jn);
+        // no celular: a coluna de partidas em pe (TelaJornadaCelular.cs)
+        if (Celular.Ativo) MontarCelular();
         AttachedToVisualTree += (_, _) => { Focus(); Visual.Mudou -= VisualMudou; Visual.Mudou += VisualMudou; };
         DetachedFromVisualTree += (_, _) => Visual.Mudou -= VisualMudou;
         // como no classico: o botao direito durante a jornada abre a Gestao de Tecnicos (o unico
@@ -123,7 +125,7 @@ public sealed partial class TelaJornada : UserControl
     void VisualMudou()
     {
         arranjo = null;
-        sup.InvalidateVisual();
+        Redesenhar();
     }
 
     // um tique do relogio (MinutePassed, seg10:069b), com o motor parado
@@ -153,7 +155,7 @@ public sealed partial class TelaJornada : UserControl
             else if (m >= 45) { corRelogio = Rgb(0x0000FF); relMin = 45; relMax = 105; }
             relProg = m;
         }
-        sup.InvalidateVisual();
+        Redesenhar();
     }
 
     // o relogio acabou: a tela espera o jogador e chama "continuar"
@@ -162,7 +164,7 @@ public sealed partial class TelaJornada : UserControl
         Fotografar(jn);
         acabou = true;
         this.continuar = continuar;
-        sup.InvalidateVisual();
+        Redesenhar();
         Focus();
         // o Enter do fim vale com o foco em qualquer lugar da janela: depois dos detalhes de
         // um jogo ou de um clique no menu, o foco nao voltava a tela e o Enter nao fazia nada
@@ -201,7 +203,7 @@ public sealed partial class TelaJornada : UserControl
     {
         pausado = p;
         if (!p && pausa != null) pausa.Continue = false;
-        sup.InvalidateVisual();
+        Redesenhar();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -469,7 +471,7 @@ public sealed partial class TelaJornada : UserControl
         int p = Math.Clamp(pagina + d, 0, UltimaPagina);
         if (p == pagina) return;
         pagina = p;
-        sup.InvalidateVisual();
+        Redesenhar();
     }
 
     // ---------------------------------------------------------------- teclado

@@ -223,7 +223,15 @@ public sealed class Sessao
         dialogo.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
         quadro.Children.Add(dialogo);
         var camada = new Grid { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0x55, 0, 0, 0)) };
-        camada.Children.Add(new Viewbox { Stretch = Avalonia.Media.Stretch.Uniform, Child = quadro });
+        // no celular (em pe) o quadro de 800x600 deixava a janela com menos da metade do
+        // tamanho: ela e ampliada pelo tamanho dela mesma, ate a largura da tela (enquanto as
+        // janelas nao tem a versao propria do celular)
+        if (Celular.Ativo)
+        {
+            quadro.Children.Clear();
+            camada.Children.Add(new Viewbox { Stretch = Avalonia.Media.Stretch.Uniform, Margin = new Avalonia.Thickness(8), Child = dialogo });
+        }
+        else camada.Children.Add(new Viewbox { Stretch = Avalonia.Media.Stretch.Uniform, Child = quadro });
         camada.Tag = dialogo;
         // visivel antes de entrar: o Focus() que o dialogo faz ao entrar na arvore so pega
         // num controle visivel
