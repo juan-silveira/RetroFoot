@@ -33,6 +33,15 @@ sealed class LeilaoCelular : UserControl
     {
         _v = v; _preco = preco;
         _moeda = Moeda.DoSave(s.S);
+        if (CUi.Retro)
+        {
+            // no Retro, a janela amarela do computador (TsellPlayerDlg) em pe
+            _folha = new CUi.Folha(T("Venda de jogador por leilão"), FichaRetro(p, v, preco, salario, launcher), new Border(), fechar: null);
+            MercadoRetro.Pintar(_folha, W95.Amarelo);
+            _folha.Rodape(null);
+            Content = _folha;
+            return;
+        }
         var corpo = new StackPanel { Spacing = 12 };
         corpo.Children.Add(CUi.Cartao_(null, MercadoCelular.Cabecalho(p, v)));
         var linhas = new List<(string, string)>
@@ -43,6 +52,74 @@ sealed class LeilaoCelular : UserControl
         corpo.Children.Add(MercadoCelular.Ficha(p, launcher, linhas));
         _folha = new CUi.Folha(T("Venda de jogador por leilão"), corpo, Esperando(), TM.NomeEquipa(v), CUi.Escudo(v, 32), fechar: null);
         Content = _folha;
+    }
+
+    // ------------------------------------------------------------ o Retro
+    // a ficha da janela do computador (2:3002): a esquerda Time (nas cores do vendedor),
+    // Jogador, Posicao, Forca, Salario pretendido e Preco base; a direita a Nacionalidade com
+    // a bandeira; embaixo o suspenso / lesionado em vermelho e o Panel1 com o Historico
+    Control FichaRetro(SJogador p, SEquipa v, int? preco, int salario, bool launcher)
+    {
+        var preto = W95.Preto;
+        var s = new StackPanel { Spacing = 6 };
+        var topo = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+        var esq = new StackPanel { Spacing = 2 };
+        var time = new Grid { ColumnDefinitions = new ColumnDefinitions("62,*"), MinHeight = 30 };
+        time.Children.Add(MercadoRetro.Txt(T("Time"), 14, preto));
+        var nome = CUi.NomeEquipa(v, TM.NomeEquipa(v), 16, true);
+        Grid.SetColumn(nome, 1); time.Children.Add(nome);
+        esq.Children.Add(time);
+        esq.Children.Add(MercadoRetro.Linha(T("Jogador"), TM.NomeJogador(p), preto, 136, 14.5));
+        esq.Children.Add(MercadoRetro.Linha(T("Posição"), TM.Posicao(p), preto, 136, 14.5));
+        var f = new Grid { ColumnDefinitions = new ColumnDefinitions("136,*"), MinHeight = 30 };
+        f.Children.Add(MercadoRetro.Txt(T("Força"), 14.5, preto));
+        MercadoRetro.Col(f, 1, p.Forca.ToString(), preto, true, 18);
+        esq.Children.Add(f);
+        esq.Children.Add(MercadoRetro.Linha(T("Salário pretendido"), FormatoDinheiro.Valor(_moeda, salario), preto, 136, 14.5));
+        esq.Children.Add(MercadoRetro.Linha(T("Preço base"), preco is int b ? FormatoDinheiro.Valor(_moeda, b) : "", preto, 136, 14.5));
+        topo.Children.Add(esq);
+        string pais = TM.PaisDe(p.Pais);
+        var dir = new StackPanel { Spacing = 2, Width = 92, Margin = new Thickness(8, 0, 0, 0) };
+        dir.Children.Add(MercadoRetro.Txt(T("Nacionalidade"), 13, preto));
+        dir.Children.Add(MercadoRetro.Txt(TM.NomePais(pais), 14, preto, true, true));
+        if (CUi.Bandeira(pais, 64) is { } band) { band.Margin = new Thickness(0, 6, 0, 0); band.HorizontalAlignment = HorizontalAlignment.Left; dir.Children.Add(band); }
+        Grid.SetColumn(dir, 1); topo.Children.Add(dir);
+        s.Children.Add(topo);
+        MercadoRetro.Avisos(s, p, W95.Vermelho);
+        var ficha = MercadoRetro.Ficha(p, launcher, W95.Amarelo, preto);
+        ficha.Margin = new Thickness(0, 4, 0, 0);
+        s.Children.Add(ficha);
+        return s;
+    }
+
+    // o PanelHumanOffer do computador nas cores da equipa que licita: o treinador, a
+    // "Oferta (milhares de...)" com a caixa, o "Dinheiro em caixa: ..." e o OK com o visto
+    void PainelRetro(SEquipa c, string treinador, string dinheiro, char senha)
+    {
+        var (letra, fundo) = TM.Cores(c);
+        var p = new StackPanel { Spacing = 6 };
+        p.Children.Add(MercadoRetro.Txt(treinador, 16, letra, true));
+        var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,10,84") };
+        var esq = new StackPanel { Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
+        esq.Children.Add(MercadoRetro.Txt(T("Oferta (milhares de{0})", _moeda.Sufixo), 14, letra));
+        var caixa = MercadoRetro.Edit("", 5, 19);
+        if (senha != '\0') caixa.PasswordChar = senha;
+        Avalonia.Input.TextInput.TextInputOptions.SetContentType(caixa, Avalonia.Input.TextInput.TextInputContentType.Number);
+        caixa.TextChanged += (_, _) => { if (_erro != null) _erro.IsVisible = false; Mudou?.Invoke(caixa.Text ?? ""); };
+        caixa.KeyDown += (_, e) => { if (e.Key is Avalonia.Input.Key.Enter or Avalonia.Input.Key.Return) { e.Handled = true; Licitou?.Invoke(); } };
+        Caixa = caixa;
+        esq.Children.Add(caixa);
+        g.Children.Add(esq);
+        var ok = MercadoRetro.Botao(T("OK"), "Imagens/leilao-ok.png", 1, () => Licitou?.Invoke(), true);
+        ok.HorizontalAlignment = HorizontalAlignment.Stretch;
+        ok.MinHeight = 80;
+        Grid.SetColumn(ok, 2); g.Children.Add(ok);
+        p.Children.Add(g);
+        p.Children.Add(MercadoRetro.Txt(dinheiro, 14, letra, false, true));
+        _erro = MercadoRetro.Txt(T("A oferta é maior que o dinheiro em caixa."), 14, letra, true, true);
+        _erro.IsVisible = false;
+        p.Children.Add(_erro);
+        _folha.Rodape(new Border { Background = fundo, BorderBrush = W95.Preto, BorderThickness = new Thickness(1), Padding = new Thickness(10, 8), Child = p });
     }
 
     // ------------------------------------------------------------ os estados do rodape
@@ -62,6 +139,7 @@ sealed class LeilaoCelular : UserControl
     // o lance humano (Licitante, 2:3787): o painel nas cores da equipa que licita
     public void MostrarPainel(SEquipa c, string treinador, string dinheiro, char senha)
     {
+        if (CUi.Retro) { PainelRetro(c, treinador, dinheiro, senha); return; }
         var (letra, fundo) = TM.Cores(c);
         IBrush texto = CUi.Retro ? letra : CUi.Texto, fraco = CUi.Retro ? letra : CUi.Fraco;
         var p = new StackPanel { Spacing = 10 };
@@ -112,12 +190,19 @@ sealed class LeilaoCelular : UserControl
     public void EsconderPainel()
     {
         Caixa = null; _erro = null;
-        _folha.Rodape(Esperando());
+        // (no Retro, como no computador: sem o painel, nada embaixo)
+        _folha.Rodape(CUi.Retro ? null : Esperando());
     }
 
     // "Vendido ao X por Y" (os escudos do vendedor e do comprador) ou "Nao houve ofertas"
     public void MostrarResultado(string texto, SEquipa? comprador)
     {
+        if (CUi.Retro)
+        {
+            // textTransferred: o texto em negrito, preto sobre o amarelo
+            _folha.Rodape(MercadoRetro.Txt(texto, 17, W95.Preto, true, true));
+            return;
+        }
         var g = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,Auto,Auto,*") };
         g.Children.Add(CUi.Escudo(_v, 40));
         int col = 1;

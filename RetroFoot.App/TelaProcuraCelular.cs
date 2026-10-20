@@ -28,7 +28,10 @@ public static partial class TelaProcura
             readonly Form _f;
             readonly WrapPanel _filtros = new() { ItemSpacing = 8, LineSpacing = 8 };
             readonly StackPanel _resultados = new() { Spacing = 8 };
-            readonly CUi.Botao _botao;
+            CUi.Botao _botao;
+            // (o Retro: os criterios refeitos a cada troca, o Time... e o Comprar do launcher)
+            readonly ContentControl _criterios = new();
+            CUi.Botao? _equipaR, _comprarR;
             int _mostrar = Pagina;
             Action? _fecharFolha;
 
@@ -37,7 +40,7 @@ public static partial class TelaProcura
                 _f = f;
                 var corpo = new StackPanel { Spacing = 12 };
                 // o nome (TEdit, 20 letras, maiusculas)
-                var nome = CUi.Caixa(_nome, 20, T("Nome"));
+                var nome = CUi.Retro ? MercadoRetro.Edit(_nome, 20, 16) : CUi.Caixa(_nome, 20, T("Nome"));
                 bool trocando = false;
                 nome.TextChanged += (_, _) =>
                 {
@@ -52,6 +55,12 @@ public static partial class TelaProcura
                     Atualizar();
                 };
                 nome.KeyDown += (_, e) => { if (e.Key is Avalonia.Input.Key.Enter or Avalonia.Input.Key.Return && _procurar) { e.Handled = true; Procurar(); } };
+                if (CUi.Retro)
+                {
+                    _botao = null!;
+                    ConstruirRetro(nome);
+                    return;
+                }
                 corpo.Children.Add(nome);
                 corpo.Children.Add(_filtros);
                 corpo.Children.Add(CUi.Grupo(new Control[]
@@ -86,6 +95,7 @@ public static partial class TelaProcura
             void Atualizar()
             {
                 _botao.Habilitado = _procurar;
+                if (CUi.Retro) { AtualizarRetro(); return; }
                 _filtros.Children.Clear();
                 string forca = _f._porFaixas
                     ? (_faixa >= 0 && _faixa < Faixas.Length ? Faixas[_faixa].Trim() : "")
@@ -230,6 +240,7 @@ public static partial class TelaProcura
             // ------------------------------------------------------------ o que foi achado
             void Lista()
             {
+                if (CUi.Retro) { ListaRetro(); return; }
                 _resultados.Children.Clear();
                 var s = _f.S;
                 var achados = _achados;
@@ -289,6 +300,165 @@ public static partial class TelaProcura
                 }));
                 FecharFolha();
                 _fecharFolha = MercadoCelular.Abrir(s, new CUi.Folha(TM.NomeJogador(p), corpo, CUi.Botoes(bs.ToArray()), Texto(eq.NomeCompleto), fechar: FecharFolha));
+            }
+
+            // ------------------------------------------------------------ o Retro
+            // A janela amarela do computador (TcheckPlayerDlg) em pe: os criterios em linhas
+            // (o rotulo, a caixa de escolha e os botoes pequenos de limpar), a caixa de marcar,
+            // o dinheiro em caixa em azul, a lista branca afundada e Procurar, Time... (Comprar
+            // no launcher) e Fechar com os glifos. O toque escolhe a linha (o realce azul); na
+            // escolhida, e o duplo clique do original (o Time...)
+            void ConstruirRetro(TextBox nome)
+            {
+                var corpo = new StackPanel { Spacing = 8 };
+                corpo.Children.Add(Criterio(T("Nome"), nome, Pequeno("clearNameBtn", () => nome.Text = "")));
+                corpo.Children.Add(_criterios);
+                corpo.Children.Add(_resultados);
+                _botao = MercadoRetro.Botao(T("Procurar"), "Mercado/TcheckPlayerDlg.findBtn.png", 1, Procurar, true);
+                _equipaR = MercadoRetro.Botao(T("Time..."), "Mercado/TcheckPlayerDlg.teamBtn.png", 2, () => _f.Equipa());
+                var fechar = MercadoRetro.Botao(T("Fechar"), "Mercado/TcheckPlayerDlg.OKBtn.png", 2, Fechar, false, 36);
+                var bs = new List<Control> { _botao, _equipaR };
+                if (_f._launcher)
+                {
+                    _comprarR = MercadoRetro.Botao(T("Comprar"), "Mercado/TPlantelDlg.buyBtn.png", 2, () => { _f.Comprar(); Lista(); });
+                    bs.Add(_comprarR);
+                }
+                bs.Add(fechar);
+                var folha = new CUi.Folha(T("Lista de Jogadores"), corpo, MercadoRetro.Fila(bs.ToArray()), null, inteira: true, fechar: Fechar);
+                MercadoRetro.Pintar(folha, W95.Amarelo);
+                Content = folha;
+                Atualizar();
+                Lista();
+            }
+
+            // uma linha de criterio: o rotulo (preto sobre o amarelo), a caixa e os botoes
+            static Control Criterio(string rotulo, Control caixa, params Control[] botoes)
+            {
+                var g = new Grid { ColumnDefinitions = new ColumnDefinitions("104,*") };
+                g.Children.Add(MercadoRetro.Txt(rotulo, 14, W95.Preto, false, true));
+                Grid.SetColumn(caixa, 1); g.Children.Add(caixa);
+                foreach (var b in botoes)
+                {
+                    g.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+                    b.Margin = new Thickness(6, 0, 0, 0);
+                    b.VerticalAlignment = VerticalAlignment.Center;
+                    Grid.SetColumn(b, g.ColumnDefinitions.Count - 1);
+                    g.Children.Add(b);
+                }
+                return g;
+            }
+
+            CUi.Botao Pequeno(string nome, Action clique) => MercadoRetro.Pequeno("Mercado/TcheckPlayerDlg." + nome + ".png", 2, () =>
+            {
+                clique();
+                _f.Alterado();
+                Atualizar();
+            });
+
+            static Clicavel Combo(string texto, Action abrir) => MercadoRetro.Combo(MercadoRetro.Txt(texto, 14.5, W95.Preto), abrir);
+
+            void AtualizarRetro()
+            {
+                var p = new StackPanel { Spacing = 8 };
+                // a forca: as faixas (uma caixa) ou o minimo e o maximo (o vazio: sem limite)
+                Control forca;
+                if (_f._porFaixas)
+                    forca = Combo(_faixa >= 0 && _faixa < Faixas.Length ? Faixas[_faixa].Trim() : "", () =>
+                        Escolher(T("Força"), Faixas.Select(x => x.Trim()).ToList(), _faixa, true, i => _faixa = i));
+                else
+                {
+                    var um = Enumerable.Range(1, ForcaMaxima).Select(x => x.ToString()).ToList();
+                    var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,18,*") };
+                    g.Children.Add(Combo(_forcaMin > 0 ? _forcaMin.ToString() : "", () =>
+                        Escolher(T("Mínimo"), um, _forcaMin > 0 ? _forcaMin - 1 : -1, true, i => _forcaMin = i >= 0 ? i + 1 : -1)));
+                    var traco = MercadoRetro.Txt("–", 14, W95.Preto);
+                    traco.HorizontalAlignment = HorizontalAlignment.Center;
+                    Grid.SetColumn(traco, 1); g.Children.Add(traco);
+                    var max = Combo(_forcaMax > 0 ? _forcaMax.ToString() : "", () =>
+                        Escolher(T("Máximo"), um, _forcaMax > 0 ? _forcaMax - 1 : -1, true, i => _forcaMax = i >= 0 ? i + 1 : -1));
+                    Grid.SetColumn(max, 2); g.Children.Add(max);
+                    forca = g;
+                }
+                p.Children.Add(Criterio(T("Força"), forca, Pequeno("clearSkillBtn", () => _forcaMin = _forcaMax = _faixa = -1)));
+                p.Children.Add(Criterio(T("Posição"), Combo(_posicao >= 0 && _posicao < Posicoes.Length ? T(Posicoes[_posicao]) : "", () =>
+                    Escolher(T("Posição"), Posicoes.Select(x => T(x)).ToList(), _posicao, true, i => _posicao = i)),
+                    Pequeno("clearPositionBtn", () => _posicao = -1)));
+                // a nacionalidade: a bandeira e o nome (comboCountryDrawItem), o X e o pais do time
+                var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                if (_pais >= 0 && _pais < _f._paises.Count)
+                {
+                    if (CUi.Bandeira(_f._paises[_pais].Cod, 26) is { } b) sp.Children.Add(b);
+                    sp.Children.Add(MercadoRetro.Txt(_f._paises[_pais].Nome, 14.5, W95.Preto));
+                }
+                p.Children.Add(Criterio(T("Nacionalidade"), MercadoRetro.Combo(sp, EscolherPais, 44),
+                    Pequeno("clearCountryBtn", () => _pais = -1),
+                    Pequeno("myCountryBtn", () =>
+                    {
+                        // 10:3930: o pais da equipa
+                        var cod = PaisDe(_f._e.Pais);
+                        int k = _f._paises.FindIndex(x => x.Cod == cod);
+                        if (k >= 0) _pais = k;
+                    })));
+                p.Children.Add(Criterio(T("Preço"), Combo(_preco >= 0 && _preco < _f._precos.Length ? _f._precos[_preco].Trim() : "", () =>
+                    Escolher(T("Preço"), _f._precos.Select(x => x.Trim()).ToList(), _preco, true, i => _preco = i)),
+                    Pequeno("clearPriceBtn", () => _preco = -1)));
+                if (_f._launcher)
+                {
+                    p.Children.Add(Criterio(T("Comportamento"), Combo(T(ComportamentosLauncher[Math.Clamp(_comp, 0, ComportamentosLauncher.Length - 1)]), () =>
+                        Escolher(T("Comportamento"), ComportamentosLauncher.Select(x => T(x)).ToList(), _comp, false, i => _comp = i)),
+                        Pequeno("clearPositionBtn", () => _comp = 0)));
+                    p.Children.Add(Criterio(T("Nota"), Combo(NotasLauncher[Math.Clamp(_nota, 0, NotasLauncher.Length - 1)], () =>
+                        Escolher(T("Nota"), NotasLauncher, _nota, false, i => _nota = i)),
+                        Pequeno("clearSkillBtn", () => _nota = 0)));
+                    p.Children.Add(Criterio(T("Risco de lesão"), Combo(RiscosLauncher[Math.Clamp(_risco, 0, RiscosLauncher.Length - 1)], () =>
+                        Escolher(T("Risco de lesão"), RiscosLauncher, _risco, false, i => _risco = i)),
+                        Pequeno("clearPositionBtn", () => _risco = 0)));
+                }
+                p.Children.Add(MercadoRetro.Marcar(T("Não mostrar os jogadores do meu time"), _naoMinha, W95.Preto, () => { _f.TrocarNaoMinha(); Atualizar(); }));
+                // "Dinheiro em caixa" em azul (clBlue), como no computador
+                var din = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
+                din.Children.Add(MercadoRetro.Txt(T("Dinheiro em caixa"), 14, W95.Azul));
+                din.Children.Add(MercadoRetro.Txt(_f.Dinheiro((int)_f._e.Dinheiro), 14, W95.Azul, true));
+                p.Children.Add(din);
+                _criterios.Content = p;
+            }
+
+            void ListaRetro()
+            {
+                _resultados.Children.Clear();
+                var s = _f.S;
+                var achados = _achados;
+                var linhas = new StackPanel();
+                int n = Math.Min(_mostrar, achados.Count);
+                for (int i = 0; i < n; i++)
+                {
+                    var (eq, k) = MercadoJogo.EquipaDoJogador(s.S, achados[i]);
+                    if (eq == null) continue;
+                    var p = eq.Jogadores[k];
+                    bool sel = i == _f._lista.Sel;
+                    var cor = sel ? W95.Branco : W95.Preto;
+                    int v = s.Mercado.PrecoDeVenda(eq, _f._e, p, MercadoJogo.ForcaMedia(eq));
+                    var b = new List<(string, double, bool)> { (PaisDe(p.Pais), 40, false), (ComportamentoCurto(p), 36, false) };
+                    // (launcher: as colunas Nota e RL)
+                    if (_f._launcher) { b.Add((p.Nota.ToString(), 24, true)); b.Add((p.Lesao.ToString(), 24, true)); }
+                    var c = MercadoRetro.Jogador2(cor, Idioma.Posicao(Math.Min((int)p.Posicao, 3)), TM.NomeJogador(p),
+                        new[] { (p.Forca.ToString(), 24.0, true), (v > 0 ? _f.Dinheiro(v) : "", 100, true) }, Texto(eq.NomeCurto), b.ToArray());
+                    int ii = i;
+                    linhas.Children.Add(MercadoRetro.LinhaLista(c, sel, () => TocarRetro(ii), 48));
+                }
+                _resultados.Children.Add(MercadoRetro.Lista(new Border { MinHeight = 220, Child = linhas }, W95.Branco));
+                if (n < achados.Count)
+                    _resultados.Children.Add(MercadoCelular.Largo(T("Mostrar mais ({0})", achados.Count - n), false, () => { _mostrar += Pagina; Lista(); }));
+                if (_equipaR != null) _equipaR.Habilitado = _f.Escolhido() != null;
+                if (_comprarR != null) _comprarR.Habilitado = _f.PrecoDoEscolhido() > 0;
+            }
+
+            void TocarRetro(int i)
+            {
+                if (i < 0 || i >= _achados.Count) return;
+                if (i == _f._lista.Sel) { _f.Equipa(); return; }
+                _f._lista.Sel = i;
+                Lista();
             }
         }
     }
