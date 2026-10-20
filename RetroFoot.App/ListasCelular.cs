@@ -35,12 +35,8 @@ static class ListasCelular
         // Tirar: so fecha (o toque que abre o plantel, como o duplo clique do computador)
         void Tirar() { if (fechado) return; fechado = true; d.Fechar(f!); }
         void Fechar() { if (fechado) return; Tirar(); fechou?.Invoke(); }
-        Control? rodape = null;
-        if (ok)
-        {
-            var botaoOk = new CUi.Botao(T("OK"), true, Fechar) { HorizontalAlignment = HorizontalAlignment.Stretch };
-            rodape = botaoOk;
-        }
+        // (no Retro, todas tem o OK com o visto verde embaixo, como a TPrintListDlg)
+        Control? rodape = ok || CUi.Retro ? BotaoOk(T("OK"), Fechar) : null;
         f = new CUi.Folha(titulo, corpo, rodape, sub, icone, inteira: inteira, fechar: Fechar);
         if (fim)
             f.AttachedToVisualTree += (_, _) => Dispatcher.UIThread.Post(() =>
@@ -50,6 +46,85 @@ static class ListasCelular
         d.Abrir(f);
         return (f, Fechar, Tirar);
     }
+
+    // o botao de fechar embaixo: no Retro o TBitBtn do computador (o visto verde, no meio, na
+    // largura dele); no Moderno, a largura toda
+    internal static Control BotaoOk(string texto, Action clique)
+    {
+        var b = new CUi.Botao(texto, true, clique) { HorizontalAlignment = HorizontalAlignment.Stretch };
+        if (!CUi.Retro) return b;
+        b.ComIcone("Imagens/ok.png", "Imagens/ok-desab.png");
+        b.HorizontalAlignment = HorizontalAlignment.Center;
+        b.MinWidth = 150;
+        return b;
+    }
+
+    // ---------------------------------------------------------------- Retro
+    // A TPrintListDlg do computador no celular: a moldura (Bevel) com a lista branca afundada
+    // dentro, as linhas no texto preto da lista (Arial), as colunas do original na ordem dele, e
+    // o item escolhido no azul do realce (OpUltimo: o ultimo). Sem fio entre as linhas.
+
+    // um texto da lista (preto; negrito como os codigos do original)
+    internal static TextBlock R(string s, bool negrito = false, IBrush? cor = null, double tam = 14.5) =>
+        CUi.Txt(s, tam, cor ?? W95.Preto, negrito ? FontWeight.Bold : FontWeight.Normal);
+
+    // o mesmo a direita (os numeros)
+    internal static TextBlock RD(string s, bool negrito = false, IBrush? cor = null, double tam = 14.5)
+    {
+        var t = R(s, negrito, cor, tam);
+        t.HorizontalAlignment = HorizontalAlignment.Right;
+        t.TextAlignment = TextAlignment.Right;
+        return t;
+    }
+
+    // uma linha da lista: o fundo dela (o calendario) ou o realce (escolhida, com o texto
+    // branco); com toque, a altura do dedo
+    internal static Clicavel LinhaR(Control c, Action? toque = null, IBrush? fundo = null, bool sel = false)
+    {
+        var b = new Clicavel
+        {
+            Background = sel ? W95.Destaque : fundo ?? Brushes.Transparent, Child = c, CorFoco = null,
+            MinHeight = toque != null ? 40 : 28, Padding = new Thickness(6, 2),
+        };
+        if (sel) Branco(c);
+        if (toque != null) b.Clique += toque; else b.Cursor = Avalonia.Input.Cursor.Default;
+        return b;
+    }
+
+    // o texto da linha escolhida fica branco (o realce do Windows 95)
+    internal static void Branco(Control? c)
+    {
+        switch (c)
+        {
+            case TextBlock t when t.Tag is not "fixo": t.Foreground = W95.Branco; break;
+            case Panel p: foreach (var x in p.Children) Branco(x); break;
+            case Decorator d: Branco(d.Child); break;
+        }
+    }
+
+    // a moldura com a lista dentro (as linhas ja feitas); vazia, a caixa branca sem nada
+    internal static Control CaixaR(IReadOnlyList<Control> linhas)
+    {
+        Control lista = linhas.Count == 0
+            ? CUi.Grupo(new Control[] { new Border { MinHeight = 28 } })
+            : CUi.Grupo(linhas);
+        lista.VerticalAlignment = VerticalAlignment.Top;
+        var g = CUi.GrupoRetro(null, lista);
+        g.VerticalAlignment = VerticalAlignment.Top;
+        return g;
+    }
+
+    // n linhas da lista: linha(i), toque(i) e a escolhida (sel; -1 nenhuma)
+    internal static Control ListaR(int n, Func<int, Control> linha, Func<int, Action?>? toque = null, int sel = -1, Func<int, IBrush?>? fundo = null)
+    {
+        var ls = new List<Control>(n);
+        for (int i = 0; i < n; i++) ls.Add(LinhaR(linha(i), toque?.Invoke(i), fundo?.Invoke(i), i == sel));
+        return CaixaR(ls);
+    }
+
+    // a folha da lista no Retro (as que devolvem a janela: as subidas e descidas)
+    internal static CUi.Folha FolhaR(string titulo, Control corpo, Action fechar) =>
+        new(titulo, corpo, BotaoOk(T("OK"), fechar), fechar: fechar);
 
     // as linhas num grupo (com o fio entre elas); toque(i) != null: a linha se toca
     internal static Control Grupo(int n, Func<int, Control> linha, Func<int, Action?>? toque = null, double altura = 44)
@@ -143,7 +218,11 @@ static class ListasCelular
         bool numerada = (opcoes & TelaListas.OpNumerada) != 0;
         bool toca = (opcoes & TelaListas.OpDuplo) != 0 && duplo != null;
         Action Tirar = () => { };
-        var corpo = Grupo(n, i => LinhaFormatada(Formatado.Ler(numerada ? TelaListas.Numerada(i, linha(i)) : linha(i), false)),
+        bool ultimo = (opcoes & TelaListas.OpUltimo) != 0;
+        var corpo = CUi.Retro
+            ? ListaR(n, i => LinhaFormatada(Formatado.Ler(numerada ? TelaListas.Numerada(i, linha(i)) : linha(i), false)),
+                toca ? i => () => { Tirar(); duplo!(i); } : null, ultimo ? n - 1 : -1)
+            : Grupo(n, i => LinhaFormatada(Formatado.Ler(numerada ? TelaListas.Numerada(i, linha(i)) : linha(i), false)),
             toca ? i => () => { Tirar(); duplo!(i); } : null, 40);
         (_, _, Tirar) = Abrir(d, titulo, null, corpo, fechou, (opcoes & TelaListas.OpUltimo) != 0);
     }
@@ -165,7 +244,7 @@ static class ListasCelular
             else if (txt.Length > 0 && txt[0] == 'ý') txt = "";
             txt = txt.Trim();
             if (txt.Length == 0 && c.Logo == null) continue;
-            var t = CUi.Txt(txt, 14.5, c.Vermelho ? CUi.Erro : null, c.Negrito ? FontWeight.Bold : FontWeight.Normal);
+            var t = CUi.Txt(txt, CUi.Retro ? 14 : 14.5, c.Vermelho ? CUi.Erro : null, c.Negrito ? FontWeight.Bold : FontWeight.Normal);
             if (c.Italico) t.FontStyle = FontStyle.Italic;
             Control cel = t;
             if (c.Direita) { t.HorizontalAlignment = HorizontalAlignment.Right; t.TextAlignment = TextAlignment.Right; }
@@ -191,8 +270,42 @@ static class ListasCelular
     internal static void Calendario(Dialogos d, Sessao s, List<EntradaCalendario> cal, Action<int>? toque, Action? fechou, string sub)
     {
         Action Tirar = () => { };
-        var corpo = Grupo(cal.Count, i => LinhaCalendario(s, cal[i]), toque == null ? null : i => () => { Tirar(); toque(i); }, 46);
+        var corpo = CUi.Retro
+            ? ListaR(cal.Count, i => LinhaCalendarioRetro(s, cal[i]), toque == null ? null : i => () => { Tirar(); toque(i); },
+                fundo: i => CorCalendario(cal[i]).Fundo)
+            : Grupo(cal.Count, i => LinhaCalendario(s, cal[i]), toque == null ? null : i => () => { Tirar(); toque(i); }, 46);
         (_, _, Tirar) = Abrir(d, T("Calendário"), sub, corpo, fechou);
+    }
+
+    // as cores do original (3:254c fundo, 3:2597 letra): em casa o fundo azul (vermelho na
+    // Copa) e a letra branca; fora (e neutro) o fundo branco e a letra azul (ou vermelha)
+    static (IBrush Letra, IBrush Fundo) CorCalendario(EntradaCalendario c)
+    {
+        var cor = c.B07 == 1 ? W95.Vermelho : W95.Azul;
+        return c.W0E == 0 ? (W95.Branco, cor) : (cor, W95.Branco);
+    }
+
+    // Retro: as colunas do TCalendarEntry.Formatar (a jornada a direita, o adversario, C/F/N,
+    // golos : golos, "a. p." / "v. pen." / "d. pen." e o publico), a linha toda nas cores do jogo
+    static Control LinhaCalendarioRetro(Sessao s, EntradaCalendario c)
+    {
+        var (letra, _) = CorCalendario(c);
+        var adv = s.Equipa(c.W08);
+        TextBlock X(string t, bool dir = false) { var x = dir ? RD(t, false, letra) : R(t, false, letra); x.Tag = "fixo"; return x; }
+        var nome = X(adv != null ? Dlg.Texto(adv.NomeCurto) : "");
+        nome.Margin = new Thickness(8, 0, 4, 0);
+        var local = X(TelaListas.Local("CFN"[Math.Min((int)c.W0E, 2)]));
+        Control? gp = null, dp = null, gc = null, ex = null, pub = null;
+        if ((short)c.W0A >= 0)
+        {
+            gp = X(((short)c.W0A).ToString(), true);
+            var x = X(":"); x.HorizontalAlignment = HorizontalAlignment.Center; dp = x;
+            gc = X(((short)c.W0C).ToString(), true);
+            string e = (c.B06 switch { 1 => T("  a. p."), 2 => T("  v. pen."), 3 => T("  d. pen."), _ => "" }).Trim();
+            if (e.Length > 0) { var t = X(e); t.FontSize = 12 * Acessibilidade.Texto; t.Margin = new Thickness(6, 0, 0, 0); ex = t; }
+            pub = X(((int)c.D10).ToString(), true);
+        }
+        return Grade("24,*,22,22,12,22,Auto,62", X((short)c.W04 > 0 ? c.W04.ToString() : "", true), nome, local, gp, dp, gc, ex, pub);
     }
 
     static Control LinhaCalendario(Sessao s, EntradaCalendario c)
@@ -241,6 +354,21 @@ static class ListasCelular
     // os golos
     internal static void Marcadores(Dialogos d, string titulo, List<(Jogador P, Equipa E, int Golos)> ms)
     {
+        if (CUi.Retro)
+        {
+            // as colunas do computador, numeradas: o nome (negrito), os golos e a equipa
+            Abrir(d, titulo, null, ListaR(ms.Count, i =>
+            {
+                var (p, e, g) = ms[i];
+                var nome = R(TextosMercado.NomeJogador(p), true);
+                nome.Margin = new Thickness(8, 0, 0, 0);
+                var eq = R(Dlg.Texto(e.NomeCurto));
+                eq.Margin = new Thickness(12, 0, 0, 0);
+                eq.MaxWidth = 140;
+                return Grade("24,*,30,Auto", RD((i + 1).ToString()), nome, RD(g.ToString(), true), eq);
+            }), null);
+            return;
+        }
         var corpo = Pilha(Cabecalho("26,*,Auto,40", "#", T("Jogador"), T("Time"), T("Gols")),
             Grupo(ms.Count, i =>
             {
@@ -258,12 +386,31 @@ static class ListasCelular
         Abrir(d, titulo, null, corpo, null);
     }
 
-    static Control Margem(Control c, double esq) { c.Margin = new Thickness(esq, 0, 0, 0); return c; }
+    internal static Control Margem(Control c, double esq) { c.Margin = new Thickness(esq, 0, 0, 0); return c; }
 
     // os ultimos vencedores: o ano e, embaixo um do outro, o campeao (a taca dourada) e o
     // vencedor da Copa (a prateada), cada um com o treinador embaixo (em negrito o humano)
     internal static void UltimosVencedores(Dialogos d, Sessao s, IReadOnlyList<ushort[]> cs)
     {
+        if (CUi.Retro)
+        {
+            // TLastWinners.Formatar em duas linhas: o ano, o campeao e o treinador; embaixo o
+            // vencedor da Copa e o treinador dele (negrito o humano)
+            Control Par(string ano, ushort eq, ushort tr)
+            {
+                var t = s.J.M.Treinador(tr);
+                var e = R(s.Equipa(eq) is { } x ? Dlg.Texto(x.NomeCurto) : "");
+                e.Margin = new Thickness(0, 0, 8, 0);
+                return Grade("44,*,*", R(ano), e, R(t != null ? Dlg.Texto(t.Nome) : "", t != null && t.Humano != 0));
+            }
+            // (o titulo do computador nao cabe na barra: o curto e o resto embaixo)
+            Abrir(d, T("Últimos campeões"), T("Campeões do campeonato e da copa"), ListaR(cs.Count, i =>
+            {
+                var w = cs[i];
+                return new StackPanel { Margin = new Thickness(0, 2), Children = { Par(w[0].ToString(), w[1], w[2]), Par("", w[3], w[4]) } };
+            }), null, fim: true);
+            return;
+        }
         Control Sub(bool copa, ushort eq, ushort tr)
         {
             var t = s.J.M.Treinador(tr);
@@ -309,6 +456,32 @@ static class ListasCelular
     internal static void UltimasTransferencias(Dialogos d, Sessao s, List<Transferencia> tr, Action<int>? toque)
     {
         Action Tirar = () => { };
+        if (CUi.Retro)
+        {
+            // TLastTransfer.Formatar em duas linhas: a posicao, o nome, o pais e a forca na hora;
+            // embaixo o preco e a equipa compradora; a compra directa em vermelho; o ultimo
+            // escolhido
+            var lista = ListaR(tr.Count, i =>
+            {
+                var t = tr[i];
+                var (eq, k) = s.J.M.EquipaDoJogador(t.W06);
+                IBrush? cor = t.B04 != 0 ? W95.Vermelho : null;
+                Control cima;
+                if (eq != null)
+                {
+                    var p = eq.Jogadores[k];
+                    cima = Grade("20,*,40,28", R(Idioma.Posicao(Math.Min((int)p.Posicao, 3)), false, cor), R(TextosMercado.NomeJogador(p), false, cor),
+                        R(Dlg.Texto(p.Pais), false, cor), RD(((short)t.W08).ToString(), false, cor));
+                }
+                else cima = R(" ");
+                var c = R(s.Equipa(t.W0A) is { } x ? Dlg.Texto(x.NomeCurto) : "", false, cor);
+                c.Margin = new Thickness(12, 0, 0, 0);
+                var baixo = Grade("20,112,*", null, RD(FormatoDinheiro.Valor(s.S, (int)t.D0C), false, cor), c);
+                return new StackPanel { Margin = new Thickness(0, 2), Children = { cima, baixo } };
+            }, toque == null ? null : i => () => { Tirar(); toque(i); }, tr.Count - 1);
+            (_, _, Tirar) = Abrir(d, T("Últimas transferências"), null, lista, null, fim: true);
+            return;
+        }
         var corpo = Grupo(tr.Count, i =>
         {
             var t = tr[i];
@@ -340,6 +513,20 @@ static class ListasCelular
     // o historico da equipa: o ano, o titulo e o treinador (em negrito o humano)
     internal static void HistoricoEquipa(Dialogos d, Sessao s, Equipa e, List<EventoEquipa> ev, Action? fechou)
     {
+        if (CUi.Retro)
+        {
+            // TTeamEvent.Formatar: o ano, o titulo e o treinador (em negrito se humano); o ultimo
+            // escolhido
+            Abrir(d, Dlg.Texto(e.NomeCompleto), null, ListaR(ev.Count, i =>
+            {
+                var v = ev[i];
+                var t = s.J.M.Treinador(v.W09);
+                bool h = t != null && t.Humano != 0;
+                string tit = v.B04 switch { 1 => T("Campeonato"), 2 => T("Copa"), 3 => T("DOBRADINHA"), 4 => T("2º lugar"), 5 => T("3º lugar"), _ => "" };
+                return Grade("48,Auto,*", R(((int)v.D05).ToString()), Margem(R(tit, h), 0), Margem(R(t != null ? Dlg.Texto(t.Nome) : "", h), 12));
+            }, sel: ev.Count - 1), fechou, fim: true);
+            return;
+        }
         var corpo = Grupo(ev.Count, i =>
         {
             var v = ev[i];
@@ -359,6 +546,21 @@ static class ListasCelular
     // equipa de onde vem
     internal static void Contratacoes(Dialogos d, List<(Jogador P, Equipa E)> ps, Action? fechou)
     {
+        if (CUi.Retro)
+        {
+            // TPlayer.Formatar com as colunas 0x4063: a posicao, o nome (negrito), a equipa, a
+            // forca e o pais
+            Abrir(d, T("Jogadores adquiridos"), null, ListaR(ps.Count, i =>
+            {
+                var (p, e) = ps[i];
+                var eq = R(Dlg.Texto(e.NomeCurto));
+                eq.MaxWidth = 130;
+                eq.Margin = new Thickness(8, 0, 0, 0);
+                return Grade("20,*,Auto,30,40", R(Idioma.Posicao(Math.Min((int)p.Posicao, 3))), R(TextosMercado.NomeJogador(p), true), eq,
+                    RD(p.Forca.ToString()), Margem(R(Dlg.Texto(p.Pais)), 8));
+            }), fechou);
+            return;
+        }
         var corpo = Grupo(ps.Count, i =>
         {
             var eq = Eq(ps[i].E, 12.5);
@@ -372,6 +574,26 @@ static class ListasCelular
     // a historia do treinador: o ano e o texto do evento, com a equipa (os titulos em negrito)
     internal static void HistoriaTreinador(Dialogos d, Sessao s, Treinador t, List<EventoTreinador> ev)
     {
+        if (CUi.Retro)
+        {
+            // TCoachEvent.Formatar: o ano e o texto do evento com o nome da equipa (os titulos
+            // em negrito); o ultimo escolhido
+            Abrir(d, Dlg.Texto(t.Nome), null, ListaR(ev.Count, i =>
+            {
+                var v = ev[i];
+                string eq = s.Equipa(v.W09) is { } e ? Dlg.Texto(e.NomeCurto) : "";
+                string txt = v.B04 switch
+                {
+                    1 => T("Contratado pelo ") + eq, 2 => T("Despedido"), 3 => T("VENCEDOR DO CAMPEONATO"), 4 => T("VENCEDOR DA COPA"),
+                    5 => T("Entrada no ") + eq, 6 => T("Rebaixado para o ") + eq, 7 => T("Promovido para o ") + eq, 8 => T("DOBRADINHA"),
+                    9 => T("2º lugar"), 10 => T("3º lugar"), _ => "",
+                };
+                var x = R(txt, v.B04 is 3 or 4 or 8);
+                x.TextWrapping = TextWrapping.Wrap;
+                return Grade("48,*", R(((int)v.D05).ToString()), x);
+            }, sel: ev.Count - 1), null, fim: true);
+            return;
+        }
         var corpo = Grupo(ev.Count, i =>
         {
             var v = ev[i];
@@ -415,6 +637,17 @@ static class ListasCelular
             else txt = T("Troca com ") + nome + " (" + eq + ")";
             linhas.Add((e, txt, t != null && t.Humano != 0));
         }
+        if (CUi.Retro)
+        {
+            // a TLash do computador: uma coluna so, negrito o humano
+            Abrir(d, T("Demissões de Técnicos"), null, ListaR(linhas.Count, i =>
+            {
+                var x = R(linhas[i].Texto, linhas[i].Humano);
+                x.TextWrapping = TextWrapping.Wrap;
+                return x;
+            }), fechou, ok: true);
+            return;
+        }
         var corpo = Grupo(linhas.Count, i =>
         {
             var (e, txt, h) = linhas[i];
@@ -429,6 +662,24 @@ static class ListasCelular
     // embaixo, os titulos (campeonatos + copas e a soma) e, com o add-in, os pontos
     internal static void RankingTreinadores(Dialogos d, Sessao s, List<Treinador> tr, bool pontos)
     {
+        if (CUi.Retro)
+        {
+            // TCoach.Formatar (0x2B, e os pontos com o add-in) em duas linhas: o numero, o nome
+            // (negrito o humano), "campeonatos + copas = soma" e os pontos; embaixo a equipa
+            string cr = pontos ? "28,*,Auto,40" : "28,*,Auto";
+            Abrir(d, T("Ranking de Treinadores"), null, ListaR(tr.Count, i =>
+            {
+                var t = tr[i];
+                short c = (short)t.D16, ta = (short)(t.D16 >> 16);
+                var nome = Margem(R(Dlg.Texto(t.Nome), t.Humano != 0), 8);
+                var tit = Margem(RD(c + " + " + ta + " = " + (c + ta)), 8);
+                var cima = pontos ? Grade(cr, RD((i + 1).ToString()), nome, tit, RD(((int)t.D0E).ToString()))
+                    : Grade(cr, RD((i + 1).ToString()), nome, tit);
+                var eq = Margem(R(s.J.M.EquipaDoTreinador(t.ID) is { } e ? Dlg.Texto(e.NomeCurto) : ""), 8);
+                return new StackPanel { Margin = new Thickness(0, 2), Children = { cima, Grade("28,*", null, eq) } };
+            }), null);
+            return;
+        }
         string cols = pontos ? "34,*,Auto,52" : "34,*,Auto";
         var cab = pontos ? Cabecalho(cols, "#", T("Treinador"), T("Títulos"), T("Pontos")) : Cabecalho(cols, "#", T("Treinador"), T("Títulos"));
         var corpo = Pilha(cab, Grupo(tr.Count, i =>
@@ -452,6 +703,18 @@ static class ListasCelular
     // do classico); o Moderno nos ultimos campeoes (como no computador).
     internal static void Titulos(Dialogos d, List<TelaTitulos.Ano> anos)
     {
+        if (CUi.Retro)
+        {
+            // o classico: a lista so com as duas contagens (equipa, Camp., Copa e Total), do
+            // maior para o menor, como no computador
+            var ids = anos.SelectMany(a => new[] { a.Campeao, a.Taca }).Where(e => e != null).Select(e => e!).DistinctBy(e => e.ID).ToList();
+            var ls = ids.Select(e => (E: e, C: anos.Count(a => a.Campeao?.ID == e.ID), T: anos.Count(a => a.Taca?.ID == e.ID)))
+                .OrderByDescending(x => x.C + x.T).ThenByDescending(x => x.C).ToList();
+            Abrir(d, T("Títulos: campeonato e copa"), null, ListaR(ls.Count, i => Grade("*,Auto,Auto,Auto",
+                R(Dlg.Texto(ls[i].E.NomeCurto)), Margem(R(T("Camp.") + " " + ls[i].C), 10), Margem(R(T("Copa") + " " + ls[i].T), 12),
+                Margem(R(T("Total") + " " + (ls[i].C + ls[i].T)), 12))), null);
+            return;
+        }
         var area = new ContentControl();
         var abas = new[] { T("Últimos campeões"), T("Total"), T("Campeonato"), T("Copa") };
         Control Pagina(int k)
