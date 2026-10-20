@@ -68,12 +68,9 @@ sealed class TelaClassificacaoCelular : UserControl
         vistas.Margin = new Thickness(12, 0, 12, 8);
         var topo = new StackPanel { Children = { fila, vistas } };
         var corpo = new DockPanel();
-        // no Retro, a do classico: sem abas nem vistas, as divisoes uma embaixo da outra
-        if (!CUi.Retro)
-        {
-            DockPanel.SetDock(topo, Dock.Top);
-            corpo.Children.Add(topo);
-        }
+        // as abas das divisoes e as vistas nas duas peles (no Retro, os botoes do Windows 95)
+        DockPanel.SetDock(topo, Dock.Top);
+        corpo.Children.Add(topo);
         corpo.Children.Add(new ScrollViewer { Content = _tabela, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled });
         string titulo = rodada > 0 ? T("Classificação · {0}ª rodada", rodada) : T("Classificação");
         Content = new CUi.Folha(titulo, corpo, _continuar, inteira: true, rolar: false, fechar: Fechar);
@@ -128,8 +125,9 @@ sealed class TelaClassificacaoCelular : UserControl
     static string NomeDivisao(int d) => d < 4 ? T("{0}ª Divisão", d + 1) : T("Distrital");
 
     // as cores das zonas (as do kit: o destaque, o bom e o erro de cada pele)
-    static IBrush CorCampeao => CUi.Retro ? W95.Marinho : TemaVerde.Destaque;
-    static IBrush CorSobe => CUi.Retro ? CUi.Bom : TemaVerde.Verde;
+    static IBrush CorCampeao => CUi.Retro ? W95.Branco : TemaVerde.Destaque;
+    // (no Retro, sobre o verde: o branco e o verde-limao do classico)
+    static IBrush CorSobe => CUi.Retro ? W95.Cor(0, 255, 0) : TemaVerde.Verde;
     static IBrush CorDesce => CUi.Retro ? W95.Vermelho : TemaVerde.VermelhoForte;
 
     // a zona da posicao i (0 = 1o) numa divisao de n equipas (como a do Moderno)
@@ -267,58 +265,113 @@ sealed class TelaClassificacaoCelular : UserControl
     // o TclassificationDlg (TelaClassificacaoOriginal) em pe: no verde, cada divisao com o
     // titulo amarelo e as colunas P V E D GP GC; o numero da posicao em amarelo e a linha
     // inteira nas cores da equipa (fundo e letra), em negrito. Tocar numa equipa abre o plantel
+    // a divisao escolhida (como no Moderno), no visual do TclassificationDlg: no verde, o nome
+    // da divisao e os titulos das colunas em amarelo, o numero da posicao em amarelo (no fundo
+    // amarelo, o time do humano) e a linha inteira nas cores da equipa, em negrito; a barra a
+    // esquerda marca a zona (sobe / desce / campeao). As linhas encolhem para caber a divisao
+    // toda (20 times) sem rolar. Tocar numa equipa abre o plantel
     Control Retro()
     {
-        const string cols = "22,*,30,26,26,26,58";
-        var p = new StackPanel { Margin = new Thickness(8, 6, 8, 14), Spacing = 2 };
-        for (int d = 0; d < _divisoes; d++)
+        var eqs = Equipas(_divisao);
+        bool apertado = eqs.Count > 12;
+        string cols = _vista switch
         {
-            var cab = new Grid { ColumnDefinitions = new ColumnDefinitions(cols), Margin = new Thickness(0, d == 0 ? 4 : 16, 0, 2) };
-            var nome = CUi.Txt(NomeDivisao(d), 22, W95.Amarelo, FontWeight.Bold);
-            Grid.SetColumn(nome, 0); Grid.SetColumnSpan(nome, 2);
-            cab.Children.Add(nome);
-            string[] tit = { T("pontos:P"), T("V"), T("E"), T("D"), T("GP") + "  " + T("GC") };
-            for (int i = 0; i < tit.Length; i++)
-            {
-                var t = CUi.Txt(tit[i], 13, W95.Amarelo, FontWeight.Bold);
-                t.HorizontalAlignment = HorizontalAlignment.Center;
-                t.VerticalAlignment = VerticalAlignment.Bottom;
-                Grid.SetColumn(t, 2 + i);
-                cab.Children.Add(t);
-            }
-            p.Children.Add(cab);
-            var eqs = Equipas(d);
-            for (int i = 0; i < eqs.Count; i++) p.Children.Add(LinhaRetro(eqs[i], i, cols));
+            0 => "6,24,*,28,24,24,24,24,52",
+            1 => "6,24,*,28,24,30,30,34",
+            _ => "6,24,*,28,112",
+        };
+        string[] tit = _vista switch
+        {
+            0 => new[] { T("pontos:P"), T("J"), T("V"), T("E"), T("D"), T("GP") + ":" + T("GC") },
+            1 => new[] { T("pontos:P"), T("J"), T("GP"), T("GC"), T("SG") },
+            _ => new[] { T("pontos:P"), T("Últimas 5") },
+        };
+        var p = new StackPanel { Margin = new Thickness(6, 2, 8, 10), Spacing = apertado ? 1 : 2 };
+        var cab = new Grid { ColumnDefinitions = new ColumnDefinitions(cols), Margin = new Thickness(0, 0, 0, 2) };
+        var nome = CUi.Txt(NomeDivisao(_divisao), 20, W95.Amarelo, FontWeight.Bold);
+        Grid.SetColumn(nome, 1); Grid.SetColumnSpan(nome, 2);
+        cab.Children.Add(nome);
+        for (int i = 0; i < tit.Length; i++)
+        {
+            var t = CUi.Txt(tit[i], 12, W95.Amarelo, FontWeight.Bold);
+            t.HorizontalAlignment = HorizontalAlignment.Center;
+            t.VerticalAlignment = VerticalAlignment.Bottom;
+            Grid.SetColumn(t, 3 + i);
+            cab.Children.Add(t);
         }
+        p.Children.Add(cab);
+        for (int i = 0; i < eqs.Count; i++) p.Children.Add(LinhaRetro(eqs[i], i, eqs.Count, cols, apertado));
+        if (_divisao < 4) p.Children.Add(LegendaRetro());
         return p;
     }
 
-    Control LinhaRetro(Equipa e, int i, string cols)
+    Control LinhaRetro(Equipa e, int i, int n, string cols, bool apertado)
     {
         var (letra, fundo) = TextosMercado.Cores(e);
-        var g = new Grid { ColumnDefinitions = new ColumnDefinitions(cols), MinHeight = 30 };
-        var pos = CUi.Txt((i + 1).ToString(), 12.5, W95.Amarelo, FontWeight.Bold);
+        bool humana = Humana(e);
+        double tam = apertado ? 12.5 : 14;
+        var g = new Grid { ColumnDefinitions = new ColumnDefinitions(cols), MinHeight = apertado ? 23 : 30 };
+        if (Zona(_divisao, i, n) is { } zona) g.Children.Add(new Border { Background = zona, Margin = new Thickness(0, 2, 2, 2) });
+        // o numero da posicao em amarelo; o do humano em preto no amarelo
+        var pos = CUi.Txt((i + 1).ToString(), 12.5, humana ? W95.Preto : W95.Amarelo, FontWeight.Bold);
         pos.HorizontalAlignment = HorizontalAlignment.Center;
-        g.Children.Add(pos);
-        var linha = new Grid { ColumnDefinitions = new ColumnDefinitions("*,30,26,26,26,58"), Background = fundo };
-        Grid.SetColumn(linha, 1); Grid.SetColumnSpan(linha, 6);
+        var caixaPos = new Border { Child = pos, Background = humana ? W95.Amarelo : null, Margin = new Thickness(1, 1) };
+        Grid.SetColumn(caixaPos, 1);
+        g.Children.Add(caixaPos);
+        var linha = new Grid { Background = fundo };
+        foreach (var c in cols.Split(',').Skip(2)) linha.ColumnDefinitions.Add(c == "*" ? new ColumnDefinition(GridLength.Star) : new ColumnDefinition(double.Parse(c), GridUnitType.Pixel));
+        Grid.SetColumn(linha, 2); Grid.SetColumnSpan(linha, cols.Split(',').Length - 2);
         g.Children.Add(linha);
         void Cel(int c, string t, HorizontalAlignment h = HorizontalAlignment.Center)
         {
-            var x = CUi.Txt(t, 14, letra, FontWeight.Bold);
+            var x = CUi.Txt(t, tam, letra, FontWeight.Bold);
             x.HorizontalAlignment = h;
             if (c == 0) x.Margin = new Thickness(6, 0, 2, 0);
             Grid.SetColumn(x, c);
             linha.Children.Add(x);
         }
         int pts = EqW(e, EqPontos), v = EqW(e, EqVitorias), em = EqW(e, EqEmpates), de = EqW(e, EqDerrotas);
-        int gm = EqW(e, EqGolosPro), gc = EqW(e, EqGolosContra);
+        int gm = EqW(e, EqGolosPro), gc = EqW(e, EqGolosContra), sg = gm - gc;
         Cel(0, Dlg.Texto(e.NomeCurto).ToUpperInvariant(), HorizontalAlignment.Left);
-        Cel(1, pts.ToString()); Cel(2, v.ToString()); Cel(3, em.ToString()); Cel(4, de.ToString());
-        Cel(5, gm + " : " + gc);
-        var c = new Clicavel { Child = g, Background = Brushes.Transparent, CorFoco = null };
-        if (AbrirEquipa != null) c.Clique += () => Abrir(e);
-        return c;
+        Cel(1, pts.ToString());
+        switch (_vista)
+        {
+            case 0:
+                Cel(2, (v + em + de).ToString()); Cel(3, v.ToString()); Cel(4, em.ToString()); Cel(5, de.ToString());
+                Cel(6, gm + ":" + gc);
+                break;
+            case 1:
+                Cel(2, (v + em + de).ToString()); Cel(3, gm.ToString()); Cel(4, gc.ToString()); Cel(5, sg > 0 ? "+" + sg : sg.ToString());
+                break;
+            default:
+            {
+                var ult = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 3, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                var rs = Ultimas(e);
+                for (int k = 0; k < 5 - rs.Count; k++) ult.Children.Add(Resultado(null));
+                foreach (var x in rs) ult.Children.Add(Resultado(x));
+                Grid.SetColumn(ult, 2);
+                linha.Children.Add(ult);
+                break;
+            }
+        }
+        var cl = new Clicavel { Child = g, Background = Brushes.Transparent, CorFoco = null };
+        if (AbrirEquipa != null) cl.Clique += () => Abrir(e);
+        return cl;
+    }
+
+    // a legenda em amarelo sobre o verde
+    Control LegendaRetro()
+    {
+        var w = new WrapPanel { ItemSpacing = 14, LineSpacing = 4, Margin = new Thickness(4, 6, 4, 0) };
+        Control Item(IBrush c, string s) => new StackPanel
+        {
+            Orientation = Orientation.Horizontal, Spacing = 6,
+            Children = { new Border { Width = 6, Height = 14, Background = c, VerticalAlignment = VerticalAlignment.Center }, CUi.Txt(s, 12, W95.Amarelo) },
+        };
+        if (_divisao == 0) w.Children.Add(Item(CorCampeao, T("Campeão")));
+        else w.Children.Add(Item(CorSobe, T("Sobe de divisão")));
+        w.Children.Add(Item(CorDesce, T("Desce de divisão")));
+        return w;
     }
 
     static Action<Equipa, bool, Action>? AbrirEquipa => TelaClassificacao.AbrirEquipa;
