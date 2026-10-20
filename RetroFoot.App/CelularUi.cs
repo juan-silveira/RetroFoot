@@ -396,7 +396,7 @@ public static class CUi
     public static Control Interruptor(string texto, string? explicacao, bool ligado, Action<bool> mudou, bool habilitado = true)
     {
         var sw = new ToggleSwitch { IsChecked = ligado, OnContent = "", OffContent = "", IsEnabled = habilitado, VerticalAlignment = VerticalAlignment.Center };
-        if (Retro) sw = new ToggleSwitch { IsChecked = ligado, OnContent = "", OffContent = "", IsEnabled = habilitado, VerticalAlignment = VerticalAlignment.Center };
+        Pintar(sw);
         sw.IsCheckedChanged += (_, _) => mudou(sw.IsChecked == true);
         var t = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
         t.Children.Add(Txt(texto, 15, null, FontWeight.Medium, true));
@@ -407,6 +407,20 @@ public static class CUi
         g.Children.Add(sw);
         var c = Toque(g, habilitado ? () => sw.IsChecked = sw.IsChecked != true : null);
         return c;
+    }
+
+    // o interruptor e o deslizador nas cores da pele (o Fluent traz o azul do sistema)
+    public static void Pintar(Control c)
+    {
+        var cor = Retro ? W95.Marinho : TemaVerde.Destaque;
+        var claro = Retro ? (IBrush)W95.Azul : TemaVerde.BotaoPrimarioHover;
+        foreach (var k in new[] { "ToggleSwitchFillOn", "ToggleSwitchFillOnPointerOver", "ToggleSwitchFillOnPressed",
+                     "SliderTrackValueFill", "SliderTrackValueFillPointerOver", "SliderTrackValueFillPressed",
+                     "SliderThumbBackground", "SliderThumbBackgroundPointerOver", "SliderThumbBackgroundPressed" })
+            c.Resources[k] = k.EndsWith("PointerOver") ? claro : cor;
+        c.Resources["ToggleSwitchKnobFillOn"] = Retro ? W95.Branco : TemaVerde.SobreDestaque;
+        c.Resources["ToggleSwitchKnobFillOnPointerOver"] = Retro ? W95.Branco : TemaVerde.SobreDestaque;
+        c.Resources["ToggleSwitchKnobFillOnPressed"] = Retro ? W95.Branco : TemaVerde.SobreDestaque;
     }
 
     // a escolha de uma opcao entre varias, em pilulas que quebram a linha (formacoes, faixas,
@@ -460,6 +474,7 @@ public static class CUi
     {
         var v = Txt(texto(valor), 14, null, FontWeight.SemiBold);
         var sl = new Slider { Minimum = min, Maximum = max, Value = valor, SmallChange = passo, LargeChange = passo, TickFrequency = passo, IsSnapToTickEnabled = true };
+        Pintar(sl);
         sl.ValueChanged += (_, e) => { v.Text = texto(e.NewValue); mudou(e.NewValue); };
         var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         cab.Children.Add(Txt(rotulo, 15, null, FontWeight.Medium));
