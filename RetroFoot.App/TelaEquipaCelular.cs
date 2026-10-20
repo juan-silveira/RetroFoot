@@ -740,34 +740,63 @@ public sealed partial class TelaEquipa
         // a ficha do jogador, com as acoes
         void AbrirFicha(SJogador j)
         {
-            var p = new StackPanel { Spacing = 6 };
+            var p = new StackPanel { Spacing = 8 };
             int pos = Math.Min((int)j.Posicao, 3);
-            p.Children.Add(Linha(T("Posição"), T(NomePosicao[pos])));
-            p.Children.Add(Linha(T("País"), NomePais(Painel.PaisCelular(j))));
-            if (j.B35 == 1) p.Children.Add(CUi.Txt(T("Não é considerado jogador estrangeiro, ao abrigo da Lei Bosman"), 13, CUi.Fraco, FontWeight.Normal, true));
-            p.Children.Add(Linha(T("Força"), j.Forca.ToString()));
-            p.Children.Add(Linha(T("Salário"), _p.DinheiroCelular(j.Salario)));
-            p.Children.Add(Linha(T("Comportamento"), j.Comportamento < Comportamentos.Length ? T(Comportamentos[j.Comportamento]) : j.Comportamento.ToString()));
-            if (_s.J.M.Regras.CartoesAmarelos)
+            // o topo: a bandeira, o pais e a posicao (e a Lei Bosman, como no computador)
+            string pais = Painel.PaisCelular(j);
+            var topo = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            if (CUi.Bandeira(pais, 28) is { } bb) topo.Children.Add(bb);
+            topo.Children.Add(CUi.Txt(NomePais(pais) + "  ·  " + T(NomePosicao[pos]), 15, null, FontWeight.SemiBold));
+            p.Children.Add(topo);
+            if (j.B35 == 1) p.Children.Add(CUi.Txt(T("Não é considerado jogador estrangeiro, ao abrigo da Lei Bosman"), 12.5, CUi.Fraco, FontWeight.Normal, true));
+            if (j.JogosLesao > 0) p.Children.Add(CUi.Txt(T(j.JogosLesao == 1 ? "Lesionado por 1 jogo" : "Lesionado por {0} jogos", j.JogosLesao), 14, CUi.Erro, FontWeight.Bold));
+            if (j.Suspensao > 0) p.Children.Add(CUi.Txt(T(j.Suspensao == 1 ? "Suspenso por 1 jogo" : "Suspenso por {0} jogos", j.Suspensao), 14, CUi.Erro, FontWeight.Bold));
+            // os dados dois por linha
+            var dados = new List<(string, string)>
             {
-                p.Children.Add(Linha(T("Nota"), j.Nota.ToString()));
-                p.Children.Add(Linha(T("Risco de lesão"), j.Lesao.ToString()));
-            }
-            p.Children.Add(Linha(T("Gols na Temporada"), Mem.Golos14(j).ToString()));
+                (T("Força"), j.Forca.ToString()),
+                (T("Salário"), _p.DinheiroCelular(j.Salario)),
+                (T("Comportamento"), j.Comportamento < Comportamentos.Length ? T(Comportamentos[j.Comportamento]) : j.Comportamento.ToString()),
+                (T("Gols na Temporada"), Mem.Golos14(j).ToString()),
+            };
+            if (_s.J.M.Regras.CartoesAmarelos) { dados.Add((T("Nota"), j.Nota.ToString())); dados.Add((T("Risco de lesão"), j.Lesao.ToString())); }
+            p.Children.Add(Pares(dados));
+            var hist = new List<(string, string)>
+            {
+                (T("Jogos"), _p.HistCelular(j, Mem.HistJogos).ToString()),
+                (T("Gols"), _p.HistCelular(j, Mem.HistGolos).ToString()),
+            };
+            if (_s.J.M.Regras.CartoesAmarelos) hist.Add((T("Cartões amarelos"), Painel.AmarelosCelular(j).ToString()));
+            hist.Add((T("Cartões vermelhos"), _p.HistCelular(j, Mem.HistVermelhos).ToString()));
+            hist.Add((T("Lesões"), _p.HistCelular(j, Mem.HistLesoes).ToString()));
             p.Children.Add(CUi.SecaoFolha(T("Histórico")));
-            p.Children.Add(Linha(T("Jogos"), _p.HistCelular(j, Mem.HistJogos).ToString()));
-            p.Children.Add(Linha(T("Gols"), _p.HistCelular(j, Mem.HistGolos).ToString()));
-            if (_s.J.M.Regras.CartoesAmarelos) p.Children.Add(Linha(T("Cartões amarelos"), Painel.AmarelosCelular(j).ToString()));
-            p.Children.Add(Linha(T("Cartões vermelhos"), _p.HistCelular(j, Mem.HistVermelhos).ToString()));
-            p.Children.Add(Linha(T("Lesões"), _p.HistCelular(j, Mem.HistLesoes).ToString()));
-            if (j.JogosLesao > 0) p.Children.Add(Linha(T("Lesionado"), T(j.JogosLesao == 1 ? "Lesionado por 1 jogo" : "Lesionado por {0} jogos", j.JogosLesao), CUi.Erro));
-            if (j.Suspensao > 0) p.Children.Add(Linha(T("Suspenso"), T(j.Suspensao == 1 ? "Suspenso por 1 jogo" : "Suspenso por {0} jogos", j.Suspensao), CUi.Erro));
+            p.Children.Add(Pares(hist));
             var vender = new CUi.Botao(T("Vender"), true, () => { FecharGaveta(); _p.VenderCelular(j); Refazer(); });
             var renovar = new CUi.Botao(T("Renovar contrato"), false, () => { FecharGaveta(); _p.RenovarCelular(j); Refazer(); });
             renovar.Habilitado = MercadoJogo.PodeMudarSalario(j);
-            p.Children.Add(new Border { Height = 6 });
+            p.Children.Add(new Border { Height = 2 });
             p.Children.Add(CUi.Botoes(renovar, vender));
             AbrirGaveta(Painel.NomeCelular(j), p);
+        }
+
+        // os dados em duas colunas: o rotulo pequeno em cima e o valor embaixo
+        static Control Pares(List<(string Rotulo, string Valor)> dados)
+        {
+            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*"), ColumnSpacing = 12, RowSpacing = 8 };
+            for (int i = 0; i < dados.Count; i++)
+            {
+                g.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+                var c = new StackPanel
+                {
+                    Spacing = 0,
+                    Children = { CUi.Txt(dados[i].Rotulo, 12, CUi.Fraco), CUi.Txt(dados[i].Valor, 16, null, FontWeight.Bold) },
+                };
+                Grid.SetRow(c, i / 2);
+                Grid.SetColumn(c, i % 2);
+                g.Children.Add(c);
+            }
+            while (g.RowDefinitions.Count > (dados.Count + 1) / 2) g.RowDefinitions.RemoveAt(g.RowDefinitions.Count - 1);
+            return g;
         }
 
         // ------------------------------------------------------------ jogar e os menus
@@ -830,7 +859,7 @@ public sealed partial class TelaEquipa
             cab.Children.Add(fechar);
             var folha = new Border
             {
-                Background = CUi.Retro ? W95.Face : TemaVerde.FundoTela, VerticalAlignment = VerticalAlignment.Bottom, MaxHeight = 620,
+                Background = CUi.Retro ? W95.Face : TemaVerde.FundoTela, VerticalAlignment = VerticalAlignment.Bottom, MaxHeight = Math.Max(400, _raiz.Bounds.Height * 0.92),
                 CornerRadius = new CornerRadius(CUi.Retro ? 0 : 22, CUi.Retro ? 0 : 22, 0, 0), Padding = new Thickness(16, 14, 16, 18),
                 BorderBrush = CUi.Retro ? W95.Preto : TemaVerde.Borda, BorderThickness = new Thickness(1, 1, 1, 0),
                 Child = new DockPanel
