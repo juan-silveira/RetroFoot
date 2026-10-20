@@ -53,10 +53,18 @@ public static partial class TelaPlantel
                     // outra equipa: a folha nova (o titulo e o nome dela), do comeco da lista
                     _equipaMostrada = e.ID;
                     _rolar = new ScrollViewer { HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
-                    Content = new CUi.Folha(Texto(e.NomeCompleto), _rolar, null, NomePais(PaisDe(e.Pais)), inteira: true, rolar: false, fechar: _f.Fechar);
+                    if (CUi.Retro)
+                    {
+                        // no Retro, o titulo do computador ("NOME (Pais)") e a janela na cor da equipa
+                        var f = new CUi.Folha(Texto(e.NomeCompleto) + " (" + NomePais(PaisDe(e.Pais)) + ")", _rolar, new Border(), null, inteira: true, rolar: false, fechar: _f.Fechar);
+                        MercadoRetro.Pintar(f, Cores(e).Fundo);
+                        Content = f;
+                    }
+                    else Content = new CUi.Folha(Texto(e.NomeCompleto), _rolar, null, NomePais(PaisDe(e.Pais)), inteira: true, rolar: false, fechar: _f.Fechar);
                 }
+                if (CUi.Retro && Content is CUi.Folha fr) fr.Rodape(RodapeRetro());
                 // a mesma equipa: so o corpo (a rolagem fica onde estava)
-                _rolar.Content = new Border { Padding = new Thickness(12, 10, 12, 16), Child = Corpo(e) };
+                _rolar.Content = new Border { Padding = new Thickness(12, 10, 12, 16), Child = CUi.Retro ? CorpoRetro(e) : Corpo(e) };
                 // a ficha aberta de outro jogador (a equipa mudou pelos observados): fecha; do
                 // mesmo, refeita (o Observado, o preco)
                 if (_fecharFicha != null && _fichaDe != _f._sel) FecharFicha();
@@ -174,6 +182,7 @@ public static partial class TelaPlantel
             // ------------------------------------------------------------ a ficha
             void AbrirFicha(SJogador p)
             {
+                if (CUi.Retro) { AbrirFichaRetro(p); return; }
                 var s = _f.S;
                 var e = _f.Mostrada();
                 if (e == null) return;
@@ -246,6 +255,148 @@ public static partial class TelaPlantel
                 int k = atual == null ? -1 : _f._nomes.IndexOf(Texto(atual.NomeCurto));
                 if (k >= 0) marcar(k);
                 fechar = MercadoCelular.Abrir(s, new CUi.Folha(T("Trocar de equipa"), lista, null, fechar: () => fechar()));
+            }
+
+            // ------------------------------------------------------------ o Retro
+            // A TPlantelDlg do computador em pe, nas cores da equipa: a bandeira do pais, a
+            // caixa da equipa (o toque troca), a divisao e o medidor do moral; o Balanco e o
+            // Calendario com os glifos; a lista afundada na cor da equipa (P, nome, F, S, L, a
+            // nacionalidade e o preco, em negrito, o traco no fim de cada posicao) e embaixo
+            // Procurar, Emprestimo, Lista e Fechar. O toque num jogador escolhe a linha (o
+            // realce azul) e abre a ficha (o Observado e o Comprar com os glifos)
+            Control CorpoRetro(SEquipa e)
+            {
+                var s = _f.S;
+                var (letra, fundo) = Cores(e);
+                var p = new StackPanel { Spacing = 8 };
+                var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,10,*") };
+                if (CUi.Bandeira(PaisDe(e.Pais), 44) is { } band) cab.Children.Add(band);
+                var combo = MercadoRetro.Combo(MercadoRetro.Txt(Texto(e.NomeCurto), 15, W95.Preto, true), EscolherEquipa, 42);
+                Grid.SetColumn(combo, 2); cab.Children.Add(combo);
+                p.Children.Add(cab);
+                var linha2 = new Grid { ColumnDefinitions = new ColumnDefinitions("*,10,*") };
+                int dv = s.J.M.DivisaoDa(e);
+                if (dv >= 0 && dv < s.S.Divisoes.Count)
+                    linha2.Children.Add(MercadoRetro.Txt(dv >= 4 ? T("Distrital") : Pascal(s.S.Divisoes[dv].Nome, 20), 15, letra));
+                var moral = MercadoRetro.Moral(e, 14);
+                Grid.SetColumn(moral, 2); linha2.Children.Add(moral);
+                p.Children.Add(linha2);
+                // o Balanco e o Calendario (em cima, a direita, no computador)
+                var cima = new List<Control>();
+                if (Balanco != null)
+                    cima.Add(MercadoRetro.Botao(T("Balanço"), "Mercado/TPlantelDlg.balanceBtn.png", 2, () => { if (_f.Mostrada() is { } m) Balanco?.Invoke(s, m, Refazer); }));
+                var cal = MercadoRetro.Botao(T("Calendário"), "Mercado/TPlantelDlg.calendarBtn.png", 2, () => { if (_f.Mostrada() is { } m) Calendario?.Invoke(s, m, Refazer); });
+                cal.Habilitado = Calendario != null;
+                cima.Add(cal);
+                p.Children.Add(MercadoRetro.Fila(cima.ToArray()));
+
+                // a lista (ListBoxOfPlayersDrawItem) na cor da equipa
+                bool comPreco = _f.Compradora() != null && !_f.Humana(e);
+                var lista = new StackPanel();
+                var js = e.Jogadores;
+                for (int i = 0; i < js.Count; i++)
+                {
+                    bool fim = i < js.Count - 1 && Math.Min((int)js[i].Posicao, 3) != Math.Min((int)js[i + 1].Posicao, 3);
+                    var l = LinhaRetro(e, i, comPreco, letra);
+                    lista.Children.Add(new Border { Child = l, BorderBrush = letra, BorderThickness = new Thickness(0, 0, 0, fim ? 1 : 0), Margin = new Thickness(0, 0, 0, fim ? 3 : 0) });
+                }
+                p.Children.Add(MercadoRetro.Lista(lista, fundo));
+                return p;
+            }
+
+            Control LinhaRetro(SEquipa e, int i, bool comPreco, IBrush letra)
+            {
+                var j = e.Jogadores[i];
+                bool sel = j.ID == _f._sel;
+                var cor = sel ? W95.Branco : letra;
+                var g = new Grid { ColumnDefinitions = new ColumnDefinitions(comPreco ? "20,*,26,16,16,44,96" : "20,*,26,16,16,44") };
+                MercadoRetro.Col(g, 0, Idioma.Posicao(Math.Min((int)j.Posicao, 3)), cor, true);
+                MercadoRetro.Col(g, 1, NomeJogador(j), cor, true);
+                MercadoRetro.Col(g, 2, j.Forca.ToString(), cor, true, 14, true);
+                MercadoRetro.Col(g, 3, j.Suspensao != 0 ? Abrev("coluna: S", " S").Trim() : "", cor, true, 14, true);
+                MercadoRetro.Col(g, 4, j.JogosLesao != 0 ? Abrev("coluna: L", " L").Trim() : "", cor, true, 14, true);
+                MercadoRetro.Col(g, 5, Nacional(j), cor, true, 13).Margin = new Thickness(6, 0, 0, 0);
+                if (comPreco && _f.Compradora() is { } comp)
+                {
+                    int v = _f.S.Mercado.PrecoDeVenda(e, comp, j, MercadoJogo.ForcaMedia(e));
+                    MercadoRetro.Col(g, 6, v > 0 ? _f.Dinheiro(v) : "", cor, true, 13, true);
+                }
+                int k = i;
+                return MercadoRetro.LinhaLista(g, sel, () => Tocar(k), 38);
+            }
+
+            // os botoes de baixo (Procurar, Emprestimo, Lista e Fechar, nas condicoes do Form)
+            Control RodapeRetro()
+            {
+                var s = _f.S;
+                var bs = new List<Control>();
+                if (_f.Compradora() is { } c)
+                {
+                    bs.Add(MercadoRetro.Botao(T("Procurar"), "Mercado/TPlantelDlg.findBtn.png", 1, () => { if (_f.Compradora() is { } c2) TelaProcura.Abrir(s, c2, _f.MostrarJogador); }));
+                    if (_f.PodeComprarAqui() && Emprestimo != null)
+                        bs.Add(MercadoRetro.Botao(T("Empréstimo"), "Mercado/TPlantelDlg.loanBtn.png", 2, () => { if (_f.Compradora() is { } c2) Emprestimo?.Invoke(s, c2, () => { _f.AtualizarCompra(); Refazer(); }); }));
+                    if (_f.Humana(c))
+                        bs.Add(MercadoRetro.Botao(T("Lista"), "Mercado/TPlantelDlg.observedPlayersBtn.png", 2, () => { if (_f.Compradora() is { } c2) TelaObservados.Abrir(s, c2, _f.MostrarJogador); }));
+                }
+                bs.Add(MercadoRetro.Botao(T("Fechar"), "Mercado/TPlantelDlg.OKBtn.png", 2, _f.Fechar, true, 36));
+                return MercadoRetro.Fila(bs.ToArray());
+            }
+
+            // a ficha (PanelPlayer, GroupBox1) numa folha nas cores da equipa: o jogador, o
+            // preco, o Comportamento, os gols, o Historico, o suspenso / lesionado e o "Salario
+            // pretendido"; o Observado (premido se ja observado) e o Comprar
+            void AbrirFichaRetro(SJogador p)
+            {
+                var s = _f.S;
+                var e = _f.Mostrada();
+                if (e == null) return;
+                var (letra, fundo) = Cores(e);
+                bool launcher = s.J.M.Regras.CartoesAmarelos;
+                var corpo = new StackPanel { Spacing = 6 };
+                var cab = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                if (CUi.Bandeira(TM.PaisDe(p.Pais), 26) is { } b) cab.Children.Add(b);
+                cab.Children.Add(MercadoRetro.Txt(TM.NomeJogador(p), 18, letra, true));
+                cab.Children.Add(MercadoRetro.Txt(TM.Posicao(p) + " · " + p.Forca, 15, letra));
+                corpo.Children.Add(cab);
+                var nac = Nacional(p);
+                if (nac.Length > 0) corpo.Children.Add(MercadoRetro.Linha(T("Nacionalidade"), nac.StartsWith("* ") ? NomePais(nac[2..]) + " *" : NomePais(nac), letra, 170, 14, false));
+                var c = _f.Compradora();
+                if (c != null && !_f.Humana(e))
+                {
+                    int v = s.Mercado.PrecoDeVenda(e, c, p, MercadoJogo.ForcaMedia(e));
+                    corpo.Children.Add(MercadoRetro.Linha(T("Preço"), v > 0 ? _f.Dinheiro(v) : "–", letra, 170, 14, true));
+                }
+                corpo.Children.Add(MercadoRetro.Ficha(p, launcher, fundo, letra));
+                MercadoRetro.Avisos(corpo, p, letra);
+                if (c != null && _f._preco > 0 && _f.PodeComprarAqui())
+                    corpo.Children.Add(MercadoRetro.Linha(T("Salário pretendido:"), FormatoDinheiro.Valor(s.S, s.Mercado.Salario(p, Ext.Bytes(c.B79))), letra, 170, 14, true));
+                var bs = new List<Control>();
+                if (c != null)
+                {
+                    var obs = MercadoRetro.Botao(T("Observado"), "Mercado/TPlantelDlg.SpeedButtonObserved.png", 2, () => { _f.Observar(); Refazer(); });
+                    obs.Habilitado = _f._observadoLigado;
+                    MercadoRetro.Baixo(obs, _f._observadoLigado && MercadoJogo.Observado(s.S, c.Treinador, p.ID));
+                    bs.Add(obs);
+                }
+                if (_f.PodeComprarAqui())
+                {
+                    var comprar = MercadoRetro.Botao(T("Comprar"), "Mercado/TPlantelDlg.buyBtn.png", 2, () =>
+                    {
+                        FecharFicha();
+                        _f.Comprar();
+                        Refazer();
+                    });
+                    comprar.Habilitado = _f._preco > 0;
+                    bs.Add(comprar);
+                }
+                var folha = new CUi.Folha(TM.NomeJogador(p), corpo, bs.Count > 0 ? MercadoRetro.Fila(bs.ToArray()) : null, Texto(e.NomeCompleto),
+                    CUi.Bandeira(PaisDe(e.Pais), 30), fechar: () => FecharFicha());
+                MercadoRetro.Pintar(folha, fundo);
+                var antiga = _fecharFicha;
+                _fecharFicha = null;
+                antiga?.Invoke();
+                _fichaDe = p.ID;
+                _fecharFicha = MercadoCelular.Abrir(s, folha);
             }
         }
     }
