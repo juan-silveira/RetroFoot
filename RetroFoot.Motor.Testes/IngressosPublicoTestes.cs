@@ -64,7 +64,7 @@ public class IngressosPublicoTestes
         Ingressos.Escolher(casa, 50);
         j.M.RecalcularPublico(jogo);
         int cheio = jogo.W4C;
-        Assert.True(cheio >= vazio, $"cheio {cheio} < vazio {vazio}");
+        Assert.Equal(3, cheio - vazio);   // +3 com mais gente que o preco de tabela, +0 com 1/4 dele
         // sem a opcao (o jogo classico, o oraculo): o +2 fixo, o preco nao mexe no arbitro
         var (j2, jogo2, casa2) = Cenario(torcida: false);
         int antes = jogo2.W4C;
@@ -73,16 +73,28 @@ public class IngressosPublicoTestes
         Assert.Equal(antes, jogo2.W4C);
     }
 
-    // os quartos do estadio: ate 1/4 +0, ate 2/4 +1, ate 3/4 +2, acima +3
+    // sem mexer no preco: o +2 do classico em todos os jogos
+    [Fact]
+    public void PrecoDeTabelaDaOMesmoArbitroDoClassico()
+    {
+        var (j, _, _) = Cenario();
+        var (j2, _, _) = Cenario(torcida: false);
+        var com = j.M.S.Jogos.Where(x => x.Arbitro != 0).Select(x => x.W4C).ToArray();
+        var sem = j2.M.S.Jogos.Where(x => x.Arbitro != 0).Select(x => x.W4C).ToArray();
+        Assert.NotEmpty(com);
+        Assert.Equal(sem, com);
+    }
+
+    // o publico com o preco escolhido sobre o do preco de tabela: ate 1/4 +0, ate 2/4 +1,
+    // ate igual +2, mais +3
     [Theory]
     [InlineData(0, 0)]
     [InlineData(2500, 0)]
     [InlineData(2501, 1)]
     [InlineData(5000, 1)]
     [InlineData(5001, 2)]
-    [InlineData(7500, 2)]
-    [InlineData(7501, 3)]
-    [InlineData(10000, 3)]
-    public void BonusPorQuartoDoEstadio(int publico, int bonus) =>
-        Assert.Equal(bonus, Mundo.BonusPelaOcupacao(publico, 10000));
+    [InlineData(10000, 2)]
+    [InlineData(10001, 3)]
+    public void BonusPeloPublicoDoPrecoDeTabela(int publico, int bonus) =>
+        Assert.Equal(bonus, Mundo.BonusPeloPublico(publico, 10000));
 }

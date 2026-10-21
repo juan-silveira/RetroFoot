@@ -41,7 +41,7 @@ public sealed record Opcoes
     // oraculo sao de 2026-10-11, de antes disso: o roteiro do oraculo desliga.
     public bool AmarelosZeramNaEpoca = true;
     // RetroFoot (versao Atual): o publico pesa no arbitro (Mundo.BonusDaTorcida: +0 a +3 ao
-    // mandante pela ocupacao do estadio, no lugar do +2 fixo); o oraculo (os EXEs do launcher) desliga
+    // mandante pelo publico comparado ao do preco de tabela, +2 sem mexer no preco); o oraculo (os EXEs do launcher) desliga
     public bool TorcidaNoArbitro = true;
 
     // as do elif98.ini do launcher

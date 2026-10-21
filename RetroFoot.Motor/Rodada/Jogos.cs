@@ -118,7 +118,7 @@ public sealed partial class Mundo
             if (a != null)
             {
                 j.Arbitro = a.ID;
-                j.W4C = (ushort)(PreJogo.InfluenciaDoArbitro(a, casa) + BonusDaTorcida(casa, j.D40));
+                j.W4C = (ushort)(PreJogo.InfluenciaDoArbitro(a, casa) + BonusDaTorcida(casa, j));
                 j.W4E = (ushort)PreJogo.InfluenciaDoArbitro(a, fora);
             }
             else j.Arbitro = 0;
@@ -157,19 +157,24 @@ public sealed partial class Mundo
     }
 
     // o +2 do mandante na influencia do arbitro (seg03:1a66). Na versao Atual (as regras do
-    // launcher, com o preco do ingresso) a torcida pesa pela ocupacao do estadio, em quartos:
-    // ate 1/4 cheio +0, ate 2/4 +1, ate 3/4 +2 e acima +3; no jogo classico, sempre +2
+    // launcher, com o preco do ingresso) a torcida pesa pelo publico com o preco escolhido
+    // comparado ao publico com o preco de tabela (a mesma procura sorteada): ate 1/4 dele +0,
+    // ate 2/4 +1, ate igual +2 e mais que ele (o ingresso barato trouxe mais gente) +3. Sem
+    // mexer no preco, sempre +2, como no jogo classico (que fica sempre com +2)
     public bool TorcidaNoArbitro;
 
-    int BonusDaTorcida(Equipa casa, uint publico)
+    int BonusDaTorcida(Equipa casa, Jogo j)
     {
-        if (!Regras.CartoesAmarelos || !TorcidaNoArbitro) return 2;
-        int cap = PreJogo.CapacidadeDoEstadio(casa);
-        return cap <= 0 ? 2 : BonusPelaOcupacao(publico, cap);
+        if (!Regras.CartoesAmarelos || !TorcidaNoArbitro || !_demanda.TryGetValue(j, out var d)) return 2;
+        long tabela = Math.Min(Arred(d.Procura), PreJogo.CapacidadeDoEstadio(casa));
+        return BonusPeloPublico(j.D40, tabela);
     }
 
-    public static int BonusPelaOcupacao(long publico, int capacidade) =>
-        4 * publico <= capacidade ? 0 : 4 * publico <= 2L * capacidade ? 1 : 4 * publico <= 3L * capacidade ? 2 : 3;
+    public static int BonusPeloPublico(long publico, long publicoTabela) =>
+        publicoTabela <= 0 ? 2
+        : publico > publicoTabela ? 3
+        : 4 * publico <= publicoTabela ? 0
+        : 4 * publico <= 2 * publicoTabela ? 1 : 2;
 
     // a procura de cada jogo criado nesta execucao (o publico antes do preco do ingresso) e a
     // ocupacao media do estadio antes dele; so na memoria (nao vai para o save)
@@ -185,33 +190,35 @@ public sealed partial class Mundo
     {
         var casa = Equipa(j.Casa); var fora = Equipa(j.Fora);
         if (casa == null || fora == null || j.Taca == TipoJogo.SemEquipas) return;
-        int antes = BonusDaTorcida(casa, j.D40);
-        try { RecalcularSo(j, casa, fora); }
+        // (um save carregado: a procura media, com o publico guardado no peso de antes)
+        if (!_demanda.ContainsKey(j)) _demanda[j] = (ProcuraMedia(j, casa, fora), null);
+        int antes = BonusDaTorcida(casa, j);
+        try { RecalcularSo(j, casa); }
         finally
         {
             // a torcida nova muda o peso dela no arbitro
-            if (j.Arbitro != 0) j.W4C = (ushort)Math.Max(0, j.W4C - antes + BonusDaTorcida(casa, j.D40));
+            if (j.Arbitro != 0) j.W4C = (ushort)Math.Max(0, j.W4C - antes + BonusDaTorcida(casa, j));
         }
     }
 
-    void RecalcularSo(Jogo j, Equipa casa, Equipa fora)
+    // a procura com o sorteio no meio (0,5), sem mexer no gerador
+    Ext ProcuraMedia(Jogo j, Equipa casa, Equipa fora)
     {
-        if (_demanda.TryGetValue(j, out var d) && d.Ocupacao != null)
+        var b = X(0.5).Mul(X(3)).Add(Xi((short)(MediaForca(casa) * 3 + MediaForca(fora))));
+        var c = DeReal48(fora.Moral).Sqrt().Mul(DeReal48(casa.Moral).Sqrt().Mul(b)).Mul(X(200));
+        return Pot(Real48(c), Mercado.Constantes.C1_04).Mul(Xi(j.Taca == TipoJogo.Taca ? 1 : 0).Mul(C0_3).Add(X(1)));
+    }
+
+    void RecalcularSo(Jogo j, Equipa casa)
+    {
+        var d = _demanda[j];
+        if (d.Ocupacao != null)
         {
             d.Ocupacao.CopyTo(casa.EstadioReal, 0);
             j.D40 = (uint)PreJogo.LotacaoDoEstadio(casa, Arred(Ingressos.Publico(d.Procura, casa)));
             return;
         }
-        Ext p;
-        if (d.Procura is { } guardada && _demanda.ContainsKey(j)) p = guardada;
-        else
-        {
-            var b = X(0.5).Mul(X(3)).Add(Xi((short)(MediaForca(casa) * 3 + MediaForca(fora))));
-            var c = DeReal48(fora.Moral).Sqrt().Mul(DeReal48(casa.Moral).Sqrt().Mul(b)).Mul(X(200));
-            p = Pot(Real48(c), Mercado.Constantes.C1_04).Mul(Xi(j.Taca == TipoJogo.Taca ? 1 : 0).Mul(C0_3).Add(X(1)));
-            _demanda[j] = (p, null);
-        }
-        j.D40 = (uint)Math.Min(Arred(Ingressos.Publico(p, casa)), PreJogo.CapacidadeDoEstadio(casa));
+        j.D40 = (uint)Math.Min(Arred(Ingressos.Publico(d.Procura, casa)), PreJogo.CapacidadeDoEstadio(casa));
     }
 
     // seg03:1df4(calendario, fora, adversario): entrada da Taca (+0x07 = 1, +0x08 =
