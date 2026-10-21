@@ -55,6 +55,19 @@ sealed class TelaClassificacaoModerna : UserControl
     readonly int _divisoes;
     int _divisao;
     double _alturaLista;
+    // a letra das linhas acompanha a altura delas (14 em 24 pontos; ate 19 nas divisoes pequenas)
+    double Fonte => Math.Clamp(Math.Round(_alturaLinha * 0.64 * 2) / 2, 13, 20);
+
+    // o titulo, as abas e o Continuar cabem numa linha do 4:3 (772 pontos)? estimado pelas letras
+    bool CabeNumaLinha()
+    {
+        double Largura(string t, double tam) => new FormattedText(t, System.Globalization.CultureInfo.InvariantCulture,
+            FlowDirection.LeftToRight, new Typeface(Inter, FontStyle.Normal, FontWeight.SemiBold), tam, Texto).Width;
+        double w = Largura(_titulo, 17) + 24 + Largura(_textoBotao.Text ?? T("Continuar (10)"), 14) + 44;
+        for (int d = 0; d < _divisoes; d++)
+            w += Largura(NomeDivisao(d), 14) + 18 + (Escudos.Liga(_s, d) != null ? 24 : 0);
+        return w <= 772 - 10;
+    }
     int _tiques;
     DispatcherTimer? _relogio;
     bool _fechou;
@@ -157,7 +170,7 @@ sealed class TelaClassificacaoModerna : UserControl
         // topo: titulo, abas das divisoes e o Continuar
         var titulo = new TextBlock
         {
-            Text = _titulo, FontSize = 19, FontWeight = FontWeight.SemiBold, Foreground = Texto,
+            Text = _titulo, FontSize = 17, FontWeight = FontWeight.SemiBold, Foreground = Texto,
             VerticalAlignment = VerticalAlignment.Center,
         };
         for (int d = 0; d < _divisoes; d++) _abas.Children.Add(Aba(d));
@@ -168,9 +181,9 @@ sealed class TelaClassificacaoModerna : UserControl
             Cursor = new Cursor(StandardCursorType.Hand), Child = _textoBotao, VerticalAlignment = VerticalAlignment.Center,
         };
         botao.PointerPressed += (_, a) => { a.Handled = true; Fechar(); };
-        // 16:9: titulo, abas e Continuar numa linha; 4:3: as abas descem para a linha de baixo
-        // (numa linha so, com 5 divisoes, elas passavam por baixo do Continuar)
-        bool largo = Formato.Largo;
+        // titulo, abas e Continuar numa linha (a tabela fica com a altura); no 4:3 so se couber:
+        // com o titulo comprido e 5 divisoes as abas descem para a linha de baixo
+        bool largo = Formato.Largo || CabeNumaLinha();
         var topo = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), RowDefinitions = new RowDefinitions(largo ? "Auto" : "Auto,Auto"),
@@ -267,7 +280,7 @@ sealed class TelaClassificacaoModerna : UserControl
         }
         var b = new Border
         {
-            Padding = new Thickness(12, 8, 12, 6), Background = Brushes.Transparent, BorderThickness = new Thickness(0, 0, 0, 3),
+            Padding = new Thickness(9, 7, 9, 5), Background = Brushes.Transparent, BorderThickness = new Thickness(0, 0, 0, 3),
             Cursor = new Cursor(StandardCursorType.Hand), Child = conteudo, Tag = d,
         };
         b.PointerPressed += (_, a) => { a.Handled = true; MostrarDivisao(d); _tiques = 0; AtualizarBotao(); };
@@ -287,7 +300,7 @@ sealed class TelaClassificacaoModerna : UserControl
         _linhas.Children.Clear();
         var eqs = Equipas(_divisao);
         // as linhas enchem a lista (com o fio de 1 entre elas); o Distrital rola
-        _alturaLinha = eqs.Count > 24 || _alturaLista <= 0 ? 24 : Math.Clamp(Math.Floor(_alturaLista / Math.Max(eqs.Count, 1)) - 1, 18, 30);
+        _alturaLinha = eqs.Count > 24 || _alturaLista <= 0 ? 24 : Math.Clamp(Math.Floor(_alturaLista / Math.Max(eqs.Count, 1)) - 1, 18, 52);
         for (int i = 0; i < eqs.Count; i++) _linhas.Children.Add(LinhaEquipa(eqs[i], i, eqs.Count));
     }
 
@@ -306,10 +319,11 @@ sealed class TelaClassificacaoModerna : UserControl
 
         // clube: escudo + nome curto
         var clube = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(8, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
-        clube.Children.Add(Escudos.ControleComDisco(Escudos.Escudo(e), 20) ?? Escudo(e));
+        double tamEscudo = Math.Round(_alturaLinha * 0.78);
+        clube.Children.Add(Escudos.ControleComDisco(Escudos.Escudo(e), tamEscudo) is { } esc ? esc : new Viewbox { Height = tamEscudo, Child = Escudo(e) });
         clube.Children.Add(new TextBlock
         {
-            Text = Nome(e.NomeCurto), FontSize = 14, Foreground = Texto, VerticalAlignment = VerticalAlignment.Center,
+            Text = Nome(e.NomeCurto), FontSize = Fonte, Foreground = Texto, VerticalAlignment = VerticalAlignment.Center,
             FontWeight = humana ? FontWeight.Bold : FontWeight.Normal, TextTrimming = TextTrimming.CharacterEllipsis,
         });
         Grid.SetColumn(clube, 2);
@@ -340,7 +354,7 @@ sealed class TelaClassificacaoModerna : UserControl
         for (int k = 0; k < 5 - r.Count; k++) ult.Children.Add(Resultado(null, false));
         for (int k = 0; k < r.Count; k++) ult.Children.Add(Resultado(r[k], k == r.Count - 1));
         // (os circulos de 24 encolhem com a linha)
-        var ultV = new Viewbox { Height = Math.Min(24, _alturaLinha - 2), Child = ult, HorizontalAlignment = HorizontalAlignment.Center };
+        var ultV = new Viewbox { Height = Math.Min(26, _alturaLinha * 0.8), Child = ult, HorizontalAlignment = HorizontalAlignment.Center };
         Grid.SetColumn(ultV, 11);
         g.Children.Add(ultV);
 
@@ -367,11 +381,11 @@ sealed class TelaClassificacaoModerna : UserControl
 
     static Action<Equipa, bool, Action>? AbrirEquipa => TelaClassificacao.AbrirEquipa;
 
-    static void Celula(Grid g, int c, string s, IBrush cor, bool negrito = false)
+    void Celula(Grid g, int c, string s, IBrush cor, bool negrito = false)
     {
         var t = new TextBlock
         {
-            Text = s, FontSize = 14, Foreground = cor, FontWeight = negrito ? FontWeight.Bold : FontWeight.Normal,
+            Text = s, FontSize = Fonte, Foreground = cor, FontWeight = negrito ? FontWeight.Bold : FontWeight.Normal,
             HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
         };
         Grid.SetColumn(t, c);
