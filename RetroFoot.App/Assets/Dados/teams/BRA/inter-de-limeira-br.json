@@ -8,7 +8,7 @@
   "level": 1,
   "textColor": "#008000",
   "backgroundColor": "#00FF00",
-  "coach": " ",
+  "coach": "Márcio Araújo",
   "players": [
     { "name": "Ricardo", "position": "G", "country": "BRA" },
     { "name": "Edinan", "position": "D", "country": "BRA" },

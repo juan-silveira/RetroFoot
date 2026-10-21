@@ -22,7 +22,7 @@ public static class DadosJogo
 {
     // sobe quando Assets/Dados muda (os arquivos novos do pacote entram na pasta do jogador)
     // 2: mais arbitros do Brasil (referees.tsv do jogador recebe os que faltam)
-    public const int VersaoPacote = 2;
+    public const int VersaoPacote = 3;   // 3: os treinadores do Cruzeiro e do Inter de Limeira
     const string Marca = ".retrofoot-pacote";
     const string Pacote = "avares://RetroFoot.App/Assets/Dados/";
     static readonly object _trava = new();
@@ -139,17 +139,32 @@ public static class DadosJogo
         var lista = AssetLoader.GetAssets(base0, null).ToList();
         if (lista.Count == 0) return;
         // a mesma equipa (o mesmo .EFT) ja na pasta do jogador, com outro nome de JSON: fica a dele
-        var equipas = new HashSet<string>(PastaDados.IndiceEquipas(raiz).Keys, StringComparer.Ordinal);
+        var indice = PastaDados.IndiceEquipas(raiz);
+        var equipas = new HashSet<string>(indice.Keys, StringComparer.Ordinal);
+        // o mesmo clube (pais e nome curto) ja na pasta com outro arquivo (o de um patch): nao
+        // volta o de 1998 ao lado dele; e com um patch aplicado que trocou as equipas todas, as
+        // de 1998 que ele tirou tambem nao voltam (antes voltavam e o jogo ficava com os times
+        // em dobro: o Cruzeiro de 1998 e o do patch)
+        var clubes = BibliotecaPatches.ClubesDaPasta(indice);
+        bool trocouTodas = BibliotecaPatches.RegistosAplicados(raiz).Any(x => x.SubstituiuEquipas);
         int n = 0;
         foreach (var u in lista)
         {
             var rel = Uri.UnescapeDataString(u.AbsolutePath)["/Assets/Dados/".Length..];
             var destino = Path.Combine(raiz, rel.Replace('/', Path.DirectorySeparatorChar));
-            if (File.Exists(destino) && rel != PastaDados.Arbitros) continue;
+            bool jsonEquipa = rel.StartsWith(PastaDados.Equipas + "/", StringComparison.Ordinal) && rel.EndsWith(".json", StringComparison.Ordinal);
+            if (File.Exists(destino) && rel != PastaDados.Arbitros && !jsonEquipa) continue;
             using var s = AssetLoader.Open(u);
             using var m = new MemoryStream();
             s.CopyTo(m);
             var b = m.ToArray();
+            if (File.Exists(destino) && jsonEquipa)
+            {
+                // a equipa do pacote ja na pasta: so o treinador que faltava (o arquivo original
+                // do Cruzeiro e do Inter de Limeira vinha com ele em branco e o editor acusava)
+                n += CompletarTreinador(destino, b) ? 1 : 0;
+                continue;
+            }
             if (File.Exists(destino))
             {
                 // a lista de arbitros do jogador: so acrescenta os novos do pacote
@@ -165,7 +180,9 @@ public static class DadosJogo
             {
                 try
                 {
+                    if (trocouTodas) continue;
                     var l = EquipaJson.ParaEft(System.Text.Encoding.UTF8.GetString(b), rel);
+                    if (BibliotecaPatches.ClubeDoEft(l.Bytes) is { } c && clubes.Contains(c)) continue;
                     if (!equipas.Add(l.Arquivo.ToUpperInvariant())) continue;
                 }
                 catch { continue; }
@@ -179,6 +196,24 @@ public static class DadosJogo
     }
 
     // saves/ nova: os .e98 de JOGOS (a pasta antiga do RetroFoot) ou, sem ela, os do launcher
+    // o treinador em branco no JSON do jogador e preenchido no do pacote: grava o do pacote
+    static bool CompletarTreinador(string destino, byte[] pacote)
+    {
+        try
+        {
+            var meu = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(destino))?.AsObject();
+            var dele = System.Text.Json.Nodes.JsonNode.Parse(System.Text.Encoding.UTF8.GetString(pacote))?.AsObject();
+            if (meu == null || dele == null) return false;
+            var t = (string?)meu["coach"] ?? "";
+            var novo = ((string?)dele["coach"] ?? "").Trim();
+            if (t.Trim().Length > 0 || novo.Length == 0) return false;
+            meu["coach"] = novo;
+            File.WriteAllText(destino, meu.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+            return true;
+        }
+        catch { return false; }
+    }
+
     static void CopiarSaves(string raiz)
     {
         var saves = Path.Combine(raiz, PastaDados.Saves);

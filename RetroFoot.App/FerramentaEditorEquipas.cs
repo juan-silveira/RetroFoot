@@ -401,7 +401,7 @@ public sealed partial class TelaEditorEquipas : UserControl
         if (edit == null) return;
         var erros = regras.Validar(edit);
         estado.FontFamily = tema.Fonte;
-        estado.Text = (erros.Count == 0 ? "✓ " + T("Pronta para o jogo") : "✗ " + T("{0} problemas", erros.Count)) + (Alterada ? " · " + T("por gravar") : "");
+        estado.Text = (erros.Count == 0 ? "✓ " + T("Pronta para o jogo") : "✗ " + (erros.Count == 1 ? T("1 problema") : T("{0} problemas", erros.Count))) + (Alterada ? " · " + T("por gravar") : "");
         estado.Foreground = erros.Count == 0 ? tema.Ok : tema.Erro;
     }
 

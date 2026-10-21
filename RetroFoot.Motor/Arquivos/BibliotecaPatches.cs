@@ -411,6 +411,7 @@ public static class BibliotecaPatches
         public bool Ok;
         public string Erro = "";
         public int Equipas, Arquivos, Retirados, Restaurados, Apagados;
+        public int Substituidas;                    // equipas da pasta trocadas pelo mesmo clube do patch
         public string? CopiaDasMudancas;           // reverter: onde ficaram os arquivos mudados depois do patch
         public List<string> Avisos = new();
         public List<string> Bloqueadores = new();  // reverter: patches aplicados depois que mexem no mesmo
@@ -465,6 +466,46 @@ public static class BibliotecaPatches
 
     static string Rel(string raiz, string cam) => Path.GetRelativePath(raiz, cam).Replace('\\', '/');
 
+    // o clube de uma equipa: "PAIS\tNOME CURTO" normalizado (null sem nome curto)
+    static string? Clube(string pais, string curto)
+    {
+        var n = NormalizarNome(curto);
+        return n.Length == 0 ? null : pais.Trim().ToUpperInvariant() + "\t" + n;
+    }
+
+    public static string? ClubeDoEft(byte[] eft)
+    {
+        try { var e = RetroFoot.Motor.Base.Eft.Decodificar(eft); return Clube(e.Pais, Encoding.Latin1.GetString(e.NomeAbreviado)); }
+        catch { return null; }
+    }
+
+    // os clubes das equipas da pasta (o pais e o nome curto normalizados)
+    public static HashSet<string> ClubesDaPasta(Dictionary<string, string> indice) =>
+        ClubesExistentes(indice, new HashSet<string>(), repetidosTambem: true).Keys.ToHashSet(StringComparer.Ordinal);
+
+    // as equipas da pasta pelo clube (as que o patch traz com o mesmo arquivo ficam de fora:
+    // essas ja sao trocadas pelo arquivo); um clube repetido na pasta nao entra (ambiguo)
+    static Dictionary<string, (string Chave, string Json)> ClubesExistentes(Dictionary<string, string> indice, HashSet<string> doPatch, bool repetidosTambem = false)
+    {
+        var r = new Dictionary<string, (string, string)>(StringComparer.Ordinal);
+        var repetidos = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var (k, j) in indice)
+        {
+            if (doPatch.Contains(k)) continue;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllBytes(j), new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
+                var o = doc.RootElement;
+                string S(string n) => o.TryGetProperty(n, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString()! : "";
+                if (Clube(S("country"), S("shortName")) is not { } c) continue;
+                if (!r.TryAdd(c, (k, j))) repetidos.Add(c);
+            }
+            catch { }
+        }
+        if (!repetidosTambem) foreach (var c in repetidos) r.Remove(c);
+        return r;
+    }
+
     // aplica o patch da biblioteca na pasta de dados. substituirEquipas: as equipas que o patch
     // nao traz saem (como trocar a pasta EQUIPAS inteira no jogo classico); voltam ao reverter.
     public static Resultado Aplicar(string raiz, string nome, bool substituirEquipas)
@@ -510,6 +551,24 @@ public static class BibliotecaPatches
                     indice.Remove(k);
                     retiradas.Add(ChaveEquipa(k));
                     res.Retirados++;
+                }
+            }
+            // o mesmo clube com outro arquivo (o patch novo de um time do jogo, ex. 0776ip0h.eft e
+            // CRUZEIRO.EFT): o do patch substitui o que ja existe (o mesmo pais e o mesmo nome curto);
+            // antes os dois ficavam e o jogo tinha o time duplicado. O antigo volta ao reverter.
+            if (!(substituirEquipas && equipas.Count > 0))
+            {
+                var doPatch = equipas.Select(q => q.Arquivo.ToUpperInvariant()).ToHashSet(StringComparer.Ordinal);
+                var porClube = ClubesExistentes(indice, doPatch);
+                foreach (var (arq, eft) in equipas)
+                {
+                    if (indice.ContainsKey(arq.ToUpperInvariant())) continue;
+                    if (ClubeDoEft(eft) is not { } c || !porClube.TryGetValue(c, out var velho)) continue;
+                    d.Apagar(Rel(raiz, velho.Json));
+                    indice.Remove(velho.Chave);
+                    porClube.Remove(c);
+                    retiradas.Add(ChaveEquipa(velho.Chave));
+                    res.Substituidas++;
                 }
             }
             foreach (var (arq, eft) in equipas)

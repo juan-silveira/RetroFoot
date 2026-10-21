@@ -115,7 +115,11 @@ public class PatchesTestes(ITestOutputHelper saida)
             Assert.True(BibliotecaPatches.Listar(raiz).Single().Aplicado);
             Assert.Equal("aplicado", BibliotecaPatches.Aplicar(raiz, nome, false).Erro);
             var d = Dados.Ler(raiz);
-            Assert.Equal(eqs.Count + 1, d.Equipas.Count);
+            // NOVA.EFT e o mesmo clube de eqs[50] (o mesmo pais e nome curto): substitui-o, nao
+            // fica duplicado (volta ao reverter)
+            Assert.Equal(1, r.Substituidas);
+            Assert.Equal(eqs.Count, d.Equipas.Count);
+            Assert.DoesNotContain(d.Equipas, a => a.Nome.Equals(Path.GetFileName(eqs[50]), StringComparison.OrdinalIgnoreCase));
             var e0 = d.Equipas.Single(a => a.Nome.Equals(Path.GetFileName(eqs[0]), StringComparison.OrdinalIgnoreCase));
             Assert.True(e0.Eft.Codificar().AsSpan().SequenceEqual(File.ReadAllBytes(eqs[100])));
             Assert.Equal(new byte[] { 4, 5, 6 }, File.ReadAllBytes(flag));

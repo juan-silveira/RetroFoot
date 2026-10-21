@@ -581,7 +581,18 @@ sealed class EditorEquipasCelular : UserControl
             var ts = st.Children.OfType<TextBlock>().ToList();
             tituloBarra = ts.ElementAtOrDefault(0);
             subBarra = ts.ElementAtOrDefault(1);
-            if (subBarra != null) subBarra.FontWeight = FontWeight.Bold;
+            if (subBarra != null)
+            {
+                subBarra.FontWeight = FontWeight.Bold;
+                // tocar no estado mostra os problemas (antes so a contagem, sem dizer quais)
+                subBarra.Background = Brushes.Transparent;
+                subBarra.PointerPressed += (_, a) =>
+                {
+                    if (edit == null || regras.Validar(edit) is not { Count: > 0 } erros) return;
+                    a.Handled = true;
+                    Mensagem(T("O jogo não aceita a equipa assim:") + "\n\n• " + string.Join("\n• ", erros));
+                };
+            }
         }
         var rodape = CUi.Botoes(Bt(T("Desfazer"), false, Desfazer), Bt(T("Gravar"), true, () => _ = Gravar()));
         var nomes = new[] { T("Equipa"), T("Jogadores ({0})", e.Jogadores.Count), T("Escudo") };
@@ -669,7 +680,7 @@ sealed class EditorEquipasCelular : UserControl
         if (tituloBarra != null) tituloBarra.Text = TituloEquipa();
         if (subBarra != null)
         {
-            subBarra.Text = (erros.Count == 0 ? "✓ " + T("Pronta para o jogo") : "✗ " + T("{0} problemas", erros.Count)) + (Alterada ? " · " + T("por gravar") : "");
+            subBarra.Text = (erros.Count == 0 ? "✓ " + T("Pronta para o jogo") : "✗ " + (erros.Count == 1 ? T("1 problema") + " · " + T("toque para ver") : T("{0} problemas", erros.Count) + " · " + T("toque para ver"))) + (Alterada ? " · " + T("por gravar") : "");
             subBarra.Foreground = erros.Count == 0 ? CUi.Bom : CUi.Erro;
         }
     }
