@@ -195,6 +195,10 @@ public sealed class JogoEmCurso
     // gravado no meio de uma, e acaba com o fim de temporada (5:038e)
     public void Ciclo(Action<Resultado>? aoFim = null)
     {
+        // o convite a um humano empregado quando um time demite o treinador depois de um jogo
+        // (seg03:8bcc -> TinviteCoachDlg): a mesma pergunta do mercado (H.Convite). Sem isto o
+        // Mundo respondia sempre "nao" e o humano nunca era chamado para um time mais forte
+        M.G.AceitaConvite = (_, t, e) => H.Convite?.Invoke(t, e) ?? false;
         M.G.FimDaTemporada = m =>
         {
             var t = Epoca();
