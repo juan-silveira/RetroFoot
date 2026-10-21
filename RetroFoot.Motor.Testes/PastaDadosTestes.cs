@@ -245,6 +245,8 @@ public class PastaDadosTestes(ITestOutputHelper saida)
         finally { Directory.Delete(raiz, true); }
     }
 
+    static readonly Dictionary<string, string> Corrigidas = new() { ["CRUZEIRO.EFT"] = "Levir Culpi", ["INTER_BR.EFT"] = "Márcio Araújo" };
+
     // os dados que vao com o jogo (RetroFoot.App/Assets/Dados) sao as equipas originais de 1998
     [Fact]
     public void PacoteSaoAsEquipasOriginais()
@@ -260,6 +262,17 @@ public class PastaDadosTestes(ITestOutputHelper saida)
         {
             var l = EquipaJson.LerArquivo(j);
             Assert.True(originais.TryGetValue(l.Arquivo.ToUpperInvariant(), out var f), j);
+            // as correcoes da comunidade: o treinador que o arquivo de 1998 trazia em branco (o
+            // resto da equipa igual ao original)
+            if (Corrigidas.TryGetValue(l.Arquivo.ToUpperInvariant(), out var tecnico))
+            {
+                var orig = Eft.Decodificar(File.ReadAllBytes(f!));
+                var nova = Eft.Decodificar(l.Bytes);
+                Assert.Equal(tecnico, System.Text.Encoding.Latin1.GetString(nova.Treinador).Trim());
+                nova.Treinador = orig.Treinador;
+                Assert.True(orig.Codificar().AsSpan().SequenceEqual(nova.Codificar()), j);
+                continue;
+            }
             Assert.True(File.ReadAllBytes(f!).AsSpan().SequenceEqual(l.Bytes), j);
         }
         var d0 = Dados.Ler(pacote!);
