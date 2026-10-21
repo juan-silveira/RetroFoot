@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- o icone da abertura (Android 12+): a bola do RetroFoot no meio do circulo do sistema (a
+     area visivel e o circulo de 2/3 do quadro: a bola com margem para nao ser cortada) -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+	android:drawable="@drawable/splash_bola"
+	android:inset="22%" />

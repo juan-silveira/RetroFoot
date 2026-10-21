@@ -19,4 +19,21 @@ namespace RetroFoot.Android;
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public class MainActivity : AvaloniaMainActivity
 {
+    // ao voltar ao app (depois de outro app por cima, ou do Android refazer a superficie), a
+    // tela inteira e redesenhada: num celular ela voltou toda verde, sem o conteudo
+    protected override void OnResume()
+    {
+        base.OnResume();
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            if (RetroFoot.App.App.Raiz is { } v) Redesenhar(v);
+        }, Avalonia.Threading.DispatcherPriority.Background);
+    }
+
+    static void Redesenhar(Avalonia.Visual v)
+    {
+        v.InvalidateVisual();
+        if (v is Avalonia.Layout.Layoutable l) l.InvalidateMeasure();
+        foreach (var c in Avalonia.VisualTree.VisualExtensions.GetVisualChildren(v)) Redesenhar(c);
+    }
 }

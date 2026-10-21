@@ -62,7 +62,7 @@ public sealed partial class TelaEquipa
         readonly Sessao _s;
         readonly SEquipa _e;
         readonly Grid _raiz = new();
-        readonly ContentControl _topo = new(), _elenco = new();
+        readonly ContentControl _topo = new(), _elenco = new(), _abasCel = new();
         readonly Panel _gaveta = new() { IsVisible = false };
         CUi.Botao? _jogar;
         Action? _aoFecharGaveta;
@@ -95,9 +95,9 @@ public sealed partial class TelaEquipa
             FontFamily = CUi.Fonte;
             _raiz.RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto");
             _raiz.Children.Add(_topo);
-            var abas = Abas();
-            Grid.SetRow(abas, 1);
-            _raiz.Children.Add(abas);
+            // (refeitas em Refazer: a pilula da Escalacao mostra a formacao)
+            Grid.SetRow(_abasCel, 1);
+            _raiz.Children.Add(_abasCel);
             Grid.SetRow(_elenco, 2);
             _raiz.Children.Add(_elenco);
             var jogar = BarraJogar();
@@ -138,6 +138,9 @@ public sealed partial class TelaEquipa
         void Refazer()
         {
             _topo.Content = Topo();
+            double rol = (_abasCel.Content as ScrollViewer)?.Offset.X ?? 0;
+            _abasCel.Content = Abas();
+            if (rol > 0) Dispatcher.UIThread.Post(() => { if (_abasCel.Content is ScrollViewer sv) sv.Offset = new Vector(rol, 0); }, DispatcherPriority.Loaded);
             _elenco.Content = Elenco();
             if (_jogar != null) _jogar.Habilitado = _p.PodeJogar;
             if (_p.TirarMensagem() is { Length: > 0 } m) Aviso(m);
@@ -206,9 +209,9 @@ public sealed partial class TelaEquipa
         Control Abas()
         {
             var s = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(12, 10, 12, 4) };
-            void Aba(string nome, Func<Control> conteudo)
+            void Aba(string nome, Func<Control> conteudo, string? rotulo = null)
             {
-                var b = new CUi.Botao(T(nome), false, () =>
+                var b = new CUi.Botao(rotulo ?? T(nome), false, () =>
                 {
                     _naPagina = true;
                     Control c;
@@ -220,7 +223,7 @@ public sealed partial class TelaEquipa
                 s.Children.Add(b);
             }
             Aba("Jogo", PaginaJogo);
-            Aba("Escalação", PaginaEscalacao);
+            Aba("Escalação", PaginaEscalacao, FormacaoAtual() is { } f ? T("Escalação") + " · " + f : null);
             Aba("Finanças", PaginaFinancas);
             if (_p.Adversario != null) Aba("Adversário", PaginaAdversario);
             if (_s.J.Op.Patrocinios) Aba("Patrocínio", PaginaPatrocinio);
@@ -363,12 +366,11 @@ public sealed partial class TelaEquipa
 
         Control PaginaFinancas()
         {
-            if (CUi.Retro) return FinancasRetro();
-            var p = new StackPanel { Spacing = 6 };
-            p.Children.Add(Linha(T("Dinheiro em caixa"), _p.DinheiroCelular((int)_e.Dinheiro), (int)_e.Dinheiro < 0 ? CUi.Erro : null));
-            long folha = _e.Jogadores.Sum(j => (long)j.Salario);
-            p.Children.Add(Linha(T("Salários por jogo"), _p.DinheiroCelular(folha)));
-            p.Children.Add(Linha(T("Jogadores"), _e.Jogadores.Count.ToString()));
+            // o balanco do computador (bilheteria, vendas, premios, salarios, juros...) nas duas
+            // peles; no Moderno, com o Estadio e o Emprestimo embaixo
+            var bal = FinancasRetro();
+            if (CUi.Retro) return bal;
+            var p = new StackPanel { Spacing = 6, Children = { bal } };
             var botoes = new StackPanel { Spacing = 8, Margin = new Thickness(0, 8, 0, 0) };
             foreach (var (menu, itens) in _p.MenusCelular)
                 foreach (var (texto, acao, hab) in itens)
@@ -407,8 +409,8 @@ public sealed partial class TelaEquipa
                 };
                 bool neg = i is 0 or 1 or 5;
                 var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = rot[i].Length == 0 ? 10 : 24 };
-                g.Children.Add(CUi.Txt(T(rot[i]), 14, _corLetra, neg ? FontWeight.Bold : FontWeight.Normal));
-                var tv = CUi.Txt(v, 14, _corLetra, neg ? FontWeight.Bold : FontWeight.Normal);
+                g.Children.Add(CUi.Txt(T(rot[i]), 14, PT, neg ? FontWeight.Bold : FontWeight.Normal));
+                var tv = CUi.Txt(v, 14, PT, neg ? FontWeight.Bold : FontWeight.Normal);
                 Grid.SetColumn(tv, 1);
                 g.Children.Add(tv);
                 if (i is 2 or 3 or 4 or 6 or 7 or 8 or 9) g.Margin = new Thickness(10, 0, 0, 0);
@@ -422,11 +424,11 @@ public sealed partial class TelaEquipa
             {
                 long preco = RetroFoot.Motor.Base.Ext.Bytes(jogo.B36.AsSpan(0, 10)).Round();
                 var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 44 };
-                g.Children.Add(CUi.Txt(T("Preço do ingresso") + "  " + _p.DinheiroCelular(preco), 14, _corLetra, FontWeight.SemiBold));
+                g.Children.Add(CUi.Txt(T("Preço do ingresso") + "  " + _p.DinheiroCelular(preco), 14, PT, FontWeight.SemiBold));
                 if (_s.J.M.Regras.CartoesAmarelos)
                 {
                     // o % do preco de tabela nos jogos em casa (ingressos.py)
-                    var pct = CUi.Txt(Ingressos.Percentual(_e) + "%", 15, _corLetra, FontWeight.Bold);
+                    var pct = CUi.Txt(Ingressos.Percentual(_e) + "%", 15, PT, FontWeight.Bold);
                     pct.Width = 52; pct.TextAlignment = TextAlignment.Center;
                     var menos = new CUi.Botao("−", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) - Ingressos.Passo); pct.Text = Ingressos.Percentual(_e) + "%"; }) { Padding = new Thickness(14, 2) };
                     var mais = new CUi.Botao("+", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) + Ingressos.Passo); pct.Text = Ingressos.Percentual(_e) + "%"; }) { Padding = new Thickness(14, 2) };
@@ -439,6 +441,15 @@ public sealed partial class TelaEquipa
             return p;
         }
 
+        // a formacao dos titulares (D-M-A, sem o goleiro), ex. "4-4-2"; null sem 11 titulares
+        string? FormacaoAtual()
+        {
+            var tit = _e.Jogadores.Where(j => Mem.Escalacao(j) == Mem.EscTitular).ToList();
+            if (tit.Count != 11) return null;
+            int d = tit.Count(j => j.Posicao == 1), m = tit.Count(j => j.Posicao == 2), a = tit.Count(j => j.Posicao == 3);
+            return $"{d}-{m}-{a}";
+        }
+
         Control PaginaEscalacao()
         {
             var p = new StackPanel { Spacing = 8 };
@@ -448,12 +459,13 @@ public sealed partial class TelaEquipa
             foreach (var (texto, acao, hab) in escalar)
             {
                 if (texto == "-" || acao == null) continue;
-                var b = new CUi.Botao(texto, texto == T("Automático"), () => { acao(); FecharGaveta(); Refazer(); });
+                // a formacao em uso fica destacada (o botao principal)
+                var b = new CUi.Botao(texto, texto == FormacaoAtual(), () => { acao(); FecharGaveta(); Refazer(); });
                 b.Habilitado = hab?.Invoke() ?? true;
                 if (char.IsDigit(texto[0])) { b.MinWidth = 86; formacoes.Children.Add(b); }
                 else outros.Add(b);
             }
-            p.Children.Add(CUi.Txt(T("Formação"), 13, PF, FontWeight.SemiBold));
+            p.Children.Add(CUi.Txt(FormacaoAtual() is { } fa ? T("Formação") + ": " + fa : T("Formação"), 15, PT, FontWeight.Bold));
             p.Children.Add(formacoes);
             p.Children.Add(CUi.Botoes(outros.ToArray()));
             p.Children.Add(CUi.Txt(T("Toque no ponto à esquerda de cada jogador para trocar entre titular, reserva e fora."), 13, PF, FontWeight.Normal, true));

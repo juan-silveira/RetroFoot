@@ -120,7 +120,7 @@ public sealed partial class TelaJornada
             foreach (var l in t.linhas)
             {
                 if (l.Cabecalho != null) h += ACab;
-                else if (!l.Vazia) h += AJogo + (l.LanceTipo != 0 ? ALance : 0) + 4;
+                else if (!l.Vazia) h += AJogo + (ComLance(l) ? ALance : 0) + 4;
             }
             Height = h + 8;
         }
@@ -150,7 +150,7 @@ public sealed partial class TelaJornada
                     continue;
                 }
                 if (l.Vazia) continue;
-                double hj = AJogo + (l.LanceTipo != 0 ? ALance : 0);
+                double hj = AJogo + (ComLance(l) ? ALance : 0);
                 var r = new Rect(x0, y, wl, hj);
                 // o cartao do jogo
                 if (CUi.Retro) { dc.FillRectangle(W95.Face, r); dc.DrawRectangle(new Pen(W95.Preto, 1), r.Deflate(0.5)); }
@@ -166,7 +166,7 @@ public sealed partial class TelaJornada
                 Equipa(dc, l.Casa, l.LetraCasa, l.FundoCasa, l.LogoCasa, new Rect(r.X + 6, yc - 15, larg, 30), true, Humano(l, Lado.Casa));
                 Equipa(dc, l.Fora, l.LetraFora, l.FundoFora, l.LogoFora, new Rect(meio + 35, yc - 15, larg, 30), false, Humano(l, Lado.Visit));
                 // o ultimo lance
-                if (l.LanceTipo != 0)
+                if (ComLance(l))
                 {
                     double yl = r.Y + AJogo - 2;
                     Icones.Desenhar(dc, l.LanceTipo, l.SegundoAmarelo, new Rect(r.X + 10, yl + 2, 12, 12));
@@ -242,7 +242,7 @@ public sealed partial class TelaJornada
             {
                 if (humano) return Math.Max(0, y - 4);
                 if (cab != null) y += ACab;
-                foreach (var l in jogos) y += AJogo + (l.LanceTipo != 0 ? ALance : 0) + 4;
+                foreach (var l in jogos) y += AJogo + (ComLance(l) ? ALance : 0) + 4;
             }
             return 0;
         }
@@ -357,6 +357,10 @@ public sealed partial class TelaJornada
                 dc.DrawText(tl, new Point(x, r.Y + (r.Height - tl.Height) / 2));
         }
 
+        // o ultimo lance embaixo do jogo so nos jogos do humano, como no Retro: em todos, os
+        // cartoes cresciam e a lista mexia a cada lance (os outros, no toque: os detalhes)
+        static bool ComLance(Linha l) => l.LanceTipo != 0 && l.Humanos > 0;
+
         static bool Humano(Linha l, int lado) => l.Jogo?.Treinador[lado] is { Humano: not 0 };
 
         void Equipa(DrawingContext dc, string nome, Color letra, Color fundo, Avalonia.Media.Imaging.Bitmap? logo, Rect r, bool casa, bool humano)
@@ -397,7 +401,7 @@ public sealed partial class TelaJornada
             {
                 if (l.Cabecalho != null) { y += ACab; continue; }
                 if (l.Vazia) continue;
-                double hj = AJogo + (l.LanceTipo != 0 ? ALance : 0);
+                double hj = AJogo + (ComLance(l) ? ALance : 0);
                 if (p.Y >= y && p.Y < y + hj && l.Jogo is { } jg)
                 {
                     LigacaoPartida.PedirDetalhes(t.s, jg, p.X < Bounds.Width / 2 ? Lado.Casa : Lado.Visit);

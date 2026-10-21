@@ -30,6 +30,7 @@ public class App : Application
         // o texto inteiro numa dica onde ficou cortado (so com o rato)
         if (!OperatingSystem.IsAndroid()) Dicas.Ligar();
         var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        Raiz = raiz;
         void Mostrar(Control t) => raiz.Child = t;
         // RETROFOOT_TELA=equipa|jornada|classificacao: uma tela sozinha, com dados de teste
         raiz.Child = Environment.GetEnvironmentVariable("RETROFOOT_TELA") switch
@@ -109,6 +110,9 @@ public class App : Application
     // vertical, o conteudo ganha FolgaBarra pontos a direita (somados ao Padding que ele ja
     // tinha), para nada ficar debaixo da barra; sem barra, o Padding de antes.
     public const double FolgaBarra = 18;
+
+    // a raiz das telas (o Android a redesenha ao voltar ao app)
+    public static Control? Raiz { get; private set; }
     static readonly ConditionalWeakTable<ScrollViewer, StrongBox<Thickness>> _padding = new();
 
     static void FolgaDaBarra()
