@@ -212,7 +212,7 @@ public sealed partial class TelaEquipa : UserControl
         static readonly Rect RNomeAdv = new(8, 8, 241, 25);
         Rect RArbitro => new(16, YJogo[2], 201, 16);                      // textReferee (OnClick)
         // o campo de % do preco dos ingressos (ingressos.py: TSpinEdit 204, 305, 52 x 24)
-        static readonly Rect RIngressos = new(204, 305, 52, 24);
+        static readonly Rect RIngressos = new(150, 307, 107, 22);   // o preco do ingresso (antes o %)
 
         const int PgJogo = 0, PgJogador = 1, PgFinancas = 2, PgEscalacao = 3, PgAdversario = 4, PgPatrocinio = 5, PgMensagem = 7;
         static readonly string[] AbasOriginais = { "Jogo", "Jogador", "Finanças", "Escalação", "Adversário" };
@@ -1461,25 +1461,68 @@ public sealed partial class TelaEquipa : UserControl
                 // o valor com a moeda: a direita em 257, como os totais de baixo (cabe "-R$ 12.345.678")
                 Direita(dc, v, 257, y, 13, _letra, neg);
             }
-            Escreve(dc, T("Total de salários"), 16, 251, 11, _letra);
-            Direita(dc, Dinheiro(MercadoJogo.FolhaSalarial(_e)), 257, 248, 13, _letra, true);
-            Escreve(dc, T("Juros do empréstimo"), 16, 264, 11, _letra);
-            Direita(dc, Dinheiro(MercadoJogo.Juros((int)_e.D6D)), 257, 264, 13, _letra, true);
-            Escreve(dc, T("Dinheiro em caixa"), 16, 288, 11, _letra);
-            Direita(dc, Dinheiro((int)_e.Dinheiro), 257, 288, 13, _letra, true);
+            // (no launcher os totais sobem para caber a previsao do ingresso antes do preco)
+            double yt = _launcher ? 237 : 251, yj = _launcher ? 251 : 264, yc = _launcher ? 265 : 288;
+            Escreve(dc, T("Total de salários"), 16, yt, 11, _letra);
+            Direita(dc, Dinheiro(MercadoJogo.FolhaSalarial(_e)), 257, yt - 3, 13, _letra, true);
+            Escreve(dc, T("Juros do empréstimo"), 16, yj, 11, _letra);
+            Direita(dc, Dinheiro(MercadoJogo.Juros((int)_e.D6D)), 257, yj, 13, _letra, true);
+            Escreve(dc, T("Dinheiro em caixa"), 16, yc, 11, _letra);
+            Direita(dc, Dinheiro((int)_e.Dinheiro), 257, yc, 13, _letra, true);
             if (_jogo != null)
             {
                 Escreve(dc, T("Preço do ingresso"), 16, 312, 11, _letra);
                 long preco = Ext.Bytes(_jogo.B36.AsSpan(0, 10)).Round();
-                Escreve(dc, Dinheiro(preco), 112, 312, 13, _letra);
+                if (!_launcher) Escreve(dc, Dinheiro(preco), 112, 312, 13, _letra);
+                else
+                {
+                    // launcher (ingressos.py): o preco direto (de 50% a 300% da tabela, de 25 em
+                    // 25; as setas mudam o %) e, entre o balanco e os totais, a previsao do
+                    // proximo jogo em casa (IngressosPrevisao)
+                    int pct = Ingressos.Percentual(_e);
+                    CampoNumero(dc, RIngressos, Dinheiro(IngressosPrevisao.PrecoCom(Ext.Bytes(_jogo.B36.AsSpan(0, 10)), pct)));
+                    var (l1, l2) = LinhasPrevisao(pct);
+                    using (dc.PushClip(new Rect(16, 280, 241, 26)))
+                    {
+                        Escreve(dc, l1, 16, 280, 11, _letra);
+                        Escreve(dc, l2, 16, 292, 11, _letra);
+                    }
+                }
             }
-            // launcher (ingressos.py): o % do preco de tabela nos jogos em casa; o preco
-            // mostrado continua o de tabela do proximo jogo
-            if (_launcher)
+        }
+
+        // a previsao do proximo jogo em casa em duas linhas curtas (o adversario, o publico e a
+        // ocupacao; a renda)
+        (string, string) LinhasPrevisao(int pct)
+        {
+            var pv = IngressosPrevisao.ProximoEmCasa(_e, _jogo, pct, id => _s.Equipa(id));
+            if (pv == null) return (T("Sem jogo em casa pela frente nesta temporada."), "");
+            string adv = _s.Equipa(pv.Adversario) is { } a ? Texto(a.NomeCurto) : "";
+            string N(int v) => v.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+            int Oc(int v) => pv.Capacidade > 0 ? (int)Math.Round(100.0 * v / pv.Capacidade) : 0;
+            string pub = pv.Minimo == pv.Maximo ? $"{N(pv.Minimo)} ({Oc(pv.Minimo)}%)" : $"{N(pv.Minimo)}–{N(pv.Maximo)} ({Oc(pv.Minimo)}–{Oc(pv.Maximo)}%)";
+            string renda = pv.RendaMinima == pv.RendaMaxima ? Dinheiro(pv.RendaMinima) : Dinheiro(pv.RendaMinima) + "–" + Dinheiro(pv.RendaMaxima);
+            return ((pv.Definido ? T("Este jogo") : T("Próx. em casa")) + $" ({adv}): " + pub,
+                T("Renda prevista") + ": " + renda + (pv.Definido ? " · " + T("público já definido") : ""));
+        }
+
+        // a mesma previsao em 3 linhas curtas (o Moderno 16:9, numa coluna estreita): o jogo, o
+        // publico e a renda
+        string[] LinhasPrevisao3(int pct)
+        {
+            var pv = IngressosPrevisao.ProximoEmCasa(_e, _jogo, pct, id => _s.Equipa(id));
+            if (pv == null) return new[] { T("Sem jogo em casa pela frente nesta temporada."), "", "" };
+            string adv = _s.Equipa(pv.Adversario) is { } a ? Texto(a.NomeCurto) : "";
+            string N(int v) => v.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+            int Oc(int v) => pv.Capacidade > 0 ? (int)Math.Round(100.0 * v / pv.Capacidade) : 0;
+            string pub = pv.Minimo == pv.Maximo ? $"{N(pv.Minimo)} ({Oc(pv.Minimo)}%)" : $"{N(pv.Minimo)}–{N(pv.Maximo)} ({Oc(pv.Minimo)}–{Oc(pv.Maximo)}%)";
+            string renda = pv.RendaMinima == pv.RendaMaxima ? Dinheiro(pv.RendaMinima) : Dinheiro(pv.RendaMinima) + "–" + Dinheiro(pv.RendaMaxima);
+            return new[]
             {
-                CampoNumero(dc, RIngressos, Ingressos.Percentual(_e).ToString());
-                Escreve(dc, "%", 258, 310, 13, _letra);
-            }
+                (pv.Definido ? T("Este jogo") : T("Próx. em casa")) + $" ({adv})",
+                T("Público") + ": " + pub + (pv.Definido ? " · " + T("já definido") : ""),
+                T("Renda prevista") + ": " + renda,
+            };
         }
 
         // TSpinEdit: o edit afundado e o TSpinButton (2 botoes com setas) a direita
@@ -1853,7 +1896,7 @@ public sealed partial class TelaEquipa : UserControl
                 case PgJogo when _jogo != null && _jogo.Casa != 0 && _jogo.Fora != 0 && RArbitro.Contains(pn):
                     _arbitro = true; InvalidateVisual(); break;
                 // o juro do emprestimo e o rotulo dele (4:3e45, 4:3e27), com o add-in 0x13
-                case PgFinancas when Registo.AddIn(0x13) && new Rect(16, 264, 241, 16).Contains(pn):
+                case PgFinancas when Registo.AddIn(0x13) && new Rect(16, _launcher ? 251 : 264, 241, 16).Contains(pn):
                     TelaEmprestimo.Abrir(_s, _e, Voltar); break;
                 case PgFinancas when _launcher && RIngressos.Contains(pn):
                     // as setas do TSpinButton (o clique no texto nao muda nada)

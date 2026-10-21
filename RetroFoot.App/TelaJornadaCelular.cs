@@ -168,6 +168,12 @@ public sealed partial class TelaJornada
                 dc.DrawText(pl, new Point(meio - pl.Width / 2, yc - pl.Height / 2 + 4));
                 var st = Txt(t.StatusDaLinha(l, status), 10 * f, CUi.Retro ? W95.Marinho : TemaVerde.Destaque, true);
                 dc.DrawText(st, new Point(meio - st.Width / 2, r.Y + 3));
+                // o publico, pequeno, no canto de cima a direita (o Retro ja o mostra)
+                if (!CUi.Retro && l.Publico > 0)
+                {
+                    var tp = Txt(FormatoDinheiro.Numero(l.Publico), 9.5 * f, CUi.Fraco);
+                    dc.DrawText(tp, new Point(r.Right - 10 - tp.Width, r.Y + 3));
+                }
                 // as equipas, nas cores delas (o Retro) ou com o logo (o Moderno)
                 double larg = (r.Width - 70 - 6 * (f - 1) * 10) / 2 - 8, ae = 30 * f;
                 _escala = f;

@@ -869,9 +869,11 @@ public sealed partial class TelaEquipa
                 ("Juros do empréstimo", Dinheiro(MercadoJogo.Juros((int)_e.D6D)), 0),
                 ("Dinheiro em caixa", Dinheiro((int)_e.Dinheiro), 2),
             };
-            if (_jogo != null) res.Add(("Preço do ingresso", Dinheiro(Ext.Bytes(_jogo.B36.AsSpan(0, 10)).Round()), 0));
+            // (no launcher o preco e o campo com as setas, e a previsao ocupa mais 2 linhas)
+            if (_jogo != null && !_launcher) res.Add(("Preço do ingresso", Dinheiro(Ext.Bytes(_jogo.B36.AsSpan(0, 10)).Round()), 0));
             bool duas = _largo;
-            int n = duas ? bal.Count : bal.Count + 1 + res.Count + (_launcher ? 1 : 0);
+            int extra = _launcher ? (_jogo != null ? (duas ? 5 : 3) : 1) : 0;
+            int n = duas ? Math.Max(bal.Count, res.Count + extra + 1) : bal.Count + 1 + res.Count + extra;
             double passo = Math.Min(22, (pg.Height - 4) / n);
             double w = duas ? (pg.Width - 24) / 2 : pg.Width;
             double y = pg.Y + passo / 2;
@@ -899,10 +901,12 @@ public sealed partial class TelaEquipa
             // launcher (ingressos.py): o % do preco de tabela nos jogos em casa
             if (_launcher)
             {
-                EscreveM(dc, T("Ingressos (% da tabela)"), xr, y, 12, MFraco, max: w - 110);
+                EscreveM(dc, T("Preço do ingresso"), xr, y, 12, MFraco, max: duas ? w : w - 130);
+                // (16:9: a coluna e estreita; o campo na linha de baixo)
+                if (duas) y += passo;
                 double xf = xr + w;
                 var mais = new Rect(xf - 22, y - 11, 22, 22);
-                var menos = new Rect(xf - 22 - 52 - 22, y - 11, 22, 22);
+                var menos = new Rect(xf - 22 - 76 - 22, y - 11, 22, 22);
                 foreach (var (r, s, d) in new[] { (menos, "−", -1), (mais, "+", 1) })
                 {
                     dc.DrawEllipse(MCartao2, null, r.Center, 11, 11);
@@ -910,8 +914,18 @@ public sealed partial class TelaEquipa
                     int dd = d;
                     _alvos.Add((r, () => MudarIngressos(dd)));
                 }
-                CentroM(dc, Ingressos.Percentual(_e) + "%", (menos.Right + mais.X) / 2, y, 13, MTexto, true);
+                // o preco direto (as setas mudam o % da tabela) e a previsao do proximo em casa
+                int pct = Ingressos.Percentual(_e);
+                string pr = _jogo != null ? Dinheiro(IngressosPrevisao.PrecoCom(Ext.Bytes(_jogo.B36.AsSpan(0, 10)), pct)) : pct + "%";
+                CentroM(dc, pr, (menos.Right + mais.X) / 2, y, 13, MTexto, true);
                 _mIngressos = new Rect(menos.X, y - 11, mais.Right - menos.X, 22);
+                if (_jogo != null)
+                {
+                    var ls = LinhasPrevisao3(pct);
+                    if (!duas) ls = new[] { ls[0] + ": " + ls[1], ls[2] };
+                    for (int i = 0; i < ls.Length; i++)
+                        if (ls[i].Length > 0) EscreveM(dc, ls[i], xr, y + (i + 1) * passo, 11.5, MFraco, max: w);
+                }
             }
         }
 

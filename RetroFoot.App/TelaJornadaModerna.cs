@@ -239,9 +239,16 @@ public sealed partial class TelaJornada
             dc.DrawText(nc, new Point(Math.Max(cx + 10, xc - 8 - nc.Width), meio - nc.Height / 2));
         using (dc.PushClip(new Rect(xf + t + 8, ry, Math.Max(0, cx + mp - 8 - xf - t - 8), passoM)))
             dc.DrawText(nf, new Point(xf + t + 8, meio - nf.Height / 2));
-        // o ultimo lance, ao lado
+        // o ultimo lance, ao lado, e o publico no fim (como o Retro mostra)
         if (hl <= 0) return;
         Ret(dc, MLinha, cx + mp, ry + 6, 1, passoM - 12);
+        double fimLance = cx + cw - 6;
+        if (l.Publico > 0)
+        {
+            var tp = TxtM(FormatoDinheiro.Numero(l.Publico), 10.5, MFraco);
+            dc.DrawText(tp, new Point(cx + cw - 6 - tp.Width, meio - tp.Height / 2));
+            fimLance = cx + cw - 12 - tp.Width;
+        }
         if (l.LanceTipo == 0) return;
         double xi = cx + mp + 10, q = Math.Min(14, passoM - 10);
         Icones.Desenhar(dc, l.LanceTipo, l.SegundoAmarelo, new Rect(xi, meio - q / 2, q, q));
@@ -252,7 +259,8 @@ public sealed partial class TelaJornada
             case TipoLance.GolAnulado: txt += " - " + T("Anulado"); break;
         }
         var tl = TxtM(txt, 12, l.LanceTipo == TipoLance.GolAnulado ? MFraco : MTexto);
-        dc.DrawText(tl, new Point(xi + q + 7, meio - tl.Height / 2));
+        using (dc.PushClip(new Rect(xi, ry, Math.Max(0, fimLance - xi), passoM)))
+            dc.DrawText(tl, new Point(xi + q + 7, meio - tl.Height / 2));
     }
 
     static void Cartao(DrawingContext dc, IBrush cor, double x, double y) =>
