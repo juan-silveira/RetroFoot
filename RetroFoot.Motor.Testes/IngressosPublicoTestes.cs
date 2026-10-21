@@ -72,4 +72,17 @@ public class IngressosPublicoTestes
         j2.M.RecalcularPublico(jogo2);
         Assert.Equal(antes, jogo2.W4C);
     }
+
+    // os quartos do estadio: ate 1/4 +0, ate 2/4 +1, ate 3/4 +2, acima +3
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(2500, 0)]
+    [InlineData(2501, 1)]
+    [InlineData(5000, 1)]
+    [InlineData(5001, 2)]
+    [InlineData(7500, 2)]
+    [InlineData(7501, 3)]
+    [InlineData(10000, 3)]
+    public void BonusPorQuartoDoEstadio(int publico, int bonus) =>
+        Assert.Equal(bonus, Mundo.BonusPelaOcupacao(publico, 10000));
 }

@@ -157,18 +157,19 @@ public sealed partial class Mundo
     }
 
     // o +2 do mandante na influencia do arbitro (seg03:1a66). Na versao Atual (as regras do
-    // launcher, com o preco do ingresso) a torcida pesa: +1 com o estadio ate 1/3 cheio, +2 ate
-    // 2/3 e +3 acima (na media, o +2 do classico); no jogo classico, sempre +2
+    // launcher, com o preco do ingresso) a torcida pesa pela ocupacao do estadio, em quartos:
+    // ate 1/4 cheio +0, ate 2/4 +1, ate 3/4 +2 e acima +3; no jogo classico, sempre +2
     public bool TorcidaNoArbitro;
 
     int BonusDaTorcida(Equipa casa, uint publico)
     {
         if (!Regras.CartoesAmarelos || !TorcidaNoArbitro) return 2;
         int cap = PreJogo.CapacidadeDoEstadio(casa);
-        if (cap <= 0) return 2;
-        double oc = (double)publico / cap;
-        return oc < 1.0 / 3 ? 1 : oc < 2.0 / 3 ? 2 : 3;
+        return cap <= 0 ? 2 : BonusPelaOcupacao(publico, cap);
     }
+
+    public static int BonusPelaOcupacao(long publico, int capacidade) =>
+        4 * publico <= capacidade ? 0 : 4 * publico <= 2L * capacidade ? 1 : 4 * publico <= 3L * capacidade ? 2 : 3;
 
     // a procura de cada jogo criado nesta execucao (o publico antes do preco do ingresso) e a
     // ocupacao media do estadio antes dele; so na memoria (nao vai para o save)

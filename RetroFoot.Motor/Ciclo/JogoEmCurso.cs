@@ -40,7 +40,7 @@ public sealed record Opcoes
     // desde 2026-10-14), com as regras do launcher (Regras.CartoesAmarelos). Os ORACnn.EXE do
     // oraculo sao de 2026-10-11, de antes disso: o roteiro do oraculo desliga.
     public bool AmarelosZeramNaEpoca = true;
-    // RetroFoot (versao Atual): o publico pesa no arbitro (Mundo.BonusDaTorcida: +1 a +3 ao
+    // RetroFoot (versao Atual): o publico pesa no arbitro (Mundo.BonusDaTorcida: +0 a +3 ao
     // mandante pela ocupacao do estadio, no lugar do +2 fixo); o oraculo (os EXEs do launcher) desliga
     public bool TorcidaNoArbitro = true;
 
