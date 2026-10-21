@@ -9,8 +9,8 @@ namespace RetroFoot.Motor.Rodada;
 // A previsao do publico e da renda do proximo jogo em casa para um preco de ingresso (so para
 // mostrar ao tecnico: nada aqui muda o jogo). O publico de um jogo e decidido quando a
 // jornada e criada (Mundo.Publico, seg03:b0a1), antes da tela da equipa:
-//  - o jogo desta jornada, se for em casa, ja tem o publico (Jogo.D40): o preco escolhido
-//    agora muda so a renda dele (Ingressos.Preco no fim do jogo);
+//  - o jogo desta jornada, se for em casa, ja tem o publico (Jogo.D40), refeito a cada mudanca
+//    do preco (Mundo.RecalcularPublico): a previsao e esse publico exato;
 //  - nos seguintes, a conta e a mesma do jogo com o sorteio (RandomReal, de 0 a 1) nas duas
 //    pontas: o menor e o maior publico possiveis com as forcas e as morais de agora
 //    (3 F casa + F fora + 3 r) raiz(W casa) raiz(W fora) 200, elevado a 1,04, x 1,3 na Taca,
@@ -20,7 +20,7 @@ public static class IngressosPrevisao
     public sealed record Previsao(
         ushort Adversario,       // a equipa de fora
         bool Taca,
-        bool Definido,           // o jogo desta jornada: o publico ja esta decidido
+        bool Definido,           // o jogo desta jornada: o publico exato (com o preco escolhido)
         int Minimo, int Maximo,  // o publico (iguais quando definido)
         int Capacidade,          // o estadio do mandante
         long Preco)              // o preco do ingresso com a escolha (a moeda do save)

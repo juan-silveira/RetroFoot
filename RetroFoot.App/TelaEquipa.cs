@@ -1503,7 +1503,7 @@ public sealed partial class TelaEquipa : UserControl
             string pub = pv.Minimo == pv.Maximo ? $"{N(pv.Minimo)} ({Oc(pv.Minimo)}%)" : $"{N(pv.Minimo)}–{N(pv.Maximo)} ({Oc(pv.Minimo)}–{Oc(pv.Maximo)}%)";
             string renda = pv.RendaMinima == pv.RendaMaxima ? Dinheiro(pv.RendaMinima) : Dinheiro(pv.RendaMinima) + "–" + Dinheiro(pv.RendaMaxima);
             return ((pv.Definido ? T("Este jogo") : T("Próx. em casa")) + $" ({adv}): " + pub,
-                T("Renda prevista") + ": " + renda + (pv.Definido ? " · " + T("público já definido") : ""));
+                T("Renda prevista") + ": " + renda);
         }
 
         // a mesma previsao em 3 linhas curtas (o Moderno 16:9, numa coluna estreita): o jogo, o
@@ -1520,7 +1520,7 @@ public sealed partial class TelaEquipa : UserControl
             return new[]
             {
                 (pv.Definido ? T("Este jogo") : T("Próx. em casa")) + $" ({adv})",
-                T("Público") + ": " + pub + (pv.Definido ? " · " + T("já definido") : ""),
+                T("Público") + ": " + pub,
                 T("Renda prevista") + ": " + renda,
             };
         }
@@ -1547,6 +1547,8 @@ public sealed partial class TelaEquipa : UserControl
         void MudarIngressos(int passos)
         {
             Ingressos.Escolher(_e, Ingressos.Percentual(_e) + passos * Ingressos.Passo);
+            // o jogo desta jornada em casa: o publico dele muda ja com o preco
+            if (_jogo is { } j && j.Casa == _e.ID) _s.J.M.RecalcularPublico(j);
             InvalidateVisual();
         }
 

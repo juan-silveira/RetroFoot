@@ -40,6 +40,9 @@ public sealed record Opcoes
     // desde 2026-10-14), com as regras do launcher (Regras.CartoesAmarelos). Os ORACnn.EXE do
     // oraculo sao de 2026-10-11, de antes disso: o roteiro do oraculo desliga.
     public bool AmarelosZeramNaEpoca = true;
+    // RetroFoot (versao Atual): o publico pesa no arbitro (Mundo.BonusDaTorcida: +1 a +3 ao
+    // mandante pela ocupacao do estadio, no lugar do +2 fixo); o oraculo (os EXEs do launcher) desliga
+    public bool TorcidaNoArbitro = true;
 
     // as do elif98.ini do launcher
     public static Opcoes Padrao => new() { SubstituirNoIntervalo = true, MostrarChicotadas = 1, GravarQuando = 2, Velocidade = 6 };
@@ -107,6 +110,7 @@ public sealed class JogoEmCurso
         M.Bosman = op.Bosman; M.PLOP = op.PLOP;
         M.OpcaoGestaoCPU = op.AddIn13;
         M.MostrarChicotadas = op.MostrarChicotadas;
+        M.TorcidaNoArbitro = op.TorcidaNoArbitro;
         M.TacaModo = op.VerSorteio;
         Pat = new Patrocinios(M, op.Marcas) { Perguntar = p => h.Patrocinio?.Invoke(p) ?? false };
         M.G = new Rodada.Ganchos
@@ -314,7 +318,7 @@ public sealed class JogoEmCurso
     // rg, e devolve o save gravado
     public static byte[] JogarComoOraculo(Jogo98 s, TRegras rg, List<string>? bosman, List<string>? plop)
     {
-        var op = Opcoes.Padrao with { Regras = rg, Bosman = bosman, PLOP = plop, AmarelosZeramNaEpoca = false };
+        var op = Opcoes.Padrao with { Regras = rg, Bosman = bosman, PLOP = plop, AmarelosZeramNaEpoca = false, TorcidaNoArbitro = false };
         var j = new JogoEmCurso(s, 0, op, HumanoDoOraculo()) { Agora = () => default };
         j.Ciclo();
         return j.Gravado ?? j.Gravar();

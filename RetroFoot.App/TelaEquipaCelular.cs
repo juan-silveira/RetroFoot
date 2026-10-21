@@ -444,8 +444,15 @@ public sealed partial class TelaEquipa
                         previsao.Children.Clear();
                         foreach (var c in Previsao(pct)) previsao.Children.Add(c);
                     }
-                    var menos = new CUi.Botao("−", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) - Ingressos.Passo); Atualizar(); }) { Padding = new Thickness(16, 2) };
-                    var mais = new CUi.Botao("+", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) + Ingressos.Passo); Atualizar(); }) { Padding = new Thickness(16, 2) };
+                    // o jogo desta jornada em casa: o publico dele muda ja com o preco
+                    void Mudar(int d)
+                    {
+                        Ingressos.Escolher(_e, Ingressos.Percentual(_e) + d * Ingressos.Passo);
+                        if (jogo.Casa == _e.ID) _s.J.M.RecalcularPublico(jogo);
+                        Atualizar();
+                    }
+                    var menos = new CUi.Botao("−", false, () => Mudar(-1)) { Padding = new Thickness(16, 2) };
+                    var mais = new CUi.Botao("+", false, () => Mudar(1)) { Padding = new Thickness(16, 2) };
                     var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 44, Margin = new Thickness(0, 6, 0, 0) };
                     g.Children.Add(CUi.Txt(T("Preço do ingresso"), 14, PT, FontWeight.SemiBold));
                     var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, Children = { menos, valor, mais } };
@@ -476,7 +483,7 @@ public sealed partial class TelaEquipa
             {
                 r.Add(Linha(T("Público"), T("{0} ({1:0}% do estádio)", N(pv.Minimo), lot(pv.Minimo))));
                 r.Add(Linha(T("Renda prevista"), _p.DinheiroCelular(pv.RendaMinima)));
-                r.Add(CUi.Txt(T("O público deste jogo já foi decidido no começo da rodada: o preço muda só a renda. Nos próximos jogos em casa, muda também o público."), 12, PF, FontWeight.Normal, true));
+                r.Add(CUi.Txt(T("Ingresso caro afasta o público; barato enche o estádio."), 12, PF, FontWeight.Normal, true));
             }
             else
             {

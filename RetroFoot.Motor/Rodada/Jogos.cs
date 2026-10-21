@@ -118,7 +118,7 @@ public sealed partial class Mundo
             if (a != null)
             {
                 j.Arbitro = a.ID;
-                j.W4C = (ushort)(PreJogo.InfluenciaDoArbitro(a, casa) + 2);
+                j.W4C = (ushort)(PreJogo.InfluenciaDoArbitro(a, casa) + BonusDaTorcida(casa, j.D40));
                 j.W4E = (ushort)PreJogo.InfluenciaDoArbitro(a, fora);
             }
             else j.Arbitro = 0;
@@ -149,8 +149,68 @@ public sealed partial class Mundo
         c = Real48(c);
         var p = Pot(c, Mercado.Constantes.C1_04);
         p = p.Mul(Xi(j.Taca == TipoJogo.Taca ? 1 : 0).Mul(C0_3).Add(X(1)));
+        // (a procura antes do preco e a ocupacao media antes deste jogo: o preco escolhido na
+        // tela da equipa refaz o publico deste jogo, RecalcularPublico)
+        _demanda[j] = (p, (byte[])casa.EstadioReal.Clone());
         p = Ingressos.Publico(p, casa);   // launcher: o preco escolhido pelo mandante (seg03:B1EC)
         j.D40 = (uint)PreJogo.LotacaoDoEstadio(casa, Arred(p));
+    }
+
+    // o +2 do mandante na influencia do arbitro (seg03:1a66). Na versao Atual (as regras do
+    // launcher, com o preco do ingresso) a torcida pesa: +1 com o estadio ate 1/3 cheio, +2 ate
+    // 2/3 e +3 acima (na media, o +2 do classico); no jogo classico, sempre +2
+    public bool TorcidaNoArbitro;
+
+    int BonusDaTorcida(Equipa casa, uint publico)
+    {
+        if (!Regras.CartoesAmarelos || !TorcidaNoArbitro) return 2;
+        int cap = PreJogo.CapacidadeDoEstadio(casa);
+        if (cap <= 0) return 2;
+        double oc = (double)publico / cap;
+        return oc < 1.0 / 3 ? 1 : oc < 2.0 / 3 ? 2 : 3;
+    }
+
+    // a procura de cada jogo criado nesta execucao (o publico antes do preco do ingresso) e a
+    // ocupacao media do estadio antes dele; so na memoria (nao vai para o save)
+    readonly Dictionary<Jogo, (Ext Procura, byte[]? Ocupacao)> _demanda = new(ReferenceEqualityComparer.Instance);
+
+    // O preco do ingresso mudado na tela da equipa (a versao Atual) vale ja para o jogo desta
+    // jornada: o publico e refeito com a mesma procura sorteada ao criar o jogo (o sorteio nao
+    // muda) e o fator do preco novo, limitado ao estadio, e a ocupacao media volta a de antes
+    // dele. Sem isto o publico ficava o do preco antigo e o preco no maximo dava uma renda
+    // absurda. Um jogo de um save carregado no meio da jornada (sem a procura guardada): a
+    // procura media (o sorteio no meio), sem mexer na ocupacao.
+    public void RecalcularPublico(Jogo j)
+    {
+        var casa = Equipa(j.Casa); var fora = Equipa(j.Fora);
+        if (casa == null || fora == null || j.Taca == TipoJogo.SemEquipas) return;
+        int antes = BonusDaTorcida(casa, j.D40);
+        try { RecalcularSo(j, casa, fora); }
+        finally
+        {
+            // a torcida nova muda o peso dela no arbitro
+            if (j.Arbitro != 0) j.W4C = (ushort)Math.Max(0, j.W4C - antes + BonusDaTorcida(casa, j.D40));
+        }
+    }
+
+    void RecalcularSo(Jogo j, Equipa casa, Equipa fora)
+    {
+        if (_demanda.TryGetValue(j, out var d) && d.Ocupacao != null)
+        {
+            d.Ocupacao.CopyTo(casa.EstadioReal, 0);
+            j.D40 = (uint)PreJogo.LotacaoDoEstadio(casa, Arred(Ingressos.Publico(d.Procura, casa)));
+            return;
+        }
+        Ext p;
+        if (d.Procura is { } guardada && _demanda.ContainsKey(j)) p = guardada;
+        else
+        {
+            var b = X(0.5).Mul(X(3)).Add(Xi((short)(MediaForca(casa) * 3 + MediaForca(fora))));
+            var c = DeReal48(fora.Moral).Sqrt().Mul(DeReal48(casa.Moral).Sqrt().Mul(b)).Mul(X(200));
+            p = Pot(Real48(c), Mercado.Constantes.C1_04).Mul(Xi(j.Taca == TipoJogo.Taca ? 1 : 0).Mul(C0_3).Add(X(1)));
+            _demanda[j] = (p, null);
+        }
+        j.D40 = (uint)Math.Min(Arred(Ingressos.Publico(p, casa)), PreJogo.CapacidadeDoEstadio(casa));
     }
 
     // seg03:1df4(calendario, fora, adversario): entrada da Taca (+0x07 = 1, +0x08 =
