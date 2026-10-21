@@ -5,10 +5,10 @@
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <!-- a versao: a mesma do jogo (RetroFoot.App.csproj <Version>); o codigo da versao do
-         Android (inteiro, so cresce) = maior x 10000 + menor x 100 + correcao (0.1.1 = 101).
+         Android (inteiro, so cresce) = maior x 10000 + menor x 100 + correcao (0.1.2 = 102).
          Mudar os dois a cada release, senao o Android nao instala a atualizacao -->
-    <ApplicationDisplayVersion>0.1.1</ApplicationDisplayVersion>
-    <ApplicationVersion>101</ApplicationVersion>
+    <ApplicationDisplayVersion>0.1.2</ApplicationDisplayVersion>
+    <ApplicationVersion>102</ApplicationVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <!-- AOT: o codigo vai compilado para o processador no APK (sem JIT ao abrir cada tela) -->
     <RunAOTCompilation>true</RunAOTCompilation>

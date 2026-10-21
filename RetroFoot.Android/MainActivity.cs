@@ -19,46 +19,4 @@ namespace RetroFoot.Android;
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public class MainActivity : AvaloniaMainActivity
 {
-    protected override void OnCreate(Bundle? savedInstanceState)
-    {
-        // a atualizacao (RetroFoot.App/Atualizacao.cs): o APK vai para o cache (a pasta do
-        // FileProvider, Resources/xml/caminhos.xml) e e entregue ao instalador do Android.
-        // Antes do base.OnCreate: e nele que a tela inicial e montada e procura a versao nova
-        RetroFoot.App.Atualizacao.PastaApk = System.IO.Path.Combine(CacheDir!.AbsolutePath, "atualizacao");
-        RetroFoot.App.Atualizacao.InstalarApk = InstalarApk;
-        // os efeitos sonoros (RetroFoot.App/Som.cs): o .wav gerado pelo jogo no MediaPlayer
-        RetroFoot.App.Som.TocarAndroid = Tocar;
-        base.OnCreate(savedInstanceState);
-    }
-
-    static void Tocar(string arquivo)
-    {
-        try
-        {
-            var mp = new global::Android.Media.MediaPlayer();
-            mp.SetDataSource(arquivo);
-            mp.Completion += (_, _) => mp.Release();
-            mp.Prepare();
-            mp.Start();
-        }
-        catch (System.Exception ex) { System.Console.WriteLine("som: " + ex.Message); }
-    }
-
-    // false: falta a permissao de instalar apps do RetroFoot (abre a tela dela; ao voltar, o
-    // jogo chama de novo)
-    bool InstalarApk(string caminho)
-    {
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.O && !PackageManager!.CanRequestPackageInstalls())
-        {
-            var p = new Intent(global::Android.Provider.Settings.ActionManageUnknownAppSources, global::Android.Net.Uri.Parse("package:" + PackageName));
-            StartActivity(p);
-            return false;
-        }
-        var uri = AndroidX.Core.Content.FileProvider.GetUriForFile(this, PackageName + ".arquivos", new Java.IO.File(caminho));
-        var i = new Intent(Intent.ActionView);
-        i.SetDataAndType(uri, "application/vnd.android.package-archive");
-        i.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
-        StartActivity(i);
-        return true;
-    }
 }

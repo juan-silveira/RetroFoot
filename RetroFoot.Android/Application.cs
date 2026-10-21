@@ -16,6 +16,12 @@ public class Application : AvaloniaAndroidApplication<RetroFoot.App.App>
     // (sem a propriedade, o padrao do Avalonia: EGL e, se falhar, software)
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
+        // a atualizacao (RetroFoot.App/Atualizacao.cs) e os efeitos sonoros (Som.cs), ligados
+        // aqui, antes de qualquer tela: a tela inicial procura a versao nova ao ser montada, e
+        // isso pode acontecer antes da MainActivity (assim, as vezes, nao procurava)
+        RetroFoot.App.Atualizacao.PastaApk = System.IO.Path.Combine(CacheDir!.AbsolutePath, "atualizacao");
+        RetroFoot.App.Atualizacao.InstalarApk = InstalarApk;
+        RetroFoot.App.Som.TocarAndroid = Tocar;
         builder = base.CustomizeAppBuilder(builder).WithInterFont();
         string modo = "";
         try
@@ -51,5 +57,39 @@ public class Application : AvaloniaAndroidApplication<RetroFoot.App.App>
             _ => null,
         };
         return modos == null ? builder : builder.With(new AndroidPlatformOptions { RenderingMode = modos });
+    }
+
+    // o APK baixado (no cache, a pasta do FileProvider, Resources/xml/caminhos.xml) no
+    // instalador do Android; false: falta a permissao de instalar apps do RetroFoot (abre a
+    // tela dela; ao voltar, o jogo chama de novo)
+    bool InstalarApk(string caminho)
+    {
+        if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.O && !PackageManager!.CanRequestPackageInstalls())
+        {
+            var p = new global::Android.Content.Intent(global::Android.Provider.Settings.ActionManageUnknownAppSources, global::Android.Net.Uri.Parse("package:" + PackageName));
+            p.AddFlags(global::Android.Content.ActivityFlags.NewTask);
+            StartActivity(p);
+            return false;
+        }
+        var uri = AndroidX.Core.Content.FileProvider.GetUriForFile(this, PackageName + ".arquivos", new Java.IO.File(caminho));
+        var i = new global::Android.Content.Intent(global::Android.Content.Intent.ActionView);
+        i.SetDataAndType(uri, "application/vnd.android.package-archive");
+        i.AddFlags(global::Android.Content.ActivityFlags.GrantReadUriPermission | global::Android.Content.ActivityFlags.NewTask);
+        StartActivity(i);
+        return true;
+    }
+
+    // um efeito sonoro (o .wav que o jogo gera) no MediaPlayer
+    static void Tocar(string arquivo)
+    {
+        try
+        {
+            var mp = new global::Android.Media.MediaPlayer();
+            mp.SetDataSource(arquivo);
+            mp.Completion += (_, _) => mp.Release();
+            mp.Prepare();
+            mp.Start();
+        }
+        catch (Exception ex) { Console.WriteLine("som: " + ex.Message); }
     }
 }
