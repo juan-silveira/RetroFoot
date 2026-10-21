@@ -442,14 +442,32 @@ static class Icones
         dc.DrawRectangle(cor, new Pen(Escuro, 0.8), new Rect(c.X - w / 2 + dx, c.Y - h / 2 + dx * 0.6, w, h), 1.5, 1.5);
     }
 
+    // a bola da marca reduzida uma vez a 64 pontos (o bastante para as telas de alta densidade)
+    static Avalonia.Media.Imaging.Bitmap? _bolaPequena;
+    static bool _bolaFeita;
+    static Avalonia.Media.Imaging.Bitmap? BolaPequena
+    {
+        get
+        {
+            if (_bolaFeita) return _bolaPequena;
+            _bolaFeita = true;
+            try { _bolaPequena = Logotipo.Bola?.CreateScaledBitmap(new PixelSize(64, 64), Avalonia.Media.Imaging.BitmapInterpolationMode.HighQuality); }
+            catch { _bolaPequena = Logotipo.Bola; }
+            return _bolaPequena;
+        }
+    }
+
     // a bola do golo: a da marca do RetroFoot (Assets/Marca/bola-256.png, a do launcher); no
     // golo anulado (cor cinza), apagada. Sem a imagem, o circulo com o pentagono
     static void Bola(DrawingContext dc, Rect r, IBrush cor)
     {
-        if (Logotipo.Bola is { } img)
+        if (BolaPequena is { } img)
         {
             double t = Math.Min(r.Width, r.Height) + 2;
             var q = new Rect(r.Center.X - t / 2, r.Center.Y - t / 2, t, t);
+            // (a imagem de 256 encolhida na hora ficava serrilhada: a de 64, reduzida com
+            // qualidade, e desenhada com suavizacao)
+            using (dc.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = Avalonia.Media.Imaging.BitmapInterpolationMode.HighQuality }))
             using (dc.PushOpacity(cor == Cinza ? 0.45 : 1))
                 dc.DrawImage(img, q);
             return;
