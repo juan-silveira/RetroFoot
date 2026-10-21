@@ -54,6 +54,7 @@ sealed class TelaClassificacaoOriginal : Control
     // (fora do original) a posicao de cada equipa, pequena, a esquerda da lista: a janela
     // ganha estes pontos de largura e as listas andam o mesmo para a direita
     const double MargemPosicao = 8;
+    const double MargemQuadro = 10;
 
     public event Action? Fechou;
 
@@ -92,7 +93,11 @@ sealed class TelaClassificacaoOriginal : Control
             : 41 + 2 * _alturaLista + 46 + 24;
         double larguraCliente = (_lado ? 10 + 3 * 296 + LarguraLista + 10 : 588) + MargemPosicao;
         double w = larguraCliente + 6, h = _alturaCliente + 6 + 19;
-        _janela = new Rect(Math.Floor((L - w) / 2), Math.Floor((A - h) / 2), w, h);
+        // o quadro e so a janela com uma margem verde: ampliada com a tela, a janela enche a
+        // tela (antes ficava no meio do quadro de 800x600, pequena, com muito verde em volta)
+        L = w + 2 * MargemQuadro; A = h + 2 * MargemQuadro;
+        Width = L; Height = A;
+        _janela = new Rect(MargemQuadro, MargemQuadro, w, h);
         _cliente = new Rect(_janela.X + 3, _janela.Y + 3 + 19, larguraCliente, _alturaCliente);
         _titulo = rodada > 0 ? T("Classificação - {0}ª rodada", rodada) : T("Classificação");
         if (_paginas) _pagina = PaginaDosHumanos();
