@@ -126,6 +126,15 @@ public sealed partial class TelaEquipa : UserControl
         var m = sessao.J.M;
         var e = m.S.Equipas.FirstOrDefault(x => Mem.Humano(m.TreinadorDa(x)));
         if (e == null) return Aviso("Demo: o save não tem equipa humana");
+        // RETROFOOT_PATROC_CONTRATO=1 (com RETROFOOT_PATROC=1): um master (2 temporadas) e um
+        // pontual (3 jogos) de exemplo, para ver a aba Patrocinio com os logos
+        if (Environment.GetEnvironmentVariable("RETROFOOT_PATROC_CONTRATO") == "1")
+        {
+            e.SetB(RetroFoot.Motor.Patrocinio.Contrato.MMarca, 3); e.SetB(RetroFoot.Motor.Patrocinio.Contrato.MAnos, 2);
+            e.SetD(RetroFoot.Motor.Patrocinio.Contrato.MValor, 850000);
+            e.SetB(RetroFoot.Motor.Patrocinio.Contrato.PMarca, 7); e.SetB(RetroFoot.Motor.Patrocinio.Contrato.PJogos, 3);
+            e.SetD(RetroFoot.Motor.Patrocinio.Contrato.PValor, 50000);
+        }
         var jogo = m.S.Jogos.FirstOrDefault(j => j.Casa == e.ID || j.Fora == e.ID);
         if (jogo == null)
         {

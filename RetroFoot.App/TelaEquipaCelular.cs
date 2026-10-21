@@ -513,21 +513,36 @@ public sealed partial class TelaEquipa
         {
             var p = new StackPanel { Spacing = 6 };
             var marcas = _s.J.Op.Marcas;
+            // o logo da marca (o do master maior que o do pontual, como no computador), o nome e
+            // os valores
+            Control Marca(RetroFoot.Motor.Patrocinio.Marca m, double larg, double alt)
+            {
+                var c = new StackPanel { Spacing = 4, HorizontalAlignment = HorizontalAlignment.Center };
+                if (marcas != null && TelaPatrocinio.Logo(marcas.CaminhoLogo(m)) is { } img)
+                    c.Children.Add(new Image { Source = img, MaxWidth = larg, MaxHeight = alt, Stretch = Stretch.Uniform, HorizontalAlignment = HorizontalAlignment.Center });
+                var n = CUi.Txt(m.Nome, 17, PT, FontWeight.Bold);
+                n.HorizontalAlignment = HorizontalAlignment.Center;
+                c.Children.Add(n);
+                return c;
+            }
             var mc = _e.MarcaMaster() != 0 ? marcas?.Registro(_e.MarcaMaster()) : null;
             p.Children.Add(Secao(T("Patrocinador master")));
             if (mc != null)
             {
-                p.Children.Add(Linha(mc.Nome, _p.DinheiroCelular(_e.ValorMaster()) + " " + T("por temporada")));
+                p.Children.Add(Marca(mc, 200, 100));
+                p.Children.Add(Linha(T("Valor"), T("{0} por temporada", _p.DinheiroCelular(_e.ValorMaster()))));
                 int n = _e.EpocasMaster();
                 p.Children.Add(Linha(T("Restante"), T(n == 1 ? "{0} temporada restante" : "{0} temporadas restantes", (char)('0' + n))));
             }
             else p.Children.Add(CUi.Txt(T("Sem patrocinador"), 14, PF));
             var mp = _e.JogosPontual() != 0 ? marcas?.Registro(_e.MarcaPontual()) : null;
+            p.Children.Add(new Border { Height = 8 });
             p.Children.Add(Secao(T("Patrocínio pontual")));
             if (mp != null)
             {
+                p.Children.Add(Marca(mp, 140, 64));
                 int j = _e.JogosPontual();
-                p.Children.Add(Linha(mp.Nome, T("{0} por jogo", _p.DinheiroCelular(_e.ValorPontual()))));
+                p.Children.Add(Linha(T("Valor"), T("{0} por jogo", _p.DinheiroCelular(_e.ValorPontual()))));
                 p.Children.Add(Linha(T("Restante"), T(j == 1 ? "{0} jogo restante" : "{0} jogos restantes", (char)('0' + j))));
             }
             else p.Children.Add(CUi.Txt(T("Nenhum no momento"), 14, PF));
