@@ -2,3 +2,4 @@
 
 Nenhuma equipa	No teams
 Toque num jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).	Tap a player to edit. S = suspended, A = yellow cards, L = injured (matches).
+Na história do treinador fica "Promovido para o {0}", como num convite aceito no jogo.	The coach history shows "Promoted to {0}", like an invitation accepted in the game.

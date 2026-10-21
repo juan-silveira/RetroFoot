@@ -76,7 +76,10 @@ public sealed class SaveEditavel
     public TreinadorEditavel? Treinador(int id) => Treinadores.FirstOrDefault(t => t.Id == id);
 
     // Poe o treinador na equipa destino como a "chicotada psicologica" do jogo (seg03:4f40): as
-    // duas equipas trocam de treinador e ficam com moral 1,0; o humano "da vez" acompanha.
+    // duas equipas trocam de treinador e ficam com moral 1,0 e 0 jogos; o humano "da vez"
+    // acompanha. E, como o jogo quando um time chama o treinador de outro, a historia dos dois
+    // treinadores ganha a troca (o novo "foi chamado e entrou" no destino; o antigo do destino
+    // "saiu" para a equipa de origem): antes a troca do editor nao ficava na historia.
     public void TrocarEquipa(TreinadorEditavel tec, EquipaEditavel destino)
     {
         var origem = EquipaDoTreinador(tec) ?? throw new InvalidOperationException("sem equipa");
@@ -87,8 +90,23 @@ public sealed class SaveEditavel
         origem.TreinadorId = outro;
         origem.Moral = 1.0;
         destino.Moral = 1.0;
+        uint ano = (uint)Ano;
+        tec.T.W0C = 0;
+        Evento(tec.T, Rodada.Mundo.EvTreinadorTrocouEntrou, ano, destino.Id);
+        if (Treinador(outro) is { } antigo)
+        {
+            antigo.T.W0C = 0;
+            Evento(antigo.T, Rodada.Mundo.EvTreinadorTrocouSaiu, ano, origem.Id);
+        }
         if (HumanoDaVez == origem.Id) HumanoDaVez = destino.Id;
         else if (HumanoDaVez == destino.Id) HumanoDaVez = origem.Id;
+    }
+
+    // seg03:b4cf + seg14:06e8: o evento no fim da historia do treinador (lista limitada)
+    static void Evento(Treinador t, byte tipo, uint ano, ushort equipa)
+    {
+        t.Eventos.Add(new EventoTreinador { B04 = tipo, D05 = ano, W09 = equipa });
+        while (t.Eventos.Count > Mercado.MercadoJogo.LimiteEventosTreinador) t.Eventos.RemoveAt(0);
     }
 
     internal static string Latin1(ReadOnlySpan<byte> b) => Encoding.Latin1.GetString(b);

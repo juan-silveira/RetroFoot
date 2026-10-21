@@ -183,6 +183,15 @@ public class EditorSaveTestes
             Assert.Equal(tec.Id, r.Equipas.Single(e => e.Id == destino.Id).TreinadorId);
             Assert.Equal(outro, r.Equipas.Single(e => e.Id == origem.Id).TreinadorId);
             Assert.Equal(1.0, r.Equipas.Single(e => e.Id == destino.Id).Moral, 9);
+            // a historia: o humano "promovido" para o destino (7) e o antigo do destino
+            // "rebaixado" para a origem (6), no ano do save, como a troca feita pelo jogo
+            var ev = r.Treinador(tec.Id)!.T.Eventos.Last();
+            Assert.Equal(7, ev.B04);
+            Assert.Equal(destino.Id, ev.W09);
+            Assert.Equal((uint)s.Ano, ev.D05);
+            var ev2 = r.Treinador(outro)!.T.Eventos.Last();
+            Assert.Equal(6, ev2.B04);
+            Assert.Equal(origem.Id, ev2.W09);
             return;
         }
         Assert.Fail("nenhum save com treinador humano");

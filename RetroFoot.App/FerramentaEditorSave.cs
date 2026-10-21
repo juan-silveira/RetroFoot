@@ -617,6 +617,7 @@ public sealed class TelaEditorSave : UserControl
         {
             var d = destinos[Math.Max(0, lista.SelectedIndex)];
             efeito.Text = (d.Treinador is { } o ? T("{0} vai para {1}.", o.Nome, origem.NomeExibido) + " " : "")
+                + T("Na história do treinador fica \"Promovido para o {0}\", como num convite aceito no jogo.", d.NomeExibido) + " "
                 + T("As duas equipas ficam com moral 10, como numa chicotada psicológica. Só aparecem equipas das divisões (no Distrital o jogo quebra).");
         }
         lista.SelectionChanged += (_, _) => Atualiza();

@@ -2,3 +2,4 @@
 
 Nenhuma equipa	Ningún equipo
 Toque num jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).	Toca un jugador para editarlo. S = sancionado, A = amarillas, L = lesionado (partidos).
+Na história do treinador fica "Promovido para o {0}", como num convite aceito no jogo.	En la historia del entrenador queda "Ascendido al {0}", como una invitación aceptada en el juego.

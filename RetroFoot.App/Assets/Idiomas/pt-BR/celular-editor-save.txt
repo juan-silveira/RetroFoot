@@ -2,3 +2,4 @@
 
 Nenhuma equipa	Nenhum time
 Toque num jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).	Toque em um jogador para editar. S = suspenso, A = amarelos, L = lesionado (jogos).
+Na história do treinador fica "Promovido para o {0}", como num convite aceito no jogo.	Na história do técnico fica "Promovido para o {0}", como num convite aceito no jogo.
