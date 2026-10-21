@@ -39,7 +39,9 @@ sealed class TelaClassificacaoModerna : UserControl
     static readonly IBrush CorVitoria = TemaVerde.VerdeForte, CorEmpate = TemaVerde.CinzaForte, CorDerrota = TemaVerde.VermelhoForte;
     static readonly FontFamily Inter = new("fonts:Inter#Inter");
 
-    const double AlturaLinha = 26;
+    // a altura das linhas: a tabela enche a area da tela (20 equipas sem rolar; menos equipas,
+    // linhas mais altas, ate 30); o Distrital (dezenas) rola com linhas de 24
+    double _alturaLinha = 26;
     // larguras das colunas: barra, posicao, clube (*), Pts, PJ, VIT, E, DER, GM, GC, SG, ultimas 5
     static readonly string Colunas = "4,34,*,46,40,40,40,40,40,40,46,152";
 
@@ -52,6 +54,7 @@ sealed class TelaClassificacaoModerna : UserControl
     readonly string _titulo;
     readonly int _divisoes;
     int _divisao;
+    double _alturaLista;
     int _tiques;
     DispatcherTimer? _relogio;
     bool _fechou;
@@ -154,7 +157,7 @@ sealed class TelaClassificacaoModerna : UserControl
         // topo: titulo, abas das divisoes e o Continuar
         var titulo = new TextBlock
         {
-            Text = _titulo, FontSize = 20, FontWeight = FontWeight.SemiBold, Foreground = Texto,
+            Text = _titulo, FontSize = 19, FontWeight = FontWeight.SemiBold, Foreground = Texto,
             VerticalAlignment = VerticalAlignment.Center,
         };
         for (int d = 0; d < _divisoes; d++) _abas.Children.Add(Aba(d));
@@ -171,7 +174,7 @@ sealed class TelaClassificacaoModerna : UserControl
         var topo = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), RowDefinitions = new RowDefinitions(largo ? "Auto" : "Auto,Auto"),
-            Margin = new Thickness(0, 0, 0, 10),
+            Margin = new Thickness(0, 0, 0, 6),
         };
         topo.Children.Add(titulo);
         _abas.VerticalAlignment = VerticalAlignment.Center;
@@ -182,7 +185,7 @@ sealed class TelaClassificacaoModerna : UserControl
         topo.Children.Add(botao);
 
         var cabecalho = LinhaGrade();
-        cabecalho.Height = 30;
+        cabecalho.Height = 24;
         string[] nomes = { "", "", "Clube", "Pts", "PJ", "VIT", "E", "DER", "GM", "GC", "SG", "Últimas 5" };
         for (int c = 2; c < nomes.Length; c++)
         {
@@ -202,9 +205,16 @@ sealed class TelaClassificacaoModerna : UserControl
         // minusculo. A legenda fica fixa embaixo.
         var lista = new ScrollViewer
         {
-            Content = _linhas, MaxHeight = 20 * (AlturaLinha + 1) + 2,   // + a linha de baixo de cada uma
+            Content = _linhas,
             HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+        };
+        // a altura da lista decide a das linhas (o que sobra do quadro de 600 de altura)
+        lista.SizeChanged += (_, e) =>
+        {
+            if (Math.Abs(e.NewSize.Height - e.PreviousSize.Height) < 0.5) return;
+            _alturaLista = e.NewSize.Height;
+            MostrarDivisao(_divisao);
         };
         // o cabecalho acompanha a folga da barra de rolagem (App.FolgaBarra): as colunas batem
         lista.PropertyChanged += (_, e) =>
@@ -225,18 +235,19 @@ sealed class TelaClassificacaoModerna : UserControl
         var cartao = new Border
         {
             Background = TemaVerde.Cartao, BorderBrush = TemaVerde.Borda, BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(12), Padding = new Thickness(10, 4, 10, 10), Child = tabela, VerticalAlignment = VerticalAlignment.Top,
+            CornerRadius = new CornerRadius(12), Padding = new Thickness(10, 2, 10, 6), Child = tabela,
         };
-        var corpo = new DockPanel { Width = largo ? 1000 : 900, Margin = new Thickness(20, 16, 20, 12) };
+        // o quadro logico das outras telas (800x600; 1067x600 no 16:9), ampliado com a janela
+        // como a jornada: antes a tabela ficava no tamanho dos pontos (so encolhia) e, numa
+        // janela grande, pequena perto da tela dos resultados
+        var corpo = new DockPanel { Width = largo ? 1067 - 28 : 800 - 28, Height = 600 - 20, Margin = new Thickness(14, 10, 14, 10) };
         DockPanel.SetDock(topo, Dock.Top);
         corpo.Children.Add(topo);
         corpo.Children.Add(cartao);
-        // a tabela inteira (20 equipas e a legenda) sem rolagem: encolhe o que for preciso para
-        // caber na tela (no 4:3 com 20 equipas ficava cortada embaixo, com barra de rolagem)
         return new Avalonia.Controls.ThemeVariantScope
         {
             RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark,
-            Child = new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, VerticalAlignment = VerticalAlignment.Top, Child = corpo },
+            Child = new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.Both, Child = corpo },
         };
     }
 
@@ -275,6 +286,8 @@ sealed class TelaClassificacaoModerna : UserControl
         }
         _linhas.Children.Clear();
         var eqs = Equipas(_divisao);
+        // as linhas enchem a lista (com o fio de 1 entre elas); o Distrital rola
+        _alturaLinha = eqs.Count > 24 || _alturaLista <= 0 ? 24 : Math.Clamp(Math.Floor(_alturaLista / Math.Max(eqs.Count, 1)) - 1, 18, 30);
         for (int i = 0; i < eqs.Count; i++) _linhas.Children.Add(LinhaEquipa(eqs[i], i, eqs.Count));
     }
 
@@ -282,7 +295,7 @@ sealed class TelaClassificacaoModerna : UserControl
     {
         bool humana = Humana(e);
         var g = LinhaGrade();
-        g.Height = AlturaLinha;
+        g.Height = _alturaLinha;
         var zona = Zona(_divisao, i, n);
         if (zona != null)
         {
@@ -326,8 +339,10 @@ sealed class TelaClassificacaoModerna : UserControl
         var r = Ultimas(e);
         for (int k = 0; k < 5 - r.Count; k++) ult.Children.Add(Resultado(null, false));
         for (int k = 0; k < r.Count; k++) ult.Children.Add(Resultado(r[k], k == r.Count - 1));
-        Grid.SetColumn(ult, 11);
-        g.Children.Add(ult);
+        // (os circulos de 24 encolhem com a linha)
+        var ultV = new Viewbox { Height = Math.Min(24, _alturaLinha - 2), Child = ult, HorizontalAlignment = HorizontalAlignment.Center };
+        Grid.SetColumn(ultV, 11);
+        g.Children.Add(ultV);
 
         var linha = new Border
         {
@@ -409,29 +424,18 @@ sealed class TelaClassificacaoModerna : UserControl
 
     Control Legenda()
     {
-        // duas colunas; em cada uma, o titulo e os itens numa linha (para caber 20 equipas)
-        static StackPanel Coluna(string titulo, params Control[] itens)
+        // numa linha so (a tabela fica com a altura): as zonas e, depois, as ultimas 5
+        var linha = new WrapPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 6, 0, 0), ItemSpacing = 16 };
+        foreach (var i in new[]
         {
-            var linha = new WrapPanel { Orientation = Orientation.Horizontal };
-            foreach (var i in itens) { i.Margin = new Thickness(0, 0, 20, 0); linha.Children.Add(i); }
-            var p = new StackPanel { Spacing = 6 };
-            p.Children.Add(TituloLegenda(titulo));
-            p.Children.Add(linha);
-            return p;
-        }
-        var zonas = Coluna(T("Zonas"),
             ItemLegenda(BarraLegenda(CorCampeao), T("Campeão")),
             ItemLegenda(BarraLegenda(CorSobe), T("Sobe de divisão")),
-            ItemLegenda(BarraLegenda(CorDesce), T("Desce de divisão")));
-        var ult = Coluna(T("Últimas 5 partidas"),
-            ItemLegenda(Resultado(1, false), T("Vitória")),
-            ItemLegenda(Resultado(0, false), T("Empate")),
-            ItemLegenda(Resultado(-1, false), T("Derrota")));
-        var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*"), Margin = new Thickness(0, 12, 0, 0) };
-        g.Children.Add(zonas);
-        Grid.SetColumn(ult, 1);
-        g.Children.Add(ult);
-        return g;
+            ItemLegenda(BarraLegenda(CorDesce), T("Desce de divisão")),
+            ItemLegenda(new Viewbox { Height = 16, Child = Resultado(1, false) }, T("Vitória")),
+            ItemLegenda(new Viewbox { Height = 16, Child = Resultado(0, false) }, T("Empate")),
+            ItemLegenda(new Viewbox { Height = 16, Child = Resultado(-1, false) }, T("Derrota")),
+        }) linha.Children.Add(i);
+        return linha;
     }
 
     static TextBlock TituloLegenda(string s) => new() { Text = s, FontSize = 13, FontWeight = FontWeight.SemiBold, Foreground = Texto };

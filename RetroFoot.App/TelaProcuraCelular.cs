@@ -38,6 +38,10 @@ public static partial class TelaProcura
             public ProcuraCelular(Form f)
             {
                 _f = f;
+                // (uma compra no plantel aberto pelo Time..., um emprestimo: o caixa muda)
+                void Mudou(RetroFoot.Motor.Save.Equipa x) { if (x == _f._e) AtualizarCaixa(); }
+                AttachedToVisualTree += (_, _) => { TelaDinheiro.Mudou -= Mudou; TelaDinheiro.Mudou += Mudou; };
+                DetachedFromVisualTree += (_, _) => TelaDinheiro.Mudou -= Mudou;
                 var corpo = new StackPanel { Spacing = 12 };
                 // o nome (TEdit, 20 letras, maiusculas)
                 var nome = CUi.Retro ? MercadoRetro.Edit(_nome, 20, 16) : CUi.Caixa(_nome, 20, T("Nome"));
@@ -66,7 +70,7 @@ public static partial class TelaProcura
                 corpo.Children.Add(CUi.Grupo(new Control[]
                 {
                     CUi.Interruptor(T("Não mostrar os jogadores do meu time"), null, _naoMinha, v => { if (v != _naoMinha) { _f.TrocarNaoMinha(); Atualizar(); } }),
-                    MercadoCelular.Linha(T("Dinheiro em caixa"), _f.Dinheiro((int)_f._e.Dinheiro)),
+                    CaixaModerno(),
                 }));
                 corpo.Children.Add(_resultados);
                 _botao = new CUi.Botao(T("Procurar"), true, Procurar) { HorizontalAlignment = HorizontalAlignment.Stretch };
@@ -238,8 +242,23 @@ public static partial class TelaProcura
             }
 
             // ------------------------------------------------------------ o que foi achado
+            // o dinheiro em caixa: atualiza depois de cada compra (antes ficava o valor da
+            // abertura ate voltar ao plantel) e quando outra janela muda o dinheiro
+            TextBlock? _caixaTxt;
+            Control CaixaModerno()
+            {
+                var l = MercadoCelular.Linha(T("Dinheiro em caixa"), _f.Dinheiro((int)_f._e.Dinheiro));
+                _caixaTxt = ((l as Border)?.Child as Panel)?.Children.OfType<TextBlock>().LastOrDefault();
+                return l;
+            }
+            void AtualizarCaixa()
+            {
+                if (_caixaTxt != null) _caixaTxt.Text = _f.Dinheiro((int)_f._e.Dinheiro);
+            }
+
             void Lista()
             {
+                AtualizarCaixa();
                 if (CUi.Retro) { ListaRetro(); return; }
                 _resultados.Children.Clear();
                 var s = _f.S;
@@ -418,7 +437,9 @@ public static partial class TelaProcura
                 // "Dinheiro em caixa" em azul (clBlue), como no computador
                 var din = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
                 din.Children.Add(MercadoRetro.Txt(T("Dinheiro em caixa"), 14, W95.Azul));
-                din.Children.Add(MercadoRetro.Txt(_f.Dinheiro((int)_f._e.Dinheiro), 14, W95.Azul, true));
+                var valorCaixa = MercadoRetro.Txt(_f.Dinheiro((int)_f._e.Dinheiro), 14, W95.Azul, true);
+                _caixaTxt = valorCaixa as TextBlock;
+                din.Children.Add(valorCaixa);
                 p.Children.Add(din);
                 _criterios.Content = p;
             }
