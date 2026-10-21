@@ -110,13 +110,27 @@ public sealed partial class TelaInicio
         var texto = CUi.Txt(T("A versão {0} do RetroFoot está disponível (você tem a {1}). Seus saves, equipas e configurações ficam como estão.",
             nova.Versao.ToString(3), Atualizacao.Atual.ToString(3)), 15, null, FontWeight.Normal, true);
         var estado = CUi.Txt("", 13.5, CUi.Fraco, FontWeight.Normal, true);
+        // se o Android nao deixar instalar por aqui: baixar o APK pelo navegador e abrir
+        var navegador = new CUi.Botao(T("Baixar pelo navegador"), false, () =>
+            _ = TopLevel.GetTopLevel(this)?.Launcher.LaunchUriAsync(new Uri(nova.Url))) { IsVisible = false, HorizontalAlignment = HorizontalAlignment.Stretch };
+        void Falhou(Exception ex, bool instalando)
+        {
+            Console.WriteLine("atualizacao: " + ex);
+            estado.Text = T("Não consegui atualizar: {0}", ex.Message) + (instalando
+                ? "\n" + T("Toque em \"Baixar pelo navegador\" e abra o arquivo baixado para instalar por cima (os saves ficam).")
+                : "");
+            navegador.IsVisible = instalando;
+        }
         bool baixando = false;
         string? apk = null;
         CUi.Botao? depois = null, agora = null;
         void Instalar()
         {
             if (apk == null) return;
-            if (Atualizacao.InstalarApk!(apk)) estado.Text = T("Confirme a instalação na janela do Android.");
+            bool abriu;
+            try { abriu = Atualizacao.InstalarApk!(apk); }
+            catch (Exception ex) { Falhou(ex, true); agora!.Habilitado = depois!.Habilitado = true; return; }
+            if (abriu) estado.Text = T("Confirme a instalação na janela do Android.");
             else
             {
                 // o Android abriu a tela da permissao: ao voltar, tocar de novo
@@ -142,13 +156,12 @@ public sealed partial class TelaInicio
             }
             catch (Exception ex)
             {
-                Console.WriteLine("atualizacao: " + ex);
-                estado.Text = T("Não consegui atualizar: {0}", ex.Message);
+                Falhou(ex, false);
                 baixando = false;
                 agora.Habilitado = depois.Habilitado = true;
             }
         });
-        SobreporCelular(CUi.Caixa_(T("Nova versão do RetroFoot"), new StackPanel { Spacing = 10, Children = { texto, estado } }, depois, agora));
+        SobreporCelular(CUi.Caixa_(T("Nova versão do RetroFoot"), new StackPanel { Spacing = 10, Children = { texto, estado, navegador } }, depois, agora));
     }
 
     void PaginaCelular(Control cabecalho, Control corpo, Control? rodape, Action? enter, Action? esc, Control? foco)

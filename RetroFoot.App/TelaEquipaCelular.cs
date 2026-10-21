@@ -423,22 +423,71 @@ public sealed partial class TelaEquipa
             if (_tela._jogo is { } jogo)
             {
                 long preco = RetroFoot.Motor.Base.Ext.Bytes(jogo.B36.AsSpan(0, 10)).Round();
-                var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 44 };
-                g.Children.Add(CUi.Txt(T("Preço do ingresso") + "  " + _p.DinheiroCelular(preco), 14, PT, FontWeight.SemiBold));
-                if (_s.J.M.Regras.CartoesAmarelos)
+                if (!_s.J.M.Regras.CartoesAmarelos)
                 {
-                    // o % do preco de tabela nos jogos em casa (ingressos.py)
-                    var pct = CUi.Txt(Ingressos.Percentual(_e) + "%", 15, PT, FontWeight.Bold);
-                    pct.Width = 52; pct.TextAlignment = TextAlignment.Center;
-                    var menos = new CUi.Botao("−", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) - Ingressos.Passo); pct.Text = Ingressos.Percentual(_e) + "%"; }) { Padding = new Thickness(14, 2) };
-                    var mais = new CUi.Botao("+", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) + Ingressos.Passo); pct.Text = Ingressos.Percentual(_e) + "%"; }) { Padding = new Thickness(14, 2) };
-                    var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, Children = { menos, pct, mais } };
+                    // o jogo classico: so o preco de tabela
+                    p.Children.Add(Linha(T("Preço do ingresso"), _p.DinheiroCelular(preco)));
+                }
+                else
+                {
+                    // a versao Atual (ingressos.py): o preco do ingresso direto (de 50% a 300%
+                    // da tabela, de 25 em 25) e, embaixo, o publico e a renda previstos
+                    var valor = CUi.Txt("", 16, PT, FontWeight.Bold);
+                    valor.MinWidth = 96; valor.TextAlignment = TextAlignment.Center;
+                    var tabela = CUi.Txt("", 12, PF);
+                    var previsao = new StackPanel { Spacing = 2 };
+                    void Atualizar()
+                    {
+                        int pct = Ingressos.Percentual(_e);
+                        valor.Text = _p.DinheiroCelular(IngressosPrevisao.PrecoCom(RetroFoot.Motor.Base.Ext.Bytes(jogo.B36.AsSpan(0, 10)), pct));
+                        tabela.Text = T("{0}% do preço de tabela ({1})", pct, _p.DinheiroCelular(preco));
+                        previsao.Children.Clear();
+                        foreach (var c in Previsao(pct)) previsao.Children.Add(c);
+                    }
+                    var menos = new CUi.Botao("−", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) - Ingressos.Passo); Atualizar(); }) { Padding = new Thickness(16, 2) };
+                    var mais = new CUi.Botao("+", false, () => { Ingressos.Escolher(_e, Ingressos.Percentual(_e) + Ingressos.Passo); Atualizar(); }) { Padding = new Thickness(16, 2) };
+                    var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 44, Margin = new Thickness(0, 6, 0, 0) };
+                    g.Children.Add(CUi.Txt(T("Preço do ingresso"), 14, PT, FontWeight.SemiBold));
+                    var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, Children = { menos, valor, mais } };
                     Grid.SetColumn(sp, 1);
                     g.Children.Add(sp);
+                    p.Children.Add(g);
+                    p.Children.Add(tabela);
+                    previsao.Margin = new Thickness(0, 6, 0, 0);
+                    p.Children.Add(previsao);
+                    Atualizar();
                 }
-                p.Children.Add(g);
             }
             return p;
+        }
+
+        // o publico e a renda previstos do proximo jogo em casa com o preco escolhido
+        // (IngressosPrevisao): o desta jornada ja tem o publico decidido; os seguintes, a faixa
+        List<Control> Previsao(int pct)
+        {
+            var r = new List<Control>();
+            var pv = IngressosPrevisao.ProximoEmCasa(_e, _tela._jogo, pct, id => _s.Equipa(id));
+            if (pv == null) { r.Add(CUi.Txt(T("Sem jogo em casa pela frente nesta temporada."), 12.5, PF, FontWeight.Normal, true)); return r; }
+            string adv = _s.Equipa(pv.Adversario) is { } a ? Painel.TextoCelular(a.NomeCurto) : "";
+            string N(int v) => v.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+            double lot(int v) => pv.Capacidade > 0 ? 100.0 * v / pv.Capacidade : 0;
+            r.Add(CUi.Txt((pv.Definido ? T("Este jogo em casa") : T("Próximo jogo em casa")) + " · " + adv + (pv.Taca ? " (" + T("Copa") + ")" : ""), 13, PT, FontWeight.Bold));
+            if (pv.Definido)
+            {
+                r.Add(Linha(T("Público"), T("{0} ({1:0}% do estádio)", N(pv.Minimo), lot(pv.Minimo))));
+                r.Add(Linha(T("Renda prevista"), _p.DinheiroCelular(pv.RendaMinima)));
+                r.Add(CUi.Txt(T("O público deste jogo já foi decidido no começo da rodada: o preço muda só a renda. Nos próximos jogos em casa, muda também o público."), 12, PF, FontWeight.Normal, true));
+            }
+            else
+            {
+                r.Add(Linha(T("Público previsto"), pv.Minimo == pv.Maximo ? N(pv.Minimo) : T("{0} a {1}", N(pv.Minimo), N(pv.Maximo))));
+                r.Add(Linha(T("Estádio"), Math.Round(lot(pv.Minimo)) == Math.Round(lot(pv.Maximo))
+                    ? T("{0:0}% de {1}", lot(pv.Minimo), N(pv.Capacidade))
+                    : T("{0:0}% a {1:0}% de {2}", lot(pv.Minimo), lot(pv.Maximo), N(pv.Capacidade))));
+                r.Add(Linha(T("Renda prevista"), pv.RendaMinima == pv.RendaMaxima ? _p.DinheiroCelular(pv.RendaMinima) : T("{0} a {1}", _p.DinheiroCelular(pv.RendaMinima), _p.DinheiroCelular(pv.RendaMaxima))));
+                r.Add(CUi.Txt(T("Previsão com a força e a moral de agora; muda com os resultados até lá."), 12, PF, FontWeight.Normal, true));
+            }
+            return r;
         }
 
         // a formacao dos titulares (D-M-A, sem o goleiro), ex. "4-4-2"; null sem 11 titulares

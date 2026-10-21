@@ -1,3 +1,5 @@
 Confirme a instalação na janela do Android.	Confirm the installation in the Android window.
 Permita que o RetroFoot instale atualizações e toque em Instalar.	Allow RetroFoot to install updates, then tap Install.
 Instalar	Install
+Baixar pelo navegador	Download in the browser
+Toque em "Baixar pelo navegador" e abra o arquivo baixado para instalar por cima (os saves ficam).	Tap "Download in the browser" and open the downloaded file to install over it (your saves stay).

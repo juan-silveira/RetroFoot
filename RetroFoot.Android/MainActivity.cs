@@ -21,9 +21,19 @@ public class MainActivity : AvaloniaMainActivity
 {
     // ao voltar ao app (depois de outro app por cima, ou do Android refazer a superficie), a
     // tela inteira e redesenhada: num celular ela voltou toda verde, sem o conteudo
+    // a tela em primeiro plano (o instalador da atualizacao abre a partir dela)
+    internal static MainActivity? Atual;
+
+    protected override void OnPause()
+    {
+        if (Atual == this) Atual = null;
+        base.OnPause();
+    }
+
     protected override void OnResume()
     {
         base.OnResume();
+        Atual = this;
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             if (RetroFoot.App.App.Raiz is { } v) Redesenhar(v);

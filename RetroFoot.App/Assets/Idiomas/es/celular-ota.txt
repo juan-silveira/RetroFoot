@@ -1,3 +1,5 @@
 Confirme a instalação na janela do Android.	Confirme la instalación en la ventana de Android.
 Permita que o RetroFoot instale atualizações e toque em Instalar.	Permita que RetroFoot instale actualizaciones y toque en Instalar.
 Instalar	Instalar
+Baixar pelo navegador	Descargar en el navegador
+Toque em "Baixar pelo navegador" e abra o arquivo baixado para instalar por cima (os saves ficam).	Toque en "Descargar en el navegador" y abra el archivo descargado para instalar encima (las partidas se mantienen).
