@@ -94,6 +94,13 @@ public static partial class TelaProcura
             _e = e;
             _escolher = escolher;
             _launcher = s.J.M.Regras.CartoesAmarelos;
+            // o dinheiro em caixa (desenhado aqui) muda com uma compra feita no plantel aberto
+            // pelo "Time...": enquanto a janela esta aberta, ela se refaz
+            void Mudou(SEquipa x) { if (x == _e) Redesenhar(); }
+            // (do abrir ao fechar: no celular este desenho nem entra na tela, a versao dele se
+            // refaz pelo Redesenhar)
+            TelaDinheiro.Mudou += Mudou;
+            Fechou += () => TelaDinheiro.Mudou -= Mudou;
             _mais = _launcher ? 50 : 0;
             Titulo = T("Lista de Jogadores");
             FundoCliente = Amarelo;
@@ -338,6 +345,7 @@ public static partial class TelaProcura
             int preco = S.Mercado.PrecoParaComprar(_e, eq, p);
             if (preco <= 0) return;
             S.Mercado.Comprar(_e, eq, eq.Jogadores.IndexOf(p), preco, registado: S.J.Op.Registrado);
+            TelaDinheiro.Avisar(_e);
             Redesenhar();
         }
 

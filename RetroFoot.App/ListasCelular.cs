@@ -352,12 +352,15 @@ static class ListasCelular
 
     // os artilheiros (TelaListas.MelhoresMarcadores): o lugar, a bandeira, o nome, a equipa e
     // os golos
-    internal static void Marcadores(Dialogos d, string titulo, List<(Jogador P, Equipa E, int Golos)> ms)
+    internal static void Marcadores(Dialogos d, string titulo, List<(Jogador P, Equipa E, int Golos)> ms, Action<int>? toque = null)
     {
+        // o toque (a compra directa) fecha a lista e abre o plantel, como o duplo clique
+        Action Tirar = () => { };
+        Func<int, Action?>? tq = toque == null ? null : i => () => { Tirar(); toque(i); };
         if (CUi.Retro)
         {
             // as colunas do computador, numeradas: o nome (negrito), os golos e a equipa
-            Abrir(d, titulo, null, ListaR(ms.Count, i =>
+            (_, _, Tirar) = Abrir(d, titulo, null, ListaR(ms.Count, i =>
             {
                 var (p, e, g) = ms[i];
                 var nome = R(TextosMercado.NomeJogador(p), true);
@@ -366,7 +369,7 @@ static class ListasCelular
                 eq.Margin = new Thickness(12, 0, 0, 0);
                 eq.MaxWidth = 140;
                 return Grade("24,*,30,Auto", RD((i + 1).ToString()), nome, RD(g.ToString(), true), eq);
-            }), null);
+            }, tq), null);
             return;
         }
         var corpo = Pilha(Cabecalho("26,*,Auto,40", "#", T("Jogador"), T("Time"), T("Gols")),
@@ -382,8 +385,8 @@ static class ListasCelular
                 eq.MaxWidth = 130;
                 eq.Margin = new Thickness(8, 0, 0, 0);
                 return Grade("26,*,Auto,40", Num((i + 1).ToString(), 13, CUi.Fraco, true), Margem(nome, 8), eq, Num(g.ToString(), 16, Forte, true));
-            }));
-        Abrir(d, titulo, null, corpo, null);
+            }, tq));
+        (_, _, Tirar) = Abrir(d, titulo, null, corpo, null);
     }
 
     internal static Control Margem(Control c, double esq) { c.Margin = new Thickness(esq, 0, 0, 0); return c; }

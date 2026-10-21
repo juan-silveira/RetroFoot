@@ -208,7 +208,11 @@ public static class TelaListas
     {
         var ms = MelhoresMarcadores(s, deSempre);
         if (ms.Count == 0) return;
-        if (Celular.Ativo) { ListasCelular.Marcadores(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms); return; }
+        // com a compra directa (add-in 0x10), o duplo clique abre o plantel do time do jogador
+        // (com ele escolhido), como nas ultimas transferencias
+        bool compra = Registo.AddIn(Registo.AddInCompraDirecta);
+        Action<int>? abrir = compra ? i => AbrirPlantel?.Invoke(ms[i].E, ms[i].P.ID) : null;
+        if (Celular.Ativo) { ListasCelular.Marcadores(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms, abrir); return; }
         Lista(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms.Count, i =>
         {
             var (p, e, g) = ms[i];
@@ -219,7 +223,7 @@ public static class TelaListas
             Formatado.Logo(b, e);
             Formatado.Col(b, Dlg.Bytes(e.NomeCurto), 4, 0x8C);
             return b.ToArray();
-        }, OpNumerada);
+        }, OpNumerada | (compra ? OpDuplo : 0), abrir);
     }
 
     // 3:d83a: o maximo M de golos (da epoca, +0x14, ou de sempre, historial) entre todos os

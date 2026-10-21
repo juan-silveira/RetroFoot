@@ -64,7 +64,7 @@ internal abstract class MercadoForm : Control
     Control? _celular;
     // a versao do celular se refaz quando o desenho daqui se refaria (Redesenhar)
     protected Action? AoRedesenhar;
-    protected void Redesenhar()
+    internal void Redesenhar()
     {
         InvalidateVisual();
         AoRedesenhar?.Invoke();

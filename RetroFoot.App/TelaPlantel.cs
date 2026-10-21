@@ -236,6 +236,9 @@ public static partial class TelaPlantel
             var c = Compradora();
             if (p == null || e == null || c == null || _preco <= 0) return;
             S.Mercado.Comprar(c, e, k, _preco, registado: S.J.Op.Registrado);
+            // (as janelas que mostram o dinheiro em caixa se refazem: a Lista de Jogadores
+            // aberta por baixo, a tela da equipa)
+            TelaDinheiro.Avisar(c);
             _inicial = 0;
             Atualizar();
         }

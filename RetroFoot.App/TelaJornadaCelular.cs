@@ -31,6 +31,7 @@ public sealed partial class TelaJornada
         if (_listaCel == null) return;
         _listaCel.Medir();
         _listaCel.InvalidateVisual();
+        Avalonia.Threading.Dispatcher.UIThread.Post(SeguirHumano, Avalonia.Threading.DispatcherPriority.Render);
         _relogioCel?.InvalidateVisual();
         if (_relogioCel != null) _relogioCel.IsVisible = !acabou;
         _tituloCel!.Text = CUi.Retro ? titulo + (pausado ? "  (" + T("pausa") + ")" : "")
@@ -39,6 +40,16 @@ public sealed partial class TelaJornada
         _continuarCel!.IsVisible = acabou;
         _pausaCel!.IsVisible = !acabou;
         _pausaCel.Texto = pausado ? "▶" : "❚❚";
+    }
+
+    ScrollViewer? _rolarCel;
+    bool _jogadorRolou;
+
+    // poe a divisao do humano no alto, ate o jogador tocar na lista ou rolar
+    void SeguirHumano()
+    {
+        if (_rolarCel == null || _listaCel == null || _jogadorRolou) return;
+        _rolarCel.Offset = new Vector(0, _listaCel.InicioHumano());
     }
 
     void MontarCelular()
@@ -73,12 +84,12 @@ public sealed partial class TelaJornada
         // (no Retro, poucos jogos ficam no alto, como no computador)
         if (CUi.Retro) _listaCel.VerticalAlignment = VerticalAlignment.Top;
         var rolar = new ScrollViewer { Content = _listaCel, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
-        // no Retro a tela abre na divisao do humano (uma vez; depois o jogador rola a vontade)
-        if (CUi.Retro)
-            rolar.AttachedToVisualTree += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-            {
-                if (_listaCel != null) rolar.Offset = new Vector(0, _listaCel.InicioHumano());
-            }, Avalonia.Threading.DispatcherPriority.Loaded);
+        // a tela abre na divisao do humano (uma vez; depois o jogador rola a vontade)
+        // e a acompanha enquanto o jogador nao rola (os lances aumentam as divisoes de cima)
+        _rolarCel = rolar;
+        rolar.AddHandler(PointerPressedEvent, (_, _) => _jogadorRolou = true, Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+        rolar.AddHandler(PointerWheelChangedEvent, (_, _) => _jogadorRolou = true, Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+        rolar.AttachedToVisualTree += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(SeguirHumano, Avalonia.Threading.DispatcherPriority.Loaded);
         _continuarCel = new CUi.Botao(T("Continuar"), true, Seguir) { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 48, IsVisible = false };
         var rodape = new Border { Padding = new Thickness(12, 6), Child = _continuarCel };
         var d = new DockPanel { Background = CUi.Fundo };
@@ -103,6 +114,7 @@ public sealed partial class TelaJornada
         // a altura do conteudo (a ScrollViewer rola)
         public void Medir()
         {
+            _cabHumano = null;   // (as linhas sao refeitas a cada minuto)
             if (CUi.Retro) { Height = AlturaRetro(); return; }
             double h = 8;
             foreach (var l in t.linhas)
@@ -128,8 +140,12 @@ public sealed partial class TelaJornada
             {
                 if (l.Cabecalho != null)
                 {
-                    var tc = Txt(TituloNoIdioma(l.Cabecalho).Trim().ToUpperInvariant(), 13, CUi.TituloSecao, true);
-                    dc.DrawText(tc, new Point(x0 + 4, y + ACab - tc.Height - 4));
+                    // a divisao do humano: o titulo em amarelo numa pilula (abre nela)
+                    bool hum = CabecalhoHumano(l);
+                    var tc = Txt(TituloNoIdioma(l.Cabecalho).Trim().ToUpperInvariant(), 13, hum ? TemaVerde.SobreDestaque : CUi.TituloSecao, true);
+                    var pt = new Point(x0 + 4, y + ACab - tc.Height - 4);
+                    if (hum) dc.DrawRectangle(TemaVerde.BotaoPrimario, null, new Rect(pt.X - 8, pt.Y - 3, tc.Width + 16, tc.Height + 6), 10, 10);
+                    dc.DrawText(tc, pt);
                     y += ACab;
                     continue;
                 }
@@ -206,7 +222,7 @@ public sealed partial class TelaJornada
         // onde comeca a divisao do humano (a tela abre nela)
         public double InicioHumano()
         {
-            if (!CUi.Retro) return 0;
+            if (!CUi.Retro) return InicioHumanoModerno();
             double y = RTopo;
             foreach (var (cab, jogos, humano) in Blocos())
             {
@@ -216,6 +232,31 @@ public sealed partial class TelaJornada
                 y += RFim;
             }
             return 0;
+        }
+
+        // o Moderno: o cabecalho da divisao em que o humano joga (a 1a com ele)
+        double InicioHumanoModerno()
+        {
+            double y = 8;
+            foreach (var (cab, jogos, humano) in Blocos())
+            {
+                if (humano) return Math.Max(0, y - 4);
+                if (cab != null) y += ACab;
+                foreach (var l in jogos) y += AJogo + (l.LanceTipo != 0 ? ALance : 0) + 4;
+            }
+            return 0;
+        }
+
+        // a divisao do humano (o cabecalho fica destacado no Moderno)
+        HashSet<Linha>? _cabHumano;
+        bool CabecalhoHumano(Linha l)
+        {
+            if (_cabHumano == null)
+            {
+                _cabHumano = new HashSet<Linha>();
+                foreach (var (cab, _, humano) in Blocos()) if (humano && cab != null) _cabHumano.Add(cab);
+            }
+            return _cabHumano.Contains(l);
         }
 
         // o jogo na altura y (o toque)
