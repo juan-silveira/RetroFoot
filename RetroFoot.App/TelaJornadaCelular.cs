@@ -107,7 +107,10 @@ public sealed partial class TelaJornada
     sealed class ListaCelular : Control
     {
         readonly TelaJornada t;
-        const double ACab = 30, AJogo = 46, ALance = 18;
+        const double ACab = 30, AJogo = 46, AJogoHumano = 58, ALance = 18;
+        double _escala = 1;   // as equipas do jogo do humano, maiores
+
+        static double AlturaM(Linha l) => (l.Humanos > 0 ? AJogoHumano : AJogo) + (ComLance(l) ? ALance : 0);
 
         public ListaCelular(TelaJornada t) { this.t = t; Medir(); }
 
@@ -120,7 +123,7 @@ public sealed partial class TelaJornada
             foreach (var l in t.linhas)
             {
                 if (l.Cabecalho != null) h += ACab;
-                else if (!l.Vazia) h += AJogo + (ComLance(l) ? ALance : 0) + 4;
+                else if (!l.Vazia) h += AlturaM(l) + 4;
             }
             Height = h + 8;
         }
@@ -150,25 +153,31 @@ public sealed partial class TelaJornada
                     continue;
                 }
                 if (l.Vazia) continue;
-                double hj = AJogo + (ComLance(l) ? ALance : 0);
+                double hj = AlturaM(l);
+                bool jh = l.Humanos > 0;
+                double aj = jh ? AJogoHumano : AJogo, f = jh ? 1.2 : 1;
                 var r = new Rect(x0, y, wl, hj);
                 // o cartao do jogo
                 if (CUi.Retro) { dc.FillRectangle(W95.Face, r); dc.DrawRectangle(new Pen(W95.Preto, 1), r.Deflate(0.5)); }
+                // o jogo do humano: mais alto, no fundo de destaque com a borda amarela
+                else if (jh) dc.DrawRectangle(TemaVerde.Humano, new Pen(TemaVerde.Destaque, 2), r.Deflate(1), 12, 12);
                 else dc.DrawRectangle(TemaVerde.CartaoHub, new Pen(TemaVerde.Borda, 1), r, 12, 12);
-                double meio = r.X + r.Width / 2, yc = r.Y + AJogo / 2;
+                double meio = r.X + r.Width / 2, yc = r.Y + aj / 2;
                 // o placar e o minuto do jogo
-                var pl = Txt($"{l.GC} - {l.GF}", 18, CUi.Texto, true);
+                var pl = Txt($"{l.GC} - {l.GF}", 18 * f, CUi.Texto, true);
                 dc.DrawText(pl, new Point(meio - pl.Width / 2, yc - pl.Height / 2 + 4));
-                var st = Txt(t.StatusDaLinha(l, status), 10, CUi.Retro ? W95.Marinho : TemaVerde.Destaque, true);
+                var st = Txt(t.StatusDaLinha(l, status), 10 * f, CUi.Retro ? W95.Marinho : TemaVerde.Destaque, true);
                 dc.DrawText(st, new Point(meio - st.Width / 2, r.Y + 3));
                 // as equipas, nas cores delas (o Retro) ou com o logo (o Moderno)
-                double larg = (r.Width - 70) / 2 - 8;
-                Equipa(dc, l.Casa, l.LetraCasa, l.FundoCasa, l.LogoCasa, new Rect(r.X + 6, yc - 15, larg, 30), true, Humano(l, Lado.Casa));
-                Equipa(dc, l.Fora, l.LetraFora, l.FundoFora, l.LogoFora, new Rect(meio + 35, yc - 15, larg, 30), false, Humano(l, Lado.Visit));
+                double larg = (r.Width - 70 - 6 * (f - 1) * 10) / 2 - 8, ae = 30 * f;
+                _escala = f;
+                Equipa(dc, l.Casa, l.LetraCasa, l.FundoCasa, l.LogoCasa, new Rect(r.X + 6, yc - ae / 2, larg, ae), true, Humano(l, Lado.Casa));
+                Equipa(dc, l.Fora, l.LetraFora, l.FundoFora, l.LogoFora, new Rect(meio + 35 + 3 * (f - 1) * 10, yc - ae / 2, larg, ae), false, Humano(l, Lado.Visit));
+                _escala = 1;
                 // o ultimo lance
                 if (ComLance(l))
                 {
-                    double yl = r.Y + AJogo - 2;
+                    double yl = r.Y + aj - 2;
                     Icones.Desenhar(dc, l.LanceTipo, l.SegundoAmarelo, new Rect(r.X + 10, yl + 2, 12, 12));
                     string txt = MinutoTexto.Texto(l.LanceMin, l.LanceAcr) + " " + l.LanceNome.Trim();
                     if (l.LanceTipo == TipoLance.Penalti) txt += " (" + T("pen.") + ")";
@@ -242,7 +251,7 @@ public sealed partial class TelaJornada
             {
                 if (humano) return Math.Max(0, y - 4);
                 if (cab != null) y += ACab;
-                foreach (var l in jogos) y += AJogo + (ComLance(l) ? ALance : 0) + 4;
+                foreach (var l in jogos) y += AlturaM(l) + 4;
             }
             return 0;
         }
@@ -375,10 +384,11 @@ public sealed partial class TelaJornada
                     dc.DrawText(tn, new Point(casa ? r.Right - 6 - tn.Width : r.X + 6, r.Center.Y - tn.Height / 2));
                 return;
             }
-            double q = 24, xl = casa ? r.Right - q : r.X;
+            double q = 24 * _escala, xl = casa ? r.Right - q : r.X;
             if (logo != null) TelaJornada.Imagem(dc, logo, new Rect(xl, r.Center.Y - q / 2, q, q));
             else dc.DrawEllipse(new SolidColorBrush(fundo), new Pen(fl, 2), new Point(xl + q / 2, r.Center.Y), q / 2 - 1, q / 2 - 1);
-            var t2 = Txt(nome, 14, CUi.Texto, humano);
+            // (o nome cresce menos que o escudo: os compridos nao cabiam)
+            var t2 = Txt(nome, _escala > 1 ? 14.5 : 14, CUi.Texto, humano);
             double area = r.Width - q - 8;
             double xt = casa ? Math.Max(r.X, r.Right - q - 8 - t2.Width) : r.X + q + 8;
             using (dc.PushClip(new Rect(casa ? r.X : r.X + q + 8, r.Y, area, r.Height)))
@@ -401,7 +411,7 @@ public sealed partial class TelaJornada
             {
                 if (l.Cabecalho != null) { y += ACab; continue; }
                 if (l.Vazia) continue;
-                double hj = AJogo + (ComLance(l) ? ALance : 0);
+                double hj = AlturaM(l);
                 if (p.Y >= y && p.Y < y + hj && l.Jogo is { } jg)
                 {
                     LigacaoPartida.PedirDetalhes(t.s, jg, p.X < Bounds.Width / 2 ? Lado.Casa : Lado.Visit);
