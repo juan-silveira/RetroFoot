@@ -29,26 +29,14 @@ public static class IngressosPrevisao
         public long RendaMaxima => Maximo * Preco;
     }
 
-    // a procura de cada escolha (ingressos.asm), por percentual de 50 a 300
-    static readonly float[] Procura = { 2.4623f, 1.4535f, 1.0f, 0.7482f, 0.5903f, 0.4831f, 0.4061f, 0.3485f, 0.3039f, 0.2685f, 0.2397f };
-
-    static double FatorProcura(int percentual)
-    {
-        int k = Math.Clamp(percentual / Ingressos.Passo, 2, 12);
-        return Procura[k - 2];
-    }
-
-    // o preco de tabela x a escolha (como Ingressos.Preco, mas para um percentual qualquer)
-    public static long PrecoCom(Ext precoTabela, int percentual) =>
-        precoTabela.Mul(Ext.Int(Math.Clamp(percentual / Ingressos.Passo, 2, 12)).Mul(Ext.F32(0.25f))).Round();
-
-    // o proximo jogo em casa de e (o desta jornada, se for em casa); null sem nenhum. jogoAtual:
+    // o proximo jogo em casa de e (o desta jornada, se for em casa) com a razao do preco
+    // (Ingressos.Razao); null sem nenhum. jogoAtual:
     // o jogo de e nesta jornada (o preco de tabela vem dele); equipa: o id -> Equipa
-    public static Previsao? ProximoEmCasa(Equipa e, Jogo? jogoAtual, int percentual, Func<ushort, Equipa?> equipa)
+    public static Previsao? ProximoEmCasa(Equipa e, Jogo? jogoAtual, int razao, Func<ushort, Equipa?> equipa)
     {
         if (jogoAtual == null) return null;
         var tabela = Ext.Bytes(jogoAtual.B36.AsSpan(0, 10));
-        long preco = PrecoCom(tabela, percentual);
+        long preco = Ingressos.PrecoCom(tabela, razao);
         int cap = PreJogo.CapacidadeDoEstadio(e);
         if (jogoAtual.Casa == e.ID && jogoAtual.Taca != TipoJogo.SemEquipas)
         {
@@ -69,7 +57,7 @@ public static class IngressosPrevisao
             {
                 double b = 3 * Mundo.MediaForca(e) + Mundo.MediaForca(fora) + 3 * r;
                 double v = b * Math.Sqrt(Ext.DeReal48(e.Moral).Float64()) * Math.Sqrt(Ext.DeReal48(fora.Moral).Float64()) * 200;
-                v = Math.Pow(Math.Max(v, 0), 1.04) * (taca ? 1.3 : 1) * FatorProcura(percentual);
+                v = Math.Pow(Math.Max(v, 0), 1.04) * (taca ? 1.3 : 1) * Ingressos.FatorProcura(razao).Float64();
                 return Math.Min((int)Math.Round(v), cap);
             }
             return new Previsao(fora.ID, taca, false, Conta(0), Conta(1), cap, preco);

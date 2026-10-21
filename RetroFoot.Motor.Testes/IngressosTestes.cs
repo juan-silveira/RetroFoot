@@ -161,4 +161,49 @@ public class IngressosTestes
         Assert.Equal(225, Ingressos.Percentual(lido.Equipas[3]));
         Assert.Equal(0, lido.Equipas[2].Cabeca[4]);
     }
+
+    // RetroFoot: o -/+ muda o preco de $1 em $1, de metade ate o triplo da tabela; o preco
+    // mostrado e o cobrado; o publico cai com o preco (razao^-1,3, nos quartos a tabela)
+    [Fact]
+    public void PrecoDeUmEmUm()
+    {
+        var e = Time(1);
+        var tabela = X(10);
+        Assert.Equal(10, Ingressos.PrecoCom(tabela, Ingressos.Razao(e)));
+        long antes = 10;
+        for (int i = 0; i < 25; i++)
+        {
+            Ingressos.MudarPreco(e, tabela, 1);
+            long p = Ingressos.PrecoCom(tabela, Ingressos.Razao(e));
+            Assert.Equal(Math.Min(antes + 1, 30), p);
+            Assert.Equal((double)p, Ingressos.Preco(tabela, e).Float64());
+            antes = p;
+        }
+        Assert.Equal(300, Ingressos.Percentual(e));
+        for (int i = 0; i < 30; i++) Ingressos.MudarPreco(e, tabela, -1);
+        Assert.Equal(5, Ingressos.PrecoCom(tabela, Ingressos.Razao(e)));
+        // a procura cai sempre com o preco e bate com a tabela nos quartos
+        double ant = double.MaxValue;
+        for (int r = Ingressos.RazaoMinima; r <= Ingressos.RazaoMaxima; r += 100)
+        {
+            double f = Ingressos.FatorProcura(r).Float64();
+            Assert.True(f < ant);
+            ant = f;
+        }
+        Assert.Equal(1.4535f, (float)Ingressos.FatorProcura(7500).Float64());
+        // um preco de tabela quebrado (com inflacao): cada clique muda $1
+        var t2 = X(137.6);
+        var e2 = Time(2);
+        long a2 = Ingressos.PrecoCom(t2, Ingressos.Razao(e2));
+        for (int i = 0; i < 50; i++)
+        {
+            Ingressos.MudarPreco(e2, t2, 1);
+            long p = Ingressos.PrecoCom(t2, Ingressos.Razao(e2));
+            Assert.Equal(a2 + 1, p);
+            a2 = p;
+        }
+        // o escolher em quartos (o launcher) apaga a razao fina
+        Ingressos.Escolher(e2, 150);
+        Assert.Equal(15000, Ingressos.Razao(e2));
+    }
 }

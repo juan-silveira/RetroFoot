@@ -1476,12 +1476,12 @@ public sealed partial class TelaEquipa : UserControl
                 if (!_launcher) Escreve(dc, Dinheiro(preco), 112, 312, 13, _letra);
                 else
                 {
-                    // launcher (ingressos.py): o preco direto (de 50% a 300% da tabela, de 25 em
-                    // 25; as setas mudam o %) e, entre o balanco e os totais, a previsao do
-                    // proximo jogo em casa (IngressosPrevisao)
-                    int pct = Ingressos.Percentual(_e);
-                    CampoNumero(dc, RIngressos, Dinheiro(IngressosPrevisao.PrecoCom(Ext.Bytes(_jogo.B36.AsSpan(0, 10)), pct)));
-                    var (l1, l2) = LinhasPrevisao(pct);
+                    // launcher (ingressos.py): o preco direto (de 50% a 300% da tabela, as setas
+                    // de $1 em $1) e, entre o balanco e os totais, a previsao do proximo jogo em
+                    // casa (IngressosPrevisao)
+                    int razao = Ingressos.Razao(_e);
+                    CampoNumero(dc, RIngressos, Dinheiro(Ingressos.PrecoCom(Ext.Bytes(_jogo.B36.AsSpan(0, 10)), razao)));
+                    var (l1, l2) = LinhasPrevisao(razao);
                     using (dc.PushClip(new Rect(16, 280, 241, 26)))
                     {
                         Escreve(dc, l1, 16, 280, 11, _letra);
@@ -1493,9 +1493,9 @@ public sealed partial class TelaEquipa : UserControl
 
         // a previsao do proximo jogo em casa em duas linhas curtas (o adversario, o publico e a
         // ocupacao; a renda)
-        (string, string) LinhasPrevisao(int pct)
+        (string, string) LinhasPrevisao(int razao)
         {
-            var pv = IngressosPrevisao.ProximoEmCasa(_e, _jogo, pct, id => _s.Equipa(id));
+            var pv = IngressosPrevisao.ProximoEmCasa(_e, _jogo, razao, id => _s.Equipa(id));
             if (pv == null) return (T("Sem jogo em casa pela frente nesta temporada."), "");
             string adv = _s.Equipa(pv.Adversario) is { } a ? Texto(a.NomeCurto) : "";
             string N(int v) => v.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
@@ -1508,9 +1508,9 @@ public sealed partial class TelaEquipa : UserControl
 
         // a mesma previsao em 3 linhas curtas (o Moderno 16:9, numa coluna estreita): o jogo, o
         // publico e a renda
-        string[] LinhasPrevisao3(int pct)
+        string[] LinhasPrevisao3(int razao)
         {
-            var pv = IngressosPrevisao.ProximoEmCasa(_e, _jogo, pct, id => _s.Equipa(id));
+            var pv = IngressosPrevisao.ProximoEmCasa(_e, _jogo, razao, id => _s.Equipa(id));
             if (pv == null) return new[] { T("Sem jogo em casa pela frente nesta temporada."), "", "" };
             string adv = _s.Equipa(pv.Adversario) is { } a ? Texto(a.NomeCurto) : "";
             string N(int v) => v.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
@@ -1543,10 +1543,12 @@ public sealed partial class TelaEquipa : UserControl
             }
         }
 
-        // o OnChange do campo (abas.asm): grava no time do tecnico, de 25 em 25, de 50 a 300
+        // o OnChange do campo (abas.asm): grava no time do tecnico o preco de $1 em $1, de 50% a
+        // 300% da tabela
         void MudarIngressos(int passos)
         {
-            Ingressos.Escolher(_e, Ingressos.Percentual(_e) + passos * Ingressos.Passo);
+            if (_jogo == null) return;
+            Ingressos.MudarPreco(_e, Ext.Bytes(_jogo.B36.AsSpan(0, 10)), passos);
             // o jogo desta jornada em casa: o publico dele muda ja com o preco
             if (_jogo is { } j && j.Casa == _e.ID) _s.J.M.RecalcularPublico(j);
             InvalidateVisual();

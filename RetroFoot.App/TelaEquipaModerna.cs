@@ -914,14 +914,14 @@ public sealed partial class TelaEquipa
                     int dd = d;
                     _alvos.Add((r, () => MudarIngressos(dd)));
                 }
-                // o preco direto (as setas mudam o % da tabela) e a previsao do proximo em casa
-                int pct = Ingressos.Percentual(_e);
-                string pr = _jogo != null ? Dinheiro(IngressosPrevisao.PrecoCom(Ext.Bytes(_jogo.B36.AsSpan(0, 10)), pct)) : pct + "%";
+                // o preco direto (as setas de $1 em $1) e a previsao do proximo em casa
+                int razao = Ingressos.Razao(_e);
+                string pr = _jogo != null ? Dinheiro(Ingressos.PrecoCom(Ext.Bytes(_jogo.B36.AsSpan(0, 10)), razao)) : Ingressos.Percentual(_e) + "%";
                 CentroM(dc, pr, (menos.Right + mais.X) / 2, y, 13, MTexto, true);
                 _mIngressos = new Rect(menos.X, y - 11, mais.Right - menos.X, 22);
                 if (_jogo != null)
                 {
-                    var ls = LinhasPrevisao3(pct);
+                    var ls = LinhasPrevisao3(razao);
                     if (!duas) ls = new[] { ls[0] + ": " + ls[1], ls[2] };
                     for (int i = 0; i < ls.Length; i++)
                         if (ls[i].Length > 0) EscreveM(dc, ls[i], xr, y + (i + 1) * passo, 11.5, MFraco, max: w);

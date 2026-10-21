@@ -431,23 +431,23 @@ public sealed partial class TelaEquipa
                 else
                 {
                     // a versao Atual (ingressos.py): o preco do ingresso direto (de 50% a 300%
-                    // da tabela, de 25 em 25) e, embaixo, o publico e a renda previstos
+                    // da tabela, de $1 em $1) e, embaixo, o publico e a renda previstos
                     var valor = CUi.Txt("", 16, PT, FontWeight.Bold);
                     valor.MinWidth = 96; valor.TextAlignment = TextAlignment.Center;
                     var tabela = CUi.Txt("", 12, PF);
                     var previsao = new StackPanel { Spacing = 2 };
                     void Atualizar()
                     {
-                        int pct = Ingressos.Percentual(_e);
-                        valor.Text = _p.DinheiroCelular(IngressosPrevisao.PrecoCom(RetroFoot.Motor.Base.Ext.Bytes(jogo.B36.AsSpan(0, 10)), pct));
-                        tabela.Text = T("{0}% do preço de tabela ({1})", pct, _p.DinheiroCelular(preco));
+                        int razao = Ingressos.Razao(_e);
+                        valor.Text = _p.DinheiroCelular(Ingressos.PrecoCom(RetroFoot.Motor.Base.Ext.Bytes(jogo.B36.AsSpan(0, 10)), razao));
+                        tabela.Text = T("{0}% do preço de tabela ({1})", Ingressos.Percentual(_e), _p.DinheiroCelular(preco));
                         previsao.Children.Clear();
-                        foreach (var c in Previsao(pct)) previsao.Children.Add(c);
+                        foreach (var c in Previsao(razao)) previsao.Children.Add(c);
                     }
                     // o jogo desta jornada em casa: o publico dele muda ja com o preco
                     void Mudar(int d)
                     {
-                        Ingressos.Escolher(_e, Ingressos.Percentual(_e) + d * Ingressos.Passo);
+                        Ingressos.MudarPreco(_e, RetroFoot.Motor.Base.Ext.Bytes(jogo.B36.AsSpan(0, 10)), d);
                         if (jogo.Casa == _e.ID) _s.J.M.RecalcularPublico(jogo);
                         Atualizar();
                     }
@@ -470,10 +470,10 @@ public sealed partial class TelaEquipa
 
         // o publico e a renda previstos do proximo jogo em casa com o preco escolhido
         // (IngressosPrevisao): o desta jornada ja tem o publico decidido; os seguintes, a faixa
-        List<Control> Previsao(int pct)
+        List<Control> Previsao(int razao)
         {
             var r = new List<Control>();
-            var pv = IngressosPrevisao.ProximoEmCasa(_e, _tela._jogo, pct, id => _s.Equipa(id));
+            var pv = IngressosPrevisao.ProximoEmCasa(_e, _tela._jogo, razao, id => _s.Equipa(id));
             if (pv == null) { r.Add(CUi.Txt(T("Sem jogo em casa pela frente nesta temporada."), 12.5, PF, FontWeight.Normal, true)); return r; }
             string adv = _s.Equipa(pv.Adversario) is { } a ? Painel.TextoCelular(a.NomeCurto) : "";
             string N(int v) => v.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
