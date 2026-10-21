@@ -810,10 +810,36 @@ public sealed partial class TelaEquipa
                 Background = fundo, CornerRadius = new CornerRadius(CUi.Retro ? 0 : 5), Padding = new Thickness(4, 0), VerticalAlignment = VerticalAlignment.Center,
                 Child = CUi.Txt(t, 11.5, letra, FontWeight.Bold),
             };
-            if (j.Suspensao > 0) yield return Selo("⊘" + j.Suspensao, new SolidColorBrush(Color.Parse("#FFE4E1")), new SolidColorBrush(Color.Parse("#C62828")));
+            // os cartoes como no Moderno do computador: o vermelho com os jogos de suspensao; o
+            // amarelo com o numero de amarelos (com 2, dois cartoes empilhados)
+            if (j.Suspensao > 0) yield return CartaoSelo(j.Suspensao, Color.Parse("#E53935"), Brushes.White, false);
             else if (_s.J.M.Regras.CartoesAmarelos && Painel.AmarelosCelular(j) is int a && a > 0)
-                yield return Selo(a == 1 ? "▮" : "▮▮", Brushes.Transparent, new SolidColorBrush(Color.Parse("#F5B400")));
+                yield return CartaoSelo(a, Color.Parse("#F5C400"), Brushes.Black, a >= 2);
             if (j.JogosLesao > 0) yield return Selo("✚" + j.JogosLesao, Brushes.White, new SolidColorBrush(Color.Parse("#D32F2F")));
+        }
+
+        // um cartao (14 x 18) com o numero dentro; empilhado = outro cartao atras, deslocado
+        static Control CartaoSelo(int n, Color cor, IBrush letra, bool empilhado)
+        {
+            Border Cartao(double op) => new()
+            {
+                Width = 14, Height = 18, CornerRadius = new CornerRadius(2.5), Background = new SolidColorBrush(cor, op),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(90, 0, 0, 0)), BorderThickness = new Thickness(0.8),
+            };
+            var g = new Grid { Width = empilhado ? 18 : 14, Height = empilhado ? 21 : 18, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2, 0, 0, 0) };
+            if (empilhado)
+            {
+                var atras = Cartao(1);
+                atras.HorizontalAlignment = HorizontalAlignment.Right; atras.VerticalAlignment = VerticalAlignment.Top;
+                g.Children.Add(atras);
+            }
+            var frente = Cartao(1);
+            frente.HorizontalAlignment = HorizontalAlignment.Left; frente.VerticalAlignment = VerticalAlignment.Bottom;
+            var t = CUi.Txt(n.ToString(), 11, letra, FontWeight.Bold);
+            t.HorizontalAlignment = HorizontalAlignment.Center; t.Tag = "fixo";
+            frente.Child = t;
+            g.Children.Add(frente);
+            return g;
         }
 
         // a ficha do jogador, com as acoes
