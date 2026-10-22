@@ -56,7 +56,9 @@ public sealed class Sessao
     // o tempo que a tela final da jornada fica antes da classificacao (0 nos testes automaticos)
     public static int PausaFimJornadaMs = 3000;
 
-    public Sessao(Jogo98 s, Action<Control> mostrar, Opcoes? op = null, string? arquivo = null)
+    // retrato: o jogo online continuado de um retrato (Online/Retrato: a semente e o que o save
+    // nao guarda; o host novo depois de uma troca); com ele, s nao e usado (o save vem dele)
+    public Sessao(Jogo98 s, Action<Control> mostrar, Opcoes? op = null, string? arquivo = null, RetroFoot.Motor.Online.Retrato? retrato = null)
     {
         host.Children.Add(camadaTela);
         host.Children.Add(camadaDialogo);
@@ -110,7 +112,7 @@ public sealed class Sessao
             // a proposta de patrocinio (Opcoes.Patrocinios): a janela de Sim/Nao do patch
             Patrocinio = p => EsperarDialogo<bool>(fim => new TelaPatrocinio(p, J.Op.Marcas, Moeda.DoSave(S), fim)),
         };
-        J = new JogoEmCurso(s, (uint)Environment.TickCount, op ?? Opcoes.Padrao, h);
+        J = retrato?.Jogo(op ?? Opcoes.Padrao, h) ?? new JogoEmCurso(s, (uint)Environment.TickCount, op ?? Opcoes.Padrao, h);
         // o banco e as substituicoes das regras deste jogo (5 e 3 = como no classico)
         RetroFoot.Motor.Rodada.Escalacao.MaxReservas = J.M.Regras.MaxReservas;
         RetroFoot.Motor.Rodada.Escalacao.MaxSubstituicoes = J.M.Regras.MaxSubstituicoes;

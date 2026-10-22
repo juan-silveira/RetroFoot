@@ -71,7 +71,7 @@ public static class Ingressos
         GravarRazao(e, r);
     }
 
-    static void GravarRazao(Equipa e, int r)
+    internal static void GravarRazao(Equipa e, int r)
     {
         e.Cabeca[RazaoByte] = (byte)r; e.Cabeca[RazaoByte + 1] = (byte)(r >> 8);
         e.Cabeca[CabecaByte] = (byte)System.Math.Clamp((r + 1250) / 2500, 2, 12);
