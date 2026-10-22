@@ -73,7 +73,12 @@ prontos ("Jogador 1 PRONTO · Jogador 2 AGUARDANDO…").
   `comandos/<uid>/…`, `perguntas/<uid>`, `respostas/<uid>`, `rodada` (transmissão).
 - Regras do banco: cada jogador só escreve nos próprios comandos/respostas/estado; só o host
   escreve o retrato, as perguntas e a rodada.
-- Sala por **código de 6 letras**: o host cria, os outros entram com o código e escolhem o time.
+- **Sem login nem conta.** Entra-se numa sala só com a **chave da sala** (código de 6 letras
+  que o host cria e passa aos amigos) e o nome do técnico. A "autenticação anônima" do Firebase
+  é invisível: o app cria sozinho uma identidade para o aparelho (guardada nele), só para as
+  regras do banco saberem quem escreve o quê.
+- **No máximo 6 vagas por sala** — o limite de técnicos humanos do jogo. Cada vaga é um
+  técnico num aparelho; com a sala cheia, ninguém mais entra.
 - Retrato de ~70–230 KB por rodada, comprimido: folgado no plano gratuito.
 
 ## Host no Android e troca de host
