@@ -23,6 +23,8 @@ public sealed class ClienteOnline : IDisposable
     // um retrato novo (rodada nova, ou a mesma com o jogo mudado): na thread do banco
     // (retrato, rodada, versao, instancia do host: muda quando o host volta ou e outro)
     public event Action<Retrato, string, int, string>? NovoRetrato;
+    // o host parou o jogo (o retrato sumiu)
+    public event Action? Pausado;
 
     public ClienteOnline(Sala sala)
     {
@@ -43,6 +45,14 @@ public sealed class ClienteOnline : IDisposable
         try
         {
             if (caminho != "/") v = await _sala.B.Ler($"{_sala.Raiz}/retrato");
+            if (v == null)
+            {
+                // o host parou o jogo (saiu ou vai continuar): a espera
+                bool tinha;
+                lock (this) { tinha = Rodada.Length > 0; Rodada = ""; _versao = 0; _instancia = ""; }
+                if (tinha) Pausado?.Invoke();
+                return;
+            }
             if (v is not JsonObject o || (string?)o["dados"] is not { } dados) return;
             int versao = (int?)o["versao"] ?? 0;
             string rodada = (string?)o["rodada"] ?? "";

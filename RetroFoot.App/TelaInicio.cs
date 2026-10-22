@@ -902,6 +902,7 @@ public sealed partial class TelaInicio : UserControl
         {
             var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a));
             sessao.LigarOnline(host);
+            Online.Sinal(null);   // (o HostOnline manda o sinal de vida daqui em diante)
             Online.ManterVivo?.Invoke(true);
             sessao.Saiu += () => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
             sessao.Erro += _ => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
@@ -917,6 +918,8 @@ public sealed partial class TelaInicio : UserControl
                 mostrar(new TelaSala(mostrar, () => mostrar(new TelaHub(mostrar)), online.Sala, false));
                 return;
             }
+            // o host saiu do jogo: quem esta na sala espera ele continuar
+            _ = online.Sala.Pausar();
             mostrar(new TelaHub(mostrar));
         };
         // o motor parou com erro (na thread dele): volta ao inicio com o aviso, sem travar;

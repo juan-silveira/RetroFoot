@@ -57,6 +57,19 @@ public static class Online
     // todos roda aqui; em segundo plano ele pararia)
     public static Action<bool>? ManterVivo;
 
+    // o sinal de vida do host fora do jogo (na sala e enquanto cria o jogo); null para
+    static DispatcherTimer? _sinal;
+    public static void Sinal(Sala? sala)
+    {
+        _sinal?.Stop();
+        _sinal = null;
+        if (sala == null) return;
+        _sinal = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
+        _sinal.Tick += (_, _) => _ = sala.SinalDeVida();
+        _sinal.Start();
+        _ = sala.SinalDeVida();
+    }
+
     public static string Versao => typeof(Online).Assembly.GetName().Version?.ToString(3) ?? "0";
 
     // a pagina do kit numa coluna no meio (no computador a tela e larga)
@@ -283,9 +296,13 @@ public sealed class TelaSala : UserControl
             obsInfo?.Dispose();
             cliente?.Dispose();
             // (o host de um jogo gravado so sai: a sala fica para continuar depois)
+            if (host) Online.Sinal(null);
             try { if (host && arquivo == null) await sala.Apagar(); else if (!host) await sala.Sair(); } catch { }
             voltar();
         }
+        // (host) o sinal de vida desde a sala, antes do jogo (e enquanto ele cria o jogo): os
+        // outros nao acham que ele caiu; o HostOnline continua dali
+        if (host) Online.Sinal(sala);
         if (!host)
         {
             // o jogo comecou quando chega o primeiro retrato

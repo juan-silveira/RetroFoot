@@ -37,6 +37,14 @@ public sealed class JogoRemoto
     {
         _mostrar = mostrar; _voltar = voltar; _sala = sala; _cli = cli;
         cli.NovoRetrato += (r, rodada, versao, instancia) => Dispatcher.UIThread.Post(() => Novo(r, rodada, instancia));
+        // o host parou o jogo: a espera ate ele continuar
+        cli.Pausado += () => Dispatcher.UIThread.Post(() =>
+        {
+            _rodada = ""; _instancia = ""; _pronto = false;
+            _sessao?.EsconderRelogio();
+            _sessao = null;
+            _mostrar(Mensagem(T("Jogo online"), T("O host parou o jogo. Quando ele continuar, a rodada volta para você aqui.")));
+        });
         // o sinal de vida do host (de 10 em 10 s): parado por 35 s, o aviso de que o host saiu ou
         // caiu (o jogo continua quando ele voltar); voltou, o aviso some
         sala.B.Observar($"{sala.Raiz}/hostVivo", (caminho, v) => _sinalHost = DateTime.UtcNow);

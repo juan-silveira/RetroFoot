@@ -72,8 +72,12 @@ public sealed class Sala
     {
         if (!CodigoValido(codigo) || await b.Ler($"salas/{codigo}/info", ct) == null) return null;
         if ((string?)await b.Ler($"salas/{codigo}/host", ct) != uid) return null;
-        await b.Gravar($"salas/{codigo}/hostVivo", Agora(), ct);
-        return new Sala(b, codigo, uid);
+        var s = new Sala(b, codigo, uid);
+        await s.SinalDeVida(ct);
+        // (o retrato e a rodada da vez anterior: ninguem entra num jogo velho antes do host
+        // continuar)
+        await s.Pausar(ct);
+        return s;
     }
 
     // assumir o host de uma sala cujo host sumiu (as regras so deixam com o sinal de vida
@@ -145,6 +149,17 @@ public sealed class Sala
 
     public Task DefinirPrazo(int minutos, CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/info", new JsonObject { ["prazo"] = Math.Clamp(minutos, 1, 5) }, ct);
+
+    // o sinal de vida do host (HostOnline de 10 em 10 s; na sala, antes do jogo, a TelaSala)
+    public Task SinalDeVida(CancellationToken ct = default) => B.Gravar($"{Raiz}/hostVivo", Agora(), ct);
+
+    // o host parou o jogo (saiu, ou reabriu a sala para continuar): sem retrato, quem esta na
+    // sala espera ele comecar de novo
+    public async Task Pausar(CancellationToken ct = default)
+    {
+        await B.Gravar($"{Raiz}/retrato", null, ct);
+        await B.Gravar($"{Raiz}/rodada", null, ct);
+    }
 
     // o que o host esta fazendo antes do jogo ("criando": o jogo novo sendo montado, os times
     // sorteados), para quem espera na sala
