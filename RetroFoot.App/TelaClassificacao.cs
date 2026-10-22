@@ -7,9 +7,9 @@ using TRegras = RetroFoot.Motor.Regras.Regras;
 
 namespace RetroFoot.App;
 
-// A Classificacao: a do visual escolhido (Visual.cs). Original = o TclassificationDlg
-// (TelaClassificacaoOriginal, 800x600 ampliado sobre o verde); Moderno = a tabela escura
-// (TelaClassificacaoModerna). Os dois fecham com Fechou e abrem o plantel com AbrirEquipa.
+// A Classificacao: a do visual escolhido (Visual.cs). Retro = a do jogo classico com o
+// launcher (TelaClassificacaoRetro: a janela do Windows 95 com a tabela escura, 800x600 ou
+// 1067x600 ampliado sobre o verde); Moderno = a tabela escura (TelaClassificacaoModerna). Os dois fecham com Fechou e abrem o plantel com AbrirEquipa.
 public sealed class TelaClassificacao : UserControl
 {
     public event Action? Fechou;
@@ -47,7 +47,7 @@ public sealed class TelaClassificacao : UserControl
         }
         else
         {
-            var o = new TelaClassificacaoOriginal(s, rodada, relogio);
+            var o = new TelaClassificacaoRetro(s, rodada, relogio, regras);
             o.Fechou += () => Fechou?.Invoke();
             _tela = o;
             Background = new SolidColorBrush(Color.FromRgb(0, 128, 0));

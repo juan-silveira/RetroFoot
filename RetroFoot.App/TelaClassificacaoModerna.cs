@@ -19,7 +19,7 @@ using TRegras = RetroFoot.Motor.Regras.Regras;
 namespace RetroFoot.App;
 
 // A Classificacao no visual Moderno (Visual.cs; tema escuro, no estilo das tabelas de
-// campeonato do Google), no lugar do TclassificationDlg do original (TelaClassificacaoOriginal):
+// campeonato do Google), no lugar do TclassificationDlg do original (no Retro, TelaClassificacaoRetro):
 //  - uma divisao por vez, escolhida nas abas do topo (1a a 4a e o Distrital; num jogo de um
 //    pais so, com o logo da liga: Escudos.Liga); abre na
 //    divisao com mais treinadores humanos (empate: a de cima);

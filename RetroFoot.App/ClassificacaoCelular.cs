@@ -17,7 +17,7 @@ using TRegras = RetroFoot.Motor.Regras.Regras;
 namespace RetroFoot.App;
 
 // A Classificacao no celular (Celular.cs), em pe, nas duas peles do kit (CelularUi.cs), no lugar
-// do TclassificationDlg (TelaClassificacaoOriginal) e da tabela do Moderno:
+// do TclassificationDlg e da tabela do Moderno:
 //  - a tela toda: a barra com o titulo (e a jornada) e a seta de voltar; as divisoes nas abas
 //    (Retro: 1a a 4a, como o classico; Moderno: e o Distrital), abrindo na divisao com mais
 //    treinadores humanos (empate: a de cima);
@@ -262,7 +262,7 @@ sealed class TelaClassificacaoCelular : UserControl
     }
 
     // ---------------------------------------------------------------- o Retro
-    // o TclassificationDlg (TelaClassificacaoOriginal) em pe: no verde, cada divisao com o
+    // o TclassificationDlg em pe: no verde, cada divisao com o
     // titulo amarelo e as colunas P V E D GP GC; o numero da posicao em amarelo e a linha
     // inteira nas cores da equipa (fundo e letra), em negrito. Tocar numa equipa abre o plantel
     // a divisao escolhida (como no Moderno), no visual do TclassificationDlg: no verde, o nome
