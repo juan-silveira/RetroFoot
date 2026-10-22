@@ -239,8 +239,18 @@ public sealed class JogoRemoto
     void Pausa(JsonObject? p)
     {
         var s = _jornada != null ? _sessaoAoVivo : _sessao;
-        if (p == null) { s?.MostrarAviso(null); return; }
+        if (p == null) { s?.MostrarAviso(null); s?.EsconderRelogio(); return; }
         string uid = (string?)p["uid"] ?? "";
+        // o intervalo de todos (30 s): a janela das trocas para quem tem time no jogo; o relogio
+        if ((bool?)p["coletivo"] == true)
+        {
+            int seg = (int?)p["segundos"] ?? 30;
+            s?.MostrarRelogio(TimeSpan.FromSeconds(seg));
+            var meus = (p["equipas"] as JsonArray)?.Select(x => (int?)x ?? 0).ToHashSet() ?? new();
+            if (_time is { } t && meus.Contains(t.ID)) AbrirTrocas(t.ID, 4, TimeSpan.FromSeconds(seg));
+            else s?.MostrarAviso(T("⏸ Intervalo: os técnicos fazem as substituições"));
+            return;
+        }
         if (uid != _sala.Uid)
         {
             s?.MostrarAviso(T("⏸ {0} está fazendo substituições…", (string?)p["nome"] ?? ""));
@@ -248,8 +258,12 @@ public sealed class JogoRemoto
         }
         // as trocas deste aparelho: a janela sobre a copia ao vivo; as trocas feitas nela vao
         // para o host (ele confere e transmite); fechar e Retomar
+        AbrirTrocas((int?)p["equipa"] ?? 0, (int?)p["motivo"] ?? 1, null);
+    }
+
+    void AbrirTrocas(int eq, int motivo, TimeSpan? prazo)
+    {
         if (_aoVivo is not { } av || _sessaoAoVivo is not { } sv || _pausaMinha) return;
-        int eq = (int?)p["equipa"] ?? 0, motivo = (int?)p["motivo"] ?? 1;
         var jg = av.Jornada.Jogos.FirstOrDefault(x => x.Dados.Casa == eq || x.Dados.Fora == eq);
         if (jg == null) return;
         int lado = jg.Dados.Casa == eq ? Lado.Casa : Lado.Visit;
@@ -260,7 +274,9 @@ public sealed class JogoRemoto
             try
             {
                 var antes = e.Jogadores.Where(x => Memoria.Escalacao(x) == Memoria.EscTitular).Select(x => x.ID).ToList();
-                LigacaoPartida.JanelaOnline(sv, jg, lado, motivo, av.Jornada);
+                Sessao.PrazoDialogo = prazo;
+                try { LigacaoPartida.JanelaOnline(sv, jg, lado, motivo, av.Jornada); }
+                finally { Sessao.PrazoDialogo = null; }
                 var depois = e.Jogadores.Where(x => Memoria.Escalacao(x) == Memoria.EscTitular).Select(x => x.ID).ToList();
                 var sairam = antes.Where(id => !depois.Contains(id)).ToList();
                 foreach (var entra in depois.Where(id => !antes.Contains(id)))

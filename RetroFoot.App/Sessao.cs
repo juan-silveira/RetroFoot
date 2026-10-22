@@ -210,8 +210,40 @@ public sealed class Sessao
             foreach (var (k, v) in c) o[k] = v;
             return o;
         }
+        string intervaloFeito = "";
         h.Substituicao = (jg, lado, saiu, motivo) =>
         {
+            // o intervalo no online: o de todos ao mesmo tempo, com 30 s (o primeiro gancho do
+            // intervalo faz o de todos; os seguintes, do mesmo intervalo, nada)
+            if (motivo == 4 && jornadaOnline is { } jn)
+            {
+                string chave = host.Rodada + "/" + jn.Minuto;
+                if (intervaloFeito == chave) return;
+                intervaloFeito = chave;
+                var prazo = TimeSpan.FromSeconds(30);
+                Action? local = null;
+                foreach (var g in jn.Jogos)
+                    for (int l = 0; l < 2; l++)
+                        if (g.Equipa[l] is { } me && me.ID == host.MeuTime && Memoria.Humano(g.Treinador[l]))
+                        {
+                            var (mg, ml) = (g, l);
+                            local = () =>
+                            {
+                                PrazoDialogo = prazo;
+                                try
+                                {
+                                    Jornada.OrdenarPorPosicaoNome(me);
+                                    if (mg == jg && ml == lado) sub?.Invoke(mg, ml, null, 4);
+                                    else jn.ObservarTrocas(mg, ml, null, true, () => sub?.Invoke(mg, ml, null, 4));
+                                }
+                                finally { PrazoDialogo = null; }
+                            };
+                        }
+                Dispatcher.UIThread.Post(() => MostrarRelogio(prazo));
+                host.IntervaloColetivo(jn, jg, lado, local, prazo);
+                Dispatcher.UIThread.Post(EsconderRelogio);
+                return;
+            }
             if (!host.Remota(jg.Equipa[lado])) { sub?.Invoke(jg, lado, saiu, motivo); return; }
             var e = jg.Equipa[lado]!;
             // o intervalo e o goleiro expulso: a paralisacao para todos, com as trocas feitas la
@@ -233,7 +265,8 @@ public sealed class Sessao
             }
             JogoEmCurso.SubstituicaoForcada(e, saiu, k);
         };
-        host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
+        host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null
+            : nome == "*" ? Idioma.T("⏸ Intervalo: os técnicos fazem as substituições") : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
         var bat = h.Batedor;
         h.Batedor = (e, titulares, sugerido) =>
         {
@@ -603,8 +636,18 @@ public sealed class Sessao
             }
             catch (Exception ex) { tcs.TrySetException(ex); }
         });
+        // (jogo online: o intervalo coletivo) com prazo, a janela fecha sozinha e vale o padrao
+        if (PrazoDialogo is { } prazo && !tcs.Task.Wait(prazo))
+        {
+            Dispatcher.UIThread.Post(() => { if (d != null) FecharDialogo(d); });
+            return default!;
+        }
         return tcs.Task.GetAwaiter().GetResult();
     }
+
+    // o prazo das janelas do motor (null = sem prazo): o intervalo do jogo online
+    [ThreadStatic] public static TimeSpan? PrazoDialogo;
+
     // troca a tela mostrada (ex.: as Configuracoes por cima da tela da equipa e a volta)
     public void Mostrar(Control tela) => mostrar(tela);
 

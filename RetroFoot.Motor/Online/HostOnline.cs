@@ -561,6 +561,57 @@ public sealed class HostOnline : IDisposable
 
     readonly List<(string Uid, string Chave, Comando C)> _pendentes = new();
 
+    // ---------------------------------------------------------------- o intervalo
+    // No online o intervalo e de todos ao mesmo tempo: a pausa vai para todos (coletivo: os
+    // times dos outros aparelhos que jogam), cada um abre a janela das trocas, o host abre a
+    // dele (janelaLocal) e todos tem o mesmo prazo; acabou (ou todos deram Continuar), segue.
+    // As trocas do time do gancho que chamou (chamador) ja sao observadas pela Jornada; as dos
+    // outros, aqui (ObservarTrocas), para a linha do tempo.
+    public void IntervaloColetivo(Jornada jn, JogoAtual chamador, int ladoChamador, Action? janelaLocal, TimeSpan prazo)
+    {
+        AtualizarJogadores();
+        var remotos = new Dictionary<string, (JogoAtual Jg, int Lado)>();
+        foreach (var jg in jn.Jogos)
+            for (int l = 0; l < 2; l++)
+                if (jg.Equipa[l] is { } e && Remota(e) && DonoDe(e.ID) is { } j && !Ausente(j)) remotos[j.Uid] = (jg, l);
+        var fim = DateTime.UtcNow + prazo;
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", new JsonObject
+        {
+            ["uid"] = "*", ["coletivo"] = true, ["motivo"] = 4, ["segundos"] = (int)prazo.TotalSeconds,
+            ["equipas"] = new JsonArray(remotos.Values.Select(x => (JsonNode)(int)x.Jg.Equipa[x.Lado]!.ID).ToArray()),
+        });
+        PausaMudou?.Invoke("*");
+        janelaLocal?.Invoke();
+        var faltam = new HashSet<string>(remotos.Keys);
+        while (DateTime.UtcNow < fim && faltam.Count > 0)
+        {
+            if (!_filaAoVivo.TryTake(out var p, 300)) continue;
+            if (!remotos.TryGetValue(p.Uid, out var alvo)) { Responder(p.Uid, p.Chave, Resposta.Recusado("intervalo")); continue; }
+            switch (p.C)
+            {
+                case Trocar t:
+                {
+                    var e = alvo.Jg.Equipa[alvo.Lado]!;
+                    Resposta r = Resposta.Recusado("?");
+                    if (alvo.Jg == chamador && alvo.Lado == ladoChamador) r = ExecutorComandos.Substituir(e, t.Saiu, t.Entra, 4);
+                    else jn.ObservarTrocas(alvo.Jg, alvo.Lado, null, true, () => r = ExecutorComandos.Substituir(e, t.Saiu, t.Entra, 4));
+                    Responder(p.Uid, p.Chave, r);
+                    if (r.Ok) TransmitirMinuto(jn);
+                    break;
+                }
+                case Retomar:
+                    faltam.Remove(p.Uid);
+                    Responder(p.Uid, p.Chave, Resposta.Feito);
+                    break;
+                default:
+                    Responder(p.Uid, p.Chave, Resposta.Feito);
+                    break;
+            }
+        }
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", null);
+        PausaMudou?.Invoke(null);
+    }
+
     // a pausa do proprio host (a janela de detalhes dele): o aviso para os outros
     public void AvisarPausa(ushort equipa, bool comecou)
     {
