@@ -247,6 +247,13 @@ public sealed class TelaSala : UserControl
             mostrar(new TelaInicio(mostrar, new TelaInicio.OnlineNovo(sala, jogadores.ToList(), arquivo, null, modoAmigo)));
         }) { HorizontalAlignment = HorizontalAlignment.Stretch };
         string hostUid = host ? sala.Uid : "";
+        long? difRelogio = null;
+        _ = Task.Run(async () => { try { var d = await sala.DiferencaDoRelogio(); Dispatcher.UIThread.Post(() => { difRelogio = d; Desenhar(); }); } catch { } });
+        // (o estado conectado muda com o tempo, sem novidade no banco: refaz de 5 em 5 s)
+        var refazer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+        refazer.Tick += (_, _) => Desenhar();
+        refazer.Start();
+        DetachedFromVisualTree += (_, _) => refazer.Stop();
         void Desenhar()
         {
             lista.Children.Clear();
@@ -256,8 +263,18 @@ public sealed class TelaSala : UserControl
                 var g = new Grid { ColumnDefinitions = new ColumnDefinitions("28,*,Auto"), MinHeight = 36 };
                 g.Children.Add(CUi.Txt((v + 1) + ".", 14, CUi.Fraco));
                 var n = CUi.Txt(j == null ? T("vaga livre") : j.Nome + (j.Uid == sala.Uid ? " " + T("(você)") : ""), 15, j == null ? CUi.Fraco : CUi.Texto, j?.Uid == sala.Uid ? FontWeight.Bold : FontWeight.Normal);
-                Grid.SetColumn(n, 1);
-                g.Children.Add(n);
+                Control nomeEStatus = n;
+                if (j != null)
+                {
+                    // conectado (o sinal de vida recente) ou nao; este aparelho sempre esta
+                    bool on = j.Uid == sala.Uid || (difRelogio is long d && Sala.Conectado(j, d));
+                    var st = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
+                    st.Children.Add(new Avalonia.Controls.Shapes.Ellipse { Width = 10, Height = 10, Fill = on ? CUi.Bom : Brushes.Gray, VerticalAlignment = VerticalAlignment.Center });
+                    st.Children.Add(CUi.Txt(difRelogio == null && j.Uid != sala.Uid ? "…" : on ? T("conectado") : T("desconectado"), 12, on ? CUi.Bom : CUi.Fraco));
+                    nomeEStatus = new StackPanel { Spacing = 1, Children = { n, st } };
+                }
+                Grid.SetColumn(nomeEStatus, 1);
+                g.Children.Add(nomeEStatus);
                 if (j != null && j.Uid == hostUid)
                 {
                     var et = CUi.Etiqueta(T("host"));

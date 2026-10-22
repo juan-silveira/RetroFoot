@@ -71,7 +71,7 @@ public sealed class HostOnline : IDisposable
 
     async Task Vida()
     {
-        try { await _sala.B.Gravar($"{_sala.Raiz}/hostVivo", new JsonObject { [".sv"] = "timestamp" }); } catch { }
+        try { await _sala.SinalDeVida(); } catch { }
     }
 
     // um time humano que nao e o do host (de outro aparelho, mesmo que o dono tenha saido): as

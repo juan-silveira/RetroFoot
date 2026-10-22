@@ -166,7 +166,11 @@ public sealed class Sala
         B.Atualizar($"{Raiz}/info", new JsonObject { ["prazo"] = Math.Clamp(minutos, 1, 5) }, ct);
 
     // o sinal de vida do host (HostOnline de 10 em 10 s; na sala, antes do jogo, a TelaSala)
-    public Task SinalDeVida(CancellationToken ct = default) => B.Gravar($"{Raiz}/hostVivo", Agora(), ct);
+    public async Task SinalDeVida(CancellationToken ct = default)
+    {
+        await B.Gravar($"{Raiz}/hostVivo", Agora(), ct);
+        await Visto(ct);   // (o host tambem aparece conectado na lista)
+    }
 
     // o host parou o jogo (saiu, ou reabriu a sala para continuar): sem retrato, quem esta na
     // sala espera ele comecar de novo
@@ -195,6 +199,20 @@ public sealed class Sala
 
     public Task<string> Mandar(Comando c, CancellationToken ct = default) =>
         B.Acrescentar($"{Raiz}/comandos/{Uid}", new JsonObject { ["c"] = c.Json() }, ct);
+
+    // a diferenca (ms) entre o relogio do servidor e o deste aparelho: grava o sinal de vida
+    // (a hora do servidor) e le de volta; com ela, o Visto de cada um diz quem esta conectado
+    public async Task<long> DiferencaDoRelogio(CancellationToken ct = default)
+    {
+        await Visto(ct);
+        long agora = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        long servidor = (long?)await B.Ler($"{Raiz}/jogadores/{Uid}/visto", ct) ?? agora;
+        return servidor - agora;
+    }
+
+    // conectado: o sinal de vida dele (a cada 15 s) chegou ha menos de 40 s
+    public static bool Conectado(JogadorSala j, long diferenca) =>
+        j.Visto > 0 && DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + diferenca - j.Visto < 40_000;
 
     // o sinal de vida do aparelho (ClienteOnline, a cada 15 s)
     public Task Visto(CancellationToken ct = default) =>
