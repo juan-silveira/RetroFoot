@@ -32,13 +32,13 @@ sealed class TelaClassificacaoRetro : Control
     static readonly FontFamily Sans = new("avares://RetroFoot.App/Assets/Fontes#MS Sans Serif");
     static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
     static readonly IBrush Verde = H("#008000"), Prata = H("#C0C0C0"), Cinza = H("#808080"), Titulo = H("#3296FA");
-    // os tons de verde do jogo: o cliente verde (clGreen) com a zebra mais escura, o titulo, o
+    // (tambem a do celular, ClassificacaoCelular) os tons de verde do jogo: o cliente verde (clGreen) com a zebra mais escura, o titulo, o
     // cabecalho e as posicoes em amarelo como os rotulos do original; o humano em verde-escuro
-    static readonly IBrush Fundo = H("#008000"), Zebra = H("#007000"), Humano = H("#004A00"), Fio = H("#006000");
-    static readonly IBrush Texto = Brushes.White, Fraco = H("#FFFF00"), Legenda_ = H("#E8F5E0"), AbaSel = H("#FFFF00");
-    static readonly IBrush Campeao = H("#FFD700"), Sobe = H("#4FA8FF"), Desce = H("#FF4040");
-    static readonly IBrush Vitoria = H("#3CE63C"), Empate = H("#C0C0C0"), Derrota = H("#FF4040"), NaoJogou = H("#005A00");
-    static readonly IPen Contorno = new Pen(H("#003A00"), 1);
+    internal static readonly IBrush Fundo = H("#008000"), Zebra = H("#007000"), Humano = H("#004A00"), Fio = H("#006000");
+    internal static readonly IBrush Texto = Brushes.White, Fraco = H("#FFFF00"), Legenda_ = H("#E8F5E0"), AbaSel = H("#FFFF00");
+    internal static readonly IBrush Campeao = H("#FFD700"), Sobe = H("#4FA8FF"), Desce = H("#FF4040");
+    internal static readonly IBrush Vitoria = H("#3CE63C"), Empate = H("#C0C0C0"), Derrota = H("#FF4040"), NaoJogou = H("#005A00");
+    internal static readonly IPen Contorno = new Pen(H("#003A00"), 1);
 
     const double Margem = 10;
 
@@ -302,7 +302,7 @@ sealed class TelaClassificacaoRetro : Control
     }
 
     // a bandeira nas cores da equipa: tres faixas em pe (fundo, letra, fundo)
-    static void Bandeira(DrawingContext dc, Equipa e, Rect r)
+    internal static void Bandeira(DrawingContext dc, Equipa e, Rect r)
     {
         var f = Cor(e.CorFundo, Brushes.White);
         var l = Cor(e.CorLetra, Brushes.Black);
