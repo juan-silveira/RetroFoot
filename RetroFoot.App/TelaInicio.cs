@@ -42,13 +42,39 @@ public sealed partial class TelaInicio : UserControl
     Configuracoes cfg = Configuracoes.Ler();
 
     // o jogo novo de uma sala online (TelaSala): os tecnicos sao os da sala, um time cada
-    public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores);
+    // Arquivo: o jogo online gravado que o host continua (null: um jogo novo)
+    public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores, string? Arquivo = null);
     readonly OnlineNovo? online;
 
     public TelaInicio(Action<Control> mostrar, OnlineNovo online) : this(mostrar, false)
     {
         this.online = online;
-        NovoJogo(Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98"));
+        if (online.Arquivo != null) ContinuarOnline(online.Arquivo);
+        else NovoJogo(Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98"));
+    }
+
+    // o jogo online gravado: quem esta na sala sem time recebe o do tecnico com o nome dele
+    async void ContinuarOnline(string arquivo)
+    {
+        var o = online!;
+        Jogo98 s;
+        try
+        {
+            s = Jogo98.Ler(File.ReadAllBytes(arquivo));
+            var usados = o.Jogadores.Where(x => x.Equipa != 0).Select(x => x.Equipa).ToHashSet();
+            foreach (var j in o.Jogadores.Where(x => x.Equipa == 0))
+            {
+                var t = s.Treinadores.FirstOrDefault(t => t.Humano != 0 && TextoSave(t.Nome).Trim().Equals(j.Nome.Trim(), StringComparison.OrdinalIgnoreCase)
+                    && s.Equipas.Any(e => e.Treinador == t.ID && !usados.Contains(e.ID)));
+                if (t != null && s.Equipas.FirstOrDefault(e => e.Treinador == t.ID) is { } e)
+                {
+                    await o.Sala.DarEquipa(j.Uid, e.ID);
+                    usados.Add(e.ID);
+                }
+            }
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); return; }
+        Comecar(s, arquivo, false);
     }
 
     public TelaInicio(Action<Control> mostrar) : this(mostrar, true) { }

@@ -12,7 +12,8 @@ using RetroFoot.Motor.Save;
 using TRegras = RetroFoot.Motor.Regras.Regras;
 
 var http = new HttpClient();
-var banco = new BancoFirebase(http, new IdentidadeFirebase(http, null));
+// RETROFOOT_ID: o arquivo da identidade (o mesmo uid entre execucoes, como um aparelho)
+var banco = new BancoFirebase(http, new IdentidadeFirebase(http, Environment.GetEnvironmentVariable("RETROFOOT_ID")));
 await banco.Ler("salas/AAAAAA/info");
 void Log(string s) => Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {s}");
 
@@ -70,10 +71,10 @@ else
     using var cli = new ClienteOnline(sala);
     string ultima = "";
     var acabou = new TaskCompletionSource();
-    cli.NovoRetrato += (r, rodada, versao) => _ = Task.Run(async () =>
+    cli.NovoRetrato += (r, rodada, versao, inst) => _ = Task.Run(async () =>
     {
-        if (rodada == ultima) return;
-        ultima = rodada;
+        if (rodada + inst == ultima) return;
+        ultima = rodada + inst;
         var minha = (await sala.Jogadores()).First(x => x.Uid == sala.Uid);
         var copia = Jogo98.Ler(r.Save);
         var e = copia.Equipas.First(x => x.ID == minha.Equipa);

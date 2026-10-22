@@ -29,6 +29,19 @@ public static class Online
     // os jogos online ficam fora da pasta dos saves (as ferramentas nao os veem)
     public static string Pasta(string codigo) => Path.Combine(Path.GetDirectoryName(DadosJogo.Saves)!, "online", codigo);
 
+    // os jogos online em que este aparelho e o host, do mais recente
+    public static List<string> JogosDoHost()
+    {
+        try
+        {
+            var raiz = Path.Combine(Path.GetDirectoryName(DadosJogo.Saves)!, "online");
+            if (!Directory.Exists(raiz)) return new();
+            return Directory.GetDirectories(raiz).Select(d => Path.Combine(d, "JOGO.e98")).Where(File.Exists)
+                .OrderByDescending(File.GetLastWriteTime).ToList();
+        }
+        catch { return new(); }
+    }
+
     static string ArquivoNome => Path.Combine(Path.GetDirectoryName(Configuracoes.Arquivo)!, "online-nome.txt");
     public static string UltimoNome
     {
@@ -101,6 +114,28 @@ public sealed class TelaOnline : UserControl
             catch (Exception ex) { Erro(T("Não consegui entrar: {0}", Curto(ex))); }
         });
         criar.HorizontalAlignment = entrar.HorizontalAlignment = HorizontalAlignment.Stretch;
+        // os jogos online deste aparelho como host (data/online/<CHAVE>/JOGO.e98): continuar
+        var meus = new StackPanel { Spacing = 8 };
+        foreach (var arq in Online.JogosDoHost())
+        {
+            var codigoJogo = Path.GetFileName(Path.GetDirectoryName(arq))!;
+            var info = $"{codigoJogo} · {File.GetLastWriteTime(arq):dd/MM/yyyy HH:mm}";
+            var b = new CUi.Botao(T("Continuar {0}", codigoJogo), false, async () =>
+            {
+                Online.UltimoNome = nome.Text ?? "";
+                Ocupado(true); aviso.IsVisible = false;
+                try
+                {
+                    var bn = Online.Banco;
+                    await bn.Ler("salas/AAAAAA/info");
+                    // a mesma sala, se ainda for dele; senao uma sala nova (chave nova)
+                    var sala = await Sala.Reabrir(bn, bn.Uid, codigoJogo) ?? await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao);
+                    _mostrar(new TelaSala(_mostrar, _voltar, sala, true, arq));
+                }
+                catch (Exception ex) { Erro(T("Não consegui abrir a sala: {0}", Curto(ex))); }
+            }) { HorizontalAlignment = HorizontalAlignment.Stretch };
+            meus.Children.Add(new StackPanel { Spacing = 4, Children = { CUi.Txt(info, 13, CUi.Fraco), b } });
+        }
         var corpo = new StackPanel
         {
             Spacing = 14,
@@ -112,6 +147,7 @@ public sealed class TelaOnline : UserControl
                 aviso,
             },
         };
+        if (meus.Children.Count > 0) corpo.Children.Insert(1, CUi.Cartao_(T("Seus jogos online (host)"), meus));
         Content = Online.Pagina(T("Jogo online"), T("Sem login: só a chave da sala"), _voltar, corpo);
     }
 
@@ -121,17 +157,18 @@ public sealed class TelaOnline : UserControl
 // a sala: a chave, as 6 vagas ao vivo e, no host, o Comecar; no cliente, a espera pelo jogo
 public sealed class TelaSala : UserControl
 {
-    public TelaSala(Action<Control> mostrar, Action voltar, Sala sala, bool host)
+    // arquivo: o jogo online gravado que o host continua (null: um jogo novo)
+    public TelaSala(Action<Control> mostrar, Action voltar, Sala sala, bool host, string? arquivo = null)
     {
         FontFamily = CUi.Fonte;
         var lista = new StackPanel { Spacing = 6 };
         List<JogadorSala> jogadores = new();
         IDisposable? obs = null;
         ClienteOnline? cliente = null;
-        var comecar = new CUi.Botao(T("Começar jogo novo"), true, () =>
+        var comecar = new CUi.Botao(arquivo == null ? T("Começar jogo novo") : T("Continuar o jogo"), true, () =>
         {
             obs?.Dispose();
-            mostrar(new TelaInicio(mostrar, new TelaInicio.OnlineNovo(sala, jogadores.ToList())));
+            mostrar(new TelaInicio(mostrar, new TelaInicio.OnlineNovo(sala, jogadores.ToList(), arquivo)));
         }) { HorizontalAlignment = HorizontalAlignment.Stretch };
         void Desenhar()
         {
@@ -182,7 +219,8 @@ public sealed class TelaSala : UserControl
         {
             obs?.Dispose();
             cliente?.Dispose();
-            try { if (host) await sala.Apagar(); else await sala.Sair(); } catch { }
+            // (o host de um jogo gravado so sai: a sala fica para continuar depois)
+            try { if (host && arquivo == null) await sala.Apagar(); else if (!host) await sala.Sair(); } catch { }
             voltar();
         }
         if (!host)

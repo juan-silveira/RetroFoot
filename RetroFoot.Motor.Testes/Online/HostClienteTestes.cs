@@ -52,7 +52,7 @@ public class HostClienteTestes
         int rodadasCliente = 0;
         string ultima = "";
         Preparo? ultimoPreparo = null;
-        cli.NovoRetrato += (r, rodada, versao) =>
+        cli.NovoRetrato += (r, rodada, versao, inst) =>
         {
             if (rodada == ultima) return;
             ultima = rodada;

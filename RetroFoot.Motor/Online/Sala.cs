@@ -65,6 +65,16 @@ public sealed class Sala
         throw new InvalidOperationException("nao achei um codigo livre");
     }
 
+    // o host volta para a sala dele (o jogo continuado de um save): null se a sala nao existe
+    // mais ou se o host agora e outro
+    public static async Task<Sala?> Reabrir(IBanco b, string uid, string codigo, CancellationToken ct = default)
+    {
+        if (!CodigoValido(codigo) || await b.Ler($"salas/{codigo}/info", ct) == null) return null;
+        if ((string?)await b.Ler($"salas/{codigo}/host", ct) != uid) return null;
+        await b.Gravar($"salas/{codigo}/hostVivo", Agora(), ct);
+        return new Sala(b, codigo, uid);
+    }
+
     public sealed class SalaCheia : Exception { public SalaCheia() : base("sala cheia") { } }
     public sealed class SalaInexistente : Exception { public SalaInexistente() : base("sala nao existe") { } }
 

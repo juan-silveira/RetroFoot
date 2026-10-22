@@ -35,12 +35,16 @@ public sealed class JogoRemoto
     public JogoRemoto(Action<Control> mostrar, Action voltar, Sala sala, ClienteOnline cli)
     {
         _mostrar = mostrar; _voltar = voltar; _sala = sala; _cli = cli;
-        cli.NovoRetrato += (r, rodada, versao) => Dispatcher.UIThread.Post(() => Novo(r, rodada));
+        cli.NovoRetrato += (r, rodada, versao, instancia) => Dispatcher.UIThread.Post(() => Novo(r, rodada, instancia));
     }
 
-    void Novo(Retrato r, string rodada)
+    string _instancia = "";
+
+    void Novo(Retrato r, string rodada, string instancia)
     {
-        bool nova = rodada != _rodada;
+        // (o host voltou ou mudou: o Preparo mandado se perdeu, prepara de novo)
+        bool nova = rodada != _rodada || instancia != _instancia;
+        _instancia = instancia;
         if (!nova && _pronto) return;   // (ja mandou o Preparo desta rodada)
         if (_rodada.Length == 0) Comecou?.Invoke();
         _rodada = rodada;

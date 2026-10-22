@@ -38,6 +38,8 @@ public sealed class HostOnline : IDisposable
     readonly Timer _vida;
     bool _localPronto;
     int _versao;
+    // esta execucao do host (um host que volta, ou um host novo, recomeca as versoes)
+    readonly string _instancia = Guid.NewGuid().ToString("N")[..8];
 
     // a rodada da barreira atual ("2027-5-L"; "T" na Taca)
     public string Rodada { get; private set; } = "";
@@ -108,6 +110,10 @@ public sealed class HostOnline : IDisposable
         _preparos.Clear();
         _jogam = _j.M.S.Jogos.SelectMany(x => new[] { x.Casa, x.Fora }).Where(x => x != 0).ToHashSet();
         _localPronto = TimeDoHost is not ushort th || PrepararLocal == null || !_jogam.Contains(th);
+        // (quem estava PRONTO para um host que caiu prepara de novo: o Preparo se perdeu)
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Estado == Estados.Pronto))
+            try { _sala.B.Atualizar($"{_sala.Raiz}/jogadores/{j.Uid}", new JsonObject { ["estado"] = Estados.Preparando }).GetAwaiter().GetResult(); } catch { }
+        AtualizarJogadores();
         Publicar(e, jogo);
         if (!_localPronto && TimeDoHost is ushort t && _j.M.Equipa(t) is { } minha)
         {
@@ -135,7 +141,7 @@ public sealed class HostOnline : IDisposable
         _versao++;
         _sala.B.Gravar($"{_sala.Raiz}/retrato", new JsonObject
         {
-            ["rodada"] = Rodada, ["versao"] = _versao, ["dados"] = Convert.ToBase64String(r.Bytes()),
+            ["rodada"] = Rodada, ["versao"] = _versao, ["host"] = _instancia, ["dados"] = Convert.ToBase64String(r.Bytes()),
         }).GetAwaiter().GetResult();
         _ultimo = (e, jogo);
     }

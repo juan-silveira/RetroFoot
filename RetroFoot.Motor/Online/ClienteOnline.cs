@@ -17,10 +17,12 @@ public sealed class ClienteOnline : IDisposable
     readonly ConcurrentDictionary<string, TaskCompletionSource<Resposta>> _esperando = new();
     readonly ConcurrentDictionary<string, Resposta> _chegaram = new();
     int _versao;
+    string _instancia = "";
 
     public string Rodada { get; private set; } = "";
     // um retrato novo (rodada nova, ou a mesma com o jogo mudado): na thread do banco
-    public event Action<Retrato, string, int>? NovoRetrato;
+    // (retrato, rodada, versao, instancia do host: muda quando o host volta ou e outro)
+    public event Action<Retrato, string, int, string>? NovoRetrato;
 
     public ClienteOnline(Sala sala)
     {
@@ -37,13 +39,16 @@ public sealed class ClienteOnline : IDisposable
             if (v is not JsonObject o || (string?)o["dados"] is not { } dados) return;
             int versao = (int?)o["versao"] ?? 0;
             string rodada = (string?)o["rodada"] ?? "";
+            string instancia = (string?)o["host"] ?? "";
             lock (this)
             {
-                if (versao <= _versao) return;
+                // (um host que voltou, ou outro, recomeca as versoes)
+                if (instancia == _instancia && versao <= _versao) return;
                 _versao = versao;
+                _instancia = instancia;
                 Rodada = rodada;
             }
-            NovoRetrato?.Invoke(Online.Retrato.Ler(Convert.FromBase64String(dados)), rodada, versao);
+            NovoRetrato?.Invoke(Online.Retrato.Ler(Convert.FromBase64String(dados)), rodada, versao, instancia);
         }
         catch (Exception ex) { Console.Error.WriteLine("retrato: " + ex.Message); }
     }
