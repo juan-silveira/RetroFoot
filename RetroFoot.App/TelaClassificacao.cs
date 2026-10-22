@@ -8,7 +8,7 @@ using TRegras = RetroFoot.Motor.Regras.Regras;
 namespace RetroFoot.App;
 
 // A Classificacao: a do visual escolhido (Visual.cs). Retro = a do jogo classico com o
-// launcher (TelaClassificacaoRetro: a janela do Windows 95 com a tabela escura, 800x600 ou
+// launcher (TelaClassificacaoRetro: a janela do Windows 95 com a tabela nos verdes do jogo, 800x600 ou
 // 1067x600 ampliado sobre o verde); Moderno = a tabela escura (TelaClassificacaoModerna). Os dois fecham com Fechou e abrem o plantel com AbrirEquipa.
 public sealed class TelaClassificacao : UserControl
 {

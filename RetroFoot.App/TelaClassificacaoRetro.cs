@@ -16,7 +16,7 @@ namespace RetroFoot.App;
 
 // A Classificacao no visual Retro como a do jogo classico com o launcher: a janela do Windows
 // 95 (moldura prateada, barra azul com "Classificacao - Na rodada" e o X) sobre o verde, com a
-// tabela escura dentro:
+// tabela nos verdes do jogo dentro:
 //  - "Na Divisao" e as abas 1a a 4a no topo; colunas posicao, a bandeira nas cores da equipa
 //    (fundo, letra, fundo), clube, Pts, PJ, VIT, E, DER, GM, GC, SG e as ultimas 5 (bolinhas);
 //  - a barra a esquerda marca a zona: campeao (1o da 1a), sobe (os K primeiros da 2a a 4a) e
@@ -32,10 +32,13 @@ sealed class TelaClassificacaoRetro : Control
     static readonly FontFamily Sans = new("avares://RetroFoot.App/Assets/Fontes#MS Sans Serif");
     static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
     static readonly IBrush Verde = H("#008000"), Prata = H("#C0C0C0"), Cinza = H("#808080"), Titulo = H("#3296FA");
-    static readonly IBrush Fundo = H("#1F2327"), Zebra = H("#262B30"), Humano = H("#2F3D52"), Fio = H("#30363C");
-    static readonly IBrush Texto = H("#E8EAED"), Fraco = H("#9AA0A6"), AbaSel = H("#8AB4F8"), AbaSelTexto = H("#1F2A3C"), Aba = H("#2B3036");
-    static readonly IBrush Campeao = H("#F2B826"), Sobe = H("#2E9E4F"), Desce = H("#D9433A");
-    static readonly IBrush Vitoria = H("#2E9E4F"), Empate = H("#6B7178"), Derrota = H("#D9433A"), NaoJogou = H("#3A4046");
+    // os tons de verde do jogo: o cliente verde (clGreen) com a zebra mais escura, o titulo, o
+    // cabecalho e as posicoes em amarelo como os rotulos do original; o humano em verde-escuro
+    static readonly IBrush Fundo = H("#008000"), Zebra = H("#007000"), Humano = H("#004A00"), Fio = H("#006000");
+    static readonly IBrush Texto = Brushes.White, Fraco = H("#FFFF00"), Legenda_ = H("#E8F5E0"), AbaSel = H("#FFFF00");
+    static readonly IBrush Campeao = H("#FFD700"), Sobe = H("#4FA8FF"), Desce = H("#FF4040");
+    static readonly IBrush Vitoria = H("#3CE63C"), Empate = H("#C0C0C0"), Derrota = H("#FF4040"), NaoJogou = H("#005A00");
+    static readonly IPen Contorno = new Pen(H("#003A00"), 1);
 
     const double Margem = 10;
 
@@ -199,8 +202,10 @@ sealed class TelaClassificacaoRetro : Control
                 var r = new Rect(ax - 36, c.Y + 2, 36, 22);
                 ax -= 37;
                 bool sel = d == _divisao || (_largo && d == _divisao + 1);
-                dc.FillRectangle(sel ? AbaSel : Aba, r);
-                Centro(dc, T("{0}ª", d + 1), r.Center.X, r.Center.Y, 13, sel ? AbaSelTexto : Texto, true);
+                // botoes do Windows 95: o escolhido afundado e amarelo
+                dc.FillRectangle(sel ? AbaSel : Prata, r);
+                Borda(dc, r.Deflate(0.5), sel);
+                Centro(dc, T("{0}ª", d + 1), r.Center.X, r.Center.Y, 13, Brushes.Black, true);
                 _abas.Add((r, d));
             }
             // a legenda embaixo (duas colunas: as zonas e os resultados)
@@ -228,9 +233,9 @@ sealed class TelaClassificacaoRetro : Control
         {
             double yy = y + i * passo;
             dc.FillRectangle(zonas[i].Item1, new Rect(r.X, yy - 5, 4, 10));
-            Escreve(dc, zonas[i].Item2, r.X + 10, yy, 10.5, Fraco);
-            dc.FillRectangle(res[i].Item1, new Rect(x2, yy - 5, 10, 10));
-            Escreve(dc, res[i].Item2, x2 + 16, yy, 10.5, Fraco);
+            Escreve(dc, zonas[i].Item2, r.X + 10, yy, 10.5, Legenda_);
+            dc.DrawEllipse(res[i].Item1, Contorno, new Point(x2 + 5, yy), 5, 5);
+            Escreve(dc, res[i].Item2, x2 + 16, yy, 10.5, Legenda_);
         }
     }
 
@@ -238,13 +243,13 @@ sealed class TelaClassificacaoRetro : Control
     // cabecalho das colunas e as linhas, que enchem a altura (ate 46 pontos)
     void Tabela(DrawingContext dc, Rect r, int d, bool primeira)
     {
-        Escreve(dc, T("{0}ª Divisão", d + 1), r.X + 2, r.Y + 13, 19, Texto, true);
+        Escreve(dc, T("{0}ª Divisão", d + 1), r.X + 2, r.Y + 13, 19, Fraco, true);
         var eqs = Equipas(d);
         int n = Math.Max(eqs.Count, 1);
         double yCab = r.Y + 40;
         double topo = yCab + 10;
         double h = Math.Clamp(Math.Floor((r.Bottom - topo) / n), 12, 46);
-        double fonte = Math.Clamp(Math.Round(h * 0.5 * 2) / 2, 9, 17);
+        double fonte = Math.Clamp(Math.Round(h * 0.55 * 2) / 2, 9, 17);
 
         // as colunas: barra 4, posicao, bandeira, clube (o que sobra), 8 numeros, as ultimas 5
         double dot = Math.Clamp(Math.Floor(h * 0.5), 7, 13), passoDot = dot + Math.Max(3, Math.Round(dot * 0.35));
@@ -290,7 +295,7 @@ sealed class TelaClassificacaoRetro : Control
             {
                 int j = k - (5 - ult.Count);
                 IBrush cor = j < 0 ? NaoJogou : ult[j] > 0 ? Vitoria : ult[j] == 0 ? Empate : Derrota;
-                dc.DrawEllipse(cor, null, new Point(dx + dot / 2, ym), dot / 2, dot / 2);
+                dc.DrawEllipse(cor, Contorno, new Point(dx + dot / 2, ym), dot / 2, dot / 2);
             }
             _linhas.Add((lr, e));
         }
