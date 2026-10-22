@@ -43,7 +43,7 @@ public static class TelaDinheiro
     // ------------------------------------------------------------ cores
     // TColor $00BBGGRR; as cores do sistema (bit de cima) nao aparecem nas equipas
     internal static IBrush CorDelphi(byte[] b, IBrush padrao) =>
-        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
 
     internal static (IBrush Letra, IBrush Fundo) Cores(SEquipa e) =>
         (CorDelphi(e.CorLetra, W95.Preto), CorDelphi(e.CorFundo, W95.Branco));
@@ -101,7 +101,7 @@ public static class TelaDinheiro
     // ampliado como os dialogos da Sessao. RETROFOOT_REGISTADO=0 esconde o Emprestimo.
     public static Control Demo()
     {
-        var raiz = new Grid { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Grid { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         var arq = AcharSaveDemo();
         if (arq == null) return new TextBlock { Text = "Demo: não achei RetroFoot.Motor.Testes/Oraculo/j3-entrada.e98", Foreground = Brushes.White };
         var jogo = Jogo98.Ler(File.ReadAllBytes(arq));

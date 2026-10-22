@@ -584,7 +584,7 @@ sealed class TelaLeilao : DialogoMercado
     //   impedimento: Vender num jogador que nao pode ser vendido
     public static Control Demo()
     {
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         var arq = Environment.GetEnvironmentVariable("RETROFOOT_SAVE");
         if (string.IsNullOrEmpty(arq) || !System.IO.File.Exists(arq)) arq = AcharSave();
         if (arq == null) return new TextBlock { Text = "Demo: sem save do oráculo", Foreground = Brushes.White };

@@ -333,8 +333,8 @@ public sealed partial class TelaJornada
         // a caixa da equipa nas cores dela (no verde da tela, o contorno na cor da letra)
         static void Caixa(DrawingContext dc, Rect r, string nome, Color letra, Color fundo, bool humano)
         {
-            var bl = new SolidColorBrush(letra);
-            dc.FillRectangle(new SolidColorBrush(fundo), r);
+            var bl = new ImmutableSolidColorBrush(letra);
+            dc.FillRectangle(new ImmutableSolidColorBrush(fundo), r);
             if (fundo == Color.FromRgb(0, 128, 0)) dc.DrawRectangle(new Pen(bl, 1), r.Deflate(0.5));
             var tn = Txt(nome, 13.5, bl, true);
             if (humano) dc.FillRectangle(W95.Amarelo, new Rect(r.X, r.Bottom - 3, r.Width, 3));
@@ -380,11 +380,11 @@ public sealed partial class TelaJornada
 
         void Equipa(DrawingContext dc, string nome, Color letra, Color fundo, Avalonia.Media.Imaging.Bitmap? logo, Rect r, bool casa, bool humano)
         {
-            var fl = new SolidColorBrush(letra);
+            var fl = new ImmutableSolidColorBrush(letra);
             if (CUi.Retro)
             {
                 // a caixa nas cores da equipa, como na jornada do classico
-                dc.FillRectangle(new SolidColorBrush(fundo), r);
+                dc.FillRectangle(new ImmutableSolidColorBrush(fundo), r);
                 var tn = Caber(nome, 14, fl, humano, r.Width - 12);
                 using (dc.PushClip(r.Deflate(2)))
                     dc.DrawText(tn, new Point(casa ? r.Right - 6 - tn.Width : r.X + 6, r.Center.Y - tn.Height / 2));
@@ -392,7 +392,7 @@ public sealed partial class TelaJornada
             }
             double q = 24 * _escala, xl = casa ? r.Right - q : r.X;
             if (logo != null) TelaJornada.Imagem(dc, logo, new Rect(xl, r.Center.Y - q / 2, q, q));
-            else dc.DrawEllipse(new SolidColorBrush(fundo), new Pen(fl, 2), new Point(xl + q / 2, r.Center.Y), q / 2 - 1, q / 2 - 1);
+            else dc.DrawEllipse(new ImmutableSolidColorBrush(fundo), new Pen(fl, 2), new Point(xl + q / 2, r.Center.Y), q / 2 - 1, q / 2 - 1);
             // (o nome cresce menos que o escudo: os compridos nao cabiam)
             double area = r.Width - q - 8;
             // o nome comprido diminui a letra ate caber (no minimo 10), em vez de cortar
@@ -448,7 +448,7 @@ public sealed partial class TelaJornada
             if (t.acabou) return;
             double d = Math.Min(Bounds.Height, 40) - 2;
             var r = new Rect(Bounds.Width - d - 1, (Bounds.Height - d) / 2, d, d);
-            var frente = new SolidColorBrush(t.corRelogio);
+            var frente = new ImmutableSolidColorBrush(t.corRelogio);
             var c = r.Center;
             double rx = r.Width / 2 - 0.5, ry = r.Height / 2 - 0.5;
             dc.DrawEllipse(W95.Branco, new Pen(frente, 1), c, rx, ry);

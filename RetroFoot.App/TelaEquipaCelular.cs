@@ -73,7 +73,7 @@ public sealed partial class TelaEquipa
         // de fundo, os textos na cor da letra, e a lista de jogadores invertida (fundo na cor da
         // letra, nomes na cor do fundo). No Moderno, o tema do kit
         IBrush _corLetra = Brushes.Black, _corFundo = Brushes.White;
-        static IBrush Alfa(IBrush b, double o) => new SolidColorBrush(((ISolidColorBrush)b).Color, o);
+        static IBrush Alfa(IBrush b, double o) => new ImmutableSolidColorBrush(((ISolidColorBrush)b).Color, o);
         IBrush TFundo => CUi.Retro ? _corFundo : CUi.Fundo;
         IBrush TBarra => CUi.Retro ? _corFundo : CUi.Barra;
         IBrush TTexto => CUi.Retro ? _corLetra : CUi.TextoBarra;
@@ -195,7 +195,7 @@ public sealed partial class TelaEquipa
 
         static (IBrush Letra, IBrush Fundo) Cores(SEquipa e)
         {
-            IBrush C(byte[] b, IBrush padrao) => b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+            IBrush C(byte[] b, IBrush padrao) => b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
             return (C(e.CorLetra, Brushes.Black), C(e.CorFundo, Brushes.White));
         }
 
@@ -314,7 +314,7 @@ public sealed partial class TelaEquipa
         static Control BarraMoral(SEquipa e)
         {
             double m = Painel.MoralCelular(e);
-            IBrush cor = m > 1.25 ? new SolidColorBrush(Color.FromRgb(0, 200, 0)) : m < 0.65 ? new SolidColorBrush(Color.FromRgb(230, 0, 0)) : new SolidColorBrush(Color.FromRgb(240, 210, 0));
+            IBrush cor = m > 1.25 ? new ImmutableSolidColorBrush(Color.FromRgb(0, 200, 0)) : m < 0.65 ? new ImmutableSolidColorBrush(Color.FromRgb(230, 0, 0)) : new ImmutableSolidColorBrush(Color.FromRgb(240, 210, 0));
             return new ProgressBar
             {
                 Minimum = 0, Maximum = 20, Value = Math.Clamp(Math.Round(m * 10, MidpointRounding.ToEven), 0, 20), Height = 18, MinHeight = 18,
@@ -898,7 +898,7 @@ public sealed partial class TelaEquipa
             if (j.Suspensao > 0) yield return CartaoSelo(j.Suspensao, Color.Parse("#E53935"), Brushes.White, false);
             else if (_s.J.M.Regras.CartoesAmarelos && Painel.AmarelosCelular(j) is int a && a > 0)
                 yield return CartaoSelo(a, Color.Parse("#F5C400"), Brushes.Black, a >= 2);
-            if (j.JogosLesao > 0) yield return Selo("✚" + j.JogosLesao, Brushes.White, new SolidColorBrush(Color.Parse("#D32F2F")));
+            if (j.JogosLesao > 0) yield return Selo("✚" + j.JogosLesao, Brushes.White, new ImmutableSolidColorBrush(Color.Parse("#D32F2F")));
         }
 
         // um cartao (14 x 18) com o numero dentro; empilhado = outro cartao atras, deslocado
@@ -906,8 +906,8 @@ public sealed partial class TelaEquipa
         {
             Border Cartao(double op) => new()
             {
-                Width = 14, Height = 18, CornerRadius = new CornerRadius(2.5), Background = new SolidColorBrush(cor, op),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(90, 0, 0, 0)), BorderThickness = new Thickness(0.8),
+                Width = 14, Height = 18, CornerRadius = new CornerRadius(2.5), Background = new ImmutableSolidColorBrush(cor, op),
+                BorderBrush = new ImmutableSolidColorBrush(Color.FromArgb(90, 0, 0, 0)), BorderThickness = new Thickness(0.8),
             };
             var g = new Grid { Width = empilhado ? 18 : 14, Height = empilhado ? 21 : 18, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2, 0, 0, 0) };
             if (empilhado)

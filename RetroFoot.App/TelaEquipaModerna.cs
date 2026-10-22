@@ -43,7 +43,7 @@ public sealed partial class TelaEquipa
         static readonly IBrush MVermelho = TemaVerde.Vermelho, MAmarelo = TemaVerde.Destaque, MLaranja = TemaVerde.Laranja;
         static readonly IBrush MEscuro = TemaVerde.SobreDestaque, MMenuFundo = TemaVerde.Menu, MApagado = TemaVerde.Apagado;
         static readonly IBrush MZebra = TemaVerde.Zebra;
-        static readonly IPen MBorda = new Pen(TemaVerde.Borda, 1);
+        static readonly IPen MBorda = new Pen(TemaVerde.Borda, 1).ToImmutable();
         static readonly IBrush[] MCorPosicao = { TemaVerde.Destaque, TemaVerde.Azul, TemaVerde.Verde, TemaVerde.Vermelho };
         static readonly string[] MNomesPosicao = { "Goleiros", "Defensores", "Meio-campistas", "Atacantes" };
         static readonly string[] MNomePosicao = { "Goleiro", "Defensor", "Meio-campista", "Atacante" };
@@ -59,7 +59,7 @@ public sealed partial class TelaEquipa
         Rect _mIngressos, _mFecharArbitro;
         SJogador? _sobre;
 
-        static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+        static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
         // ------------------------------------------------------------ medidas
         void MedidasModernas(double l, out Rect lista, out Rect itens, out Rect barra)

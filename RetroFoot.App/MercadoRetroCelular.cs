@@ -20,7 +20,7 @@ namespace RetroFoot.App;
 // o Moderno continua com as pecas do kit.
 static class MercadoRetro
 {
-    static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush H(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
     // a selecao das listas do computador (MarcarEscolhido): o azul do titulo e o texto branco
     public static readonly IBrush Selecao = W95.Destaque;
     static readonly BoxShadows Afundado = BoxShadows.Parse("inset 1 1 0 0 #808080, inset 2 2 0 0 #000000, inset -1 -1 0 0 #FFFFFF, inset -2 -2 0 0 #DFDFDF");

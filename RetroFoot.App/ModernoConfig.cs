@@ -26,7 +26,7 @@ static class ConfigEstilo
     public static readonly IBrush Erro = TemaVerde.Vermelho, Verde = TemaVerde.Verde, Amarelo = TemaVerde.Destaque;
     public static readonly FontFamily Inter = new("fonts:Inter#Inter");
 
-    public static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    public static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
     // o tema escuro do Fluent (caixas de texto, interruptores, barras de rolagem); no Moderno com
     // as cores do TemaVerde no lugar do azul e do cinzento do Fluent

@@ -37,7 +37,7 @@ static class P98
 
     // TColor $00BBGGRR; as cores do sistema (byte de cima com o bit 7) nao aparecem nas equipas
     public static IBrush Cor(byte[] b, IBrush padrao) =>
-        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
 
     public static IBrush Letra(SEquipa? e) => e == null ? W95.Preto : Cor(e.CorLetra, W95.Preto);
     public static IBrush Fundo(SEquipa? e) => e == null ? W95.Branco : Cor(e.CorFundo, W95.Branco);

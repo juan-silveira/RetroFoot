@@ -198,7 +198,7 @@ sealed class EstadioIsometrico : Control
 
         // a ordem de pintura: todas as faces (pequenas) e as balizas, de tras para a frente
         var itens = new List<(double Fundura, Action Pintar)>();
-        var aresta = new Pen(new SolidColorBrush(Color.FromArgb(55, 0, 0, 0)), 0.5);
+        var aresta = new Pen(new ImmutableSolidColorBrush(Color.FromArgb(55, 0, 0, 0)), 0.5);
         for (int k = 0; k < n; k++)
         {
             int anel = k / 8, setor = k % 8;
@@ -213,7 +213,7 @@ sealed class EstadioIsometrico : Control
             }
         }
         // as escadas entre os setores (e no meio de cada um), por cima dos assentos
-        var escada = new Pen(new SolidColorBrush(Color.FromArgb(150, 205, 208, 214)), Math.Max(0.6, _s * 0.3));
+        var escada = new Pen(new ImmutableSolidColorBrush(Color.FromArgb(150, 205, 208, 214)), Math.Max(0.6, _s * 0.3));
         for (int k = 0; k < n; k++)
         {
             int anel = k / 8;
@@ -246,7 +246,7 @@ sealed class EstadioIsometrico : Control
             _ => Sombra(Betao, b * 0.95),
         };
         if (op < 1) cor = Color.FromArgb((byte)Math.Round(255 * op), cor.R, cor.G, cor.B);
-        var brush = new SolidColorBrush(cor);
+        var brush = new ImmutableSolidColorBrush(cor);
         // a pena da cor da face tapa as frestas entre as faces pequenas
         dc.DrawGeometry(brush, f.Tipo == Tipo.Assento || f.Tipo == Tipo.Tras ? new Pen(brush, 0.6) : aresta, Poligono(Proj(f.Pts)));
     }
@@ -293,27 +293,27 @@ sealed class EstadioIsometrico : Control
             var n = Norm(new V3(b.Y - a.Y, a.X - b.X));
             if (Ponto(n, new V3(a.X, a.Y)) < 0) n = new V3(-n.X, -n.Y);
             if (Ponto(n, Olho) <= 1e-6) continue;
-            var cor = new SolidColorBrush(Sombra(Base, 0.45 + 0.35 * Math.Max(0, n.X)));
+            var cor = new ImmutableSolidColorBrush(Sombra(Base, 0.45 + 0.35 * Math.Max(0, n.X)));
             dc.DrawGeometry(cor, new Pen(cor, 0.6), Poligono(new[] { P(a), P(b), P(b.X, b.Y, -AlturaBase), P(a.X, a.Y, -AlturaBase) }));
         }
-        dc.DrawGeometry(new SolidColorBrush(Base), new Pen(new SolidColorBrush(Color.FromArgb(60, 255, 255, 255)), 0.6), Poligono(Proj(borda)));
+        dc.DrawGeometry(new ImmutableSolidColorBrush(Base), new Pen(new ImmutableSolidColorBrush(Color.FromArgb(60, 255, 255, 255)), 0.6), Poligono(Proj(borda)));
     }
 
     void DesenharCampo(DrawingContext dc)
     {
         // o chao do anel (relva escura) ate a primeira fila
-        dc.DrawGeometry(new SolidColorBrush(Margem), null, Poligono(Proj(Curva(Aneis[0].D0, 0))));
+        dc.DrawGeometry(new ImmutableSolidColorBrush(Margem), null, Poligono(Proj(Curva(Aneis[0].D0, 0))));
         // as faixas do corte da relva
         int faixas = 14;
-        var r1 = new SolidColorBrush(Relva1);
-        var r2 = new SolidColorBrush(Relva2);
+        var r1 = new ImmutableSolidColorBrush(Relva1);
+        var r2 = new ImmutableSolidColorBrush(Relva2);
         for (int i = 0; i < faixas; i++)
         {
             double x0 = -MeioC + 2 * MeioC * i / faixas, x1 = -MeioC + 2 * MeioC * (i + 1) / faixas;
             var br = i % 2 == 0 ? r1 : r2;
             dc.DrawGeometry(br, new Pen(br, 0.5), Poligono(new[] { P(x0, -MeioL), P(x1, -MeioL), P(x1, MeioL), P(x0, MeioL) }));
         }
-        var giz = new Pen(new SolidColorBrush(Color.FromArgb(225, 255, 255, 255)), Math.Max(0.8, _s * 0.55));
+        var giz = new Pen(new ImmutableSolidColorBrush(Color.FromArgb(225, 255, 255, 255)), Math.Max(0.8, _s * 0.55));
         void Ret(double x0, double y0, double x1, double y1) =>
             dc.DrawGeometry(null, giz, Poligono(new[] { P(x0, y0), P(x1, y0), P(x1, y1), P(x0, y1) }));
         Ret(-MeioC, -MeioL, MeioC, MeioL);
@@ -341,9 +341,9 @@ sealed class EstadioIsometrico : Control
     void Baliza(DrawingContext dc, int lado)
     {
         double g = lado * MeioC, f = g + lado * 2, h = 2.44, w = 3.66;
-        var rede = new Pen(new SolidColorBrush(Color.FromArgb(150, 230, 230, 230)), Math.Max(0.5, _s * 0.25));
+        var rede = new Pen(new ImmutableSolidColorBrush(Color.FromArgb(150, 230, 230, 230)), Math.Max(0.5, _s * 0.25));
         var poste = new Pen(Brushes.White, Math.Max(1, _s * 0.45), lineCap: PenLineCap.Round);
-        var fundoRede = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255));
+        var fundoRede = new ImmutableSolidColorBrush(Color.FromArgb(40, 255, 255, 255));
         dc.DrawGeometry(fundoRede, rede, Poligono(new[] { P(f, -w, 0), P(f, w, 0), P(f, w, h * 0.8), P(f, -w, h * 0.8) }));
         dc.DrawGeometry(fundoRede, rede, Poligono(new[] { P(g, -w, h), P(g, w, h), P(f, w, h * 0.8), P(f, -w, h * 0.8) }));
         foreach (double y in new[] { -w, w })
@@ -358,8 +358,8 @@ sealed class EstadioIsometrico : Control
     {
         var (d0, d1, zf, zt, _) = Aneis[anel];
         var (t0, t1) = Faixa(setor);
-        var tracejado = new Pen(new SolidColorBrush(Color.FromArgb(70, 200, 205, 212)), 0.8, new DashStyle(new double[] { 3, 3 }, 0));
-        var veu = new SolidColorBrush(Color.FromArgb(10, 255, 255, 255));
+        var tracejado = new Pen(new ImmutableSolidColorBrush(Color.FromArgb(70, 200, 205, 212)), 0.8, new DashStyle(new double[] { 3, 3 }, 0));
+        var veu = new ImmutableSolidColorBrush(Color.FromArgb(10, 255, 255, 255));
         var pts = new List<Point>();
         for (int i = 0; i <= Segmentos; i++) pts.Add(P(Anel(t0 + (t1 - t0) * i / Segmentos, d0, zf)));
         for (int i = Segmentos; i >= 0; i--) pts.Add(P(Anel(t0 + (t1 - t0) * i / Segmentos, d1, zt)));

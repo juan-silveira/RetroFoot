@@ -99,6 +99,35 @@ public class HostClienteTestes
         Assert.True(jogou.Count >= 2, $"barreiras {barreiras} cliente {rodadasCliente} jogou {string.Join(",", jogou)} humanos {humanos.Count} minha {minha.ID} dele {dele.ID}");
     }
 
+    // o pedido de aumento de um time humano vem logo depois da rodada, antes de qualquer humano
+    // preparar (no original vem na vez de cada time: online chegava a quem ja tinha dado PRONTO)
+    [Fact]
+    public void PedidoDeAumentoAntesDaPreparacao()
+    {
+        var s = Jogo98.Ler(Entrada());
+        // todos os treinadores da 1a divisao humanos: muitos pedidos, de times em todos os jogos
+        foreach (var e in s.Equipas.Where(e => s.Divisoes[0].Equipas.Contains(e.ID)))
+            if (s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador) is { } t) t.Humano = 1;
+        var eventos = new System.Collections.Generic.List<string>();
+        int preparos = 0;
+        var h = new Humano
+        {
+            Preparar = (j, e, jogo) => { eventos.Add($"{j.M.Jornada}{jogo?.Taca}:p"); return ++preparos > 60; },
+        };
+        h.PedirAumento = (e, p, atual, novo) => { lock (eventos) eventos.Add("aumento"); return true; };
+        var jg = new JogoEmCurso(s, 7, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        jg.M.RevisaoAntes = true;
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(motor.Join(100_000));
+        Assert.Contains("aumento", eventos);
+        // entre dois preparos da mesma rodada, nenhum pedido
+        for (int i = 1; i < eventos.Count - 1; i++)
+            if (eventos[i] == "aumento")
+                Assert.False(eventos[i - 1] != "aumento" && eventos.Skip(i + 1).FirstOrDefault(x => x != "aumento") == eventos[i - 1],
+                    string.Join(" ", eventos));
+    }
+
     [Fact]
     public async Task SeteNaoCabem()
     {

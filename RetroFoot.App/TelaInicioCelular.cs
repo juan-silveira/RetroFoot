@@ -488,7 +488,7 @@ public sealed partial class TelaInicio
                 if (e == null) continue;
                 var fundo = e.CorFundo.Length >= 3 ? Color.FromRgb(e.CorFundo[0], e.CorFundo[1], e.CorFundo[2]) : Colors.White;
                 var letra = e.CorLetra.Length >= 3 ? Color.FromRgb(e.CorLetra[0], e.CorLetra[1], e.CorLetra[2]) : Colors.Black;
-                var nomeEq = CUi.Txt(TextoSave(e.NomeCurto), 15, new SolidColorBrush(letra), FontWeight.Bold);
+                var nomeEq = CUi.Txt(TextoSave(e.NomeCurto), 15, new ImmutableSolidColorBrush(letra), FontWeight.Bold);
                 nomeEq.Tag = "fixo";
                 equipas[i].Content = new StackPanel
                 {
@@ -496,7 +496,7 @@ public sealed partial class TelaInicio
                     Children =
                     {
                         new ConfigEstilo.Escudo(e) { Width = 30, Height = 30, VerticalAlignment = VerticalAlignment.Center },
-                        new Border { Background = new SolidColorBrush(fundo), CornerRadius = new CornerRadius(CUi.Retro ? 0 : 6), Padding = new Thickness(8, 3), Child = nomeEq },
+                        new Border { Background = new ImmutableSolidColorBrush(fundo), CornerRadius = new CornerRadius(CUi.Retro ? 0 : 6), Padding = new Thickness(8, 3), Child = nomeEq },
                     },
                 };
                 equipas[i].IsVisible = true;

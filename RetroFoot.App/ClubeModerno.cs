@@ -24,7 +24,7 @@ static class ClubeModerno
     public static readonly IBrush Vermelho = TemaVerde.Vermelho, Ouro = TemaVerde.Destaque, Prata = TemaVerde.Prata, Escuro = TemaVerde.SobreDestaque;
     public static readonly FontFamily Inter = new("fonts:Inter#Inter");
 
-    public static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    public static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
     public static TextBlock T(string texto, double tam, IBrush cor, FontWeight? peso = null, TextAlignment alin = TextAlignment.Left) => new()
     {

@@ -35,7 +35,7 @@ static class MM
     // a Inter e mais larga que a Arial: um pouco menor para caber nas mesmas colunas
     public const double Escala = 0.92;
 
-    public static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    public static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
     public static Fonte Fonte(Fonte f) => new(Inter, Math.Round(f.Tamanho * Escala, 1), f.Negrito);
 

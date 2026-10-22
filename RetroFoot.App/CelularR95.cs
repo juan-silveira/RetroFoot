@@ -233,7 +233,7 @@ static class CR95
             Children.Add(_pop);
         }
 
-        static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
+        static IBrush H(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
         string Texto(int i) => i >= 0 && i < _itens.Count ? _itens[i] : "";
 
         public int Indice

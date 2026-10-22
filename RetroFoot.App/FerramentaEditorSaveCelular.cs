@@ -110,7 +110,7 @@ sealed class TelaEditorSaveCelular : UserControl
         };
         return new Border
         {
-            Background = new SolidColorBrush(Color.Parse(posicao is >= 0 and < 4 ? E.CoresPosicao[posicao] : "#808080")),
+            Background = new ImmutableSolidColorBrush(Color.Parse(posicao is >= 0 and < 4 ? E.CoresPosicao[posicao] : "#808080")),
             CornerRadius = new CornerRadius(R ? 0 : 6), Width = tam, Height = tam, Child = t, VerticalAlignment = VerticalAlignment.Center,
             BorderBrush = R ? W95.Preto : null, BorderThickness = new Thickness(R ? 1 : 0),
         };
@@ -164,7 +164,7 @@ sealed class TelaEditorSaveCelular : UserControl
         Control seta = R
             ? new Border
             {
-                Width = 32, Background = new SolidColorBrush(Color.Parse("#C0C0C0")), Margin = new Thickness(0, 2, 2, 2),
+                Width = 32, Background = new ImmutableSolidColorBrush(Color.Parse("#C0C0C0")), Margin = new Thickness(0, 2, 2, 2),
                 BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #FFFFFF, inset -1 -1 0 0 #000000, inset 2 2 0 0 #DFDFDF, inset -2 -2 0 0 #808080"),
                 // a seta do TComboBox (a mesma do CR95.Combo)
                 Child = new Pintor((dc, s) =>
@@ -191,7 +191,7 @@ sealed class TelaEditorSaveCelular : UserControl
         return c;
     }
 
-    static IBrush Cor(int rgb) => new SolidColorBrush(Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
+    static IBrush Cor(int rgb) => new ImmutableSolidColorBrush(Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
 
     // o nome da equipa na caixa nas cores dela (como a previa do computador)
     static Control CaixaEquipa(EquipaEditavel e, string? sub, double tam = 15)
@@ -604,9 +604,9 @@ sealed class TelaEditorSaveCelular : UserControl
         {
             var s = new Border
             {
-                Background = new SolidColorBrush(Color.Parse("#FFE4E1")), CornerRadius = new CornerRadius(5), Padding = new Thickness(5, 1),
+                Background = new ImmutableSolidColorBrush(Color.Parse("#FFE4E1")), CornerRadius = new CornerRadius(5), Padding = new Thickness(5, 1),
                 Margin = new Thickness(6, 0), VerticalAlignment = VerticalAlignment.Center,
-                Child = CUi.Txt(sit, 12, new SolidColorBrush(Color.Parse("#C62828")), FontWeight.Bold),
+                Child = CUi.Txt(sit, 12, new ImmutableSolidColorBrush(Color.Parse("#C62828")), FontWeight.Bold),
             };
             Grid.SetColumn(s, 3);
             g.Children.Add(s);
@@ -672,7 +672,7 @@ sealed class TelaEditorSaveCelular : UserControl
         }
         var cab = new Border
         {
-            Background = new SolidColorBrush(Color.Parse("#C0C0C0")), Padding = new Thickness(4, 0),
+            Background = new ImmutableSolidColorBrush(Color.Parse("#C0C0C0")), Padding = new Thickness(4, 0),
             BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #FFFFFF, inset -1 -1 0 0 #808080"),
             Child = LinhaRetroGrade(new[] { "P", T("Nome"), T("Força"), T("Salário"), "N", T("Sit.") }, true),
         };

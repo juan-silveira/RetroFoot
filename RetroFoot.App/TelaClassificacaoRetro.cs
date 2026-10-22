@@ -30,7 +30,7 @@ sealed class TelaClassificacaoRetro : Control
 {
     static readonly FontFamily Arial = new("avares://RetroFoot.App/Assets/Fontes#Liberation Sans");
     static readonly FontFamily Sans = new("avares://RetroFoot.App/Assets/Fontes#MS Sans Serif");
-    static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush H(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
     static readonly IBrush Verde = H("#008000"), Prata = H("#C0C0C0"), Cinza = H("#808080"), Titulo = H("#3296FA");
     // (tambem a do celular, ClassificacaoCelular) os tons de verde do jogo: o cliente verde (clGreen) com a zebra mais escura, o titulo, o
     // cabecalho e as posicoes em amarelo como os rotulos do original; o humano em verde-escuro
@@ -38,7 +38,7 @@ sealed class TelaClassificacaoRetro : Control
     internal static readonly IBrush Texto = Brushes.White, Fraco = H("#FFFF00"), Legenda_ = H("#E8F5E0"), AbaSel = H("#FFFF00");
     internal static readonly IBrush Campeao = H("#FFD700"), Sobe = H("#4FA8FF"), Desce = H("#FF4040");
     internal static readonly IBrush Vitoria = H("#3CE63C"), Empate = H("#C0C0C0"), Derrota = H("#FF4040"), NaoJogou = H("#005A00");
-    internal static readonly IPen Contorno = new Pen(H("#003A00"), 1);
+    internal static readonly IPen Contorno = new Pen(H("#003A00"), 1).ToImmutable();
 
     const double Margem = 10;
 
@@ -136,7 +136,7 @@ sealed class TelaClassificacaoRetro : Control
         cifrado.Length == 0 ? "" : System.Text.Encoding.Latin1.GetString(Cifra.TextoEFT(cifrado).Texto);
 
     static IBrush Cor(byte[] c, IBrush padrao) =>
-        c.Length < 4 || c[3] != 0 ? padrao : new SolidColorBrush(Color.FromRgb(c[0], c[1], c[2]));
+        c.Length < 4 || c[3] != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(c[0], c[1], c[2]));
 
     void Mostrar(int d)
     {

@@ -22,6 +22,7 @@ public sealed partial class Mundo
     // equipas (seg03:a67f)
     public void PrepararJogos()
     {
+        if (RevisaoAntes && Retomar == 0) ReverSalariosHumanos();
         foreach (var j in S.Jogos.ToArray())
             if (!Sair) PrepararJogo(j);
     }
@@ -55,13 +56,34 @@ public sealed partial class Mundo
         // endereco de retorno do StackCheck (nao nulo): a CPU nao vende nem chama o Random(20).
         bool vendeu = true;
         var t = TreinadorDa(e);
-        if (Retomar == 0 && t != null && (short)t.W0C > 1) vendeu = ReverSalarios(e, t) != null;
+        if (_revistas.Remove(e.ID, out var v)) vendeu = v;
+        else if (RevisaoAntes && t != null && HumanoAtivo(t)) { }
+        else if (Retomar == 0 && t != null && (short)t.W0C > 1) vendeu = ReverSalarios(e, t) != null;
         Retomar = 0;
         System.Array.Clear(e.B4D);
         if (t != null && HumanoAtivo(t)) G.PrepararHumano?.Invoke(this, e, j);
         else GestaoCPU(e, vendeu);   // sem treinador o original mostra "coach is nil" e segue como CPU
         if (!Sair) ForcaDosSetores(e);
         Traco?.Invoke(e, "fim");
+    }
+
+    // Jogo online: a parte 1 dos times humanos (o pedido de aumento) logo depois da rodada,
+    // antes de todos prepararem (no original vem na vez de cada time, ja na preparacao: online,
+    // a pergunta chegava a quem ja tinha dado PRONTO). Ao retomar no meio da preparacao (outro
+    // host), os humanos nao revem de novo.
+    public bool RevisaoAntes;
+    readonly Dictionary<ushort, bool> _revistas = new();
+
+    void ReverSalariosHumanos()
+    {
+        _revistas.Clear();
+        foreach (var j in S.Jogos.ToArray())
+            foreach (var e in Equipa(j.Casa) is { } c && Equipa(j.Fora) is { } f ? new[] { c, f } : [])
+            {
+                if (Sair) return;
+                if (_revistas.ContainsKey(e.ID) || TreinadorDa(e) is not { } t || !HumanoAtivo(t)) continue;
+                _revistas[e.ID] = (short)t.W0C > 1 ? ReverSalarios(e, t) != null : true;
+            }
     }
 
     // a parte 1 de seg03:3e9c (seg03:3edf-42d7)

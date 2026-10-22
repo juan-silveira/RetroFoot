@@ -258,7 +258,7 @@ sealed class TelaClassificacaoCelular : UserControl
         }
         var linha = CUi.Toque(g, AbrirEquipa == null ? null : () => Abrir(e), 40);
         linha.Padding = new Thickness(8, 0);
-        if (humana) linha.Background = CUi.Retro ? new SolidColorBrush(Color.FromRgb(255, 255, 176)) : TemaVerde.Humano;
+        if (humana) linha.Background = CUi.Retro ? new ImmutableSolidColorBrush(Color.FromRgb(255, 255, 176)) : TemaVerde.Humano;
         return linha;
     }
 

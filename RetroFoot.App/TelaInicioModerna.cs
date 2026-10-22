@@ -596,8 +596,8 @@ public sealed partial class TelaInicio
                         new Escudo(e) { Width = 30, Height = 30, VerticalAlignment = VerticalAlignment.Center },
                         new Border
                         {
-                            Background = new SolidColorBrush(fundo), CornerRadius = new CornerRadius(6), Padding = new Thickness(8, 3), VerticalAlignment = VerticalAlignment.Center,
-                            Child = new TextBlock { Text = TextoSave(e.NomeCurto), FontSize = 14, FontWeight = FontWeight.Bold, Foreground = new SolidColorBrush(letra) },
+                            Background = new ImmutableSolidColorBrush(fundo), CornerRadius = new CornerRadius(6), Padding = new Thickness(8, 3), VerticalAlignment = VerticalAlignment.Center,
+                            Child = new TextBlock { Text = TextoSave(e.NomeCurto), FontSize = 14, FontWeight = FontWeight.Bold, Foreground = new ImmutableSolidColorBrush(letra) },
                         },
                     },
                 };

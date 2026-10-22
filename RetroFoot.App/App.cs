@@ -19,17 +19,38 @@ public class App : Application
         Styles.Add(new Avalonia.Themes.Fluent.FluentTheme());
     }
 
+    // um erro que fecharia o jogo fica escrito em data/erros.log (com a hora e a pilha), para
+    // saber o que foi; os da interface e das tarefas esquecidas ficam so no arquivo, sem fechar
+    static void RegistrarErros()
+    {
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => Anotar("fatal", e.ExceptionObject as Exception);
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (_, e) => { Anotar("tarefa", e.Exception); e.SetObserved(); };
+        Avalonia.Threading.Dispatcher.UIThread.UnhandledException += (_, e) => Anotar("interface", e.Exception);
+    }
+
+    public static void Anotar(string onde, Exception? ex)
+    {
+        try
+        {
+            var arq = System.IO.Path.Combine(DadosJogo.Raiz, "erros.log");
+            if (System.IO.File.Exists(arq) && new System.IO.FileInfo(arq).Length > 512 * 1024) System.IO.File.Delete(arq);
+            System.IO.File.AppendAllText(arq, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{onde}] {ex}\n\n");
+        }
+        catch { }
+    }
+
     public override void OnFrameworkInitializationCompleted()
     {
         // No celular, a tela adaptada ao toque; no computador, a classica (800x600, fiel).
         // RETROFOOT_CELULAR=1 mostra a do celular no computador, para comparar.
         // o idioma das Configuracoes (e a traducao do motor) antes da 1a tela
         _ = Idioma.Atual;
+        RegistrarErros();
         bool celular = Celular.Ativo;
         if (!celular) FolgaDaBarra();
         // o texto inteiro numa dica onde ficou cortado (so com o rato)
         if (!OperatingSystem.IsAndroid()) Dicas.Ligar();
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         Raiz = raiz;
         void Mostrar(Control t) => raiz.Child = t;
         // RETROFOOT_TELA=equipa|jornada|classificacao: uma tela sozinha, com dados de teste

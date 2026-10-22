@@ -57,6 +57,8 @@ public sealed class HostOnline : IDisposable
     public HostOnline(Sala sala, JogoEmCurso j, Action<Action>? naInterface = null)
     {
         _sala = sala; _j = j;
+        // (o pedido de aumento dos humanos logo depois da rodada, antes da preparacao de todos)
+        j.M.RevisaoAntes = true;
         _ex = new ExecutorComandos(j);
         _naInterface = naInterface ?? (a => a());
         _observando.Add(sala.B.Observar($"{sala.Raiz}/jogadores", (_, _) => _fila.Add(AtualizarJogadores)));

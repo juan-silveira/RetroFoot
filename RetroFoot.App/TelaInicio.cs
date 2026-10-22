@@ -974,7 +974,7 @@ static class W95
         Arial13b = new(Arial, 13, true), Arial16 = new(Arial, 16, false), Arial16b = new(Arial, 16, true),
         Arial19 = new(Arial, 19, false);
 
-    public static IBrush Cor(byte r, byte g, byte b) => new SolidColorBrush(Color.FromRgb(r, g, b));
+    public static IBrush Cor(byte r, byte g, byte b) => new ImmutableSolidColorBrush(Color.FromRgb(r, g, b));
     static IBrush Cinza(byte v) => Cor(v, v, v);
 
     public static readonly IBrush Verde = Cor(0, 128, 0), Amarelo = Cor(255, 255, 0), Marinho = Cor(0, 0, 128),

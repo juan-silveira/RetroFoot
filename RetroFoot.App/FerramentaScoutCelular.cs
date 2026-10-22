@@ -165,7 +165,7 @@ sealed class ScoutCelular : UserControl
     string Din(long v) => dados == null ? v.ToString() : FormatoDinheiro.Valor(dados.Moeda, v);
 
     // ---------------------------------------------------------------- as cores
-    static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush H(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
     static readonly IBrush OuroRetro = H("#806000"), FaceRetro = H("#C0C0C0");
     static readonly BoxShadows Solto = BoxShadows.Parse("inset 1 1 0 0 #FFFFFF, inset -1 -1 0 0 #000000, inset 2 2 0 0 #DFDFDF, inset -2 -2 0 0 #808080");
     static readonly BoxShadows Premido = BoxShadows.Parse("inset 1 1 0 0 #000000, inset -1 -1 0 0 #FFFFFF, inset 2 2 0 0 #808080, inset -2 -2 0 0 #DFDFDF");

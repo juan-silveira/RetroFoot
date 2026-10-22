@@ -97,7 +97,7 @@ public sealed partial class TelaEquipa : UserControl
     // gancho Preparar, com o jogo da jornada).
     public static Control Demo()
     {
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         var arq = AcharSaveDemo();
         if (arq == null)
             return new TextBlock { Text = "Demo: não achei RetroFoot.Motor.Testes/Oraculo/j3-entrada.e98 (ou RETROFOOT_SAVE)", Foreground = Brushes.White };
@@ -240,7 +240,7 @@ public sealed partial class TelaEquipa : UserControl
         static readonly IBrush CorTitulo = Pincel(50, 150, 250), Cinza = Pincel(128, 128, 128);
         static readonly IBrush Destaque = Pincel(50, 150, 250);
 
-        static IBrush Pincel(byte r, byte g, byte b) => new SolidColorBrush(Color.FromRgb(r, g, b));
+        static IBrush Pincel(byte r, byte g, byte b) => new ImmutableSolidColorBrush(Color.FromRgb(r, g, b));
 
         // ------------------------------------------------------------ estado
         readonly TelaEquipa _tela;
@@ -606,7 +606,7 @@ public sealed partial class TelaEquipa : UserControl
 
         // TColor: $00BBGGRR; as cores do sistema (bit de cima) nao aparecem nas equipas
         static IBrush CorDelphi(byte[] b, IBrush padrao) =>
-            b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+            b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
 
         static string Texto(byte[] b) => b.Length == 0 ? "" : Encoding.Latin1.GetString(Cifra.TextoEFT(b).Texto);
         static string NomeJogador(SJogador p) => Encoding.Latin1.GetString(RetroFoot.Motor.Partida.Jornada.NomeNaTela(p));

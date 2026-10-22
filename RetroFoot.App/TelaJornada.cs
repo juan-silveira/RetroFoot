@@ -77,7 +77,7 @@ public sealed partial class TelaJornada : UserControl
         this.titulo = TituloNoIdioma(System.Text.Encoding.Latin1.GetString(titulo));
         sup = new Superficie(this);
         Content = sup;
-        Background = new SolidColorBrush(Verde);
+        Background = new ImmutableSolidColorBrush(Verde);
         Focusable = true;
         Fotografar(jn);
         // no celular: a coluna de partidas em pe (TelaJornadaCelular.cs)
@@ -510,14 +510,14 @@ public sealed partial class TelaJornada : UserControl
     // ---------------------------------------------------------------- desenho
 
     static readonly Color Verde = Color.FromRgb(0, 128, 0);           // clGreen, o fundo
-    static readonly IBrush VerdeB = new SolidColorBrush(Verde);
-    static readonly IBrush Amarelo = new SolidColorBrush(Color.FromRgb(255, 255, 0));
-    static readonly IBrush Marinho = new SolidColorBrush(Color.FromRgb(0, 0, 128));   // a moldura
-    static readonly IBrush Vermelho = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+    static readonly IBrush VerdeB = new ImmutableSolidColorBrush(Verde);
+    static readonly IBrush Amarelo = new ImmutableSolidColorBrush(Color.FromRgb(255, 255, 0));
+    static readonly IBrush Marinho = new ImmutableSolidColorBrush(Color.FromRgb(0, 0, 128));   // a moldura
+    static readonly IBrush Vermelho = new ImmutableSolidColorBrush(Color.FromRgb(255, 0, 0));
     static readonly IBrush Branco = Brushes.White, Preto = Brushes.Black;
-    static readonly IBrush Face = new SolidColorBrush(Color.FromRgb(192, 192, 192));
-    static readonly IBrush Sombra = new SolidColorBrush(Color.FromRgb(128, 128, 128));
-    static readonly IBrush Luz = new SolidColorBrush(Color.FromRgb(223, 223, 223));
+    static readonly IBrush Face = new ImmutableSolidColorBrush(Color.FromRgb(192, 192, 192));
+    static readonly IBrush Sombra = new ImmutableSolidColorBrush(Color.FromRgb(128, 128, 128));
+    static readonly IBrush Luz = new ImmutableSolidColorBrush(Color.FromRgb(223, 223, 223));
     static readonly FontFamily Arial = new("avares://RetroFoot.App/Assets/Fontes#Liberation Sans");
     static readonly FontFamily Sans = new("avares://RetroFoot.App/Assets/Fontes#MS Sans Serif");
 
@@ -652,8 +652,8 @@ public sealed partial class TelaJornada : UserControl
     static void Caixa(DrawingContext dc, double x, double y, string nome, Color letra, Color fundo, Bitmap? logo = null)
     {
         var r = new Rect(x, y, 180, H);
-        dc.FillRectangle(new SolidColorBrush(fundo), r);
-        var bl = new SolidColorBrush(letra);
+        dc.FillRectangle(new ImmutableSolidColorBrush(fundo), r);
+        var bl = new ImmutableSolidColorBrush(letra);
         using (dc.PushClip(r))
         {
             if (logo != null) Logo(dc, logo, x + 2, y);
@@ -711,7 +711,7 @@ public sealed partial class TelaJornada : UserControl
     void DesenharRelogio(DrawingContext dc)
     {
         var r = Relogio;
-        var frente = new SolidColorBrush(corRelogio);
+        var frente = new ImmutableSolidColorBrush(corRelogio);
         var c = r.Center;
         double rx = r.Width / 2 - 0.5, ry = r.Height / 2 - 0.5;
         dc.DrawEllipse(Branco, new Pen(frente, 1), c, rx, ry);
@@ -850,7 +850,7 @@ public sealed partial class TelaJornada : UserControl
     // dos humanos e automatica; depois de cada jornada vem a seguinte.
     public static Control Demo()
     {
-        var host = new ContentControl { Background = new SolidColorBrush(Verde) };
+        var host = new ContentControl { Background = new ImmutableSolidColorBrush(Verde) };
         host.AttachedToVisualTree += (_, _) =>
         {
             if (TopLevel.GetTopLevel(host) is Window w) w.Title = TelaAcerca.Nome + " - jornada (demo)";

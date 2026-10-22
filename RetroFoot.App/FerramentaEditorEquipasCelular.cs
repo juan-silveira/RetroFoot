@@ -156,7 +156,7 @@ sealed class EditorEquipasCelular : UserControl
         CUi.Txt(s, tam, cor, negrito ? FontWeight.Bold : FontWeight.Normal, quebra);
 
     static IBrush Fraco => R ? W95.Cinzento : CUi.Fraco;
-    static IBrush Ouro => R ? new SolidColorBrush(Color.Parse("#806000")) : new SolidColorBrush(Color.Parse("#E8B400"));
+    static IBrush Ouro => R ? new ImmutableSolidColorBrush(Color.Parse("#806000")) : new ImmutableSolidColorBrush(Color.Parse("#E8B400"));
 
     // o botao (no Retro, com o glifo do computador quando ha)
     static CUi.Botao Bt(string t, bool principal, Action a, string? glifo = null)
@@ -193,7 +193,7 @@ sealed class EditorEquipasCelular : UserControl
         var seta = R
             ? (Control)new Border
             {
-                Width = 32, Background = new SolidColorBrush(Color.Parse("#C0C0C0")), Margin = new Thickness(0, 2, 2, 2),
+                Width = 32, Background = new ImmutableSolidColorBrush(Color.Parse("#C0C0C0")), Margin = new Thickness(0, 2, 2, 2),
                 BoxShadow = BoxShadows.Parse("inset 1 1 0 0 #FFFFFF, inset -1 -1 0 0 #000000, inset 2 2 0 0 #DFDFDF, inset -2 -2 0 0 #808080"),
                 Child = Tx("▼", 11, W95.Preto).Ajustar(t => t.HorizontalAlignment = HorizontalAlignment.Center),
             }

@@ -342,5 +342,5 @@ public sealed class TelaDetalhesModerna : UserControl
         if (e.Key is Key.Enter or Key.Escape) { Fechar(); e.Handled = true; }
     }
 
-    static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 }

@@ -255,7 +255,7 @@ public static class LigacaoPartida
     // (Sessao + Ligar), com a escalacao automatica no lugar da tela da equipa.
     public static Control Demo()
     {
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         try
         {
             var bytes = SaveDemo();

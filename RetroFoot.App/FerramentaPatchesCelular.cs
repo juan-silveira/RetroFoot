@@ -38,7 +38,7 @@ public sealed class TelaPatchesCelular : UserControl
     List<BibliotecaPatches.Info> patches = new();
     bool ocupado;
 
-    static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush H(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
     // as cores do estado (aplicado, aviso, erro) nas duas peles
     static IBrush CorBom => CUi.Retro ? H("#006400") : TemaVerde.Verde;
     static IBrush CorAviso => CUi.Retro ? H("#806000") : TemaVerde.Ouro;
