@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -77,9 +78,18 @@ public sealed class BancoMemoria : IBanco
             o = f;
         }
         if (valor == null) o.Remove(ps[^1]);
-        else o[ps[^1]] = valor.DeepClone();
+        else o[ps[^1]] = Servidor(valor.DeepClone());
         // (como o Firebase: nos vazios somem)
         Podar(_raiz);
+    }
+
+    // {".sv": "timestamp"} vira a hora (ms), como no Firebase
+    static JsonNode? Servidor(JsonNode? n)
+    {
+        if (n is not JsonObject o) return n;
+        if (o.Count == 1 && (string?)o[".sv"] == "timestamp") return JsonValue.Create(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        foreach (var k in o.Select(x => x.Key).ToList()) o[k] = Servidor(o[k]?.DeepClone());
+        return o;
     }
 
     static void Podar(JsonObject o)
