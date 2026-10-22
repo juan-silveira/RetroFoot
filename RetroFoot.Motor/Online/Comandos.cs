@@ -24,6 +24,9 @@ namespace RetroFoot.Motor.Online;
 [JsonDerivedType(typeof(Vender), "vender")]
 [JsonDerivedType(typeof(Renovar), "renovar")]
 [JsonDerivedType(typeof(Preparo), "preparo")]
+[JsonDerivedType(typeof(Parar), "parar")]
+[JsonDerivedType(typeof(Trocar), "trocar")]
+[JsonDerivedType(typeof(Retomar), "retomar")]
 public abstract record Comando
 {
     // (o serializador gerado na compilacao: no Android o ILLink apaga os nomes dos parametros
@@ -50,6 +53,11 @@ public sealed record Renovar(ushort Jogador, int Proposta) : Comando;
 // ingresso (Ingressos.Razao), os observados e a opcao de leilao do tecnico (+0x1A[3])
 public sealed record Preparo(List<Escalado> Escalacao, int Razao, List<ushort> Observados, byte OpcaoLeilao) : Comando;
 public sealed record Escalado(ushort Id, ushort Estado);
+// durante a rodada ao vivo (fase 3): parar o jogo para substituir (para todos), uma troca e
+// seguir; o host atende no minuto seguinte
+public sealed record Parar : Comando;
+public sealed record Trocar(ushort Saiu, ushort Entra) : Comando;
+public sealed record Retomar : Comando;
 
 public sealed record Resposta(bool Ok, string Motivo = "")
 {
@@ -160,6 +168,25 @@ public sealed class ExecutorComandos(JogoEmCurso j)
             if (k.OpcaoLeilao <= 2) t.B1A[3] = k.OpcaoLeilao;
         }
         return automatica ? new Resposta(true, "escalacao automatica") : Resposta.Feito;
+    }
+
+    // uma troca durante o jogo (TelaSubstituicao.Trocar, seg02:2a4f): o titular sai, o reserva
+    // entra (+1 jogo), a equipa gasta uma substituicao e a forca dos setores e refeita; goleiro so
+    // por goleiro, a nao ser com o goleiro expulso (motivo 3)
+    public static Resposta Substituir(Equipa e, ushort saiu, ushort entra, int motivo = 1)
+    {
+        var s = e.Jogadores.Find(p => p.ID == saiu);
+        var n = e.Jogadores.Find(p => p.ID == entra);
+        if (s == null || n == null) return Resposta.Recusado("jogador");
+        if (Memoria.Substituicoes(e) <= 0) return Resposta.Recusado("sem substituicoes");
+        if (Memoria.Escalacao(s) != Memoria.EscTitular || Memoria.Escalacao(n) != Memoria.EscReserva) return Resposta.Recusado("troca invalida");
+        if (!((s.Posicao == 0) == (n.Posicao == 0) || (motivo == 3 && n.Posicao == 0))) return Resposta.Recusado("goleiro so por goleiro");
+        Memoria.MudarEscalacao(s, Memoria.EscFora);
+        Memoria.MudarEscalacao(n, Memoria.EscTitular);
+        Memoria.SomaHistorial(n, Memoria.HistJogos, 1);
+        Memoria.MudarSubstituicoes(e, (short)(Memoria.Substituicoes(e) - 1));
+        Sorteio.ForcaDosSetores(e);
+        return Resposta.Feito;
     }
 
     // a mesma conferencia do Jogar da tela da equipa (TelaEquipa.ConferirEscalacao)

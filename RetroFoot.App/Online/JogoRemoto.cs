@@ -53,6 +53,13 @@ public sealed class JogoRemoto
                 if (av.Aplicar(t)) _jornada.Minuto(av.Jornada);
             });
         });
+        // a paralisacao (fase 3): quem parou (este aparelho: a janela das trocas; os outros: o
+        // aviso), ou o fim dela
+        sala.B.Observar($"{sala.Raiz}/rodada/aoVivo/pausa", (caminho, v) =>
+        {
+            if (caminho != "/") return;
+            Dispatcher.UIThread.Post(() => Pausa(v as JsonObject));
+        });
         // o host parou o jogo: a espera ate ele continuar
         cli.Pausado += () => Dispatcher.UIThread.Post(() =>
         {
@@ -110,6 +117,61 @@ public sealed class JogoRemoto
     AoVivo.Receptor? _aoVivo;
     TelaJornada? _jornada;
 
+    // o toque no proprio jogo da jornada (LigacaoPartida.PedirDetalhes): parar o jogo de todos
+    public void PedirPausa(JogoAtual jg, int lado)
+    {
+        if (_time is not { } meu || jg.Equipa[lado]?.ID != meu.ID || _pausaMinha) return;
+        Executar(new Parar());
+    }
+
+    bool _pausaMinha;
+    bool _viuSorteio;
+
+    void Pausa(JsonObject? p)
+    {
+        var s = _jornada != null ? _sessaoAoVivo : _sessao;
+        if (p == null) { s?.MostrarAviso(null); return; }
+        string uid = (string?)p["uid"] ?? "";
+        if (uid != _sala.Uid)
+        {
+            s?.MostrarAviso(T("⏸ {0} está fazendo substituições…", (string?)p["nome"] ?? ""));
+            return;
+        }
+        // as trocas deste aparelho: a janela sobre a copia ao vivo; as trocas feitas nela vao
+        // para o host (ele confere e transmite); fechar e Retomar
+        if (_aoVivo is not { } av || _sessaoAoVivo is not { } sv || _pausaMinha) return;
+        int eq = (int?)p["equipa"] ?? 0, motivo = (int?)p["motivo"] ?? 1;
+        var jg = av.Jornada.Jogos.FirstOrDefault(x => x.Dados.Casa == eq || x.Dados.Fora == eq);
+        if (jg == null) return;
+        int lado = jg.Dados.Casa == eq ? Lado.Casa : Lado.Visit;
+        var e = jg.Equipa[lado]!;
+        _pausaMinha = true;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var antes = e.Jogadores.Where(x => Memoria.Escalacao(x) == Memoria.EscTitular).Select(x => x.ID).ToList();
+                LigacaoPartida.JanelaOnline(sv, jg, lado, motivo, av.Jornada);
+                var depois = e.Jogadores.Where(x => Memoria.Escalacao(x) == Memoria.EscTitular).Select(x => x.ID).ToList();
+                var sairam = antes.Where(id => !depois.Contains(id)).ToList();
+                foreach (var entra in depois.Where(id => !antes.Contains(id)))
+                {
+                    var pe = e.Jogadores.First(x => x.ID == entra);
+                    int k = sairam.FindIndex(id => (e.Jogadores.First(x => x.ID == id).Posicao == 0) == (pe.Posicao == 0));
+                    if (sairam.Count == 0) break;
+                    if (k < 0) k = 0;
+                    await _cli.Executar(new Trocar(sairam[k], entra));
+                    sairam.RemoveAt(k);
+                }
+                await _cli.Executar(new Retomar());
+            }
+            catch (Exception ex) { Console.Error.WriteLine("pausa: " + ex.Message); }
+            finally { _pausaMinha = false; }
+        });
+    }
+
+    Sessao? _sessaoAoVivo;
+
     void ComecarAoVivo(JsonObject ini)
     {
         try
@@ -120,6 +182,7 @@ public sealed class JogoRemoto
             _sessao?.EsconderRelogio();
             var titulo = System.Text.Encoding.Latin1.GetBytes(Mundo.TituloNaTela(System.Text.Encoding.Latin1.GetString(av.Titulo)));
             _jornada = new TelaJornada(s, titulo, av.Jornada);
+            _sessaoAoVivo = s;
             _pronto = true;
             s.Mostrar(_jornada);
         }
@@ -223,7 +286,8 @@ public sealed class JogoRemoto
 
     async Task MostrarTime(Sessao sessao, bool nova)
     {
-        var minha = (await _sala.Jogadores()).FirstOrDefault(x => x.Uid == _sala.Uid);
+        var js = await _sala.Jogadores();
+        var minha = js.FirstOrDefault(x => x.Uid == _sala.Uid);
         if (minha == null || minha.Equipa == 0 || sessao.Equipa(minha.Equipa) is not { } e)
         {
             Dispatcher.UIThread.Post(() => _mostrar(Mensagem(T("Jogo online"), T("Aguardando o host dar um time para você…"))));
@@ -245,8 +309,15 @@ public sealed class JogoRemoto
                 };
                 sessao.Mostrar(t);
             }
+            // o jogo novo (a 1a rodada, o primeiro jogo que chega): o sorteio dos times
+            if (nova && !_viuSorteio && sessao.J.M.Jornada == 1)
+            {
+                _viuSorteio = true;
+                var tecnicos = js.Where(x => x.Equipa != 0).OrderBy(x => x.Vaga).Select(x => (x.Nome, x.Equipa)).ToList();
+                sessao.Mostrar(new TelaSorteioTimes(sessao.S, tecnicos, Time));
+            }
             // a cada rodada nova, a classificacao primeiro (o resultado da rodada que passou)
-            if (nova && sessao.J.M.Jornada > 1)
+            else if (nova && sessao.J.M.Jornada > 1)
             {
                 var c = new TelaClassificacao(sessao, sessao.J.M.Jornada - 1, false);
                 c.Fechou += Time;

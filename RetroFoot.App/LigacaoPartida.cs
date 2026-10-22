@@ -94,7 +94,13 @@ public static class LigacaoPartida
             (JogoAtual, int)? p;
             lock (st.Trava) { p = st.Pedido; st.Pedido = null; }
             // as trocas feitas pela janela de detalhes (add-in 0x12) vao para a linha do tempo
-            if (p is var (jg, lado)) jn.ObservarTrocas(jg, lado, null, false, () => Detalhes(s, jg, lado, jn));
+            if (p is var (jg, lado))
+            {
+                // (jogo online: o host parou o jogo de todos; os outros veem o aviso)
+                s.Online?.AvisarPausa(jg.Equipa[lado]?.ID ?? 0, true);
+                jn.ObservarTrocas(jg, lado, null, false, () => Detalhes(s, jg, lado, jn));
+                s.Online?.AvisarPausa(0, false);
+            }
         };
         var fimJornada = h.FimJornada;
         h.FimJornada = jn =>
@@ -118,6 +124,8 @@ public static class LigacaoPartida
     // dois minutos, parado como o relogio do original. Fora de uma jornada, nada.
     public static void PedirDetalhes(Sessao s, JogoAtual jg, int lado)
     {
+        // (jogo online, noutro aparelho: o pedido de parar vai para o host)
+        if (s.Remoto is { } r) { r.PedirPausa(jg, lado); return; }
         if (!Estados.TryGetValue(s, out var st)) return;
         lock (st.Trava)
             if (st.Jornada != null && jg.Equipa[lado] != null) st.Pedido = (jg, lado);
@@ -151,6 +159,16 @@ public static class LigacaoPartida
             });
             return;
         }
+        Janela(s, jg, lado, motivo);
+    }
+
+    // (jogo online, noutro aparelho, fora da thread da interface) a janela da paralisacao: a de
+    // detalhes (motivo 1) ou a do intervalo/goleiro expulso (4/3), sobre a copia ao vivo
+    internal static void JanelaOnline(Sessao s, JogoAtual jg, int lado, int motivo, Jornada jn)
+    {
+        if (jg.Equipa[lado] is not { } e) return;
+        if (motivo == 1) { Detalhes(s, jg, lado, jn); return; }
+        Jornada.OrdenarPorPosicaoNome(e);
         Janela(s, jg, lado, motivo);
     }
 

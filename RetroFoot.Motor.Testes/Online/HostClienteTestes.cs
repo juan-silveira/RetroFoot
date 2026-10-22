@@ -293,4 +293,73 @@ public class HostClienteTestes
         // a mesma rodada em que o host passou continua no host novo
         Assert.True(r.Save.Length > 0);
     }
+
+    // a paralisacao: o cliente para o jogo durante a rodada, troca um jogador e retoma; a troca
+    // vale no host (a escalacao e o extra da substituicao) e o jogo segue
+    [Fact(Timeout = 120_000)]
+    public async Task ParalisacaoComTroca()
+    {
+        HostOnline.PrazoFixo = TimeSpan.FromSeconds(1);
+        try
+        {
+            var banco = new BancoMemoria();
+            var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+            var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+            var s = Jogo98.Ler(Entrada());
+            var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+            var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+            s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+            await sh.DarEquipa("host", minha.ID);
+            await sh.DarEquipa("cli", dele.ID);
+            using var cli = new ClienteOnline(sc);
+            // o cliente fica pronto em toda rodada (com a automatica da copia)
+            cli.NovoRetrato += (r, rodada, versao, inst) => _ = Task.Run(async () =>
+            {
+                var c = Jogo98.Ler(r.Save);
+                var e = c.Equipas.First(x => x.ID == dele.ID);
+                Escalacao.Automatico(new Aleatorio(3), e);
+                await cli.Pronto(new Preparo(e.Jogadores.Select(x => new Escalado(x.ID, Memoria.Escalacao(x))).ToList(), 10000, new(), 0));
+            });
+            HostOnline? host = null;
+            int rodadas = 0;
+            bool pediu = false;
+            Resposta? troca = null;
+            JogoAtual? jogoDele = null;
+            var h = new Humano();
+            h.Preparar = (j, e, jogo) => { bool sair = host!.Preparar(e, jogo); return sair || rodadas >= 1; };
+            h.ComecoJornada = (t, jn) => { rodadas++; host!.TransmitirInicio(t, jn); jogoDele = jn.Jogos.First(x => x.Dados.Casa == dele.ID || x.Dados.Fora == dele.ID); };
+            h.Minuto = jn =>
+            {
+                if (jn.Minuto == 30 && !pediu)
+                {
+                    pediu = true;
+                    // o cliente: parar, trocar o 1o titular de linha pelo 1o reserva de linha e retomar
+                    var eq = jogoDele!.Equipa[jogoDele.Dados.Casa == dele.ID ? 0 : 1]!;
+                    var sai = eq.Jogadores.First(p => p.Posicao != 0 && Memoria.Escalacao(p) == Memoria.EscTitular);
+                    var entra = eq.Jogadores.First(p => p.Posicao != 0 && Memoria.Escalacao(p) == Memoria.EscReserva);
+                    _ = Task.Run(async () =>
+                    {
+                        await cli.Executar(new Parar());
+                        troca = await cli.Executar(new Trocar(sai.ID, entra.ID));
+                        await cli.Executar(new Retomar());
+                    });
+                    // o motor espera o pedido chegar (o cliente e de outro "aparelho")
+                    var ate = DateTime.UtcNow.AddSeconds(5);
+                    while (DateTime.UtcNow < ate && troca == null) { host!.NoMinuto(jn); Thread.Sleep(50); }
+                }
+                host!.NoMinuto(jn);
+                host.TransmitirMinuto(jn);
+            };
+            var jg = new JogoEmCurso(s, 9, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+            host = new HostOnline(sh, jg);
+            var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+            motor.Start();
+            Assert.True(await Task.Run(() => motor.Join(90_000)));
+            host.Dispose();
+            Assert.NotNull(troca);
+            Assert.True(troca!.Ok, troca.Motivo);
+            Assert.Contains(jogoDele!.Extras, x => x.Tipo == TipoExtra.Substituicao && x.Minuto == 30);
+        }
+        finally { HostOnline.PrazoFixo = null; }
+    }
 }

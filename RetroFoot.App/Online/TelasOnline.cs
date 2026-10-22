@@ -266,7 +266,19 @@ public sealed class TelaSala : UserControl
         {
             var (esc, marcar) = CUi.Escolha(new[] { "1 min", "2 min", "3 min", "4 min", "5 min" }, Sala.PrazoPadrao - 1, i => _ = sala.DefinirPrazo(i + 1));
             _ = Task.Run(async () => { try { var p = await sala.Prazo(); Dispatcher.UIThread.Post(() => marcar(p - 1)); } catch { } });
-            regras = new StackPanel { Spacing = 8, Children = { CUi.Txt(T("Tempo para todos ficarem prontos depois do primeiro PRONTO da rodada. Acabou, quem não estiver pronto vai com a escalação automática."), 13, CUi.Fraco, FontWeight.Normal, true), esc } };
+            // a velocidade da partida (os perfis de tempo do jogo: 1 lento a 6 ultrassonico)
+            var nomesVel = OpcoesDoJogo.Perfis.Select(x => T(x.Nome.Trim())).ToArray();
+            var (escVel, marcarVel) = CUi.Escolha(nomesVel, Sala.VelocidadePadrao - 1, i => _ = sala.DefinirVelocidade(i + 1));
+            _ = Task.Run(async () => { try { var v = await sala.Velocidade(); Dispatcher.UIThread.Post(() => marcarVel(v - 1)); } catch { } });
+            regras = new StackPanel
+            {
+                Spacing = 8,
+                Children =
+                {
+                    CUi.Txt(T("Tempo para todos ficarem prontos depois do primeiro PRONTO da rodada. Acabou, quem não estiver pronto vai com a escalação automática."), 13, CUi.Fraco, FontWeight.Normal, true), esc,
+                    CUi.Txt(T("Velocidade da partida (para todos)."), 13, CUi.Fraco, FontWeight.Normal, true), escVel,
+                },
+            };
         }
         else regras = prazoTxt;
         obsInfo = sala.B.Observar($"{sala.Raiz}/info", (c, v) => _ = Task.Run(async () =>
@@ -275,10 +287,12 @@ public sealed class TelaSala : UserControl
             {
                 var info = await sala.B.Ler($"{sala.Raiz}/info");
                 int prazo = Math.Clamp((int?)info?["prazo"] ?? Sala.PrazoPadrao, 1, 5);
+                int vel = Math.Clamp((int?)info?["velocidade"] ?? Sala.VelocidadePadrao, 1, OpcoesDoJogo.Perfis.Length);
                 string? fase = (string?)info?["fase"];
                 Dispatcher.UIThread.Post(() =>
                 {
-                    prazoTxt.Text = T("Tempo para ficar pronto depois do primeiro PRONTO: {0} min.", prazo);
+                    prazoTxt.Text = T("Tempo para ficar pronto depois do primeiro PRONTO: {0} min.", prazo) + "\n"
+                        + T("Velocidade da partida: {0}.", T(OpcoesDoJogo.Perfis[vel - 1].Nome.Trim()));
                     if (host) return;
                     criandoTxt.Text = fase switch
                     {
@@ -362,5 +376,48 @@ public static class TelaEsperaOnline
         Grid.SetColumn(et, 1);
         g.Children.Add(et);
         return g;
+    }
+}
+
+// o sorteio dos times aos tecnicos da sala (o jogo novo online): cada um com o time que caiu
+// para ele, um de cada vez; depois o Continuar
+public sealed class TelaSorteioTimes : UserControl
+{
+    public TelaSorteioTimes(RetroFoot.Motor.Save.Jogo98 s, IReadOnlyList<(string Nome, ushort Equipa)> tecnicos, Action continuar)
+    {
+        FontFamily = CUi.Fonte;
+        var lista = new StackPanel { Spacing = 10 };
+        var botao = new CUi.Botao(T("Continuar"), true, continuar) { HorizontalAlignment = HorizontalAlignment.Stretch, IsEnabled = false };
+        string Divisao(ushort id)
+        {
+            for (int d = 0; d < s.Divisoes.Count; d++)
+                if (s.Divisoes[d].Equipas.Contains(id)) return d < 4 ? T("{0}ª Divisão", d + 1) : T("Distrital");
+            return "";
+        }
+        int k = 0;
+        var t = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(900) };
+        t.Tick += (_, _) =>
+        {
+            if (k >= tecnicos.Count) { t.Stop(); botao.IsEnabled = true; return; }
+            var (nome, id) = tecnicos[k++];
+            var e = s.Equipas.FirstOrDefault(x => x.ID == id);
+            var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 48 };
+            var esq = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+            esq.Children.Add(CUi.Txt(nome, 16, CUi.Texto, FontWeight.Bold));
+            if (e != null) esq.Children.Add(CUi.Txt(Divisao(e.ID) + " · " + TextosMercado.PaisDe(e.Pais), 12.5, CUi.Fraco));
+            g.Children.Add(esq);
+            if (e != null)
+            {
+                var n = CUi.NomeEquipa(e, Dlg.Texto(e.NomeCurto), 16, true);
+                n.VerticalAlignment = VerticalAlignment.Center;
+                Grid.SetColumn(n, 1);
+                g.Children.Add(n);
+            }
+            lista.Children.Add(CUi.Cartao_(null, g));
+            Som.Tocar(Som.Efeito.Sorteio);
+        };
+        t.Start();
+        DetachedFromVisualTree += (_, _) => t.Stop();
+        Content = Online.Pagina(T("Sorteio dos times"), T("O time de cada técnico da sala"), null, lista, botao);
     }
 }

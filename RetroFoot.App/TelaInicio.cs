@@ -804,13 +804,19 @@ public sealed partial class TelaInicio : UserControl
             s = CriarJogo(d, moeda, nomes, cfg.RegrasDoJogoNovo);
             var hs = s.Treinadores.Where(t => t.Humano != 0).ToList();
             var js = o.Jogadores.OrderBy(x => x.Vaga).ToList();
+            var sorteio = new List<(string, ushort)>();
             for (int k = 0; k < js.Count && k < hs.Count; k++)
-                if (s.Equipas.FirstOrDefault(q => q.Treinador == hs[k].ID) is { } e) await o.Sala.DarEquipa(js[k].Uid, e.ID);
+                if (s.Equipas.FirstOrDefault(q => q.Treinador == hs[k].ID) is { } e)
+                {
+                    await o.Sala.DarEquipa(js[k].Uid, e.ID);
+                    sorteio.Add((js[k].Nome, e.ID));
+                }
             Directory.CreateDirectory(Path.GetDirectoryName(arquivo)!);
             File.WriteAllBytes(arquivo, s.Gravar());
+            // o sorteio dos times (os outros veem o mesmo ao receber o jogo) e entao o jogo
+            mostrar(new TelaSorteioTimes(s, sorteio, () => Comecar(s, arquivo, true)));
         }
-        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); return; }
-        Comecar(s, arquivo, true);
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); }
     }
 
     // Motor.NovoJogo: o estado do inicio da 1a jornada, o save e a leitura dele (como

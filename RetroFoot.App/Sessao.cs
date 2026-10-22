@@ -64,6 +64,7 @@ public sealed class Sessao
         host.Children.Add(camadaTela);
         host.Children.Add(camadaDialogo);
         host.Children.Add(relogio);
+        host.Children.Add(aviso);
         relogio.PointerPressed += (_, e) => { e.Handled = true; relogioAberto = !relogioAberto; TiqueRelogio(); };
         mostrarRaiz = mostrar;
         this.mostrar = c =>
@@ -196,11 +197,16 @@ public sealed class Sessao
         });
         h.Preparar = (_, e, jogo) => host.Preparar(e, jogo);
         var sub = h.Substituicao;
+        Jornada? jornadaOnline = null;
         h.Substituicao = (jg, lado, saiu, motivo) =>
         {
             if (!host.Remota(jg.Equipa[lado])) { sub?.Invoke(jg, lado, saiu, motivo); return; }
-            if (motivo != 4 && saiu != null) JogoEmCurso.SubstituicaoForcada(jg.Equipa[lado]!, saiu, 0);
+            // o intervalo e o goleiro expulso de um time de outro aparelho: a paralisacao para
+            // todos, com as trocas feitas la; a lesao: a troca automatica
+            if (motivo is 3 or 4) { host.SubstituicaoRemota(jornadaOnline, jg, lado, motivo); return; }
+            if (saiu != null) JogoEmCurso.SubstituicaoForcada(jg.Equipa[lado]!, saiu, 0);
         };
+        host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
         var bat = h.Batedor;
         h.Batedor = (e, titulares, sugerido) => host.Remota(e) ? sugerido : bat != null ? bat(e, titulares, sugerido) : sugerido;
         var aum = h.PedirAumento;
@@ -220,11 +226,12 @@ public sealed class Sessao
             Dispatcher.UIThread.Post(EsconderRelogio);
             // a velocidade da partida das regras da sala; a jornada vai ao vivo para os outros
             J.Op = J.Op with { Velocidade = (short)host.Velocidade };
+            jornadaOnline = jn;
             host.TransmitirInicio(titulo, jn);
             comeco?.Invoke(titulo, jn);
         };
         var minuto = h.Minuto;
-        h.Minuto = jn => { host.TransmitirMinuto(jn); minuto?.Invoke(jn); };
+        h.Minuto = jn => { host.NoMinuto(jn); host.TransmitirMinuto(jn); minuto?.Invoke(jn); };
     }
 
     // ---------------------------------------------------------------- o relogio do prazo
@@ -263,6 +270,23 @@ public sealed class Sessao
         if (r <= TimeSpan.Zero) { EsconderRelogio(); RelogioAcabou?.Invoke(); return; }
         string t = $"{(int)r.TotalMinutes}:{r.Seconds:00}";
         ((TextBlock)relogio.Child!).Text = relogioAberto ? Idioma.T("⏱ {0} para todos ficarem prontos", t) : "⏱ " + t;
+    }
+
+    // (jogo online) o aviso no alto, no meio: "fulano esta fazendo substituicoes"; null esconde
+    readonly Border aviso = new()
+    {
+        IsVisible = false, IsHitTestVisible = false, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 40, 0, 0),
+        Padding = new Avalonia.Thickness(14, 6), CornerRadius = new Avalonia.CornerRadius(12),
+        Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xE6, 0x10, 0x10, 0x10)),
+        BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1.5),
+        Child = new TextBlock { FontSize = 15, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+    };
+
+    public void MostrarAviso(string? texto)
+    {
+        aviso.IsVisible = texto != null;
+        ((TextBlock)aviso.Child!).Text = texto ?? "";
     }
 
     public void EsconderRelogio()

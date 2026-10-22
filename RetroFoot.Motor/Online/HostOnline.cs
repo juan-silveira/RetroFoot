@@ -61,6 +61,8 @@ public sealed class HostOnline : IDisposable
         _observando.Add(sala.B.Observar($"{sala.Raiz}/jogadores", (_, _) => _fila.Add(AtualizarJogadores)));
         // (fora da preparacao o motor esta jogando: os comandos sao recusados na hora, sem fila)
         _observando.Add(sala.B.Observar($"{sala.Raiz}/comandos", (c, v) => { if (_naBarreira) _fila.Add(() => Comandos(c, v)); else Comandos(c, v); }));
+        // (fora da preparacao e da rodada, so recusa; na rodada, parar/trocar/retomar vao para a
+        // fila da rodada, atendida pelo motor entre os minutos)
         _vida = new Timer(_ => _ = Vida(), null, 0, 10_000);
     }
 
@@ -111,6 +113,7 @@ public sealed class HostOnline : IDisposable
         // (quem esta na sala e o time de cada um: antes de tudo, o host tambem)
         AtualizarJogadores();
         Ferias();
+        _naRodada = false;
         _naBarreira = true;
         Rodada = id;
         _preparos.Clear();
@@ -267,6 +270,11 @@ public sealed class HostOnline : IDisposable
             try
             {
                 var c = Comando.Ler((string?)valor["c"] ?? "");
+                if (!_naBarreira && _naRodada && c is Parar or Trocar or Retomar)
+                {
+                    _filaAoVivo.Add((uid, chave, c));
+                    continue;
+                }
                 if (!_naBarreira) r = Resposta.Recusado(Fora);
                 else if (!_jogadores.TryGetValue(uid, out var j) || j.Equipa == 0) r = Resposta.Recusado("sem time");
                 else if (c is Preparo p) { _preparos[j.Equipa] = p; r = Resposta.Feito; }
@@ -312,6 +320,8 @@ public sealed class HostOnline : IDisposable
     // na thread do motor: o comeco da jornada (ComecoJornada) e cada minuto (Minuto)
     public void TransmitirInicio(byte[] titulo, Jornada jn)
     {
+        _naRodada = true;
+        while (_filaAoVivo.TryTake(out _)) { }
         Enviar($"{_sala.Raiz}/rodada/aoVivo", new JsonObject { ["rodada"] = Rodada, ["inicio"] = _emissor.Inicio(_j, titulo, jn) });
     }
 
@@ -319,6 +329,98 @@ public sealed class HostOnline : IDisposable
 
     // a velocidade da partida das regras da sala (Opcoes.Velocidade, 1 a 6)
     public int Velocidade { get; private set; } = Sala.VelocidadePadrao;
+
+    // ---------------------------------------------------------------- a paralisacao
+    // Quem pede (o Parar de outro aparelho, ou o host na tela dele) para o jogo de todos: a
+    // pausa vai para o banco (rodada/aoVivo/pausa: quem e o time), os outros veem "fulano esta
+    // fazendo substituicoes" e o motor espera as trocas (Trocar) e o Retomar dele, ou o prazo.
+    // O intervalo dos times dos outros aparelhos usa o mesmo caminho (as trocas do intervalo).
+    public static TimeSpan PrazoPausa = TimeSpan.FromSeconds(60);
+    volatile bool _naRodada;
+    readonly BlockingCollection<(string Uid, string Chave, Comando C)> _filaAoVivo = new();
+
+    void Responder(string uid, string chave, Resposta r)
+    {
+        try
+        {
+            _sala.B.Gravar($"{_sala.Raiz}/resultados/{uid}/{chave}", new JsonObject { ["ok"] = r.Ok, ["motivo"] = r.Motivo, ["versao"] = _versao }).GetAwaiter().GetResult();
+            _sala.B.Gravar($"{_sala.Raiz}/comandos/{uid}/{chave}", null).GetAwaiter().GetResult();
+        }
+        catch { }
+    }
+
+    JogadorSala? DonoDe(ushort equipa) => _jogadores.Values.FirstOrDefault(x => x.Equipa == equipa);
+
+    // na thread do motor, a cada minuto (antes de transmitir): os pedidos de parar
+    public void NoMinuto(Jornada jn)
+    {
+        while (_filaAoVivo.TryTake(out var p))
+        {
+            if (p.C is not Parar) { Responder(p.Uid, p.Chave, Resposta.Recusado("o jogo nao esta parado")); continue; }
+            Responder(p.Uid, p.Chave, Resposta.Feito);
+            if (!_jogadores.TryGetValue(p.Uid, out var j) || j.Equipa == 0) continue;
+            var jg = jn.Jogos.FirstOrDefault(x => x.Dados.Casa == j.Equipa || x.Dados.Fora == j.Equipa);
+            if (jg == null) continue;
+            int lado = jg.Dados.Casa == j.Equipa ? Lado.Casa : Lado.Visit;
+            jn.ObservarTrocas(jg, lado, null, false, () => Pausa(jn, jg, lado, j, 1));
+            TransmitirMinuto(jn);
+        }
+    }
+
+    // na thread do motor: o intervalo (ou o goleiro expulso) de um time de outro aparelho
+    public void SubstituicaoRemota(Jornada? jn, JogoAtual jg, int lado, int motivo)
+    {
+        if (jg.Equipa[lado] is not { } e || DonoDe(e.ID) is not { } j) return;
+        Pausa(jn, jg, lado, j, motivo);
+    }
+
+    // a pausa comecou (o nome de quem para) ou acabou (null): o aviso na tela do host
+    public event Action<string?>? PausaMudou;
+
+    void Pausa(Jornada? jn, JogoAtual jg, int lado, JogadorSala j, int motivo)
+    {
+        var e = jg.Equipa[lado]!;
+        PausaMudou?.Invoke(j.Nome);
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", new JsonObject
+        {
+            ["uid"] = j.Uid, ["nome"] = j.Nome, ["equipa"] = (int)e.ID, ["motivo"] = motivo, ["segundos"] = (int)PrazoPausa.TotalSeconds,
+        });
+        var fim = DateTime.UtcNow + PrazoPausa;
+        while (DateTime.UtcNow < fim)
+        {
+            if (!_filaAoVivo.TryTake(out var p, 500)) continue;
+            if (p.Uid != j.Uid)
+            {
+                // (outro pediu para parar: depois desta pausa)
+                if (p.C is Parar) { _pendentes.Add(p); continue; }
+                Responder(p.Uid, p.Chave, Resposta.Recusado("o jogo esta parado por outro tecnico"));
+                continue;
+            }
+            if (p.C is Trocar t)
+            {
+                var r = ExecutorComandos.Substituir(e, t.Saiu, t.Entra, motivo);
+                Responder(p.Uid, p.Chave, r);
+                if (r.Ok && jn != null) TransmitirMinuto(jn);
+                continue;
+            }
+            Responder(p.Uid, p.Chave, Resposta.Feito);
+            if (p.C is Retomar) break;
+        }
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", null);
+        PausaMudou?.Invoke(null);
+        foreach (var x in _pendentes) _filaAoVivo.Add(x);
+        _pendentes.Clear();
+    }
+
+    readonly List<(string Uid, string Chave, Comando C)> _pendentes = new();
+
+    // a pausa do proprio host (a janela de detalhes dele): o aviso para os outros
+    public void AvisarPausa(ushort equipa, bool comecou)
+    {
+        if (!comecou) { Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", null); return; }
+        var j = _jogadores.GetValueOrDefault(_sala.Uid);
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", new JsonObject { ["uid"] = _sala.Uid, ["nome"] = j?.Nome ?? "Host", ["equipa"] = (int)equipa, ["motivo"] = 1 });
+    }
 
     // ---------------------------------------------------------------- passar o host
     // O host que precisa sair passa o host para outro tecnico (so na preparacao, com o motor

@@ -47,6 +47,7 @@ if (args[0] == "host")
     }
     int barreiras = 0;
     HostOnline host = null!;
+    RetroFoot.Motor.Partida.Jornada? jornada = null;
     var h = new Humano
     {
         Preparar = (j, e, jogo) =>
@@ -57,8 +58,10 @@ if (args[0] == "host")
             return sair;
         },
         // a rodada ao vivo para os outros (um minuto a cada 300 ms)
-        ComecoJornada = (titulo, jn) => host.TransmitirInicio(titulo, jn),
-        Minuto = jn => { host.TransmitirMinuto(jn); Thread.Sleep(300); },
+        ComecoJornada = (titulo, jn) => { jornada = jn; host.TransmitirInicio(titulo, jn); },
+        Minuto = jn => { host.NoMinuto(jn); host.TransmitirMinuto(jn); Thread.Sleep(300); },
+        // o intervalo dos times dos outros aparelhos: a paralisacao la
+        Substituicao = (jg, lado, saiu, motivo) => { if (motivo is 3 or 4 && host.Remota(jg.Equipa[lado])) host.SubstituicaoRemota(jornada, jg, lado, motivo); },
     };
     var jg = new JogoEmCurso(s, (uint)Environment.TickCount, Opcoes.Padrao with { Regras = TRegras.DoSave(s, TRegras.Original), Registrado = true }, h);
     host = new HostOnline(sala, jg);
