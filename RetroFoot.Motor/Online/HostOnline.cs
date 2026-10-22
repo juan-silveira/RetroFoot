@@ -79,6 +79,7 @@ public sealed class HostOnline : IDisposable
     public bool Remota(Equipa? e) =>
         e != null && e.ID != TimeDoHost && MercadoJogo.HumanoAtivo(_j.M.TreinadorDa(e));
 
+    public ushort? MeuTime => TimeDoHost;
     ushort? TimeDoHost => _jogadores.TryGetValue(_sala.Uid, out var h) && h.Equipa != 0 ? h.Equipa : null;
 
     void AtualizarJogadores()

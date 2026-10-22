@@ -195,6 +195,7 @@ public sealed class JogoRemoto
             _aoVivo = av;
             _sessao?.EsconderRelogio();
             var titulo = System.Text.Encoding.Latin1.GetBytes(Mundo.TituloNaTela(System.Text.Encoding.Latin1.GetString(av.Titulo)));
+            TelaJornada.SoTime = _time?.ID;
             _jornada = new TelaJornada(s, titulo, av.Jornada);
             _sessaoAoVivo = s;
             _pronto = true;

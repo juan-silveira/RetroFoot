@@ -376,7 +376,7 @@ public sealed partial class TelaJornada
         // cartoes cresciam e a lista mexia a cada lance (os outros, no toque: os detalhes)
         static bool ComLance(Linha l) => l.LanceTipo != 0 && l.Humanos > 0;
 
-        static bool Humano(Linha l, int lado) => l.Jogo?.Treinador[lado] is { Humano: not 0 };
+        static bool Humano(Linha l, int lado) => l.Jogo is { } jg && EDestaque(jg, lado);
 
         void Equipa(DrawingContext dc, string nome, Color letra, Color fundo, Avalonia.Media.Imaging.Bitmap? logo, Rect r, bool casa, bool humano)
         {
@@ -385,7 +385,7 @@ public sealed partial class TelaJornada
             {
                 // a caixa nas cores da equipa, como na jornada do classico
                 dc.FillRectangle(new SolidColorBrush(fundo), r);
-                var tn = Txt(nome, 14, fl, humano);
+                var tn = Caber(nome, 14, fl, humano, r.Width - 12);
                 using (dc.PushClip(r.Deflate(2)))
                     dc.DrawText(tn, new Point(casa ? r.Right - 6 - tn.Width : r.X + 6, r.Center.Y - tn.Height / 2));
                 return;
@@ -394,11 +394,19 @@ public sealed partial class TelaJornada
             if (logo != null) TelaJornada.Imagem(dc, logo, new Rect(xl, r.Center.Y - q / 2, q, q));
             else dc.DrawEllipse(new SolidColorBrush(fundo), new Pen(fl, 2), new Point(xl + q / 2, r.Center.Y), q / 2 - 1, q / 2 - 1);
             // (o nome cresce menos que o escudo: os compridos nao cabiam)
-            var t2 = Txt(nome, _escala > 1 ? 14.5 : 14, CUi.Texto, humano);
             double area = r.Width - q - 8;
+            // o nome comprido diminui a letra ate caber (no minimo 10), em vez de cortar
+            var t2 = Caber(nome, _escala > 1 ? 14.5 : 14, CUi.Texto, humano, area);
             double xt = casa ? Math.Max(r.X, r.Right - q - 8 - t2.Width) : r.X + q + 8;
             using (dc.PushClip(new Rect(casa ? r.X : r.X + q + 8, r.Y, area, r.Height)))
                 dc.DrawText(t2, new Point(xt, r.Center.Y - t2.Height / 2));
+        }
+
+        FormattedText Caber(string nome, double tam, IBrush cor, bool negrito, double largura)
+        {
+            var t = Txt(nome, tam, cor, negrito);
+            for (double f = tam - 0.5; t.Width > largura && f >= 10; f -= 0.5) t = Txt(nome, f, cor, negrito);
+            return t;
         }
 
         // tocar num jogo: os detalhes dele (do lado da metade tocada); no fim, continuar

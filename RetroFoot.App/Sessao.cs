@@ -64,6 +64,7 @@ public sealed class Sessao
         host.Children.Add(camadaTela);
         host.Children.Add(camadaDialogo);
         host.Children.Add(relogio);
+        TelaJornada.SoTime = null;   // (o jogo online liga o time deste aparelho)
         host.Children.Add(aviso);
         host.Children.Add(avisosCanto);
         MontarAvisos();
@@ -235,6 +236,7 @@ public sealed class Sessao
             // a velocidade da partida das regras da sala; a jornada vai ao vivo para os outros
             J.Op = J.Op with { Velocidade = (short)host.Velocidade };
             jornadaOnline = jn;
+            TelaJornada.SoTime = host.MeuTime;
             host.TransmitirInicio(titulo, jn);
             comeco?.Invoke(titulo, jn);
         };

@@ -44,6 +44,12 @@ namespace RetroFoot.App;
 // a velocidade (Sessao.MsPorMinuto); setas e PageUp/PageDown mudam de pagina.
 public sealed partial class TelaJornada : UserControl
 {
+    // (jogo online) o time deste aparelho: so o jogo dele fica destacado; null = todos os humanos
+    public static ushort? SoTime;
+
+    internal static bool EDestaque(JogoAtual jg, int lado) =>
+        jg.Treinador[lado] is { Humano: not 0 } && (SoTime is not ushort t || jg.Equipa[lado]?.ID == t);
+
     // o original fecha sozinho depois de Fim + 5 minutos (seg10:08DB: CanClose = 1 e
     // TCustomForm.Close); aqui, por padrao, a tela espera o jogador
     public bool FecharSozinha { get; set; }
@@ -265,8 +271,9 @@ public sealed partial class TelaJornada : UserControl
             (l.LetraFora, l.FundoFora) = (Cor(fora.CorLetra), Cor(fora.CorFundo));
             l.GC = Memoria.Golos(casa);
             l.GF = Memoria.Golos(fora);
-            // jornada.asm: humano quando o treinador tem +7 != 0
-            l.Humanos = (jg.Treinador[0] is { Humano: not 0 } ? 1 : 0) + (jg.Treinador[1] is { Humano: not 0 } ? 1 : 0);
+            // jornada.asm: humano quando o treinador tem +7 != 0 (no jogo online, so o time deste
+            // aparelho: o jogo dos outros tecnicos nao fica destacado aqui)
+            l.Humanos = (EDestaque(jg, 0) ? 1 : 0) + (EDestaque(jg, 1) ? 1 : 0);
             foreach (var ln in jg.Lances)
                 if (ln.Tipo == TipoLance.Expulsao)
                 {
