@@ -63,7 +63,7 @@ public sealed partial class TelaInicio : UserControl
                 File.WriteAllBytes(arq, r.Save);
                 Comecar(Jogo98.Ler(r.Save), arq, false, r);
             }
-            catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); }
+            catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(Inicial())); }
         }
         else if (online.Arquivo != null) ContinuarOnline(online.Arquivo);
         else NovoJogo(Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98"));
@@ -98,7 +98,7 @@ public sealed partial class TelaInicio : UserControl
                 }
             }
         }
-        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); return; }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(Inicial())); return; }
         Comecar(s, arquivo, false);
     }
 
@@ -378,7 +378,10 @@ public sealed partial class TelaInicio : UserControl
     }
 
     // o Cancelar/Esc do comeco volta ao hub (antes fechava o programa)
-    void SairDoPrograma() => mostrar(new TelaHub(mostrar));
+    void SairDoPrograma() => mostrar(Inicial());
+
+    // a tela de partida: o hub no computador; no celular, o inicio (o hub e so do computador)
+    Control Inicial() => Celular.Ativo ? new TelaInicio(mostrar) : new TelaHub(mostrar);
 
     // ---------------------------------------------------------------- TselectGameDlg
     // um treinador humano do jogo gravado: o nome, a equipa e a divisao dela ("" fora delas)
@@ -827,7 +830,7 @@ public sealed partial class TelaInicio : UserControl
             // o sorteio dos times (os outros veem o mesmo ao receber o jogo) e entao o jogo
             mostrar(new TelaSorteioTimes(s, sorteio, () => Comecar(s, arquivo, true)));
         }
-        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(Inicial())); }
     }
 
     // Motor.NovoJogo: o estado do inicio da 1a jornada, o save e a leitura dele (como
@@ -932,14 +935,14 @@ public sealed partial class TelaInicio : UserControl
             if (hostOnline?.Passou == true)
             {
                 try { File.Move(arquivo, arquivo + ".passado", true); } catch { }
-                mostrar(new TelaSala(mostrar, () => mostrar(new TelaHub(mostrar)), online.Sala, false));
+                mostrar(new TelaSala(mostrar, () => mostrar(Inicial()), online.Sala, false));
                 return;
             }
             // o modo amigo acabou: o save (ja sem os amigos) volta a ser single player e a sala some
-            if (online.ModoAmigo) { _ = online.Sala.Apagar(); mostrar(new TelaHub(mostrar)); return; }
+            if (online.ModoAmigo) { _ = online.Sala.Apagar(); mostrar(Inicial()); return; }
             // o host saiu do jogo: quem esta na sala espera ele continuar
             _ = online.Sala.Pausar();
-            mostrar(new TelaHub(mostrar));
+            mostrar(Inicial());
         };
         // o motor parou com erro (na thread dele): volta ao inicio com o aviso, sem travar;
         // o detalhe vai para a saida de erro
