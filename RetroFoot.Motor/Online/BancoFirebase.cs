@@ -122,8 +122,14 @@ public sealed class BancoFirebase : IBanco
     async Task<string> Url(string caminho, CancellationToken ct) =>
         $"{_url}/{caminho.Trim('/')}.json?auth={Uri.EscapeDataString(await _id.Token(ct))}";
 
+    // o prazo de cada pedido (a ligacao ao vivo do Observar nao tem)
+    public static TimeSpan PrazoPedido = TimeSpan.FromSeconds(30);
+
     async Task<HttpResponseMessage> Enviar(Func<string, HttpRequestMessage> pedido, string caminho, CancellationToken ct, bool aceitar412 = false)
     {
+        using var prazo = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        prazo.CancelAfter(PrazoPedido);
+        ct = prazo.Token;
         for (int tentativa = 0; ; tentativa++)
         {
             var resp = await _http.SendAsync(pedido(await Url(caminho, ct)), ct);

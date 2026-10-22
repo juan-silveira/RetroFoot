@@ -20,7 +20,10 @@ namespace RetroFoot.App;
 // tambem no computador (numa coluna no meio da tela).
 public static class Online
 {
-    static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(30) };
+    // (o SocketsHttpHandler do .NET tambem no Android: o do Android segurava o text/event-stream
+    // e os avisos ao vivo so chegavam quando a ligacao caia, ~30 s depois. Sem Timeout aqui: a
+    // ligacao ao vivo fica aberta; cada pedido do BancoFirebase tem o prazo dele)
+    static readonly HttpClient Http = new(new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(10) }) { Timeout = System.Threading.Timeout.InfiniteTimeSpan };
     static BancoFirebase? _banco;
 
     // a identidade anonima do aparelho (guardada junto das Configuracoes) e o banco

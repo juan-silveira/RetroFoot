@@ -37,6 +37,7 @@ public sealed class HostOnline : IDisposable
     readonly List<IDisposable> _observando = new();
     readonly Timer _vida;
     bool _localPronto;
+    volatile bool _naBarreira;
     int _versao;
     // esta execucao do host (um host que volta, ou um host novo, recomeca as versoes)
     readonly string _instancia = Guid.NewGuid().ToString("N")[..8];
@@ -58,7 +59,8 @@ public sealed class HostOnline : IDisposable
         _ex = new ExecutorComandos(j);
         _naInterface = naInterface ?? (a => a());
         _observando.Add(sala.B.Observar($"{sala.Raiz}/jogadores", (_, _) => _fila.Add(AtualizarJogadores)));
-        _observando.Add(sala.B.Observar($"{sala.Raiz}/comandos", (c, v) => _fila.Add(() => Comandos(c, v))));
+        // (fora da preparacao o motor esta jogando: os comandos sao recusados na hora, sem fila)
+        _observando.Add(sala.B.Observar($"{sala.Raiz}/comandos", (c, v) => { if (_naBarreira) _fila.Add(() => Comandos(c, v)); else Comandos(c, v); }));
         _vida = new Timer(_ => _ = Vida(), null, 0, 10_000);
     }
 
@@ -109,6 +111,7 @@ public sealed class HostOnline : IDisposable
         // (quem esta na sala e o time de cada um: antes de tudo, o host tambem)
         AtualizarJogadores();
         Ferias();
+        _naBarreira = true;
         Rodada = id;
         _preparos.Clear();
         _forcados.Clear();
@@ -142,7 +145,13 @@ public sealed class HostOnline : IDisposable
             if (_jogadores.Values.Any(x => x.Uid != _sala.Uid && Ausente(x))) Ferias();
             ConferirPrazo();
         }
-        try { _sala.B.Gravar($"{_sala.Raiz}/rodada/prazo", null).GetAwaiter().GetResult(); } catch { }
+        _naBarreira = false;
+        // a rodada comecou: quem nao ficou pronto (o prazo acabou) vai para a espera
+        try
+        {
+            _sala.B.Atualizar($"{_sala.Raiz}/rodada", new JsonObject { ["prazo"] = null, ["comecou"] = Rodada }).GetAwaiter().GetResult();
+        }
+        catch { }
     }
 
     bool TodosProntos() =>
@@ -233,6 +242,9 @@ public sealed class HostOnline : IDisposable
 
     (Equipa E, Jogo? Jogo) _ultimo;
 
+    // a resposta a um comando que chega com a rodada ja em jogo
+    public const string Fora = "a rodada ja comecou";
+
     // os comandos: o no inteiro ("/") ou um comando novo ("/<uid>/<chave>")
     void Comandos(string caminho, JsonNode? v)
     {
@@ -247,13 +259,13 @@ public sealed class HostOnline : IDisposable
         bool mudou = false;
         foreach (var (uid, chave, valor) in lista)
         {
-            if (!_comandosVistos.Add(uid + "/" + chave)) continue;
+            lock (_comandosVistos) if (!_comandosVistos.Add(uid + "/" + chave)) continue;
             Resposta r;
             try
             {
                 var c = Comando.Ler((string?)valor["c"] ?? "");
-                if (!_jogadores.TryGetValue(uid, out var j) || j.Equipa == 0) r = Resposta.Recusado("sem time");
-                else if (Rodada.Length == 0) r = Resposta.Recusado("fora da preparacao");
+                if (!_naBarreira) r = Resposta.Recusado(Fora);
+                else if (!_jogadores.TryGetValue(uid, out var j) || j.Equipa == 0) r = Resposta.Recusado("sem time");
                 else if (c is Preparo p) { _preparos[j.Equipa] = p; r = Resposta.Feito; }
                 else
                 {

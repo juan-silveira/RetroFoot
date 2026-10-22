@@ -64,6 +64,7 @@ public sealed class Sessao
         host.Children.Add(camadaTela);
         host.Children.Add(camadaDialogo);
         host.Children.Add(relogio);
+        relogio.PointerPressed += (_, e) => { e.Handled = true; relogioAberto = !relogioAberto; TiqueRelogio(); };
         mostrarRaiz = mostrar;
         this.mostrar = c =>
         {
@@ -218,17 +219,20 @@ public sealed class Sessao
     // ---------------------------------------------------------------- o relogio do prazo
     // (jogo online) depois do primeiro PRONTO da rodada, o tempo que falta para todos ficarem
     // prontos: por cima de tudo, no alto, em quem espera e em quem ainda mexe no time
+    // (compacto por padrao, no canto: so "⏱ 0:55"; um toque mostra a frase inteira e outro esconde)
     readonly Border relogio = new()
     {
-        IsVisible = false, IsHitTestVisible = false, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 6, 0, 0),
-        Padding = new Avalonia.Thickness(14, 5), CornerRadius = new Avalonia.CornerRadius(14),
-        Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xE6, 0x10, 0x10, 0x10)),
-        BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1.5),
-        Child = new TextBlock { FontSize = 15, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White },
+        IsVisible = false, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 4, 6, 0),
+        Padding = new Avalonia.Thickness(8, 2), CornerRadius = new Avalonia.CornerRadius(10),
+        Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xD0, 0x10, 0x10, 0x10)),
+        BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1),
+        Child = new TextBlock { FontSize = 12, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White },
+        Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
     };
     DispatcherTimer? relogioTimer;
     DateTime relogioFim;
+    bool relogioAberto;
     public event Action? RelogioAcabou;
 
     public void MostrarRelogio(TimeSpan falta)
@@ -236,16 +240,18 @@ public sealed class Sessao
         relogioFim = DateTime.UtcNow + falta;
         relogioTimer?.Stop();
         relogioTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
-        void Tique()
-        {
-            var r = relogioFim - DateTime.UtcNow;
-            if (r <= TimeSpan.Zero) { EsconderRelogio(); RelogioAcabou?.Invoke(); return; }
-            ((TextBlock)relogio.Child!).Text = Idioma.T("⏱ {0}:{1:00} para todos ficarem prontos", (int)r.TotalMinutes, r.Seconds);
-        }
-        relogioTimer.Tick += (_, _) => Tique();
+        relogioTimer.Tick += (_, _) => TiqueRelogio();
         relogioTimer.Start();
         relogio.IsVisible = true;
-        Tique();
+        TiqueRelogio();
+    }
+
+    void TiqueRelogio()
+    {
+        var r = relogioFim - DateTime.UtcNow;
+        if (r <= TimeSpan.Zero) { EsconderRelogio(); RelogioAcabou?.Invoke(); return; }
+        string t = $"{(int)r.TotalMinutes}:{r.Seconds:00}";
+        ((TextBlock)relogio.Child!).Text = relogioAberto ? Idioma.T("⏱ {0} para todos ficarem prontos", t) : "⏱ " + t;
     }
 
     public void EsconderRelogio()

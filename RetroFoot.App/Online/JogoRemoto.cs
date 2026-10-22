@@ -39,6 +39,19 @@ public sealed class JogoRemoto
         cli.NovoRetrato += (r, rodada, versao, instancia) => Dispatcher.UIThread.Post(() => Novo(r, rodada, instancia));
         // o prazo da rodada (depois do primeiro PRONTO): o relogio; acabou sem PRONTO, vai com o
         // que estiver na tela (a escalacao que nao fecha vira a automatica no host)
+        // a rodada comecou sem o PRONTO deste aparelho (o prazo acabou): a espera, com o aviso
+        sala.B.Observar($"{sala.Raiz}/rodada/comecou", (caminho, v) =>
+        {
+            if ((string?)v is not { } r || r != _rodada) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_pronto || _sessao is not { } ss || r != _rodada) return;
+                _pronto = true;
+                ss.EsconderRelogio();
+                ss.FecharDialogo();
+                ss.Mostrar(new TelaEsperaRemota(_sala, _rodada, ss, T("O tempo acabou: seu time foi com a escalação que estava (ou a automática). A rodada está sendo jogada.")));
+            });
+        });
         sala.B.Observar($"{sala.Raiz}/rodada/prazo", (caminho, v) =>
         {
             if (v is not JsonObject o || (string?)o["rodada"] != _rodada || (int?)o["segundos"] is not int seg) return;
@@ -120,6 +133,7 @@ public sealed class JogoRemoto
         _pronto = true;
         Dispatcher.UIThread.Post(() => sessao.Mostrar(new TelaEsperaRemota(_sala, _rodada, sessao)));
         var r = await _cli.Pronto(preparo);
+        if (!r.Ok && r.Motivo == HostOnline.Fora) return;   // (a espera ja mostra que a rodada comecou)
         if (!r.Ok)
         {
             _pronto = false;
@@ -162,7 +176,7 @@ public sealed class JogoRemoto
 // a espera do cliente depois do Jogar: quem ja esta pronto (ao vivo)
 sealed class TelaEsperaRemota : UserControl
 {
-    public TelaEsperaRemota(Sala sala, string rodada, Sessao sessao)
+    public TelaEsperaRemota(Sala sala, string rodada, Sessao sessao, string? aviso = null)
     {
         FontFamily = CUi.Fonte;
         var lista = new StackPanel { Spacing = 6 };
@@ -181,6 +195,10 @@ sealed class TelaEsperaRemota : UserControl
             catch { }
         }));
         DetachedFromVisualTree += (_, _) => obs.Dispose();
-        Content = Online.Pagina(T("Aguardando os técnicos"), T("A rodada começa quando todos estiverem prontos"), null, CUi.Cartao_(null, lista));
+        Control corpo = CUi.Cartao_(null, lista);
+        if (aviso != null)
+            corpo = new StackPanel { Spacing = 12, Children = { CUi.Cartao_(null, CUi.Txt(aviso, 14, CUi.Texto, FontWeight.Normal, true)), corpo } };
+        Content = Online.Pagina(aviso != null ? T("Rodada em andamento") : T("Aguardando os técnicos"),
+            aviso != null ? null : T("A rodada começa quando todos estiverem prontos"), null, corpo);
     }
 }

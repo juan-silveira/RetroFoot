@@ -23,6 +23,7 @@ if (args[0] == "host")
     int rodadas = args.Length > 2 ? int.Parse(args[2]) : 3;
     int espera = args.Length > 3 ? int.Parse(args[3]) : 60;
     var sala = await Sala.Criar(banco, banco.Uid, "Host", "0.2.0");
+    if (Environment.GetEnvironmentVariable("RETROFOOT_PRAZO") is { Length: > 0 } pz) await sala.DefinirPrazo(int.Parse(pz));
     Log("SALA " + sala.Codigo);
     File.WriteAllText(Path.Combine(Path.GetTempPath(), "retrofoot-sala.txt"), sala.Codigo);
     var humanos = s.Equipas.Where(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador))).ToList();
@@ -41,7 +42,7 @@ if (args[0] == "host")
                 await sala.DarEquipa(j.Uid, e.ID);
                 Log($"{j.Nome} entrou: time {e.ID}");
             }
-        if (dados.Count > 1 && args.Length <= 3) break;
+        if (dados.Count > 1) break;
         await Task.Delay(1000);
     }
     int barreiras = 0;
