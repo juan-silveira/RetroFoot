@@ -29,6 +29,13 @@ public sealed class ClienteOnline : IDisposable
         _sala = sala;
         _observando.Add(sala.B.Observar($"{sala.Raiz}/retrato", (c, v) => _ = Retrato(c, v)));
         _observando.Add(sala.B.Observar($"{sala.Raiz}/resultados/{sala.Uid}", Resultados));
+        _vida = new Timer(_ => _ = Vida(), null, 0, 15_000);
+    }
+
+    readonly Timer _vida;
+    async Task Vida()
+    {
+        try { await _sala.Visto(); } catch { }
     }
 
     async Task Retrato(string caminho, JsonNode? v)
@@ -91,6 +98,7 @@ public sealed class ClienteOnline : IDisposable
 
     public void Dispose()
     {
+        _vida.Dispose();
         foreach (var o in _observando) o.Dispose();
     }
 }

@@ -108,9 +108,15 @@ public sealed class HostOnline : IDisposable
     {
         // (quem esta na sala e o time de cada um: antes de tudo, o host tambem)
         AtualizarJogadores();
+        Ferias();
         Rodada = id;
         _preparos.Clear();
+        _forcados.Clear();
+        _limite = null;
+        _acabou = false;
+        try { _prazo = PrazoFixo ?? TimeSpan.FromMinutes(_sala.Prazo().GetAwaiter().GetResult()); } catch { }
         _jogam = _j.M.S.Jogos.SelectMany(x => new[] { x.Casa, x.Fora }).Where(x => x != 0).ToHashSet();
+        _hostJoga = TimeDoHost is ushort th0 && _jogam.Contains(th0);
         _localPronto = TimeDoHost is not ushort th || PrepararLocal == null || !_jogam.Contains(th);
         // (quem estava PRONTO para um host que caiu prepara de novo: o Preparo se perdeu)
         foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Estado == Estados.Pronto))
@@ -129,11 +135,88 @@ public sealed class HostOnline : IDisposable
             })));
         }
         AtualizarJogadores();
-        while (!TodosProntos() && !_sair) _fila.Take()();
+        while (!TodosProntos() && !_sair)
+        {
+            // (de segundo em segundo, mesmo sem novidade: o prazo e quem sumiu)
+            if (_fila.TryTake(out var a, 1000)) a();
+            if (_jogadores.Values.Any(x => x.Uid != _sala.Uid && Ausente(x))) Ferias();
+            ConferirPrazo();
+        }
+        try { _sala.B.Gravar($"{_sala.Raiz}/rodada/prazo", null).GetAwaiter().GetResult(); } catch { }
     }
 
     bool TodosProntos() =>
-        _localPronto && _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid && _jogam.Contains(x.Equipa) && x.Estado != Estados.Saiu).All(x => x.Estado == Estados.Pronto && x.Rodada == Rodada);
+        _localPronto && Faltam().Count == 0;
+
+    // os tecnicos dos outros aparelhos que jogam na rodada e ainda nao estao prontos
+    List<JogadorSala> Faltam() =>
+        _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid && _jogam.Contains(x.Equipa) && !Ausente(x) && !_forcados.Contains(x.Uid)
+            && !(x.Estado == Estados.Pronto && x.Rodada == Rodada)).ToList();
+
+    bool AlguemPronto() =>
+        (_localPronto && _hostJoga) || _jogadores.Values.Any(x => x.Uid != _sala.Uid && x.Estado == Estados.Pronto && x.Rodada == Rodada);
+
+    // ---------------------------------------------------------------- o prazo
+    // Depois do primeiro PRONTO da rodada, todos tem o prazo da sala (Sala.Prazo, 1 a 5 min); ele
+    // vai para o banco (rodada/prazo) e cada aparelho mostra o relogio. Acabou: quem ainda nao
+    // estava pronto vai com a escalacao que tiver (ou a automatica, se nao fecha).
+    public static TimeSpan? PrazoFixo;   // (testes)
+    TimeSpan _prazo = TimeSpan.FromMinutes(Sala.PrazoPadrao);
+    DateTime? _limite;
+    bool _acabou;
+    readonly HashSet<string> _forcados = new();
+    bool _hostJoga;
+    // o relogio comecou (o tempo que falta) e o prazo acabou (a tela do host fecha sozinha)
+    public event Action<TimeSpan>? PrazoComecou;
+    public event Action? PrazoAcabou;
+
+    void ConferirPrazo()
+    {
+        if (_limite == null)
+        {
+            if (!AlguemPronto() || TodosProntos()) return;
+            _limite = DateTime.UtcNow + _prazo;
+            try { _sala.B.Gravar($"{_sala.Raiz}/rodada/prazo", new JsonObject { ["rodada"] = Rodada, ["segundos"] = (int)_prazo.TotalSeconds }).GetAwaiter().GetResult(); } catch { }
+            PrazoComecou?.Invoke(_prazo);
+            return;
+        }
+        if (DateTime.UtcNow < _limite || _acabou) return;
+        _acabou = true;
+        foreach (var j in Faltam()) _forcados.Add(j.Uid);
+        if (!_localPronto) PrazoAcabou?.Invoke();
+    }
+
+    // ---------------------------------------------------------------- ausentes e ferias
+    // Quem sai do jogo (SAIU) ou some (o sinal de vida parado por PrazoAusente) fica de ferias,
+    // o recurso do jogo: o computador cuida do time e a rodada nao espera por ele. Quando ele
+    // volta, as ferias acabam na barreira seguinte (com o motor parado).
+    public static TimeSpan PrazoAusente = TimeSpan.FromSeconds(90);
+    readonly Dictionary<string, (long Visto, DateTime Quando)> _vistos = new();
+
+    bool Ausente(JogadorSala j)
+    {
+        if (j.Estado == Estados.Saiu) return true;
+        if (!_vistos.TryGetValue(j.Uid, out var v) || v.Visto != j.Visto) { _vistos[j.Uid] = (j.Visto, DateTime.UtcNow); return false; }
+        return DateTime.UtcNow - v.Quando > PrazoAusente;
+    }
+
+    // na barreira: as ferias de quem esta ausente, e o fim delas para quem voltou
+    void Ferias()
+    {
+        foreach (var j in _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid))
+        {
+            if (_j.M.Equipa(j.Equipa) is not { } e || _j.M.TreinadorDa(e) is not { Humano: not 0 } t) continue;
+            bool ausente = Ausente(j);
+            if (ausente != (t.B06 != 0))
+            {
+                _naInterface(() => MercadoJogo.Ferias(t, ausente));
+                Mudou?.Invoke(j, ausente);
+            }
+        }
+    }
+
+    // um tecnico entrou de ferias (true) ou voltou (false): o aviso para a tela do host
+    public event Action<JogadorSala, bool>? Mudou;
 
     // o retrato do jogo parado na equipa e (o motor esta parado; o estado nao muda debaixo)
     void Publicar(Equipa e, Jogo? jogo)

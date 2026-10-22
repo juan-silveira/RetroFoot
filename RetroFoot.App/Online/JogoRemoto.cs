@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Layout;
@@ -36,7 +37,21 @@ public sealed class JogoRemoto
     {
         _mostrar = mostrar; _voltar = voltar; _sala = sala; _cli = cli;
         cli.NovoRetrato += (r, rodada, versao, instancia) => Dispatcher.UIThread.Post(() => Novo(r, rodada, instancia));
+        // o prazo da rodada (depois do primeiro PRONTO): o relogio; acabou sem PRONTO, vai com o
+        // que estiver na tela (a escalacao que nao fecha vira a automatica no host)
+        sala.B.Observar($"{sala.Raiz}/rodada/prazo", (caminho, v) =>
+        {
+            if (v is not JsonObject o || (string?)o["rodada"] != _rodada || (int?)o["segundos"] is not int seg) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_sessao is not { } ss) return;
+                ss.MostrarRelogio(TimeSpan.FromSeconds(seg));
+                ss.RelogioAcabou += () => { if (!_pronto && _time is { } e && _sessao == ss) _ = Pronto(ss, e); };
+            });
+        });
     }
+
+    Equipa? _time;
 
     string _instancia = "";
 
@@ -72,6 +87,7 @@ public sealed class JogoRemoto
             void Time()
             {
                 var jogo = sessao.S.Jogos.FirstOrDefault(x => x.Casa == e.ID || x.Fora == e.ID);
+                _time = e;
                 // o time nao joga nesta rodada (fora da Taca): so a espera
                 if (jogo == null) { sessao.Mostrar(new TelaEsperaRemota(_sala, _rodada, sessao)); return; }
                 var t = new TelaEquipa(sessao, e, jogo);

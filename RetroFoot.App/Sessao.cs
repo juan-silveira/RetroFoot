@@ -63,6 +63,7 @@ public sealed class Sessao
     {
         host.Children.Add(camadaTela);
         host.Children.Add(camadaDialogo);
+        host.Children.Add(relogio);
         mostrarRaiz = mostrar;
         this.mostrar = c =>
         {
@@ -90,6 +91,7 @@ public sealed class Sessao
             },
             ComecoJornada = (titulo, jn) => Dispatcher.UIThread.Invoke(() =>
             {
+                EsconderRelogio();
                 msPerfil = OpcoesDoJogo.Intervalo(J.Op.Velocidade, jn);
                 jornada = new TelaJornada(this, titulo, jn);
                 this.mostrar(jornada);
@@ -168,10 +170,12 @@ public sealed class Sessao
     {
         Online = host;
         var h = J.H;
+        TaskCompletionSource<bool>? local = null;
+        TelaEquipa? telaLocal = null;
         host.PrepararLocal = (e, jogo) =>
         {
-            var tcs = new TaskCompletionSource<bool>();
-            var t = new TelaEquipa(this, e, jogo);
+            var tcs = local = new TaskCompletionSource<bool>();
+            var t = telaLocal = new TelaEquipa(this, e, jogo);
             t.Terminou += sair =>
             {
                 tcs.TrySetResult(sair);
@@ -180,6 +184,15 @@ public sealed class Sessao
             mostrar(t);
             return tcs.Task;
         };
+        // o prazo: o relogio; acabou com a tela do host aberta, ela fecha (o time vai com a
+        // escalacao que tiver; se nao fecha, a automatica)
+        host.PrazoComecou += falta => Dispatcher.UIThread.Post(() => MostrarRelogio(falta));
+        host.PrazoAcabou += () => Dispatcher.UIThread.Post(() =>
+        {
+            FecharDialogo();
+            if (local is { Task.IsCompleted: false } l && l.TrySetResult(false) && telaLocal != null && camadaTela.Child == telaLocal)
+                mostrar(TelaAguardando());
+        });
         h.Preparar = (_, e, jogo) => host.Preparar(e, jogo);
         var sub = h.Substituicao;
         h.Substituicao = (jg, lado, saiu, motivo) =>
@@ -198,6 +211,48 @@ public sealed class Sessao
         var pat = h.Patrocinio;
         h.Patrocinio = p => !host.Remota(PrimeiroHumano()) && pat != null && pat(p);
         host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => JogadoresOnline?.Invoke(l));
+        var comeco = h.ComecoJornada;
+        h.ComecoJornada = (titulo, jn) => { Dispatcher.UIThread.Post(EsconderRelogio); comeco?.Invoke(titulo, jn); };
+    }
+
+    // ---------------------------------------------------------------- o relogio do prazo
+    // (jogo online) depois do primeiro PRONTO da rodada, o tempo que falta para todos ficarem
+    // prontos: por cima de tudo, no alto, em quem espera e em quem ainda mexe no time
+    readonly Border relogio = new()
+    {
+        IsVisible = false, IsHitTestVisible = false, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 6, 0, 0),
+        Padding = new Avalonia.Thickness(14, 5), CornerRadius = new Avalonia.CornerRadius(14),
+        Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xE6, 0x10, 0x10, 0x10)),
+        BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1.5),
+        Child = new TextBlock { FontSize = 15, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White },
+    };
+    DispatcherTimer? relogioTimer;
+    DateTime relogioFim;
+    public event Action? RelogioAcabou;
+
+    public void MostrarRelogio(TimeSpan falta)
+    {
+        relogioFim = DateTime.UtcNow + falta;
+        relogioTimer?.Stop();
+        relogioTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        void Tique()
+        {
+            var r = relogioFim - DateTime.UtcNow;
+            if (r <= TimeSpan.Zero) { EsconderRelogio(); RelogioAcabou?.Invoke(); return; }
+            ((TextBlock)relogio.Child!).Text = Idioma.T("⏱ {0}:{1:00} para todos ficarem prontos", (int)r.TotalMinutes, r.Seconds);
+        }
+        relogioTimer.Tick += (_, _) => Tique();
+        relogioTimer.Start();
+        relogio.IsVisible = true;
+        Tique();
+    }
+
+    public void EsconderRelogio()
+    {
+        relogioTimer?.Stop();
+        relogioTimer = null;
+        relogio.IsVisible = false;
     }
 
     // os jogadores da sala mudaram (quem esta pronto): a tela de espera do host

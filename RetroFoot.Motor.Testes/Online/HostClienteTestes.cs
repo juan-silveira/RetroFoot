@@ -112,10 +112,10 @@ public class HostClienteTestes
         await Assert.ThrowsAsync<Sala.SalaInexistente>(() => Sala.Entrar(banco, "x", "ZZZZZZ", "X"));
     }
 
-    // quem sai do jogo (Ausentar) nao trava a rodada (o time joga no automatico) e volta com a
+    // quem sai do jogo (Ausentar) nao trava a rodada (o treinador fica de ferias) e volta com a
     // mesma chave para o mesmo time
     [Fact(Timeout = 120_000)]
-    public async Task QuemSaiNaoTravaEVoltaParaOTime()
+    public async Task QuemSaiFicaDeFeriasEVoltaParaOTime()
     {
         var banco = new BancoMemoria();
         var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
@@ -144,7 +144,8 @@ public class HostClienteTestes
         motor.Start();
         Assert.True(await Task.Run(() => motor.Join(60_000)));
         Assert.Equal(3, barreiras);
-        Assert.True(host.Remota(jg.M.Equipa(dele.ID)));
+        // o treinador dele de ferias (o computador cuida do time)
+        Assert.Equal(1, jg.M.TreinadorDa(jg.M.Equipa(dele.ID))!.B06);
         host.Dispose();
         // volta: a mesma vaga e o mesmo time, preparando
         await Sala.Entrar(banco, "cli", sh.Codigo, "João");
@@ -152,5 +153,91 @@ public class HostClienteTestes
         Assert.Equal(dele.ID, eu.Equipa);
         Assert.Equal(1, eu.Vaga);
         Assert.Equal(Estados.Preparando, eu.Estado);
+    }
+
+    // quem some sem sair (o sinal de vida parado pelo prazo) tambem fica de ferias
+    [Fact(Timeout = 120_000)]
+    public async Task QuemSomeFicaDeFerias()
+    {
+        var prazo = HostOnline.PrazoAusente;
+        HostOnline.PrazoAusente = TimeSpan.FromSeconds(2);
+        try
+        {
+            var banco = new BancoMemoria();
+            var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+            await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+            var s = Jogo98.Ler(Entrada());
+            var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+            var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+            s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+            await sh.DarEquipa("host", minha.ID);
+            await sh.DarEquipa("cli", dele.ID);
+            int barreiras = 0;
+            HostOnline? host = null;
+            var h = new Humano();
+            h.Preparar = (j, e, jogo) =>
+            {
+                string antes = host!.Rodada;
+                host.Preparar(e, jogo);
+                if (host.Rodada != antes) barreiras++;
+                return barreiras > 1;
+            };
+            var jg = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+            host = new HostOnline(sh, jg);
+            var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+            motor.Start();
+            Assert.True(await Task.Run(() => motor.Join(60_000)));
+            host.Dispose();
+            Assert.Equal(1, jg.M.TreinadorDa(jg.M.Equipa(dele.ID))!.B06);
+        }
+        finally { HostOnline.PrazoAusente = prazo; }
+    }
+
+    // o prazo depois do primeiro PRONTO: quem nao ficou pronto vai no automatico e a rodada anda
+    [Fact(Timeout = 120_000)]
+    public async Task PrazoAcabaEARodadaAnda()
+    {
+        HostOnline.PrazoFixo = TimeSpan.FromSeconds(2);
+        try
+        {
+            var banco = new BancoMemoria();
+            var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+            var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+            var s = Jogo98.Ler(Entrada());
+            var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+            var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+            s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+            await sh.DarEquipa("host", minha.ID);
+            await sh.DarEquipa("cli", dele.ID);
+            // o cliente esta conectado (sinal de vida) mas nunca marca PRONTO
+            using var cli = new ClienteOnline(sc);
+            var prazos = new System.Collections.Generic.List<int>();
+            using var obs = banco.Observar($"{sh.Raiz}/rodada/prazo", (_, v) => { if (v?["segundos"] is { } x) lock (prazos) prazos.Add((int)x); });
+            int barreiras = 0;
+            HostOnline? host = null;
+            var h = new Humano();
+            h.Preparar = (j, e, jogo) =>
+            {
+                // (as 2 primeiras rodadas do campeonato; na Taca o host nao joga e ninguem fica
+                // pronto: sem o primeiro PRONTO o prazo nao comeca)
+                string id = $"{j.M.Ano}-{j.M.Jornada}-{(jogo?.Taca == TipoJogo.Taca ? "T" : "L")}";
+                if (id != host!.Rodada && barreiras == 2) return true;
+                string antes = host.Rodada;
+                host.Preparar(e, jogo);
+                if (host.Rodada != antes) barreiras++;
+                return false;
+            };
+            var jg = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+            host = new HostOnline(sh, jg);
+            var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+            motor.Start();
+            Assert.True(await Task.Run(() => motor.Join(60_000)));
+            host.Dispose();
+            Assert.Equal(2, barreiras);
+            // nao ficou de ferias (estava conectado): so foi no automatico
+            Assert.Equal(0, jg.M.TreinadorDa(jg.M.Equipa(dele.ID))!.B06);
+            lock (prazos) Assert.Contains(2, prazos);
+        }
+        finally { HostOnline.PrazoFixo = null; }
     }
 }

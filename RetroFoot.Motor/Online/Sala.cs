@@ -16,11 +16,12 @@ namespace RetroFoot.Motor.Online;
 //                  comandos/<uid>/<chave>   o comando (Comando.Json) do tecnico
 //                  resultados/<uid>/<chave> a resposta do host
 // Sem login: o uid e a identidade anonima do aparelho; entra-se com o codigo.
-public sealed record JogadorSala(string Uid, string Nome, int Vaga, ushort Equipa, string Estado, string Rodada)
+// Visto: o sinal de vida do aparelho (a hora do servidor, ms; o cliente manda de tempos em tempos)
+public sealed record JogadorSala(string Uid, string Nome, int Vaga, ushort Equipa, string Estado, string Rodada, long Visto = 0)
 {
     public static JogadorSala? De(string uid, JsonNode? n) => n is JsonObject o
         ? new JogadorSala(uid, (string?)o["nome"] ?? "", (int?)o["vaga"] ?? -1, (ushort)((int?)o["equipa"] ?? 0),
-            (string?)o["estado"] ?? Estados.Preparando, (string?)o["rodada"] ?? "")
+            (string?)o["estado"] ?? Estados.Preparando, (string?)o["rodada"] ?? "", (long?)o["visto"] ?? 0)
         : null;
 }
 
@@ -119,6 +120,22 @@ public sealed class Sala
     public Task MudarEstado(string estado, string rodada, CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/jogadores/{Uid}", new JsonObject { ["estado"] = estado, ["rodada"] = rodada }, ct);
 
+    // ---------------------------------------------------------------- as regras da sala
+    // o tempo (minutos, 1 a 5) que todos tem para ficar PRONTOS depois do primeiro PRONTO da
+    // rodada; acabou, quem nao estiver pronto vai com a escalacao automatica (info/prazo)
+    public const int PrazoPadrao = 5;
+
+    public async Task<int> Prazo(CancellationToken ct = default) =>
+        Math.Clamp((int?)await B.Ler($"{Raiz}/info/prazo", ct) ?? PrazoPadrao, 1, 5);
+
+    public Task DefinirPrazo(int minutos, CancellationToken ct = default) =>
+        B.Atualizar($"{Raiz}/info", new JsonObject { ["prazo"] = Math.Clamp(minutos, 1, 5) }, ct);
+
+    // o que o host esta fazendo antes do jogo ("criando": o jogo novo sendo montado, os times
+    // sorteados), para quem espera na sala
+    public Task MarcarFase(string fase, CancellationToken ct = default) =>
+        B.Atualizar($"{Raiz}/info", new JsonObject { ["fase"] = fase }, ct);
+
     // o host da o time de um jogador (o id da equipa no jogo)
     public Task DarEquipa(string uid, ushort equipa, CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/jogadores/{uid}", new JsonObject { ["equipa"] = (int)equipa }, ct);
@@ -126,8 +143,12 @@ public sealed class Sala
     public Task<string> Mandar(Comando c, CancellationToken ct = default) =>
         B.Acrescentar($"{Raiz}/comandos/{Uid}", new JsonObject { ["c"] = c.Json() }, ct);
 
-    // sai do jogo em andamento: a vaga e o time ficam (volta com a mesma chave); a rodada nao
-    // espera por ele (o time joga com a escalacao automatica)
+    // o sinal de vida do aparelho (ClienteOnline, a cada 15 s)
+    public Task Visto(CancellationToken ct = default) =>
+        B.Atualizar($"{Raiz}/jogadores/{Uid}", new JsonObject { ["visto"] = Agora() }, ct);
+
+    // sai do jogo em andamento: a vaga e o time ficam (volta com a mesma chave); o treinador fica
+    // de ferias (o computador cuida do time) e a rodada nao espera por ele
     public Task Ausentar(CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/jogadores/{Uid}", new JsonObject { ["estado"] = Estados.Saiu }, ct);
 

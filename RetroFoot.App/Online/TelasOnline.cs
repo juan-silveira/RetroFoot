@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -165,9 +166,12 @@ public sealed class TelaSala : UserControl
         List<JogadorSala> jogadores = new();
         IDisposable? obs = null;
         ClienteOnline? cliente = null;
+        IDisposable? obsInfo = null;
         var comecar = new CUi.Botao(arquivo == null ? T("Começar jogo novo") : T("Continuar o jogo"), true, () =>
         {
             obs?.Dispose();
+            obsInfo?.Dispose();
+            _ = sala.MarcarFase("criando");
             mostrar(new TelaInicio(mostrar, new TelaInicio.OnlineNovo(sala, jogadores.ToList(), arquivo)));
         }) { HorizontalAlignment = HorizontalAlignment.Stretch };
         void Desenhar()
@@ -206,18 +210,66 @@ public sealed class TelaSala : UserControl
             Text = sala.Codigo, FontSize = 40, FontWeight = FontWeight.Bold, Foreground = CUi.Destaque, FontFamily = new FontFamily("monospace"),
             HorizontalAlignment = HorizontalAlignment.Center, LetterSpacing = 6,
         };
+        // copiar a chave (para colar no WhatsApp, Telegram...)
+        CUi.Botao copiar = null!;
+        copiar = new CUi.Botao(T("Copiar chave"), false, async () =>
+        {
+            try
+            {
+                if (TopLevel.GetTopLevel(this)?.Clipboard is { } cb)
+                {
+                    await cb.SetTextAsync(sala.Codigo);
+                    copiar.Texto = T("Chave copiada!");
+                }
+            }
+            catch { }
+        }) { HorizontalAlignment = HorizontalAlignment.Center };
+        var aviso = CUi.Txt(host ? T("Passe esta chave aos amigos. Eles entram em Jogo online > Entrar.") : T("Aguardando o host começar o jogo…"), 13, CUi.Fraco, FontWeight.Normal, true);
+        // (cliente) o host comecou: o jogo sendo criado e os times sorteados
+        var criando = new StackPanel
+        {
+            Spacing = 8, IsVisible = false,
+            Children = { CUi.Txt(T("O host está criando o jogo e sorteando os times…"), 14, CUi.Texto, FontWeight.SemiBold, true), new ProgressBar { IsIndeterminate = true, Height = 6 } },
+        };
+        // as regras da sala: o host escolhe; os outros veem
+        var prazoTxt = CUi.Txt("", 13, CUi.Fraco, FontWeight.Normal, true);
+        Control regras;
+        if (host)
+        {
+            var (esc, marcar) = CUi.Escolha(new[] { "1 min", "2 min", "3 min", "4 min", "5 min" }, Sala.PrazoPadrao - 1, i => _ = sala.DefinirPrazo(i + 1));
+            _ = Task.Run(async () => { try { var p = await sala.Prazo(); Dispatcher.UIThread.Post(() => marcar(p - 1)); } catch { } });
+            regras = new StackPanel { Spacing = 8, Children = { CUi.Txt(T("Tempo para todos ficarem prontos depois do primeiro PRONTO da rodada. Acabou, quem não estiver pronto vai com a escalação automática."), 13, CUi.Fraco, FontWeight.Normal, true), esc } };
+        }
+        else regras = prazoTxt;
+        obsInfo = sala.B.Observar($"{sala.Raiz}/info", (c, v) => _ = Task.Run(async () =>
+        {
+            try
+            {
+                var info = await sala.B.Ler($"{sala.Raiz}/info");
+                int prazo = Math.Clamp((int?)info?["prazo"] ?? Sala.PrazoPadrao, 1, 5);
+                bool criandoJa = (string?)info?["fase"] == "criando";
+                Dispatcher.UIThread.Post(() =>
+                {
+                    prazoTxt.Text = T("Tempo para ficar pronto depois do primeiro PRONTO: {0} min.", prazo);
+                    if (!host) { criando.IsVisible = criandoJa; aviso.IsVisible = !criandoJa; }
+                });
+            }
+            catch { }
+        }));
         var corpo = new StackPanel
         {
             Spacing = 14,
             Children =
             {
-                CUi.Cartao_(T("Chave da sala"), new StackPanel { Spacing = 6, Children = { chave, CUi.Txt(host ? T("Passe esta chave aos amigos. Eles entram em Jogo online > Entrar.") : T("Aguardando o host começar o jogo…"), 13, CUi.Fraco, FontWeight.Normal, true) } }),
+                CUi.Cartao_(T("Chave da sala"), new StackPanel { Spacing = 8, Children = { chave, copiar, aviso, criando } }),
                 CUi.Cartao_(T("Técnicos"), lista),
+                CUi.Cartao_(T("Regras da sala"), regras),
             },
         };
         async void Sair()
         {
             obs?.Dispose();
+            obsInfo?.Dispose();
             cliente?.Dispose();
             // (o host de um jogo gravado so sai: a sala fica para continuar depois)
             try { if (host && arquivo == null) await sala.Apagar(); else if (!host) await sala.Sair(); } catch { }
@@ -228,7 +280,7 @@ public sealed class TelaSala : UserControl
             // o jogo comecou quando chega o primeiro retrato
             cliente = new ClienteOnline(sala);
             var jogo = new JogoRemoto(mostrar, voltar, sala, cliente);
-            jogo.Comecou += () => obs?.Dispose();
+            jogo.Comecou += () => { obs?.Dispose(); obsInfo?.Dispose(); };
         }
         Content = Online.Pagina(T("Sala {0}", sala.Codigo), host ? T("Você é o host") : null, Sair, corpo, host ? comecar : null);
     }

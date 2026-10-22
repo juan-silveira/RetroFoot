@@ -26,10 +26,15 @@ namespace RetroFoot.Motor.Online;
 [JsonDerivedType(typeof(Preparo), "preparo")]
 public abstract record Comando
 {
-    static readonly JsonSerializerOptions Opcoes = new() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
-    public string Json() => JsonSerializer.Serialize(this, Opcoes);
-    public static Comando Ler(string json) => JsonSerializer.Deserialize<Comando>(json, Opcoes) ?? throw new JsonException("comando vazio");
+    // (o serializador gerado na compilacao: no Android o ILLink apaga os nomes dos parametros
+    // dos construtores e o serializador por reflexao nao le os records)
+    public string Json() => JsonSerializer.Serialize(this, JsonComandos.Default.Comando);
+    public static Comando Ler(string json) => JsonSerializer.Deserialize(json, JsonComandos.Default.Comando) ?? throw new JsonException("comando vazio");
 }
+
+[JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
+[JsonSerializable(typeof(Comando))]
+internal partial class JsonComandos : JsonSerializerContext;
 
 public sealed record PedirEmprestimo : Comando;
 public sealed record PagarEmprestimo : Comando;
