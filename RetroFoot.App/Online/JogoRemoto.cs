@@ -73,6 +73,13 @@ public sealed class JogoRemoto
                 s.Notificar(Online.TextoTransferencia(s.S, (int?)o["jogador"] ?? 0, (int?)o["comprador"] ?? 0, (int?)o["vendedor"] ?? 0, (long?)o["preco"] ?? 0, (int?)o["tipo"] ?? 0));
             });
         });
+        // (fase 2) as perguntas do motor para o meu time: a janela de sempre, aqui; a resposta
+        // vai para o host (sem resposta no prazo, ele usa o padrao e a janela fecha)
+        sala.B.Observar($"{sala.Raiz}/perguntas/{sala.Uid}", (caminho, v) =>
+        {
+            if (caminho != "/") return;
+            Dispatcher.UIThread.Post(() => Pergunta(v as JsonObject));
+        });
         // o host parou o jogo: a espera ate ele continuar
         cli.Pausado += () => Dispatcher.UIThread.Post(() =>
         {
@@ -129,6 +136,94 @@ public sealed class JogoRemoto
     Equipa? _time;
     AoVivo.Receptor? _aoVivo;
     TelaJornada? _jornada;
+
+    string? _perguntaAberta;
+    Sessao? _perguntaEm;
+
+    void Pergunta(JsonObject? q)
+    {
+        if (q == null)
+        {
+            // (o prazo acabou com a janela aberta: fecha)
+            if (_perguntaAberta != null) { _perguntaEm?.FecharDialogo(); _perguntaAberta = null; }
+            return;
+        }
+        string id = (string?)q["id"] ?? "";
+        if (id == _perguntaAberta) return;
+        var s = _jornada != null ? _sessaoAoVivo : _sessao;
+        if (s == null) return;
+        _perguntaAberta = id;
+        _perguntaEm = s;
+        string tipo = (string?)q["tipo"] ?? "";
+        _ = Task.Run(() =>
+        {
+            JsonObject? r = null;
+            try { r = Responder(s, tipo, q); }
+            catch (Exception ex) { Console.Error.WriteLine("pergunta: " + ex.Message); }
+            if (r != null && _perguntaAberta == id)
+                try { _sala.B.Gravar($"{_sala.Raiz}/respostas/{_sala.Uid}/{id}", r).GetAwaiter().GetResult(); } catch { }
+            Dispatcher.UIThread.Post(() => { if (_perguntaAberta == id) _perguntaAberta = null; });
+        });
+    }
+
+    // a janela de cada pergunta (na thread de uma tarefa: as janelas esperam com EsperarDialogo)
+    static JsonObject? Responder(Sessao s, string tipo, JsonObject q)
+    {
+        Equipa? Eq(string k) => s.Equipa((ushort)((int?)q[k] ?? 0));
+        Jogador? Jg(Equipa? e, string k) => e?.Jogadores.FirstOrDefault(x => x.ID == (int?)q[k]) ?? s.S.Equipas.SelectMany(x => x.Jogadores).FirstOrDefault(x => x.ID == (int?)q[k]);
+        switch (tipo)
+        {
+            case "aumento":
+            {
+                var e = Eq("equipa"); var p = Jg(e, "jogador");
+                if (e == null || p == null) return null;
+                return new JsonObject { ["ok"] = TelaPedidoSalario.Perguntar(s, e, p, (int?)q["novo"] ?? 0, (int?)q["modo"] ?? 0) };
+            }
+            case "lance":
+            {
+                var c = Eq("comprador"); var v = Eq("vendedor"); var p = Jg(v, "jogador");
+                if (c == null || v == null || p == null) return null;
+                var (mil, ok) = TelaLeilao.Lance(s)(c, v, p);
+                return new JsonObject { ["milhares"] = mil, ["ok"] = ok };
+            }
+            case "convite":
+            {
+                var t = s.S.Treinadores.FirstOrDefault(x => x.ID == (int?)q["treinador"]); var e = Eq("equipa");
+                if (t == null || e == null) return null;
+                return new JsonObject { ["ok"] = TelaTreinadores.Convite(s, t, e) };
+            }
+            case "patrocinio":
+            {
+                var p = new RetroFoot.Motor.Patrocinio.Proposta
+                {
+                    NomeBruto = Convert.FromBase64String((string?)q["nome"] ?? ""), Quantidade = (byte)((int?)q["quantidade"] ?? 0),
+                    Valor = (int?)q["valor"] ?? 0, Tipo = (byte)((int?)q["tipoP"] ?? 0), Marca = (byte)((int?)q["marca"] ?? 0), Multa = (int?)q["multa"] ?? 0,
+                    Registro = (string?)q["registro"] is { } reg ? new RetroFoot.Motor.Patrocinio.Marca(Convert.FromBase64String(reg)) : null,
+                };
+                bool ok = s.EsperarDialogo<bool>(fim => new TelaPatrocinio(p, s.J.Op.Marcas, Moeda.DoSave(s.S), fim));
+                return new JsonObject { ["ok"] = ok };
+            }
+            case "batedor":
+            {
+                var e = Eq("equipa");
+                if (e == null || q["titulares"] is not JsonArray ts) return null;
+                var tit = ts.Select(x => e.Jogadores.FirstOrDefault(p => p.ID == (int?)x)).OfType<Jogador>().ToList();
+                var sug = e.Jogadores.FirstOrDefault(p => p.ID == (int?)q["sugerido"]);
+                var b = LigacaoPartida.BatedorOnline(s, e, tit, sug);
+                return new JsonObject { ["jogador"] = (int)(b?.ID ?? 0) };
+            }
+            case "lesao":
+            {
+                var e = Eq("equipa"); var saiu = Jg(e, "saiu");
+                if (e == null || saiu == null) return null;
+                var reservas = e.Jogadores.Where(p => Memoria.Escalacao(p) == Memoria.EscReserva).Select(p => p.ID).ToHashSet();
+                s.EsperarDialogo<bool>(fim => { var t = new TelaSubstituicaoForcada(e, saiu); t.Fechou += () => fim(true); return t; });
+                var entrou = e.Jogadores.FirstOrDefault(p => reservas.Contains(p.ID) && Memoria.Escalacao(p) == Memoria.EscTitular);
+                return entrou == null ? null : new JsonObject { ["entra"] = (int)entrou.ID };
+            }
+        }
+        return null;
+    }
 
     // o toque no proprio jogo da jornada (LigacaoPartida.PedirDetalhes): parar o jogo de todos
     public void PedirPausa(JogoAtual jg, int lado)

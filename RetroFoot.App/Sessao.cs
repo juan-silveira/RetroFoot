@@ -202,13 +202,76 @@ public sealed class Sessao
         h.Preparar = (_, e, jogo) => host.Preparar(e, jogo);
         var sub = h.Substituicao;
         Jornada? jornadaOnline = null;
+        // (fase 2) as perguntas dos times dos outros aparelhos vao para o dono (com prazo; sem
+        // resposta, o padrao do motor)
+        static System.Text.Json.Nodes.JsonObject O(params (string K, System.Text.Json.Nodes.JsonNode? V)[] c)
+        {
+            var o = new System.Text.Json.Nodes.JsonObject();
+            foreach (var (k, v) in c) o[k] = v;
+            return o;
+        }
         h.Substituicao = (jg, lado, saiu, motivo) =>
         {
             if (!host.Remota(jg.Equipa[lado])) { sub?.Invoke(jg, lado, saiu, motivo); return; }
-            // o intervalo e o goleiro expulso de um time de outro aparelho: a paralisacao para
-            // todos, com as trocas feitas la; a lesao: a troca automatica
+            var e = jg.Equipa[lado]!;
+            // o intervalo e o goleiro expulso: a paralisacao para todos, com as trocas feitas la
             if (motivo is 3 or 4) { host.SubstituicaoRemota(jornadaOnline, jg, lado, motivo); return; }
-            if (saiu != null) JogoEmCurso.SubstituicaoForcada(jg.Equipa[lado]!, saiu, 0);
+            if (saiu == null) return;
+            // a lesao: quem entra, escolhido la (sem resposta, o primeiro possivel)
+            int k = 0;
+            if (Memoria.Substituicoes(e) > 0
+                && host.Perguntar(e.ID, "lesao", O(("equipa", e.ID), ("saiu", saiu.ID)), TimeSpan.FromSeconds(20)) is { } r
+                && (int?)r["entra"] is int entra)
+            {
+                int goleiros = e.Jogadores.Count(p => Memoria.Escalacao(p) == Memoria.EscReserva && p.Posicao == 0), i = 0;
+                foreach (var p in e.Jogadores)
+                {
+                    if (Memoria.Escalacao(p) != Memoria.EscReserva || (goleiros > 0 && (p.Posicao == 0) != (saiu.Posicao == 0))) continue;
+                    if (p.ID == entra) { k = i; break; }
+                    i++;
+                }
+            }
+            JogoEmCurso.SubstituicaoForcada(e, saiu, k);
+        };
+        host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
+        var bat = h.Batedor;
+        h.Batedor = (e, titulares, sugerido) =>
+        {
+            if (!host.Remota(e)) return bat != null ? bat(e, titulares, sugerido) : sugerido;
+            var r = host.Perguntar(e.ID, "batedor", O(("equipa", e.ID), ("titulares", new System.Text.Json.Nodes.JsonArray(titulares.Select(x => (System.Text.Json.Nodes.JsonNode)(int)x.ID).ToArray())),
+                ("sugerido", (int)(sugerido?.ID ?? 0))), TimeSpan.FromSeconds(20));
+            return (int?)r?["jogador"] is int id ? titulares.FirstOrDefault(x => x.ID == id) ?? sugerido : sugerido;
+        };
+        var aum = h.PedirAumento;
+        h.PedirAumento = (e, p, novo, modo) =>
+        {
+            if (!host.Remota(e)) return aum == null || aum(e, p, novo, modo);
+            var r = host.Perguntar(e.ID, "aumento", O(("equipa", e.ID), ("jogador", p.ID), ("novo", novo), ("modo", modo)));
+            return (bool?)r?["ok"] ?? true;
+        };
+        var lance = h.Lance;
+        h.Lance = (c, v, p) =>
+        {
+            if (!host.Remota(c)) return lance == null ? (0, false) : lance(c, v, p);
+            var r = host.Perguntar(c.ID, "lance", O(("comprador", c.ID), ("vendedor", v.ID), ("jogador", p.ID)));
+            return r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
+        };
+        var conv = h.Convite;
+        h.Convite = (t, e) =>
+        {
+            var dele = J.M.EquipaDoTreinador(t.ID);
+            if (!host.Remota(dele)) return conv != null && conv(t, e);
+            var r = host.Perguntar(dele!.ID, "convite", O(("treinador", t.ID), ("equipa", e.ID)));
+            return (bool?)r?["ok"] ?? false;
+        };
+        var pat = h.Patrocinio;
+        h.Patrocinio = p =>
+        {
+            var quem = PrimeiroHumano();
+            if (!host.Remota(quem)) return pat != null && pat(p);
+            var r = host.Perguntar(quem!.ID, "patrocinio", O(("nome", Convert.ToBase64String(p.NomeBruto)), ("quantidade", p.Quantidade), ("valor", p.Valor),
+                ("tipoP", p.Tipo), ("marca", p.Marca), ("multa", p.Multa), ("registro", p.Registro == null ? null : Convert.ToBase64String(p.Registro.Registro))));
+            return (bool?)r?["ok"] ?? false;
         };
         // (sem janela de leilao no jogo online: um aviso no canto de cada transferencia)
         Mercado.Janela = null;
@@ -216,17 +279,6 @@ public sealed class Sessao
         host.ConvidadoMudou += (nome, entrou) => Dispatcher.UIThread.Post(() => Notificar(entrou
             ? Idioma.T("👋 {0} entrou no jogo e assumiu um time da 4ª divisão", nome)
             : Idioma.T("👋 {0} saiu do jogo (o técnico dele foi demitido)", nome)));
-        host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
-        var bat = h.Batedor;
-        h.Batedor = (e, titulares, sugerido) => host.Remota(e) ? sugerido : bat != null ? bat(e, titulares, sugerido) : sugerido;
-        var aum = h.PedirAumento;
-        h.PedirAumento = (e, p, novo, modo) => host.Remota(e) || aum == null || aum(e, p, novo, modo);
-        var lance = h.Lance;
-        h.Lance = (c, v, p) => host.Remota(c) || lance == null ? (0, false) : lance(c, v, p);
-        var conv = h.Convite;
-        h.Convite = (t, e) => !host.Remota(J.M.EquipaDoTreinador(t.ID)) && conv != null && conv(t, e);
-        var pat = h.Patrocinio;
-        h.Patrocinio = p => !host.Remota(PrimeiroHumano()) && pat != null && pat(p);
         host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => { jogadoresOnline = l; JogadoresOnline?.Invoke(l); });
         // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
         host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });

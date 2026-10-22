@@ -215,6 +215,10 @@ public static class LigacaoPartida
         return t;
     }
 
+    // (jogo online, noutro aparelho, fora da thread da interface) a escolha do batedor
+    internal static SJogador? BatedorOnline(Sessao s, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido) =>
+        Batedor(s, Estados.GetValue(s, _ => new Estado()), atacante, titulares, sugerido);
+
     // seg08:328b com o humano cobrando. A cobranca e do motor (Jornada.Penalti, logo depois
     // deste gancho: Goleiro(defensor) e CobrarPenalti com o Random do jogo); a janela mostra o
     // mesmo resultado, calculado com uma copia do Random.

@@ -62,6 +62,7 @@ public sealed class HostOnline : IDisposable
         _observando.Add(sala.B.Observar($"{sala.Raiz}/jogadores", (_, _) => _fila.Add(AtualizarJogadores)));
         // (fora da preparacao o motor esta jogando: os comandos sao recusados na hora, sem fila)
         _observando.Add(sala.B.Observar($"{sala.Raiz}/comandos", (c, v) => { if (_naBarreira) _fila.Add(() => Comandos(c, v)); else Comandos(c, v); }));
+        _observando.Add(sala.B.Observar($"{sala.Raiz}/respostas", Respostas));
         // (fora da preparacao e da rodada, so recusa; na rodada, parar/trocar/retomar vao para a
         // fila da rodada, atendida pelo motor entre os minutos)
         _vida = new Timer(_ => _ = Vida(), null, 0, 10_000);
@@ -429,6 +430,51 @@ public sealed class HostOnline : IDisposable
             Transferiu?.Invoke(t, vendedor);
         }
         MapearTimes();
+    }
+
+    // ---------------------------------------------------------------- as perguntas (fase 2)
+    // As janelas do motor para um time de outro aparelho (aumento, lance em leilao da CPU,
+    // convite, patrocinio, batedor do penalti, substituicao por lesao): a pergunta vai para o
+    // dono (perguntas/<uid>), o motor espera a resposta (respostas/<uid>/<id>) ate o prazo; sem
+    // resposta (ou ele ausente), o padrao do motor.
+    public static TimeSpan PrazoPergunta = TimeSpan.FromSeconds(45);
+    readonly ConcurrentDictionary<string, JsonNode?> _respostas = new();
+    int _pergunta;
+
+    void Respostas(string caminho, JsonNode? v)
+    {
+        var partes = caminho.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (partes.Length == 0)
+        {
+            foreach (var (uid, rs) in Nos.Filhos(v))
+                foreach (var (id, r) in Nos.Filhos(rs)) _respostas[uid + "/" + id] = r.DeepClone();
+        }
+        else if (partes.Length == 1) { foreach (var (id, r) in Nos.Filhos(v)) _respostas[partes[0] + "/" + id] = r.DeepClone(); }
+        else if (partes.Length == 2 && v != null) _respostas[partes[0] + "/" + partes[1]] = v;
+    }
+
+    // na thread do motor: pergunta ao dono do time e espera; null = sem resposta
+    public JsonNode? Perguntar(ushort equipa, string tipo, JsonObject dados, TimeSpan? prazo = null)
+    {
+        // (fora da barreira a lista dos jogadores pode estar velha)
+        AtualizarJogadores();
+        if (DonoDe(equipa) is not { } j || j.Uid == _sala.Uid || Ausente(j)) return null;
+        string id = (++_pergunta).ToString("D6");
+        dados["id"] = id;
+        dados["tipo"] = tipo;
+        dados["segundos"] = (int)(prazo ?? PrazoPergunta).TotalSeconds;
+        try { _sala.B.Gravar($"{_sala.Raiz}/perguntas/{j.Uid}", dados).GetAwaiter().GetResult(); } catch { return null; }
+        var fim = DateTime.UtcNow + (prazo ?? PrazoPergunta);
+        JsonNode? r = null;
+        string chave = j.Uid + "/" + id;
+        while (DateTime.UtcNow < fim && !_respostas.TryRemove(chave, out r)) Thread.Sleep(150);
+        try
+        {
+            _sala.B.Gravar($"{_sala.Raiz}/perguntas/{j.Uid}", null).GetAwaiter().GetResult();
+            _sala.B.Gravar($"{_sala.Raiz}/respostas/{j.Uid}/{id}", null).GetAwaiter().GetResult();
+        }
+        catch { }
+        return r;
     }
 
     // ---------------------------------------------------------------- a paralisacao

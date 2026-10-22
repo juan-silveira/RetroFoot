@@ -468,4 +468,39 @@ public class HostClienteTestes
         Assert.NotNull(tc);
         Assert.Equal(0, tc!.Humano);
     }
+
+    // as perguntas do motor ao dono de um time de outro aparelho: a resposta dele volta; sem
+    // resposta no prazo, null (o padrao do motor)
+    [Fact(Timeout = 60_000)]
+    public async Task PerguntaVaiAoDonoEVolta()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+        await sh.DarEquipa("host", minha.ID);
+        await sh.DarEquipa("cli", dele.ID);
+        using var cli = new ClienteOnline(sc);   // (o sinal de vida: conectado)
+        var jg = new JogoEmCurso(s, 1, Opcoes.Padrao, new Humano());
+        using var host = new HostOnline(sh, jg);
+        bool responder = true;
+        using var obs = banco.Observar($"{sh.Raiz}/perguntas/cli", (c, v) =>
+        {
+            if (c != "/" || v is not System.Text.Json.Nodes.JsonObject q || !responder) return;
+            _ = banco.Gravar($"{sh.Raiz}/respostas/cli/{(string)q["id"]!}", new System.Text.Json.Nodes.JsonObject { ["ok"] = false, ["tipo"] = (string)q["tipo"]! });
+        });
+        await Task.Delay(300);
+        var r = await Task.Run(() => host.Perguntar(dele.ID, "aumento", new System.Text.Json.Nodes.JsonObject { ["jogador"] = 1 }, TimeSpan.FromSeconds(5)));
+        Assert.NotNull(r);
+        Assert.False((bool)r!["ok"]!);
+        Assert.Equal("aumento", (string)r["tipo"]!);
+        responder = false;
+        var nada = await Task.Run(() => host.Perguntar(dele.ID, "convite", new System.Text.Json.Nodes.JsonObject(), TimeSpan.FromSeconds(1)));
+        Assert.Null(nada);
+        // o time do proprio host nao pergunta pela rede
+        Assert.Null(host.Perguntar(minha.ID, "aumento", new System.Text.Json.Nodes.JsonObject(), TimeSpan.FromSeconds(1)));
+    }
 }
