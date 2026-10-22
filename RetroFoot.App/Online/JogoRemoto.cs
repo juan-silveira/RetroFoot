@@ -37,6 +37,12 @@ public sealed class JogoRemoto
     {
         _mostrar = mostrar; _voltar = voltar; _sala = sala; _cli = cli;
         cli.NovoRetrato += (r, rodada, versao, instancia) => Dispatcher.UIThread.Post(() => Novo(r, rodada, instancia));
+        // o sinal de vida do host (de 10 em 10 s): parado por 35 s, o aviso de que o host saiu ou
+        // caiu (o jogo continua quando ele voltar); voltou, o aviso some
+        sala.B.Observar($"{sala.Raiz}/hostVivo", (caminho, v) => _sinalHost = DateTime.UtcNow);
+        _vigia = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+        _vigia.Tick += (_, _) => VigiarHost();
+        _vigia.Start();
         // o prazo da rodada (depois do primeiro PRONTO): o relogio; acabou sem PRONTO, vai com o
         // que estiver na tela (a escalacao que nao fecha vira a automatica no host)
         // a rodada comecou sem o PRONTO deste aparelho (o prazo acabou): a espera, com o aviso
@@ -65,6 +71,29 @@ public sealed class JogoRemoto
     }
 
     Equipa? _time;
+    DateTime _sinalHost = DateTime.UtcNow;
+    readonly DispatcherTimer _vigia;
+    CUi.Folha? _avisoHost;
+    Sessao? _avisoEm;
+
+    void VigiarHost()
+    {
+        bool sumiu = DateTime.UtcNow - _sinalHost > TimeSpan.FromSeconds(35);
+        if (sumiu && _avisoHost == null && _sessao is { } ss)
+        {
+            _avisoHost = CUi.Pergunta(T("Host desconectado"),
+                T("O host saiu do jogo ou perdeu a conexão. O jogo continua quando ele voltar: você pode esperar aqui ou sair (sua vaga e seu time ficam guardados)."),
+                new[] { (T("Sair do jogo"), false, (Action)Sair) });
+            _avisoEm = ss;
+            ss.EsconderRelogio();
+            ss.AbrirDialogo(_avisoHost);
+        }
+        else if (!sumiu && _avisoHost != null)
+        {
+            _avisoEm?.FecharDialogo(_avisoHost);
+            _avisoHost = null;
+        }
+    }
 
     string _instancia = "";
 
@@ -164,6 +193,7 @@ public sealed class JogoRemoto
     // sai do jogo: a vaga e o time ficam (volta em Jogo online > Entrar, com a mesma chave)
     async void Sair()
     {
+        _vigia.Stop();
         _cli.Dispose();
         try { await _sala.Ausentar(); } catch { }
         _voltar();
