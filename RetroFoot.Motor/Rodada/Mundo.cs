@@ -197,6 +197,9 @@ public sealed partial class Mundo
     internal static byte[] Nome(byte[] b) => b.Length == 0 ? Array.Empty<byte>() : Cifra.TextoEFT(b).Texto;
 
     internal void SetForcaMedia(Equipa e, short v) => forcaMedia[e.ID] = v;
+
+    // (o retrato do jogo online, Online/Retrato) o +0xC5 de cada equipa, que o save nao guarda
+    internal Dictionary<ushort, short> ForcasMedias => forcaMedia;
     // o +0xC5 da equipa (nao vai para o save): a forca media guardada por GestaoCPU
     public short ForcaMediaGuardada(Equipa e) => forcaMedia.GetValueOrDefault(e.ID);
 }

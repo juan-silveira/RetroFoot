@@ -260,6 +260,37 @@ public sealed class JogoEmCurso
         return s.Gravar();
     }
 
+    // o retrato do jogo online (Online/Retrato) parado na preparacao da equipa e (dentro do
+    // gancho Preparar, antes de qualquer mudanca do humano): o save com a retomada nela, como o
+    // Sair grava, e o que o save nao guarda
+    public Online.Retrato Fotografar(Equipa e, Jogo? jogo)
+    {
+        var c = M.S.Cabecalho;
+        short retomar = M.Retomar;
+        bool taca = tacaEmPreparacao;
+        var (texto, g271e, g271a) = (c.Texto, c.G271E, c.G271A);
+        M.Retomar = (short)e.ID;
+        tacaEmPreparacao = jogo != null && jogo.Taca != 0;
+        try
+        {
+            return new Online.Retrato
+            {
+                Save = Gravar(),
+                Semente = M.R.Semente,
+                OrdemJogadores = new List<ushort>(M.OrdemJogadores),
+                ForcaMedia = new Dictionary<ushort, short>(M.ForcasMedias),
+                Demanda = M.DemandaPorPosicao(),
+                Chicotadas = new List<Chicotada>(M.Chicotadas),
+            };
+        }
+        finally
+        {
+            M.Retomar = retomar;
+            tacaEmPreparacao = taca;
+            (c.Texto, c.G271E, c.G271A) = (texto, g271e, g271a);
+        }
+    }
+
     Interacao Interacao() => new()
     {
         PedirAumento = H.PedirAumento, Lance = H.Lance, Convite = H.Convite, MostrarChicotadas = Op.MostrarChicotadas,
