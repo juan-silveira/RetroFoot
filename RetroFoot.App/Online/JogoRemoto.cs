@@ -284,6 +284,10 @@ public sealed class JogoRemoto
         // (o host voltou ou mudou: o Preparo mandado se perdeu, prepara de novo)
         bool nova = rodada != _rodada || instancia != _instancia;
         _instancia = instancia;
+        // (o retrato novo da mesma rodada vem de um comando: so refaz a tela de quem mandou; os
+        // outros seguem mexendo no time sem a tela recarregar no meio)
+        if (!nova && !_esperandoRetrato && _sessao != null) return;
+        _esperandoRetrato = false;
         if (!nova && _pronto) return;   // (ja mandou o Preparo desta rodada)
         if (_rodada.Length == 0) Comecou?.Invoke();
         _rodada = rodada;
@@ -362,8 +366,11 @@ public sealed class JogoRemoto
 
     // uma acao da tela que vira comando (Sessao.Remoto): a resposta numa mensagem quando o host
     // recusa; aceita, o retrato novo refaz a tela
+    bool _esperandoRetrato;
+
     public void Executar(Comando c, Action<Resposta>? depois = null)
     {
+        if (c is not (Parar or Trocar or Retomar)) _esperandoRetrato = true;
         _ = Task.Run(async () =>
         {
             var r = await _cli.Executar(c);

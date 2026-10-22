@@ -152,6 +152,8 @@ public sealed class HostOnline : IDisposable
             if (_fila.TryTake(out var a, 1000)) a();
             if (_jogadores.Values.Any(x => x.Uid != _sala.Uid && Ausente(x))) Ferias();
             ConferirPrazo();
+            // (as vendas e compras do host, na tela dele: o aviso para os outros na hora)
+            _naInterface(ConferirTransferencias);
         }
         _naBarreira = false;
         if (Passou) return;

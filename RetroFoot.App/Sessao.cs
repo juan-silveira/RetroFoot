@@ -66,6 +66,7 @@ public sealed class Sessao
         host.Children.Add(relogio);
         host.Children.Add(aviso);
         host.Children.Add(avisosCanto);
+        MontarAvisos();
         relogio.PointerPressed += (_, e) => { e.Handled = true; relogioAberto = !relogioAberto; TiqueRelogio(); };
         mostrarRaiz = mostrar;
         this.mostrar = c =>
@@ -287,26 +288,65 @@ public sealed class Sessao
         Child = new TextBlock { FontSize = 15, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
     };
 
-    // (jogo online) os avisos rapidos no canto (uma transferencia...): somem sozinhos em 6 s, sem
-    // parar nada
-    readonly StackPanel avisosCanto = new()
+    // (jogo online) os avisos rapidos (uma transferencia...): somem sozinhos em 6 s, sem parar
+    // nada; arrastar para o lado (ou clicar) tira. No celular, no alto, como uma notificacao do
+    // sistema; no computador, no canto de baixo
+    readonly StackPanel avisosCanto = new() { Spacing = 6 };
+
+    void MontarAvisos()
     {
-        Spacing = 6, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom,
-        Margin = new Avalonia.Thickness(0, 0, 10, 70), IsHitTestVisible = false, MaxWidth = 380,
-    };
+        if (Celular.Ativo)
+        {
+            avisosCanto.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch;
+            avisosCanto.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
+            avisosCanto.Margin = new Avalonia.Thickness(8, 8, 8, 0);
+        }
+        else
+        {
+            avisosCanto.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right;
+            avisosCanto.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom;
+            avisosCanto.Margin = new Avalonia.Thickness(0, 0, 10, 70);
+            avisosCanto.MaxWidth = 380;
+        }
+    }
 
     public void Notificar(string texto)
     {
+        bool cel = Celular.Ativo;
         var b = new Border
         {
-            Padding = new Avalonia.Thickness(12, 7), CornerRadius = new Avalonia.CornerRadius(10),
-            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xE8, 0x10, 0x10, 0x10)),
+            Padding = new Avalonia.Thickness(cel ? 14 : 12, cel ? 10 : 7), CornerRadius = new Avalonia.CornerRadius(cel ? 16 : 10),
+            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xF0, 0x1C, 0x1C, 0x1C)),
             BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1),
-            Child = new TextBlock { Text = texto, FontSize = 13, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+            BoxShadow = Avalonia.Media.BoxShadows.Parse("0 4 14 0 #80000000"),
+            Child = new TextBlock { Text = texto, FontSize = cel ? 14 : 13, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+            RenderTransform = new Avalonia.Media.TranslateTransform(),
+            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
         };
-        avisosCanto.Children.Add(b);
-        while (avisosCanto.Children.Count > 4) avisosCanto.Children.RemoveAt(0);
-        DispatcherTimer.RunOnce(() => avisosCanto.Children.Remove(b), TimeSpan.FromSeconds(6));
+        var tr = (Avalonia.Media.TranslateTransform)b.RenderTransform!;
+        Avalonia.Point? inicio = null;
+        double arrasto = 0;
+        void Tirar() => avisosCanto.Children.Remove(b);
+        b.PointerPressed += (_, e) => { inicio = e.GetPosition(host); arrasto = 0; e.Pointer.Capture(b); e.Handled = true; };
+        b.PointerMoved += (_, e) =>
+        {
+            if (inicio is not { } p0) return;
+            arrasto = e.GetPosition(host).X - p0.X;
+            tr.X = arrasto;
+            b.Opacity = Math.Max(0.2, 1 - Math.Abs(arrasto) / 250);
+        };
+        b.PointerReleased += (_, e) =>
+        {
+            e.Pointer.Capture(null);
+            if (inicio == null) return;
+            inicio = null;
+            // arrastou para o lado: sai; um toque (sem arrastar): sai tambem; pouco: volta
+            if (Math.Abs(arrasto) > 70 || Math.Abs(arrasto) < 4) Tirar();
+            else { tr.X = 0; b.Opacity = 1; }
+        };
+        if (cel) avisosCanto.Children.Insert(0, b); else avisosCanto.Children.Add(b);
+        while (avisosCanto.Children.Count > 4) avisosCanto.Children.RemoveAt(cel ? avisosCanto.Children.Count - 1 : 0);
+        DispatcherTimer.RunOnce(Tirar, TimeSpan.FromSeconds(6));
     }
 
     public void MostrarAviso(string? texto)
