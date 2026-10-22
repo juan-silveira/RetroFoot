@@ -76,10 +76,26 @@ prontos ("Jogador 1 PRONTO · Jogador 2 AGUARDANDO…").
 - Sala por **código de 6 letras**: o host cria, os outros entram com o código e escolhem o time.
 - Retrato de ~70–230 KB por rodada, comprimido: folgado no plano gratuito.
 
-## Host no Android
+## Host no Android e troca de host
 
 O Android pausa apps em segundo plano. O host no celular roda o motor num **serviço em primeiro
 plano** (notificação "RetroFoot: jogo online em andamento") para não parar com a tela apagada.
+
+E para nenhuma queda derrubar o jogo, **o host passa para outro jogador**:
+
+- A cada rodada (no ponto em que todos preparam o time) o host publica o **retrato completo**:
+  o save, a **semente do sorteio**, as opções e os comandos já recebidos. Qualquer aparelho
+  consegue continuar o jogo a partir dele.
+- O host manda um sinal de vida a cada poucos segundos. Se ele some (ex.: 30 s), o próximo
+  jogador conectado, na ordem de entrada, **assume o host** — a troca é uma escrita condicional
+  no Firebase (ETag), então dois não assumem ao mesmo tempo.
+- O novo host carrega o último retrato e segue dali:
+  - **queda na preparação:** nada se perde (os comandos estão no Firebase);
+  - **queda no meio da rodada:** a rodada é jogada de novo a partir do retrato, com a mesma
+    semente e os mesmos comandos (o resultado tende a ser o mesmo; entre plataformas diferentes
+    pode variar em detalhes).
+- O antigo host, ao voltar, entra como jogador comum. O host também pode **passar o host** de
+  propósito (ex.: antes de sair do celular).
 
 ## Fases
 
@@ -90,9 +106,10 @@ plano** (notificação "RetroFoot: jogo online em andamento") para não parar co
 1. **MVP** — sala com código, um técnico por aparelho, retrato e preparação remota completa,
    PRONTO/AGUARDANDO, leilão/compra/renovação no host, perguntas da rodada com o padrão,
    resultados ao fim da rodada, ferramentas bloqueadas, host em qualquer aparelho (serviço no
-   Android).
+   Android), retrato com a semente a cada rodada (a base da troca de host).
 2. **Perguntas remotas** — lances em leilão, aumento, convite, patrocínio, intervalo, lesão,
    batedor, com prazo.
 3. **Rodada ao vivo** — transmissão minuto a minuto e a paralisação para substituição que para
    para todos.
-4. **Robustez** — reconexão, férias automáticas de quem caiu, hash por rodada.
+4. **Robustez** — troca automática e manual de host, reconexão, férias automáticas de quem
+   caiu, hash por rodada.
