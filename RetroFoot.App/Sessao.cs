@@ -215,7 +215,16 @@ public sealed class Sessao
         // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
         host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });
         var comeco = h.ComecoJornada;
-        h.ComecoJornada = (titulo, jn) => { Dispatcher.UIThread.Post(EsconderRelogio); comeco?.Invoke(titulo, jn); };
+        h.ComecoJornada = (titulo, jn) =>
+        {
+            Dispatcher.UIThread.Post(EsconderRelogio);
+            // a velocidade da partida das regras da sala; a jornada vai ao vivo para os outros
+            J.Op = J.Op with { Velocidade = (short)host.Velocidade };
+            host.TransmitirInicio(titulo, jn);
+            comeco?.Invoke(titulo, jn);
+        };
+        var minuto = h.Minuto;
+        h.Minuto = jn => { host.TransmitirMinuto(jn); minuto?.Invoke(jn); };
     }
 
     // ---------------------------------------------------------------- o relogio do prazo

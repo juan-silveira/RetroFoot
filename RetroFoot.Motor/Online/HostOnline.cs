@@ -118,6 +118,7 @@ public sealed class HostOnline : IDisposable
         _limite = null;
         _acabou = false;
         try { _prazo = PrazoFixo ?? TimeSpan.FromMinutes(_sala.Prazo().GetAwaiter().GetResult()); } catch { }
+        try { Velocidade = _sala.Velocidade().GetAwaiter().GetResult(); } catch { }
         _jogam = _j.M.S.Jogos.SelectMany(x => new[] { x.Casa, x.Fora }).Where(x => x != 0).ToHashSet();
         _hostJoga = TimeDoHost is ushort th0 && _jogam.Contains(th0);
         _localPronto = TimeDoHost is not ushort th || PrepararLocal == null || !_jogam.Contains(th);
@@ -287,6 +288,38 @@ public sealed class HostOnline : IDisposable
         if (mudou && _ultimo.E != null) Publicar(_ultimo.E, _ultimo.Jogo);
     }
 
+    // ---------------------------------------------------------------- a rodada ao vivo
+    // (fase 3) o host transmite a jornada: o inicio e um tique por minuto (AoVivo), na ordem,
+    // por uma fila propria (o motor nao espera a rede)
+    readonly AoVivo.Emissor _emissor = new();
+    readonly BlockingCollection<(string Caminho, JsonNode? Valor)> _envios = new();
+    Thread? _enviador;
+
+    void Enviar(string caminho, JsonNode? valor)
+    {
+        if (_enviador == null)
+        {
+            _enviador = new Thread(() =>
+            {
+                foreach (var (c, v) in _envios.GetConsumingEnumerable())
+                    try { _sala.B.Gravar(c, v).GetAwaiter().GetResult(); } catch { }
+            }) { IsBackground = true, Name = "online-envios" };
+            _enviador.Start();
+        }
+        _envios.Add((caminho, valor));
+    }
+
+    // na thread do motor: o comeco da jornada (ComecoJornada) e cada minuto (Minuto)
+    public void TransmitirInicio(byte[] titulo, Jornada jn)
+    {
+        Enviar($"{_sala.Raiz}/rodada/aoVivo", new JsonObject { ["rodada"] = Rodada, ["inicio"] = _emissor.Inicio(_j, titulo, jn) });
+    }
+
+    public void TransmitirMinuto(Jornada jn) => Enviar($"{_sala.Raiz}/rodada/aoVivo/tique", _emissor.Tique(jn));
+
+    // a velocidade da partida das regras da sala (Opcoes.Velocidade, 1 a 6)
+    public int Velocidade { get; private set; } = Sala.VelocidadePadrao;
+
     // ---------------------------------------------------------------- passar o host
     // O host que precisa sair passa o host para outro tecnico (so na preparacao, com o motor
     // parado na barreira): publica o retrato de agora e grava o novo host na sala. O motor deste
@@ -311,6 +344,7 @@ public sealed class HostOnline : IDisposable
 
     public void Dispose()
     {
+        _envios.CompleteAdding();
         _vida.Dispose();
         foreach (var o in _observando) o.Dispose();
     }

@@ -153,6 +153,15 @@ public sealed class Sala
     public async Task<int> Prazo(CancellationToken ct = default) =>
         Math.Clamp((int?)await B.Ler($"{Raiz}/info/prazo", ct) ?? PrazoPadrao, 1, 5);
 
+    // a velocidade da partida (as do jogo: 1 lento a 6 ultrassonico; info/velocidade)
+    public const int VelocidadePadrao = 2;
+
+    public async Task<int> Velocidade(CancellationToken ct = default) =>
+        Math.Clamp((int?)await B.Ler($"{Raiz}/info/velocidade", ct) ?? VelocidadePadrao, 1, 6);
+
+    public Task DefinirVelocidade(int v, CancellationToken ct = default) =>
+        B.Atualizar($"{Raiz}/info", new JsonObject { ["velocidade"] = Math.Clamp(v, 1, 6) }, ct);
+
     public Task DefinirPrazo(int minutos, CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/info", new JsonObject { ["prazo"] = Math.Clamp(minutos, 1, 5) }, ct);
 

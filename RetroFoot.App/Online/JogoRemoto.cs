@@ -37,6 +37,22 @@ public sealed class JogoRemoto
     {
         _mostrar = mostrar; _voltar = voltar; _sala = sala; _cli = cli;
         cli.NovoRetrato += (r, rodada, versao, instancia) => Dispatcher.UIThread.Post(() => Novo(r, rodada, instancia));
+        // a rodada ao vivo (fase 3): o inicio (o jogo naquele momento) e um tique por minuto; a
+        // mesma tela da jornada, numa Sessao sem motor sobre a copia
+        sala.B.Observar($"{sala.Raiz}/rodada/aoVivo/inicio", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject ini) return;
+            Dispatcher.UIThread.Post(() => ComecarAoVivo(ini));
+        });
+        sala.B.Observar($"{sala.Raiz}/rodada/aoVivo/tique", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject t) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_aoVivo is not { } av || _jornada == null) return;
+                if (av.Aplicar(t)) _jornada.Minuto(av.Jornada);
+            });
+        });
         // o host parou o jogo: a espera ate ele continuar
         cli.Pausado += () => Dispatcher.UIThread.Post(() =>
         {
@@ -65,11 +81,17 @@ public sealed class JogoRemoto
             if ((string?)v is not { } r || r != _rodada) return;
             Dispatcher.UIThread.Post(() =>
             {
-                if (_pronto || _sessao is not { } ss || r != _rodada) return;
-                _pronto = true;
+                // (a jornada ao vivo ja esta na tela: nada a fazer)
+                if (_sessao is not { } ss || r != _rodada || _jornada != null) return;
                 ss.EsconderRelogio();
                 ss.FecharDialogo();
-                ss.Mostrar(new TelaEsperaRemota(_sala, _rodada, ss, T("O tempo acabou: seu time foi com a escalação que estava (ou a automática). A rodada está sendo jogada.")));
+                // (a partida ao vivo nos outros aparelhos e a fase 3: por enquanto o resultado
+                // chega no fim da rodada, com a classificacao)
+                string aviso = _pronto
+                    ? T("A rodada está sendo jogada no aparelho do host. Quando acabar, a classificação e a próxima rodada aparecem aqui.")
+                    : T("O tempo acabou: seu time foi com a escalação que estava (ou a automática). A rodada está sendo jogada no aparelho do host.");
+                _pronto = true;
+                ss.Mostrar(new TelaEsperaRemota(_sala, _rodada, ss, aviso));
             });
         });
         sala.B.Observar($"{sala.Raiz}/rodada/prazo", (caminho, v) =>
@@ -85,6 +107,24 @@ public sealed class JogoRemoto
     }
 
     Equipa? _time;
+    AoVivo.Receptor? _aoVivo;
+    TelaJornada? _jornada;
+
+    void ComecarAoVivo(JsonObject ini)
+    {
+        try
+        {
+            var av = new AoVivo.Receptor(ini);
+            var s = new Sessao(av.S, _mostrar, Configuracoes.Ler().OpcoesDoJogo(av.S, TelaInicio.PastaDoJogo())) { Remoto = this };
+            _aoVivo = av;
+            _sessao?.EsconderRelogio();
+            var titulo = System.Text.Encoding.Latin1.GetBytes(Mundo.TituloNaTela(System.Text.Encoding.Latin1.GetString(av.Titulo)));
+            _jornada = new TelaJornada(s, titulo, av.Jornada);
+            _pronto = true;
+            s.Mostrar(_jornada);
+        }
+        catch (Exception ex) { Console.Error.WriteLine("ao vivo: " + ex.Message); }
+    }
     DateTime _sinalHost = DateTime.UtcNow;
     readonly DispatcherTimer _vigia;
     CUi.Folha? _avisoHost;
@@ -163,6 +203,7 @@ public sealed class JogoRemoto
 
     void Novo(Retrato r, string rodada, string instancia)
     {
+        _aoVivo = null; _jornada = null;
         // (o host voltou ou mudou: o Preparo mandado se perdeu, prepara de novo)
         bool nova = rodada != _rodada || instancia != _instancia;
         _instancia = instancia;

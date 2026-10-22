@@ -56,6 +56,9 @@ if (args[0] == "host")
             if (host.Rodada != antes) { barreiras++; Log($"rodada {host.Rodada}: todos prontos"); if (barreiras > rodadas) return true; }
             return sair;
         },
+        // a rodada ao vivo para os outros (um minuto a cada 300 ms)
+        ComecoJornada = (titulo, jn) => host.TransmitirInicio(titulo, jn),
+        Minuto = jn => { host.TransmitirMinuto(jn); Thread.Sleep(300); },
     };
     var jg = new JogoEmCurso(s, (uint)Environment.TickCount, Opcoes.Padrao with { Regras = TRegras.DoSave(s, TRegras.Original), Registrado = true }, h);
     host = new HostOnline(sala, jg);
