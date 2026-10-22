@@ -228,6 +228,9 @@ public sealed partial class TelaInicio
         var itens = new List<CUi.Item>();
         var continuar = new CUi.Botao(T("Continuar"), true, () => { });
         var excluir = new CUi.Botao(T("Excluir"), false, () => { if (sel >= 0 && sel < jogos.Count) ExcluirJogo(jogos[sel].Nome, jogos[sel].Caminho); });
+        // (acrescimo, como no launcher) importar um .e98 de fora e exportar o escolhido
+        var importar = new CUi.Botao(T("Importar"), false, ImportarJogo);
+        var exportar = new CUi.Botao(T("Exportar"), false, () => { if (sel >= 0 && sel < jogos.Count) ExportarJogo(jogos[sel].Nome, jogos[sel].Caminho); });
         var lista = new StackPanel { Spacing = 6 };
         var nome = CUi.Caixa("", 8, T("NOME"));
         var aviso = CUi.Txt("", 13, CUi.Erro, FontWeight.Normal, true);
@@ -259,8 +262,8 @@ public sealed partial class TelaInicio
             lista.Children.Add(it);
         }
         Control jogosGravados = jogos.Count > 0
-            ? new StackPanel { Spacing = 12, Children = { lista, CUi.Botoes(excluir, continuar) } }
-            : CUi.Txt(T("Nenhum jogo gravado. Comece um jogo novo abaixo."), 14, CUi.Fraco, FontWeight.Normal, true);
+            ? new StackPanel { Spacing = 12, Children = { lista, CUi.Botoes(excluir, continuar), CUi.Botoes(importar, exportar) } }
+            : new StackPanel { Spacing = 12, Children = { CUi.Txt(T("Nenhum jogo gravado. Comece um jogo novo abaixo."), 14, CUi.Fraco, FontWeight.Normal, true), CUi.Botoes(importar) } };
 
         comecar.HorizontalAlignment = HorizontalAlignment.Stretch;
         var mudar = new CUi.Botao(T("Mudar nas Configurações"), false, AbrirConfiguracoes);
@@ -297,7 +300,7 @@ public sealed partial class TelaInicio
             aviso.Text = av ?? "";
             aviso.IsVisible = av != null;
             comecar.Habilitado = valido;
-            continuar.Habilitado = excluir.Habilitado = sel >= 0;
+            continuar.Habilitado = excluir.Habilitado = exportar.Habilitado = sel >= 0;
         }
         void Escolher(int k)
         {

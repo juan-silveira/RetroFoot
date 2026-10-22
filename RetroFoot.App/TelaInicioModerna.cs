@@ -230,6 +230,8 @@ public sealed partial class TelaInicio
         var bordas = new List<Border>();
         var continuar = Botao(T("Continuar"), true, () => { });
         var excluir = Botao(T("Excluir"), false, () => { if (sel >= 0 && sel < jogos.Count) ExcluirJogo(jogos[sel].Nome, jogos[sel].Caminho); });
+        var importar = Botao(T("Importar"), false, ImportarJogo);
+        var exportar = Botao(T("Exportar"), false, () => { if (sel >= 0 && sel < jogos.Count) ExportarJogo(jogos[sel].Nome, jogos[sel].Caminho); });
         for (int i = 0; i < jogos.Count; i++)
         {
             int k = i;
@@ -284,7 +286,12 @@ public sealed partial class TelaInicio
         cabCont.Children.Add(n);
         DockPanel.SetDock(cabCont, Dock.Top);
         cont.Children.Add(cabCont);
-        var rodCont = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 12, 0, 0), Spacing = 10, Children = { excluir, continuar } };
+        // (o Importar a esquerda, o Exportar, o Excluir e o Continuar a direita)
+        var rodCont = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), Margin = new Thickness(0, 12, 0, 0) };
+        rodCont.Children.Add(importar);
+        var dirCont = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Children = { exportar, excluir, continuar } };
+        Grid.SetColumn(dirCont, 2);
+        rodCont.Children.Add(dirCont);
         DockPanel.SetDock(rodCont, Dock.Bottom);
         cont.Children.Add(rodCont);
         cont.Children.Add(lista);
@@ -328,7 +335,7 @@ public sealed partial class TelaInicio
             aviso.Text = av ?? "";
             comecar.Habilitado = valido;
             continuar.Habilitado = sel >= 0;
-            excluir.Habilitado = sel >= 0;
+            excluir.Habilitado = exportar.Habilitado = sel >= 0;
         }
         void Escolher(int k)
         {

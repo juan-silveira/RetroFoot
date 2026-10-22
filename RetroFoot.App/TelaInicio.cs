@@ -12,6 +12,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using RetroFoot.Motor.Base;
@@ -221,6 +222,96 @@ public sealed partial class TelaInicio : UserControl
         });
     }
 
+    // (acrescimo, como o "Importar save" do launcher) traz um jogo gravado (.e98) de fora para a
+    // pasta dos jogos: so o que o RetroFoot le como save; o nome vira um nome de 8 letras; com o
+    // nome de um jogo que ja existe, pergunta antes e guarda o atual como .bak. No celular e o
+    // unico caminho (a pasta dos jogos e privada do app)
+    async void ImportarJogo()
+    {
+        var sp = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (sp is not { CanOpen: true }) { Mensagem(T("Importar jogo"), T("Copie o arquivo .e98 para a pasta dos jogos:\n{0}", pastaJogos)); return; }
+        IReadOnlyList<IStorageFile> arqs;
+        try
+        {
+            arqs = await sp.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = T("Importar jogo (.e98)"),
+                AllowMultiple = false,
+                // (o Android filtra pelos tipos MIME e nao conhece o .e98: todos os arquivos)
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType(T("Jogo gravado (.e98)")) { Patterns = new[] { "*.e98", "*.E98" }, MimeTypes = new[] { "application/octet-stream", "*/*" } },
+                    FilePickerFileTypes.All,
+                },
+            });
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message); return; }
+        if (arqs.Count == 0) return;
+        byte[] dados;
+        try
+        {
+            await using var st = await arqs[0].OpenReadAsync();
+            using var ms = new MemoryStream();
+            await st.CopyToAsync(ms);
+            dados = ms.ToArray();
+            if (Jogo98.Ler(dados).Equipas.Count == 0) throw new InvalidDataException();
+        }
+        catch { Mensagem(T("Importar jogo"), T("\"{0}\" não é um jogo gravado que o RetroFoot consiga ler.", arqs[0].Name)); return; }
+        var nome = NomeDeArquivo(Path.GetFileNameWithoutExtension(arqs[0].Name));
+        var atual = Achar(pastaJogos, nome + ".e98");
+        void Gravar()
+        {
+            try
+            {
+                Directory.CreateDirectory(pastaJogos);
+                if (atual != null) File.Copy(atual, Path.ChangeExtension(atual, ".bak"), true);
+                File.WriteAllBytes(atual ?? Path.Combine(pastaJogos, nome + ".e98"), dados);
+                Mensagem(T("Importar jogo"), T("Jogo \"{0}\" importado.", nome), () => mostrar(new TelaInicio(mostrar)));
+            }
+            catch (Exception ex) { Mensagem(T("Erro"), ex.Message); }
+        }
+        if (atual != null) Confirmar(T("Importar jogo"), T("Já existe um jogo \"{0}\". Substituir? O atual fica guardado como {0}.bak.", nome), Gravar);
+        else Gravar();
+    }
+
+    // (acrescimo, como o "Exportar save" do launcher) uma copia do .e98 onde o jogador quiser
+    // (para o launcher, outro aparelho ou backup)
+    async void ExportarJogo(string nome, string caminho)
+    {
+        byte[] dados;
+        try { dados = File.ReadAllBytes(caminho); }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message); return; }
+        var sp = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (sp is not { CanSave: true }) { Mensagem(T("Exportar jogo"), T("O jogo gravado está em:\n{0}", caminho)); return; }
+        try
+        {
+            var f = await sp.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                // (o Android poe a extensao padrao no nome sugerido: la, sem o .e98)
+                Title = T("Exportar jogo"), SuggestedFileName = OperatingSystem.IsAndroid() ? nome : nome + ".e98", DefaultExtension = "e98",
+                FileTypeChoices = new[] { new FilePickerFileType(T("Jogo gravado (.e98)")) { Patterns = new[] { "*.e98" }, MimeTypes = new[] { "application/octet-stream" } } },
+            });
+            if (f == null) return;
+            await using (var st = await f.OpenWriteAsync())
+            {
+                if (st.CanSeek) st.SetLength(0);   // (o do Android nao deixa; o arquivo e novo)
+                await st.WriteAsync(dados);
+            }
+            Mensagem(T("Exportar jogo"), T("Jogo \"{0}\" exportado.", nome));
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message); }
+    }
+
+    // um nome de arquivo do DOS (NomeValido) a partir de outro: sem acentos, em maiusculas, so
+    // letras, algarismos, _ e -, ate 8; vazio: IMPORT
+    static string NomeDeArquivo(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (var c in s.Normalize(NormalizationForm.FormD).ToUpperInvariant())
+            if (c is >= 'A' and <= 'Z' or >= '0' and <= '9' or '_' or '-') { sb.Append(c); if (sb.Length == 8) break; }
+        return sb.Length > 0 ? sb.ToString() : "IMPORT";
+    }
+
     // o Cancelar/Esc do comeco volta ao hub (antes fechava o programa)
     void SairDoPrograma() => mostrar(new TelaHub(mostrar));
 
@@ -317,7 +408,8 @@ public sealed partial class TelaInicio : UserControl
         if (Visual.Moderno) { EscolherJogoModerno(); return; }
         var jogos = ListarJogos();
         bool novo = jogos.Count == 0;
-        var j = new Janela(TelaAcerca.Nome, 469, 343, W95.Verde);
+        // (acrescimo) a janela cresce 34 pontos para o Importar e o Exportar, embaixo da lista
+        var j = new Janela(TelaAcerca.Nome, 469, 377, W95.Verde);
         j.Por(new Bevel(), 8, 8, 361, 325);
         j.Por(new Rotulo { Texto = T("Nome do arquivo (8 letras):"), Fonte = W95.Arial11b, Cor = W95.Amarelo, Auto = true }, 68, 76, 160, 14);
         j.Por(new Rotulo { Texto = T("Jogos salvos:"), Fonte = W95.Arial11b, Cor = W95.Amarelo, Auto = true }, 68, 164, 100, 14);
@@ -329,6 +421,8 @@ public sealed partial class TelaInicio : UserControl
         // (acrescimo) as Configuracoes do launcher, abaixo do Cancelar
         var configurar = j.Por(new Botao { Texto = T("Configurar"), Fonte = W95.Arial11b, Glifo = W95.Imagem("Botoes/CONFIGURAR.png"), NumGlifos = 2, GlifoEmCima = true }, 392, 164, 64, 64);
         var excluir = j.Por(new Botao { Texto = T("Excluir"), Fonte = W95.Arial11b, Glifo = W95.Imagem("Botoes/EXCLUIR.png"), NumGlifos = 2, GlifoEmCima = true }, 392, 240, 64, 64);
+        var importar = j.Por(new Botao { Texto = T("Importar"), Fonte = W95.MsSans11b }, 172, 341, 84, 27);
+        var exportar = j.Por(new Botao { Texto = T("Exportar"), Fonte = W95.MsSans11b }, 261, 341, 84, 27);
         var rNovo = j.Por(new Radio { Texto = T("Quero começar um jogo do início"), Fonte = W95.Arial16b }, 24, 36, 329, 17);
         var nome = j.Por(new Edit { MaxLen = 8, Maiusculas = true, Fonte = W95.Arial13b, Cor = W95.Azul }, 236, 72, 109, 21);
         var rCont = j.Por(new Radio { Texto = T("Quero continuar um jogo"), Fonte = W95.Arial16b }, 24, 132, 257, 17);
@@ -359,7 +453,7 @@ public sealed partial class TelaInicio : UserControl
             aviso.IsVisible = av != null;
             aviso.Texto = av ?? "";
             ok.Habilitado = okHab;
-            excluir.Habilitado = !novo && lista.Sel >= 0 && lista.Sel < jogos.Count;
+            excluir.Habilitado = exportar.Habilitado = !novo && lista.Sel >= 0 && lista.Sel < jogos.Count;
             var g = !novo && lista.Sel >= 0 && lista.Sel < jogos.Count ? jogos[lista.Sel] : null;
             // os humanos com a equipa e a divisao, a temporada; a data embaixo, menor
             desc.Texto = g == null ? "" : g.Humanos.Count == 0 ? g.Descricao
@@ -403,6 +497,8 @@ public sealed partial class TelaInicio : UserControl
         cancelar.Clique += SairDoPrograma;
         configurar.Clique += AbrirConfiguracoes;
         excluir.Clique += () => { if (excluir.Habilitado) ExcluirJogo(jogos[lista.Sel].Nome, jogos[lista.Sel].Caminho); };
+        importar.Clique += ImportarJogo;
+        exportar.Clique += () => { if (exportar.Habilitado) ExportarJogo(jogos[lista.Sel].Nome, jogos[lista.Sel].Caminho); };
         j.AoEnter = Ok;
         j.AoFechar = SairDoPrograma;
         j.Foco = novo ? nome : lista;

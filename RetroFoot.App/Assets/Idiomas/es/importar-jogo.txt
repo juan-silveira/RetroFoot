@@ -1,0 +1,12 @@
+Importar	Importar
+Exportar	Exportar
+Importar jogo	Importar partida
+Exportar jogo	Exportar partida
+Importar jogo (.e98)	Importar partida (.e98)
+Jogo gravado (.e98)	Partida guardada (.e98)
+Copie o arquivo .e98 para a pasta dos jogos:\n{0}	Copie el archivo .e98 a la carpeta de partidas:\n{0}
+"{0}" não é um jogo gravado que o RetroFoot consiga ler.	"{0}" no es una partida guardada que RetroFoot pueda leer.
+Jogo "{0}" importado.	Partida "{0}" importada.
+Já existe um jogo "{0}". Substituir? O atual fica guardado como {0}.bak.	Ya existe una partida "{0}". ¿Reemplazarla? La actual se guarda como {0}.bak.
+O jogo gravado está em:\n{0}	La partida guardada está en:\n{0}
+Jogo "{0}" exportado.	Partida "{0}" exportada.
