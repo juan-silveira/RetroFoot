@@ -64,6 +64,8 @@ public sealed class HostOnline : IDisposable
         // (fora da preparacao e da rodada, so recusa; na rodada, parar/trocar/retomar vao para a
         // fila da rodada, atendida pelo motor entre os minutos)
         _vida = new Timer(_ => _ = Vida(), null, 0, 10_000);
+        foreach (var t in j.M.S.Transferencias) _transfVistas.Add(t);
+        MapearTimes();
     }
 
     async Task Vida()
@@ -113,6 +115,7 @@ public sealed class HostOnline : IDisposable
         // (quem esta na sala e o time de cada um: antes de tudo, o host tambem)
         AtualizarJogadores();
         Ferias();
+        ConferirTransferencias();
         _naRodada = false;
         _naBarreira = true;
         Rodada = id;
@@ -293,6 +296,7 @@ public sealed class HostOnline : IDisposable
             }
             catch { }
         }
+        if (mudou) ConferirTransferencias();
         if (mudou && _ultimo.E != null) Publicar(_ultimo.E, _ultimo.Jogo);
     }
 
@@ -322,6 +326,7 @@ public sealed class HostOnline : IDisposable
     {
         _naRodada = true;
         while (_filaAoVivo.TryTake(out _)) { }
+        ConferirTransferencias();
         Enviar($"{_sala.Raiz}/rodada/aoVivo", new JsonObject { ["rodada"] = Rodada, ["inicio"] = _emissor.Inicio(_j, titulo, jn) });
     }
 
@@ -329,6 +334,42 @@ public sealed class HostOnline : IDisposable
 
     // a velocidade da partida das regras da sala (Opcoes.Velocidade, 1 a 6)
     public int Velocidade { get; private set; } = Sala.VelocidadePadrao;
+
+    // ---------------------------------------------------------------- as transferencias
+    // Cada transferencia nova (as ultimas transferencias do jogo: leiloes, compras) vira um
+    // aviso para todos (rodada/noticia: jogador, comprador, preco, tipo), que cada aparelho
+    // mostra num aviso no canto, sem janela (no jogo online o leilao nao abre janela)
+    readonly HashSet<Transferencia> _transfVistas = new(ReferenceEqualityComparer.Instance);
+    int _noticia;
+    public event Action<Transferencia, ushort>? Transferiu;
+
+    // o time de cada jogador na ultima conferencia (quem vendeu)
+    Dictionary<ushort, ushort> _timeDe = new();
+
+    void MapearTimes()
+    {
+        _timeDe = new();
+        foreach (var e in _j.M.S.Equipas) foreach (var p in e.Jogadores) _timeDe[p.ID] = e.ID;
+    }
+
+    // so as que envolvem um tecnico humano (comprador ou vendedor): as da CPU entre si ficam
+    // so nas ultimas transferencias
+    void ConferirTransferencias()
+    {
+        foreach (var t in _j.M.S.Transferencias.ToList())
+        {
+            if (!_transfVistas.Add(t)) continue;
+            ushort vendedor = _timeDe.GetValueOrDefault(t.W06);
+            bool humano(ushort id) => _j.M.Equipa(id) is { } e && MercadoJogo.HumanoAtivo(_j.M.TreinadorDa(e));
+            if (!humano(t.W0A) && !humano(vendedor)) continue;
+            Enviar($"{_sala.Raiz}/rodada/noticia", new JsonObject
+            {
+                ["n"] = ++_noticia, ["jogador"] = (int)t.W06, ["comprador"] = (int)t.W0A, ["vendedor"] = (int)vendedor, ["preco"] = (long)t.D0C, ["tipo"] = (int)t.B04,
+            });
+            Transferiu?.Invoke(t, vendedor);
+        }
+        MapearTimes();
+    }
 
     // ---------------------------------------------------------------- a paralisacao
     // Quem pede (o Parar de outro aparelho, ou o host na tela dele) para o jogo de todos: a

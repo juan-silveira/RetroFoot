@@ -70,6 +70,18 @@ public static class Online
         _ = sala.SinalDeVida();
     }
 
+    // o aviso de uma transferencia: "Fulano vai para o Palmeiras por $X (leilao)"
+    public static string TextoTransferencia(RetroFoot.Motor.Save.Jogo98 s, int jogador, int comprador, int vendedor, long preco, int tipo)
+    {
+        var v = s.Equipas.FirstOrDefault(e => e.ID == vendedor);
+        var p = s.Equipas.SelectMany(e => e.Jogadores).FirstOrDefault(x => x.ID == jogador);
+        var c = s.Equipas.FirstOrDefault(e => e.ID == comprador);
+        string nome = p == null ? "?" : System.Text.Encoding.Latin1.GetString(RetroFoot.Motor.Partida.Jornada.NomeNaTela(p)).Trim();
+        string time = c == null ? "?" : Dlg.Texto(c.NomeCurto);
+        string de = v == null ? "" : " (" + Dlg.Texto(v.NomeCurto) + ")";
+        return T("🔁 {0}{1} vai para o {2} por {3} ({4})", nome, de, time, FormatoDinheiro.Valor(s, preco), tipo == 1 ? T("compra") : T("leilão"));
+    }
+
     public static string Versao => typeof(Online).Assembly.GetName().Version?.ToString(3) ?? "0";
 
     // a pagina do kit numa coluna no meio (no computador a tela e larga)

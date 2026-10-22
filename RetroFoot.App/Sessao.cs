@@ -65,6 +65,7 @@ public sealed class Sessao
         host.Children.Add(camadaDialogo);
         host.Children.Add(relogio);
         host.Children.Add(aviso);
+        host.Children.Add(avisosCanto);
         relogio.PointerPressed += (_, e) => { e.Handled = true; relogioAberto = !relogioAberto; TiqueRelogio(); };
         mostrarRaiz = mostrar;
         this.mostrar = c =>
@@ -206,6 +207,9 @@ public sealed class Sessao
             if (motivo is 3 or 4) { host.SubstituicaoRemota(jornadaOnline, jg, lado, motivo); return; }
             if (saiu != null) JogoEmCurso.SubstituicaoForcada(jg.Equipa[lado]!, saiu, 0);
         };
+        // (sem janela de leilao no jogo online: um aviso no canto de cada transferencia)
+        Mercado.Janela = null;
+        host.Transferiu += (t, vendedor) => Dispatcher.UIThread.Post(() => Notificar(global::RetroFoot.App.Online.TextoTransferencia(S, t.W06, t.W0A, vendedor, t.D0C, t.B04)));
         host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
         var bat = h.Batedor;
         h.Batedor = (e, titulares, sugerido) => host.Remota(e) ? sugerido : bat != null ? bat(e, titulares, sugerido) : sugerido;
@@ -282,6 +286,28 @@ public sealed class Sessao
         BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1.5),
         Child = new TextBlock { FontSize = 15, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
     };
+
+    // (jogo online) os avisos rapidos no canto (uma transferencia...): somem sozinhos em 6 s, sem
+    // parar nada
+    readonly StackPanel avisosCanto = new()
+    {
+        Spacing = 6, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom,
+        Margin = new Avalonia.Thickness(0, 0, 10, 70), IsHitTestVisible = false, MaxWidth = 380,
+    };
+
+    public void Notificar(string texto)
+    {
+        var b = new Border
+        {
+            Padding = new Avalonia.Thickness(12, 7), CornerRadius = new Avalonia.CornerRadius(10),
+            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xE8, 0x10, 0x10, 0x10)),
+            BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1),
+            Child = new TextBlock { Text = texto, FontSize = 13, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+        };
+        avisosCanto.Children.Add(b);
+        while (avisosCanto.Children.Count > 4) avisosCanto.Children.RemoveAt(0);
+        DispatcherTimer.RunOnce(() => avisosCanto.Children.Remove(b), TimeSpan.FromSeconds(6));
+    }
 
     public void MostrarAviso(string? texto)
     {

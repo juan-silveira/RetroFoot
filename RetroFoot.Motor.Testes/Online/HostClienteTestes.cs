@@ -362,4 +362,49 @@ public class HostClienteTestes
         }
         finally { HostOnline.PrazoFixo = null; }
     }
+
+    // a venda de um tecnico (o leilao no host, sem janela) vira o aviso de transferencia para
+    // todos (rodada/noticia), com quem vendeu e quem comprou
+    [Fact(Timeout = 120_000)]
+    public async Task VendaViraAviso()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+        await sh.DarEquipa("host", minha.ID);
+        await sh.DarEquipa("cli", dele.ID);
+        using var cli = new ClienteOnline(sc);
+        var avisos = new System.Collections.Generic.List<System.Text.Json.Nodes.JsonObject>();
+        using var obs = banco.Observar($"{sh.Raiz}/rodada/noticia", (_, v) => { if (v is System.Text.Json.Nodes.JsonObject o) lock (avisos) avisos.Add(o); });
+        Resposta? venda = null;
+        ushort vendido = 0;
+        cli.NovoRetrato += (r, rodada, versao, inst) => _ = Task.Run(async () =>
+        {
+            if (venda != null) return;
+            var c = Jogo98.Ler(r.Save);
+            var e = c.Equipas.First(x => x.ID == dele.ID);
+            // o melhor jogador de linha, por quase nada: a CPU compra
+            var p = e.Jogadores.Where(x => x.Posicao != 0).OrderByDescending(x => x.Forca).First();
+            vendido = p.ID;
+            venda = await cli.Executar(new Vender(p.ID, 0));
+            Escalacao.Automatico(new Aleatorio(3), e);
+            await cli.Pronto(new Preparo(e.Jogadores.Where(x => x.ID != p.ID).Select(x => new Escalado(x.ID, Memoria.Escalacao(x))).ToList(), 10000, new(), 0));
+        });
+        HostOnline? host = null;
+        var h = new Humano { Preparar = (j, e, jogo) => host!.Preparar(e, jogo) || venda != null };
+        var jg = new JogoEmCurso(s, 11, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg);
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(await Task.Run(() => motor.Join(60_000)));
+        host.Dispose();
+        await Task.Delay(500);
+        Assert.NotNull(venda);
+        Assert.Equal("vendido", venda!.Motivo);
+        lock (avisos) Assert.Contains(avisos, a => (int?)a["jogador"] == vendido && (int?)a["vendedor"] == dele.ID);
+    }
 }

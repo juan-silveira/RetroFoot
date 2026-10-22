@@ -60,6 +60,19 @@ public sealed class JogoRemoto
             if (caminho != "/") return;
             Dispatcher.UIThread.Post(() => Pausa(v as JsonObject));
         });
+        // as transferencias (leiloes, compras): o aviso no canto, sem parar nada
+        sala.B.Observar($"{sala.Raiz}/rodada/noticia", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject o || (int?)o["n"] is not int n) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (n <= _noticia) return;
+                _noticia = n;
+                var s = _jornada != null ? _sessaoAoVivo : _sessao;
+                if (s == null) return;
+                s.Notificar(Online.TextoTransferencia(s.S, (int?)o["jogador"] ?? 0, (int?)o["comprador"] ?? 0, (int?)o["vendedor"] ?? 0, (long?)o["preco"] ?? 0, (int?)o["tipo"] ?? 0));
+            });
+        });
         // o host parou o jogo: a espera ate ele continuar
         cli.Pausado += () => Dispatcher.UIThread.Post(() =>
         {
@@ -126,6 +139,7 @@ public sealed class JogoRemoto
 
     bool _pausaMinha;
     bool _viuSorteio;
+    int _noticia;
 
     void Pausa(JsonObject? p)
     {
