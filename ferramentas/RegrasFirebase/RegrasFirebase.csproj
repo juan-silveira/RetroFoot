@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Testa as regras do banco (docs/firebase-regras.json) no Firebase de verdade, com varias
+       identidades anonimas: criar sala, entrar, 6 vagas, so o host escreve, troca de host -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RetroFoot.Motor\RetroFoot.Motor.csproj" />
+  </ItemGroup>
+</Project>

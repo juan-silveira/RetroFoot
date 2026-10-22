@@ -28,6 +28,19 @@ public interface IBanco
     IDisposable Observar(string caminho, Action<string, JsonNode?> mudou);
 }
 
+public static class Nos
+{
+    // os filhos de um no como (chave, valor). O Firebase devolve como lista um no cujas chaves
+    // sao 0, 1, 2... (as vagas da sala): os dois formatos, sem os buracos (null)
+    public static IEnumerable<(string Chave, JsonNode Valor)> Filhos(JsonNode? n)
+    {
+        if (n is JsonObject o)
+            foreach (var (k, v) in o) { if (v != null) yield return (k, v); }
+        else if (n is JsonArray a)
+            for (int i = 0; i < a.Count; i++) { if (a[i] is { } v) yield return (i.ToString(), v); }
+    }
+}
+
 public sealed class BancoMemoria : IBanco
 {
     readonly object _trava = new();
