@@ -41,7 +41,19 @@ public sealed partial class TelaInicio : UserControl
     readonly string pastaJogos;    // os .e98 (saves/ da pasta de dados)
     Configuracoes cfg = Configuracoes.Ler();
 
-    public TelaInicio(Action<Control> mostrar)
+    // o jogo novo de uma sala online (TelaSala): os tecnicos sao os da sala, um time cada
+    public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores);
+    readonly OnlineNovo? online;
+
+    public TelaInicio(Action<Control> mostrar, OnlineNovo online) : this(mostrar, false)
+    {
+        this.online = online;
+        NovoJogo(Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98"));
+    }
+
+    public TelaInicio(Action<Control> mostrar) : this(mostrar, true) { }
+
+    TelaInicio(Action<Control> mostrar, bool escolher)
     {
         this.mostrar = mostrar;
         Focusable = true;
@@ -61,7 +73,7 @@ public sealed partial class TelaInicio : UserControl
             AttachedToVisualTree += (_, _) => { Formato.Mudou -= mudou; Formato.Mudou += mudou; };
             DetachedFromVisualTree += (_, _) => Formato.Mudou -= mudou;
         }
-        EscolherJogo();
+        if (escolher) EscolherJogo();
     }
 
     // Ao abrir o jogo: o Sobre primeiro (como a TaboutDlg do original) e, ao fechar, o inicio
@@ -118,6 +130,8 @@ public sealed partial class TelaInicio : UserControl
     // RETROFOOT_JOGO (uma pasta do jogo classico ou de dados, para testes) ou a pasta de dados do
     // RetroFoot (DadosJogo: preparada aqui, com os arquivos soltos convertidos); se ela nao
     // tiver os dados, a do launcher instalado ou (desenvolvimento) game/ subindo do executavel
+    internal static string? PastaDoJogo() => AcharPastaJogo();
+
     static string? AcharPastaJogo()
     {
         var c = new List<string>();
@@ -675,6 +689,7 @@ public sealed partial class TelaInicio : UserControl
     // cada um; o botao vira "Continuar" e comeca
     void EscolherTreinadores(Dados d, int moeda, string arquivo)
     {
+        if (online != null) { CriarOnline(d, moeda, arquivo); return; }
         if (Celular.Ativo) { EscolherTreinadoresCelular(d, moeda, arquivo); return; }
         if (Visual.Moderno) { EscolherTreinadoresModerno(d, moeda, arquivo); return; }
         var j = new Janela(T("Jogadores"), 411, 295, W95.Face);
@@ -735,6 +750,27 @@ public sealed partial class TelaInicio : UserControl
         j.AoEnter = Clique;
         j.Foco = nomes[0];
         Abrir(j);
+    }
+
+    // o jogo novo online: um tecnico humano por jogador da sala (na ordem das vagas), sem a
+    // janela dos nomes; cada um recebe o time sorteado para ele
+    async void CriarOnline(Dados d, int moeda, string arquivo)
+    {
+        var o = online!;
+        var nomes = o.Jogadores.OrderBy(x => x.Vaga).Select(x => x.Nome).ToList();
+        Jogo98 s;
+        try
+        {
+            s = CriarJogo(d, moeda, nomes, cfg.RegrasDoJogoNovo);
+            var hs = s.Treinadores.Where(t => t.Humano != 0).ToList();
+            var js = o.Jogadores.OrderBy(x => x.Vaga).ToList();
+            for (int k = 0; k < js.Count && k < hs.Count; k++)
+                if (s.Equipas.FirstOrDefault(q => q.Treinador == hs[k].ID) is { } e) await o.Sala.DarEquipa(js[k].Uid, e.ID);
+            Directory.CreateDirectory(Path.GetDirectoryName(arquivo)!);
+            File.WriteAllBytes(arquivo, s.Gravar());
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); return; }
+        Comecar(s, arquivo, true);
     }
 
     // Motor.NovoJogo: o estado do inicio da 1a jornada, o save e a leitura dele (como
@@ -821,7 +857,14 @@ public sealed partial class TelaInicio : UserControl
         // os jogos ja existem, mas ninguem foi preparado. Retomar < 0 prepara todas sem
         // criar os jogos de novo (como IniciarMotor do Go).
         if (novo) sessao.J.M.Retomar = -1;
-        sessao.Saiu += () => mostrar(new TelaInicio(mostrar));
+        if (online != null)
+        {
+            var host = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a));
+            sessao.LigarOnline(host);
+            sessao.Saiu += host.Dispose;
+            sessao.Erro += _ => host.Dispose();
+        }
+        sessao.Saiu += () => mostrar(online != null ? new TelaHub(mostrar) : new TelaInicio(mostrar));
         // o motor parou com erro (na thread dele): volta ao inicio com o aviso, sem travar;
         // o detalhe vai para a saida de erro
         sessao.Erro += ex =>

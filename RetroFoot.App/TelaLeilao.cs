@@ -288,6 +288,13 @@ sealed class TelaLeilao : DialogoMercado
         pag.Vender += preco =>
         {
             s.FecharDialogo(pag);
+            // (jogo online, sem o host: o host faz o leilao e manda o jogo novo)
+            if (s.Remoto is { } rm)
+            {
+                rm.Executar(new RetroFoot.Motor.Online.Vender(p.ID, preco * 1000), r =>
+                    fim?.Invoke(r.Motivo == "vendido" ? ResultadoVenda.Vendido : r.Ok ? ResultadoVenda.NaoVendido : ResultadoVenda.Cancelado));
+                return;
+            }
             Task.Run(() =>
             {
                 bool vendido = false;

@@ -344,6 +344,7 @@ public static partial class TelaProcura
             if (p == null || eq == null) return;
             int preco = S.Mercado.PrecoParaComprar(_e, eq, p);
             if (preco <= 0) return;
+            if (S.Remoto is { } rm) { rm.Executar(new RetroFoot.Motor.Online.Comprar(eq.ID, p.ID, preco)); return; }
             S.Mercado.Comprar(_e, eq, eq.Jogadores.IndexOf(p), preco, registado: S.J.Op.Registrado);
             TelaDinheiro.Avisar(_e);
             Redesenhar();

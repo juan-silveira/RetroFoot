@@ -46,6 +46,7 @@ public class App : Application
             "dialogos" => DemoDialogos.Demo(),
             "hub" => new TelaHub(Mostrar),
             "inicio" => new TelaInicio(Mostrar),
+            "online" => new TelaOnline(Mostrar, () => Mostrar(new TelaHub(Mostrar))),
             // a prova antiga da tela da equipa no celular (so para consulta)
             "celular" => new TelaCelular(),
             _ when celular => new TelaInicio(Mostrar),

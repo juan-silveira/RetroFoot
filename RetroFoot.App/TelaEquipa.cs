@@ -358,13 +358,16 @@ public sealed partial class TelaEquipa : UserControl
             // Procurar 0x0C, Contratacoes 0x10 (ligado se a equipa tem compras a chegar, +0xC7)
             bool Ai(int id) => Registo.AddIn(id);
             List<Item> Se(bool c, params Item[] it) => c ? it.ToList() : new();
-            var menuJogo = new List<Item>
+            // (jogo online: as regras ficam fixas e so o host grava; docs/multiplayer-online.md)
+            bool online = _s.Online != null || _s.Remoto != null;
+            var menuJogo = new List<Item>();
+            if (!online)
             {
-                new(T("Opções..."), "", () => Campeonato.Opcoes(_s, Voltar)),
-                new(T("Configurações..."), "", () => { var t = _tela; var c = new TelaConfiguracoes(emCurso: _s); c.Fechou += _ => { _s.Mostrar(t); Voltar(); }; _s.Mostrar(c); }),
-                new(T("Gravar"), "", Gravar),
-            };
-            menuJogo.AddRange(Se(Ai(0x46), new Item(T("Sair sem salvar"), "Shift+Ctrl+F4", SairSemSalvar)));
+                menuJogo.Add(new(T("Opções..."), "", () => Campeonato.Opcoes(_s, Voltar)));
+                menuJogo.Add(new(T("Configurações..."), "", () => { var t = _tela; var c = new TelaConfiguracoes(emCurso: _s); c.Fechou += _ => { _s.Mostrar(t); Voltar(); }; _s.Mostrar(c); }));
+            }
+            if (_s.Remoto == null) menuJogo.Add(new(T("Gravar"), "", Gravar));
+            menuJogo.AddRange(Se(Ai(0x46) && !online, new Item(T("Sair sem salvar"), "Shift+Ctrl+F4", SairSemSalvar)));
             // "menu: Sair": grava e sai (pt-PT "Sair", pt-BR "Salvar e sair")
             menuJogo.Add(new(T("menu: Sair"), "Alt+F4", () => _tela.Terminar(true)));
             menuJogo.Add(new(T("Sobre..."), "", () => TelaAcerca.Abrir(_s, Voltar)));
@@ -381,7 +384,7 @@ public sealed partial class TelaEquipa : UserControl
             jogador.Add(new(T("Últimas transferências..."), "", () => Campeonato.UltimasTransferencias(_s)));
             jogador.AddRange(Se(Ai(0x10), new Item(T("Contratações..."), "", () => TelaListas.Contratacoes(_s, _e, Voltar), () => (short)_e.WC7 > 0)));
             var tecnico = new List<Item> { new(T("História..."), "", () => Campeonato.Historia(_s, _e)) };
-            tecnico.AddRange(Se(Ai(0x0E), new Item(T("Gestão de técnicos..."), "", () => Campeonato.Gestao(_s, Voltar))));
+            tecnico.AddRange(Se(Ai(0x0E) && !online, new Item(T("Gestão de técnicos..."), "", () => Campeonato.Gestao(_s, Voltar))));
             tecnico.Add(new(T("Ranking..."), "", () => Campeonato.Ranking(_s)));
             tecnico.Add(new("-"));
             tecnico.Add(new(T("Perfil..."), "", () => Campeonato.Perfil(_s, _e, Voltar)));

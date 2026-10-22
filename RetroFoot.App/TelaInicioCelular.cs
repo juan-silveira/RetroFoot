@@ -220,6 +220,19 @@ public sealed partial class TelaInicio
     static string PassoCelular(int k) => T("Jogo novo") + " · " + (k + 1) + "/3 · " + new[] { T("Países"), T("Moeda"), T("Treinadores") }[k];
 
     // ---------------------------------------------------------------- inicio
+    // (docs/multiplayer-online.md) a entrada do jogo online: criar ou entrar numa sala
+    Control CartaoOnline()
+    {
+        var b = new CUi.Botao(T("Jogo online"), false, AbrirOnline) { HorizontalAlignment = HorizontalAlignment.Stretch };
+        return CUi.Cartao_(T("Jogo online"), new StackPanel
+        {
+            Spacing = 10,
+            Children = { CUi.Txt(T("Jogue com amigos em outros aparelhos: até 6 técnicos, um por aparelho."), 13.5, CUi.Fraco, FontWeight.Normal, true), b },
+        });
+    }
+
+    void AbrirOnline() => mostrar(new TelaOnline(mostrar, () => mostrar(new TelaInicio(mostrar))));
+
     void EscolherJogoCelular()
     {
         if (CUi.Retro) { EscolherJogoRetro(); return; }
@@ -282,7 +295,7 @@ public sealed partial class TelaInicio
         var corpo = new StackPanel
         {
             Spacing = 14,
-            Children = { CUi.Cartao_(T("Continuar um jogo"), jogosGravados, jogos.Count > 0 ? CUi.Etiqueta(jogos.Count == 1 ? T("1 jogo") : T("{0} jogos", jogos.Count)) : null), CUi.Cartao_(T("Jogo novo"), novo) },
+            Children = { CUi.Cartao_(T("Continuar um jogo"), jogosGravados, jogos.Count > 0 ? CUi.Etiqueta(jogos.Count == 1 ? T("1 jogo") : T("{0} jogos", jogos.Count)) : null), CUi.Cartao_(T("Jogo novo"), novo), CartaoOnline() },
         };
         // os tres na largura da tela (o Sobre ficava cortado), o texto menor para caber
         var bAcoes = new[] { new CUi.Botao(T("Configurações"), false, AbrirConfiguracoes), new CUi.Botao(T("Ferramentas"), false, AbrirFerramentasCelular), new CUi.Botao(T("Sobre"), false, () => TelaAcerca.Abrir(new Dialogos(c => SobreporCelular(CUi.FolhaDe(c) != null ? new Panel { Background = TemaVerde.Veu, Children = { c } } : new Panel { Background = TemaVerde.Veu, Children = { new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, Child = c } } }), _ => Sobrepor(null)))) };

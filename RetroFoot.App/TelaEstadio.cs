@@ -56,6 +56,7 @@ public static class TelaEstadio
         construir.Clique += () =>
         {
             if (!mc.PodeConstruir(e)) return;
+            if (s.Remoto is { } rmB) { rmB.Executar(new RetroFoot.Motor.Online.ConstruirBancada()); return; }
             mc.ConstruirBancada(e);
             aviso.IsVisible = true;
             Atualizar();
@@ -162,6 +163,7 @@ public static class TelaEstadio
         construir = j.Botao(T("Construir"), true, () =>
         {
             if (!mc.PodeConstruir(e)) return;
+            if (s.Remoto is { } rmB) { rmB.Executar(new RetroFoot.Motor.Online.ConstruirBancada()); return; }
             mc.ConstruirBancada(e);
             aviso.IsVisible = true;
             Atualizar();

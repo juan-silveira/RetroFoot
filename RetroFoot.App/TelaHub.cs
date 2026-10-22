@@ -119,7 +119,11 @@ public sealed class TelaHub : UserControl
 
     List<Item> Itens()
     {
-        var l = new List<Item> { new("jogar", "jogar", T("Jogar"), T("Comece um jogo novo ou continue um jogo gravado."), Jogar) };
+        var l = new List<Item>
+        {
+            new("jogar", "jogar", T("Jogar"), T("Comece um jogo novo ou continue um jogo gravado."), Jogar),
+            new("online", "jogar", T("Jogo online"), T("Jogue com amigos em outros aparelhos (até 6 técnicos)."), () => mostrar(new TelaOnline(mostrar, () => mostrar(new TelaHub(mostrar))))),
+        };
         foreach (var f in Ferramentas.Todas)
         {
             var ff = f;

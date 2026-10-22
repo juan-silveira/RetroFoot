@@ -150,6 +150,7 @@ static partial class ClubeCelular
         var construir = new CUi.Botao(T("Construir"), true, () =>
         {
             if (!mc.PodeConstruir(e)) return;
+            if (s.Remoto is { } rmB) { rmB.Executar(new RetroFoot.Motor.Online.ConstruirBancada()); return; }
             mc.ConstruirBancada(e);
             aviso.IsVisible = true;
             atualizar();
@@ -228,6 +229,7 @@ static partial class ClubeCelular
         var pagar = new CUi.Botao(T("−  Pagar {0}", passo), false, () =>
         {
             if (!mc.PodePagar(e)) return;
+            if (s.Remoto is { } rmG) { rmG.Executar(new RetroFoot.Motor.Online.PagarEmprestimo()); return; }
             mc.PagarEmprestimo(e);
             atualizar();
             TelaDinheiro.Avisar(e);
@@ -235,6 +237,7 @@ static partial class ClubeCelular
         var pedir = new CUi.Botao(T("+  Pedir {0}", passo), true, () =>
         {
             if (!banco.PodePedir(e)) return;
+            if (s.Remoto is { } rmP) { rmP.Executar(new RetroFoot.Motor.Online.PedirEmprestimo()); return; }
             mc.PedirEmprestimo(e);
             atualizar();
             TelaDinheiro.Avisar(e);

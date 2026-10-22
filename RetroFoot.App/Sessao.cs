@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -151,6 +152,68 @@ public sealed class Sessao
         TelaPlantel.Balanco = Registo.AddIn(0x11) ? (ss, eq, pronto) => TelaBalanco.Abrir(ss, eq, pronto) : null;
         TelaPlantel.Emprestimo = Registo.AddIn(0x13) ? (ss, eq, pronto) => TelaEmprestimo.Abrir(ss, eq, pronto) : null;
     }
+
+    // ---------------------------------------------------------------- jogo online (host)
+    // docs/multiplayer-online.md: o host roda o motor; a preparacao de cada rodada passa pelo
+    // HostOnline (todos preparam ao mesmo tempo; a tela da equipa do host abre sem travar o
+    // motor) e as perguntas dos times dos outros aparelhos ficam com o padrao do motor (sem
+    // janela no host; as perguntas remotas sao a fase 2). Chamar depois de ligar as telas
+    // (LigacaoPartida, LigacaoMercado...) e antes de Comecar.
+    public RetroFoot.Motor.Online.HostOnline? Online { get; private set; }
+    // o jogo num aparelho que nao e o host (sem motor): as acoes que mexem no dinheiro ou noutros
+    // times viram comandos para o host
+    public JogoRemoto? Remoto { get; init; }
+
+    public void LigarOnline(RetroFoot.Motor.Online.HostOnline host)
+    {
+        Online = host;
+        var h = J.H;
+        host.PrepararLocal = (e, jogo) =>
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var t = new TelaEquipa(this, e, jogo);
+            t.Terminou += sair =>
+            {
+                tcs.TrySetResult(sair);
+                if (!sair) Dispatcher.UIThread.Post(() => { if (camadaTela.Child == t) mostrar(TelaAguardando()); });
+            };
+            mostrar(t);
+            return tcs.Task;
+        };
+        h.Preparar = (_, e, jogo) => host.Preparar(e, jogo);
+        var sub = h.Substituicao;
+        h.Substituicao = (jg, lado, saiu, motivo) =>
+        {
+            if (!host.Remota(jg.Equipa[lado])) { sub?.Invoke(jg, lado, saiu, motivo); return; }
+            if (motivo != 4 && saiu != null) JogoEmCurso.SubstituicaoForcada(jg.Equipa[lado]!, saiu, 0);
+        };
+        var bat = h.Batedor;
+        h.Batedor = (e, titulares, sugerido) => host.Remota(e) ? sugerido : bat != null ? bat(e, titulares, sugerido) : sugerido;
+        var aum = h.PedirAumento;
+        h.PedirAumento = (e, p, novo, modo) => host.Remota(e) || aum == null || aum(e, p, novo, modo);
+        var lance = h.Lance;
+        h.Lance = (c, v, p) => host.Remota(c) || lance == null ? (0, false) : lance(c, v, p);
+        var conv = h.Convite;
+        h.Convite = (t, e) => !host.Remota(J.M.EquipaDoTreinador(t.ID)) && conv != null && conv(t, e);
+        var pat = h.Patrocinio;
+        h.Patrocinio = p => !host.Remota(PrimeiroHumano()) && pat != null && pat(p);
+        host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => JogadoresOnline?.Invoke(l));
+    }
+
+    // os jogadores da sala mudaram (quem esta pronto): a tela de espera do host
+    public event Action<IReadOnlyList<RetroFoot.Motor.Online.JogadorSala>>? JogadoresOnline;
+
+    // o time que recebe as propostas de patrocinio (Patrocinios.TimeHumano: o 1o humano nas
+    // divisoes 1 a 5)
+    Equipa? PrimeiroHumano()
+    {
+        for (int d = 0; d < 5 && d < S.Divisoes.Count; d++)
+            foreach (var id in S.Divisoes[d].Equipas)
+                if (J.M.Equipa(id) is { } e && RetroFoot.Motor.Mercado.MercadoJogo.HumanoAtivo(J.M.TreinadorDa(e))) return e;
+        return null;
+    }
+
+    Control TelaAguardando() => new TelaAguardandoOnline(this);
 
     // comeca (ou continua) o jogo na thread do motor
     public void Comecar()

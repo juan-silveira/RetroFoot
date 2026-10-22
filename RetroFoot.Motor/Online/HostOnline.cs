@@ -43,9 +43,10 @@ public sealed class HostOnline : IDisposable
     public string Rodada { get; private set; } = "";
     // o time de cada uid (o do host tambem)
     public IReadOnlyDictionary<string, ushort> Times => _jogadores.Values.Where(x => x.Equipa != 0).ToDictionary(x => x.Uid, x => x.Equipa);
-    // a tela da equipa do host (na thread da interface): termina quando ele marca PRONTO.
-    // null: o host prepara no automatico
-    public Func<Equipa, Jogo?, Task>? PrepararLocal;
+    // a tela da equipa do host (na thread da interface): termina quando ele marca PRONTO
+    // (true = o host saiu do jogo). null: o host prepara no automatico
+    public Func<Equipa, Jogo?, Task<bool>>? PrepararLocal;
+    bool _sair;
     // avisos para a tela do host (quem esta pronto)
     public event Action<IReadOnlyList<JogadorSala>>? JogadoresMudaram;
 
@@ -81,8 +82,10 @@ public sealed class HostOnline : IDisposable
     // o gancho Preparar de uma equipa humana (na thread do motor); false = joga (nunca sai)
     public bool Preparar(Equipa e, Jogo? jogo)
     {
+        if (_jogadores.Count == 0) AtualizarJogadores();
         string id = Id(_j.M, jogo);
         if (id != Rodada) Barreira(e, jogo, id);
+        if (_sair) return true;
         if (Remota(e))
         {
             if (_preparos.Remove(e.ID, out var p)) _ex.Executar(e.ID, p);
@@ -93,23 +96,36 @@ public sealed class HostOnline : IDisposable
         return false;
     }
 
+    // os times que jogam na rodada da barreira (na Taca, so os que seguem nela): so eles preparam
+    HashSet<ushort> _jogam = new();
+    public bool Joga(ushort equipa) => _jogam.Contains(equipa);
+
     void Barreira(Equipa e, Jogo? jogo, string id)
     {
+        // (quem esta na sala e o time de cada um: antes de tudo, o host tambem)
+        AtualizarJogadores();
         Rodada = id;
         _preparos.Clear();
-        _localPronto = TimeDoHost == null || PrepararLocal == null;
+        _jogam = _j.M.S.Jogos.SelectMany(x => new[] { x.Casa, x.Fora }).Where(x => x != 0).ToHashSet();
+        _localPronto = TimeDoHost is not ushort th || PrepararLocal == null || !_jogam.Contains(th);
         Publicar(e, jogo);
         if (!_localPronto && TimeDoHost is ushort t && _j.M.Equipa(t) is { } minha)
         {
             var jogoDele = _j.M.S.Jogos.FirstOrDefault(x => x.Casa == t || x.Fora == t);
-            _naInterface(() => PrepararLocal!(minha, jogoDele).ContinueWith(_ => _fila.Add(() => _localPronto = true)));
+            _ = _sala.MudarEstado(Estados.Preparando, Rodada);
+            _naInterface(() => PrepararLocal!(minha, jogoDele).ContinueWith(t => _fila.Add(() =>
+            {
+                _localPronto = true;
+                _sair = t.IsCompletedSuccessfully && t.Result;
+                if (!_sair) _ = _sala.MudarEstado(Estados.Pronto, Rodada);
+            })));
         }
         AtualizarJogadores();
-        while (!TodosProntos()) _fila.Take()();
+        while (!TodosProntos() && !_sair) _fila.Take()();
     }
 
     bool TodosProntos() =>
-        _localPronto && _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid).All(x => x.Estado == Estados.Pronto && x.Rodada == Rodada);
+        _localPronto && _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid && _jogam.Contains(x.Equipa)).All(x => x.Estado == Estados.Pronto && x.Rodada == Rodada);
 
     // o retrato do jogo parado na equipa e (o motor esta parado; o estado nao muda debaixo)
     void Publicar(Equipa e, Jogo? jogo)

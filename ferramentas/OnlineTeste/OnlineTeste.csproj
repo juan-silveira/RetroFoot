@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- O jogo online pelo Firebase de verdade, sem telas: "host <save> [rodadas]" cria a sala, da um time a cada um que entra e roda o motor (o host escala no automatico); "cliente <CHAVE> [nome]" entra e marca PRONTO a cada rodada
+       (com a escalacao automatica da copia) -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RetroFoot.Motor\RetroFoot.Motor.csproj" />
+  </ItemGroup>
+</Project>

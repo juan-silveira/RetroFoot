@@ -202,7 +202,7 @@ public sealed partial class TelaInicio
         var corpo = new StackPanel
         {
             Spacing = 10,
-            Children = { CR95.Bevel(novoP), CR95.Bevel(contP) },
+            Children = { CR95.Bevel(novoP), CR95.Bevel(contP), new CUi.Botao(T("Jogo online"), false, AbrirOnline) { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 40 } },
         };
         // as ferramentas do hub do computador (Scout, Patches, editores) ao lado do Sobre
         var ferramentas = new CUi.Botao(T("Ferramentas"), false, AbrirFerramentasCelular) { Padding = new Thickness(12, 2), MinHeight = 34 };
