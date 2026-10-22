@@ -36,6 +36,10 @@ public static class Online
         set { try { Directory.CreateDirectory(Path.GetDirectoryName(ArquivoNome)!); File.WriteAllText(ArquivoNome, value); } catch { } }
     }
 
+    // o Android liga o servico em primeiro plano enquanto este aparelho e o host (o jogo de
+    // todos roda aqui; em segundo plano ele pararia)
+    public static Action<bool>? ManterVivo;
+
     public static string Versao => typeof(Online).Assembly.GetName().Version?.ToString(3) ?? "0";
 
     // a pagina do kit numa coluna no meio (no computador a tela e larga)

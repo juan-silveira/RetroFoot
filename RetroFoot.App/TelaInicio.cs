@@ -861,8 +861,9 @@ public sealed partial class TelaInicio : UserControl
         {
             var host = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a));
             sessao.LigarOnline(host);
-            sessao.Saiu += host.Dispose;
-            sessao.Erro += _ => host.Dispose();
+            Online.ManterVivo?.Invoke(true);
+            sessao.Saiu += () => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
+            sessao.Erro += _ => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
         }
         sessao.Saiu += () => mostrar(online != null ? new TelaHub(mostrar) : new TelaInicio(mostrar));
         // o motor parou com erro (na thread dele): volta ao inicio com o aviso, sem travar;
