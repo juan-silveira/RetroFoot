@@ -195,9 +195,10 @@ public sealed class TelaSala : UserControl
         {
             obs?.Dispose();
             obsInfo?.Dispose();
-            _ = sala.MarcarFase("criando");
+            _ = sala.MarcarFase(arquivo == null ? Fases.Criando : Fases.Continuando);
             mostrar(new TelaInicio(mostrar, new TelaInicio.OnlineNovo(sala, jogadores.ToList(), arquivo)));
         }) { HorizontalAlignment = HorizontalAlignment.Stretch };
+        string hostUid = host ? sala.Uid : "";
         void Desenhar()
         {
             lista.Children.Clear();
@@ -209,7 +210,7 @@ public sealed class TelaSala : UserControl
                 var n = CUi.Txt(j == null ? T("vaga livre") : j.Nome + (j.Uid == sala.Uid ? " " + T("(você)") : ""), 15, j == null ? CUi.Fraco : CUi.Texto, j?.Uid == sala.Uid ? FontWeight.Bold : FontWeight.Normal);
                 Grid.SetColumn(n, 1);
                 g.Children.Add(n);
-                if (j != null && v == 0)
+                if (j != null && j.Uid == hostUid)
                 {
                     var et = CUi.Etiqueta(T("host"));
                     Grid.SetColumn(et, 2);
@@ -229,6 +230,8 @@ public sealed class TelaSala : UserControl
             catch { }
         }));
         Desenhar();
+        var obsHost = sala.B.Observar($"{sala.Raiz}/host", (c, v) => Dispatcher.UIThread.Post(() => { hostUid = (string?)v ?? ""; Desenhar(); }));
+        DetachedFromVisualTree += (_, _) => obsHost.Dispose();
         var chave = new TextBlock
         {
             Text = sala.Codigo, FontSize = 40, FontWeight = FontWeight.Bold, Foreground = CUi.Destaque, FontFamily = new FontFamily("monospace"),
@@ -250,10 +253,11 @@ public sealed class TelaSala : UserControl
         }) { HorizontalAlignment = HorizontalAlignment.Center };
         var aviso = CUi.Txt(host ? T("Passe esta chave aos amigos. Eles entram em Jogo online > Entrar.") : T("Aguardando o host começar o jogo…"), 13, CUi.Fraco, FontWeight.Normal, true);
         // (cliente) o host comecou: o jogo sendo criado e os times sorteados
+        var criandoTxt = CUi.Txt("", 14, CUi.Texto, FontWeight.SemiBold, true);
         var criando = new StackPanel
         {
             Spacing = 8, IsVisible = false,
-            Children = { CUi.Txt(T("O host está criando o jogo e sorteando os times…"), 14, CUi.Texto, FontWeight.SemiBold, true), new ProgressBar { IsIndeterminate = true, Height = 6 } },
+            Children = { criandoTxt, new ProgressBar { IsIndeterminate = true, Height = 6 } },
         };
         // as regras da sala: o host escolhe; os outros veem
         var prazoTxt = CUi.Txt("", 13, CUi.Fraco, FontWeight.Normal, true);
@@ -271,11 +275,20 @@ public sealed class TelaSala : UserControl
             {
                 var info = await sala.B.Ler($"{sala.Raiz}/info");
                 int prazo = Math.Clamp((int?)info?["prazo"] ?? Sala.PrazoPadrao, 1, 5);
-                bool criandoJa = (string?)info?["fase"] == "criando";
+                string? fase = (string?)info?["fase"];
                 Dispatcher.UIThread.Post(() =>
                 {
                     prazoTxt.Text = T("Tempo para ficar pronto depois do primeiro PRONTO: {0} min.", prazo);
-                    if (!host) { criando.IsVisible = criandoJa; aviso.IsVisible = !criandoJa; }
+                    if (host) return;
+                    criandoTxt.Text = fase switch
+                    {
+                        Fases.Criando => T("O host está criando o jogo e sorteando os times…"),
+                        Fases.Continuando => T("O host está abrindo o jogo…"),
+                        _ => "",
+                    };
+                    criando.IsVisible = criandoTxt.Text.Length > 0;
+                    aviso.Text = fase == Fases.Pausado ? T("Aguardando o host continuar o jogo…") : T("Aguardando o host começar o jogo…");
+                    aviso.IsVisible = !criando.IsVisible;
                 });
             }
             catch { }

@@ -25,6 +25,12 @@ public sealed record JogadorSala(string Uid, string Nome, int Vaga, ushort Equip
         : null;
 }
 
+// a fase da sala (info/fase), para quem espera nela
+public static class Fases
+{
+    public const string Criando = "criando", Continuando = "continuando", Jogando = "jogando", Pausado = "pausado";
+}
+
 public static class Estados
 {
     public const string Preparando = "preparando", Pronto = "pronto", Saiu = "saiu";
@@ -159,6 +165,7 @@ public sealed class Sala
     {
         await B.Gravar($"{Raiz}/retrato", null, ct);
         await B.Gravar($"{Raiz}/rodada", null, ct);
+        await MarcarFase(Fases.Pausado, ct);
     }
 
     // o que o host esta fazendo antes do jogo ("criando": o jogo novo sendo montado, os times

@@ -126,6 +126,7 @@ public sealed class HostOnline : IDisposable
             try { _sala.B.Atualizar($"{_sala.Raiz}/jogadores/{j.Uid}", new JsonObject { ["estado"] = Estados.Preparando }).GetAwaiter().GetResult(); } catch { }
         AtualizarJogadores();
         Publicar(e, jogo);
+        try { _sala.MarcarFase(Fases.Jogando).GetAwaiter().GetResult(); } catch { }
         if (!_localPronto && TimeDoHost is ushort t && _j.M.Equipa(t) is { } minha)
         {
             var jogoDele = _j.M.S.Jogos.FirstOrDefault(x => x.Casa == t || x.Fora == t);
