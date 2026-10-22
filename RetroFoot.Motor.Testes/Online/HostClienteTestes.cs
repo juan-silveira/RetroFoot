@@ -111,4 +111,46 @@ public class HostClienteTestes
         Assert.Equal(3, (await s.Jogadores()).First(x => x.Uid == "u3").Vaga);
         await Assert.ThrowsAsync<Sala.SalaInexistente>(() => Sala.Entrar(banco, "x", "ZZZZZZ", "X"));
     }
+
+    // quem sai do jogo (Ausentar) nao trava a rodada (o time joga no automatico) e volta com a
+    // mesma chave para o mesmo time
+    [Fact(Timeout = 120_000)]
+    public async Task QuemSaiNaoTravaEVoltaParaOTime()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+        await sh.DarEquipa("host", minha.ID);
+        await sh.DarEquipa("cli", dele.ID);
+        await sc.Ausentar();
+        int barreiras = 0;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            host.Preparar(e, jogo);
+            if (host.Rodada != antes) barreiras++;
+            return barreiras > 2;
+        };
+        var jg = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg);
+        // ausente: as rodadas andam sem ele
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(await Task.Run(() => motor.Join(60_000)));
+        Assert.Equal(3, barreiras);
+        Assert.True(host.Remota(jg.M.Equipa(dele.ID)));
+        host.Dispose();
+        // volta: a mesma vaga e o mesmo time, preparando
+        await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        var eu = (await sh.Jogadores()).First(x => x.Uid == "cli");
+        Assert.Equal(dele.ID, eu.Equipa);
+        Assert.Equal(1, eu.Vaga);
+        Assert.Equal(Estados.Preparando, eu.Estado);
+    }
 }

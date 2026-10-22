@@ -131,10 +131,11 @@ public sealed class JogoRemoto
         });
     }
 
+    // sai do jogo: a vaga e o time ficam (volta em Jogo online > Entrar, com a mesma chave)
     async void Sair()
     {
         _cli.Dispose();
-        try { await _sala.Sair(); } catch { }
+        try { await _sala.Ausentar(); } catch { }
         _voltar();
     }
 

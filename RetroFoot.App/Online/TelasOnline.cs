@@ -265,7 +265,7 @@ public static class TelaEsperaOnline
         nome.Children.Add(CUi.Txt(j.Nome, 15, CUi.Texto, FontWeight.SemiBold));
         if (e != null) nome.Children.Add(CUi.Txt(Dlg.Texto(e.NomeCurto), 12.5, CUi.Fraco));
         g.Children.Add(nome);
-        var et = CUi.Etiqueta(pronto ? T("PRONTO") : T("AGUARDANDO…"), pronto ? CUi.Bom : CUi.Fraco);
+        var et = CUi.Etiqueta(pronto ? T("PRONTO") : j.Estado == Estados.Saiu ? T("SAIU (automático)") : T("AGUARDANDO…"), pronto ? CUi.Bom : CUi.Fraco);
         Grid.SetColumn(et, 1);
         g.Children.Add(et);
         return g;

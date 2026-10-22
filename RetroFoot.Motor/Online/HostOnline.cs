@@ -67,8 +67,10 @@ public sealed class HostOnline : IDisposable
         try { await _sala.B.Gravar($"{_sala.Raiz}/hostVivo", new JsonObject { [".sv"] = "timestamp" }); } catch { }
     }
 
+    // um time humano que nao e o do host (de outro aparelho, mesmo que o dono tenha saido): as
+    // perguntas dele nao abrem janela no host
     public bool Remota(Equipa? e) =>
-        e != null && _jogadores.Values.FirstOrDefault(x => x.Equipa == e.ID) is { } j && j.Uid != _sala.Uid;
+        e != null && e.ID != TimeDoHost && MercadoJogo.HumanoAtivo(_j.M.TreinadorDa(e));
 
     ushort? TimeDoHost => _jogadores.TryGetValue(_sala.Uid, out var h) && h.Equipa != 0 ? h.Equipa : null;
 
@@ -131,7 +133,7 @@ public sealed class HostOnline : IDisposable
     }
 
     bool TodosProntos() =>
-        _localPronto && _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid && _jogam.Contains(x.Equipa)).All(x => x.Estado == Estados.Pronto && x.Rodada == Rodada);
+        _localPronto && _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid && _jogam.Contains(x.Equipa) && x.Estado != Estados.Saiu).All(x => x.Estado == Estados.Pronto && x.Rodada == Rodada);
 
     // o retrato do jogo parado na equipa e (o motor esta parado; o estado nao muda debaixo)
     void Publicar(Equipa e, Jogo? jogo)

@@ -99,7 +99,7 @@ public sealed class Sala
         var ja = JogadorSala.De(uid, await Tentar(() => b.Ler($"{s.Raiz}/jogadores/{uid}", ct)));
         await b.Gravar($"{s.Raiz}/jogadores/{uid}", new JsonObject
         {
-            ["nome"] = Nome(nome), ["vaga"] = minha, ["equipa"] = (int)(ja?.Equipa ?? 0), ["estado"] = ja?.Estado ?? Estados.Preparando,
+            ["nome"] = Nome(nome), ["vaga"] = minha, ["equipa"] = (int)(ja?.Equipa ?? 0), ["estado"] = Estados.Preparando,
         }, ct);
         return s;
     }
@@ -126,7 +126,12 @@ public sealed class Sala
     public Task<string> Mandar(Comando c, CancellationToken ct = default) =>
         B.Acrescentar($"{Raiz}/comandos/{Uid}", new JsonObject { ["c"] = c.Json() }, ct);
 
-    // sai da sala: a vaga fica livre (o host apaga a sala inteira)
+    // sai do jogo em andamento: a vaga e o time ficam (volta com a mesma chave); a rodada nao
+    // espera por ele (o time joga com a escalacao automatica)
+    public Task Ausentar(CancellationToken ct = default) =>
+        B.Atualizar($"{Raiz}/jogadores/{Uid}", new JsonObject { ["estado"] = Estados.Saiu }, ct);
+
+    // sai da sala antes do jogo: a vaga fica livre (o host apaga a sala inteira)
     public async Task Sair(CancellationToken ct = default)
     {
         var j = JogadorSala.De(Uid, await B.Ler($"{Raiz}/jogadores/{Uid}", ct));
