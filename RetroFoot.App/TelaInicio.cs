@@ -44,8 +44,10 @@ public sealed partial class TelaInicio : UserControl
     // o jogo novo de uma sala online (TelaSala): os tecnicos sao os da sala, um time cada
     // Arquivo: o jogo online gravado que o host continua (null: um jogo novo)
     // Retrato: o host passado para este aparelho (ou assumido): o jogo continua do retrato
+    // ModoAmigo: um save single player do host com amigos (cada amigo assume um time da 4a
+    // divisao; ao sair, sai do jogo; no fim o save volta a ser so do host)
     public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores, string? Arquivo = null,
-        RetroFoot.Motor.Online.Retrato? Retrato = null);
+        RetroFoot.Motor.Online.Retrato? Retrato = null, bool ModoAmigo = false);
     readonly OnlineNovo? online;
 
     public TelaInicio(Action<Control> mostrar, OnlineNovo online) : this(mostrar, false)
@@ -75,6 +77,15 @@ public sealed partial class TelaInicio : UserControl
         try
         {
             s = Jogo98.Ler(File.ReadAllBytes(arquivo));
+            if (o.ModoAmigo)
+            {
+                // o host fica com o (primeiro) time humano do save; os amigos recebem um time da
+                // 4a divisao quando o jogo chega na rodada
+                var meu = s.Equipas.FirstOrDefault(e => RetroFoot.Motor.Mercado.MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+                if (meu != null) await o.Sala.DarEquipa(o.Sala.Uid, meu.ID);
+                Comecar(s, arquivo, false);
+                return;
+            }
             var usados = o.Jogadores.Where(x => x.Equipa != 0).Select(x => x.Equipa).ToHashSet();
             foreach (var j in o.Jogadores.Where(x => x.Equipa == 0))
             {
@@ -906,7 +917,7 @@ public sealed partial class TelaInicio : UserControl
         RetroFoot.Motor.Online.HostOnline? hostOnline = null;
         if (online != null)
         {
-            var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a));
+            var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a)) { ModoAmigo = online.ModoAmigo };
             sessao.LigarOnline(host);
             Online.Sinal(null);   // (o HostOnline manda o sinal de vida daqui em diante)
             Online.ManterVivo?.Invoke(true);
@@ -924,6 +935,8 @@ public sealed partial class TelaInicio : UserControl
                 mostrar(new TelaSala(mostrar, () => mostrar(new TelaHub(mostrar)), online.Sala, false));
                 return;
             }
+            // o modo amigo acabou: o save (ja sem os amigos) volta a ser single player e a sala some
+            if (online.ModoAmigo) { _ = online.Sala.Apagar(); mostrar(new TelaHub(mostrar)); return; }
             // o host saiu do jogo: quem esta na sala espera ele continuar
             _ = online.Sala.Pausar();
             mostrar(new TelaHub(mostrar));

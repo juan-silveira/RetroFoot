@@ -407,4 +407,65 @@ public class HostClienteTestes
         Assert.Equal("vendido", venda!.Motivo);
         lock (avisos) Assert.Contains(avisos, a => (int?)a["jogador"] == vendido && (int?)a["vendedor"] == dele.ID);
     }
+
+    // o modo amigo: o amigo que entra assume um time da 4a divisao (tecnico humano novo); quando
+    // sai, e despedido e sai do jogo (um tecnico do computador assume) e o save volta a ser so do host
+    [Fact(Timeout = 120_000)]
+    public async Task ModoAmigoEntraESai()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "Amigo");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        int humanosAntes = s.Treinadores.Count(t => t.Humano != 0);
+        int treinadoresAntes = s.Treinadores.Count;
+        await sh.DarEquipa("host", minha.ID);
+        using var cli = new ClienteOnline(sc);
+        ushort timeDoAmigo = 0;
+        int rodadasDoAmigo = 0;
+        cli.NovoRetrato += (r, rodada, versao, inst) => _ = Task.Run(async () =>
+        {
+            var eu = (await sc.Jogadores()).First(x => x.Uid == "cli");
+            if (eu.Equipa == 0 || rodadasDoAmigo >= 2) return;
+            timeDoAmigo = eu.Equipa;
+            rodadasDoAmigo++;
+            var c = Jogo98.Ler(r.Save);
+            var e = c.Equipas.First(x => x.ID == eu.Equipa);
+            Escalacao.Automatico(new Aleatorio(3), e);
+            await cli.Pronto(new Preparo(e.Jogadores.Select(x => new Escalado(x.ID, Memoria.Escalacao(x))).ToList(), 10000, new(), 0));
+            // depois da 2a rodada, sai do jogo
+            if (rodadasDoAmigo == 2) await sc.Ausentar();
+        });
+        int barreiras = 0;
+        bool humanoNoMeio = false;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            bool sair = host.Preparar(e, jogo);
+            if (host.Rodada != antes)
+            {
+                barreiras++;
+                if (timeDoAmigo != 0 && j.M.TreinadorDa(j.M.Equipa(timeDoAmigo)!) is { Humano: not 0 }) humanoNoMeio = true;
+            }
+            return sair || barreiras > 4;
+        };
+        var jg = new JogoEmCurso(s, 13, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg) { ModoAmigo = true };
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(await Task.Run(() => motor.Join(90_000)));
+        host.Dispose();
+        Assert.NotEqual(0, timeDoAmigo);
+        Assert.Contains(timeDoAmigo, s.Divisoes[3].Equipas);
+        Assert.True(humanoNoMeio);
+        // saiu: o tecnico dele saiu do jogo; o time ficou com um tecnico do computador
+        Assert.Equal(humanosAntes, s.Treinadores.Count(t => t.Humano != 0));
+        Assert.DoesNotContain(s.Treinadores, t => System.Text.Encoding.Latin1.GetString(Cifra.TextoEFT(t.Nome).Texto) == "Amigo");
+        var tc = s.Treinadores.FirstOrDefault(t => t.ID == s.Equipas.First(x => x.ID == timeDoAmigo).Treinador);
+        Assert.NotNull(tc);
+        Assert.Equal(0, tc!.Humano);
+    }
 }

@@ -83,6 +83,7 @@ else
         if (rodada + inst == ultima) return;
         ultima = rodada + inst;
         var minha = (await sala.Jogadores()).First(x => x.Uid == sala.Uid);
+        if (minha.Equipa == 0) { ultima = ""; return; }   // (o modo amigo: o time vem na rodada)
         var copia = Jogo98.Ler(r.Save);
         var e = copia.Equipas.First(x => x.ID == minha.Equipa);
         Escalacao.Automatico(new Aleatorio((uint)Environment.TickCount), e);

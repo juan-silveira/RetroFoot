@@ -199,6 +199,19 @@ public sealed partial class MercadoJogo
         if (i >= 0) S.Treinadores.RemoveAt(i);
     }
 
+    // (o modo "jogar com um amigo", Online/Convidado) um tecnico humano novo assume a equipa e:
+    // o tecnico dela (do computador) e despedido e fica desempregado; o novo, contratado
+    public Treinador ContratarConvidado(Equipa e, byte[] nomeCifrado)
+    {
+        var t = new Treinador { ID = S.Cabecalho.G2722, Nome = nomeCifrado, Humano = 1, B1A = new byte[] { 0, 0, 0, 1, 0 } };
+        S.Cabecalho.G2722++;
+        S.Treinadores.Add(t);
+        if (Treinador(S, e.Treinador) is { } velho) Evento(velho, EventoDespedido, e.ID);
+        e.Treinador = t.ID;
+        Evento(t, EventoContratado, e.ID);
+        return t;
+    }
+
     // 11:091c: +0x06
     public static void Ferias(Treinador t, bool ferias) => t.B06 = (byte)(ferias ? 1 : 0);
 }

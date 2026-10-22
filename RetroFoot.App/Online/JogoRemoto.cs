@@ -243,6 +243,8 @@ public sealed class JogoRemoto
     async Task TalvezAssumir(TimeSpan parado)
     {
         if (_virouHost || _rodada.Length == 0 || DateTime.UtcNow - _tentouAssumir < TimeSpan.FromSeconds(15)) return;
+        // (no modo amigo o jogo e o save do host: ninguem assume)
+        if (await _sala.Modo() == Sala.ModoAmigo) return;
         try
         {
             var js = await _sala.Jogadores();

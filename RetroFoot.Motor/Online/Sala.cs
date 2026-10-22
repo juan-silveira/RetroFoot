@@ -182,6 +182,13 @@ public sealed class Sala
     public Task MarcarFase(string fase, CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/info", new JsonObject { ["fase"] = fase }, ct);
 
+    // o modo da sala: "amigo" = um save single player do host com amigos (Convidado); vazio = o
+    // jogo online comum
+    public const string ModoAmigo = "amigo";
+    public Task DefinirModo(string modo, CancellationToken ct = default) =>
+        B.Atualizar($"{Raiz}/info", new JsonObject { ["modo"] = modo }, ct);
+    public async Task<string> Modo(CancellationToken ct = default) => (string?)await B.Ler($"{Raiz}/info/modo", ct) ?? "";
+
     // o host da o time de um jogador (o id da equipa no jogo)
     public Task DarEquipa(string uid, ushort equipa, CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/jogadores/{uid}", new JsonObject { ["equipa"] = (int)equipa }, ct);

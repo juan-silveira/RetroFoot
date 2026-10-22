@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using RetroFoot.Motor.Base;
 using RetroFoot.Motor.Ciclo;
 using RetroFoot.Motor.Mercado;
 using RetroFoot.Motor.Partida;
@@ -95,7 +96,12 @@ public sealed class HostOnline : IDisposable
         if (_jogadores.Count == 0) AtualizarJogadores();
         string id = Id(_j.M, jogo);
         if (id != Rodada) Barreira(e, jogo, id);
-        if (_sair) return true;
+        if (_sair)
+        {
+            // (o modo amigo: o save volta a ser single player antes de gravar)
+            if (ModoAmigo && !Passou) TirarConvidados();
+            return true;
+        }
         if (Remota(e))
         {
             if (_preparos.Remove(e.ID, out var p)) _ex.Executar(e.ID, p);
@@ -150,7 +156,12 @@ public sealed class HostOnline : IDisposable
         {
             // (de segundo em segundo, mesmo sem novidade: o prazo e quem sumiu)
             if (_fila.TryTake(out var a, 1000)) a();
-            if (_jogadores.Values.Any(x => x.Uid != _sala.Uid && Ausente(x))) Ferias();
+            if (_jogadores.Values.Any(x => x.Uid != _sala.Uid && (Ausente(x) || (ModoAmigo && x.Equipa == 0))))
+            {
+                Ferias();
+                // (no modo amigo, quem chegou recebe o jogo com o time dele)
+                if (ModoAmigo && _ultimo.E != null) Publicar(_ultimo.E, _ultimo.Jogo);
+            }
             ConferirPrazo();
             // (as vendas e compras do host, na tela dele: o aviso para os outros na hora)
             _naInterface(ConferirTransferencias);
@@ -220,9 +231,55 @@ public sealed class HostOnline : IDisposable
         return DateTime.UtcNow - v.Quando > PrazoAusente;
     }
 
+    // ---------------------------------------------------------------- o modo amigo
+    // (Online/Convidado) um save single player com amigos: quem entra assume um time da 4a
+    // divisao; quem sai (ou some) e despedido e sai do jogo (em vez das ferias); no fim do jogo
+    // online todos os convidados saem e o save volta a ser so do host
+    public bool ModoAmigo { get; init; }
+    readonly Dictionary<string, ushort> _convidados = new();   // uid -> o tecnico dele
+    public event Action<string, bool>? ConvidadoMudou;           // nome, entrou
+
+    void AmigosEntramESaem()
+    {
+        // quem chegou: um time da 4a divisao (o sorteio nao gasta o Random do jogo)
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && x.Estado != Estados.Saiu).ToList())
+        {
+            (Treinador T, Equipa E)? r = null;
+            _naInterface(() => r = Convidado.Entrar(_j, j.Nome, new Aleatorio((uint)Environment.TickCount)));
+            if (r is not { } ok) continue;
+            _convidados[j.Uid] = ok.T.ID;
+            try { _sala.DarEquipa(j.Uid, ok.E.ID).GetAwaiter().GetResult(); } catch { }
+            ConvidadoMudou?.Invoke(j.Nome, true);
+        }
+        // quem saiu ou sumiu: despedido e fora do jogo; a vaga fica livre (voltando, e outro tecnico)
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa != 0 && Ausente(x)).ToList())
+        {
+            if (_j.M.Equipa(j.Equipa) is { } e && _j.M.TreinadorDa(e) is { Humano: not 0 } t && t.ID != (_j.M.Equipa(TimeDoHost ?? 0)?.Treinador ?? 0))
+                _naInterface(() => Convidado.Sair(_j, t.ID));
+            _convidados.Remove(j.Uid);
+            try
+            {
+                _sala.B.Gravar($"{_sala.Raiz}/jogadores/{j.Uid}", null).GetAwaiter().GetResult();
+                if (j.Vaga >= 0) _sala.B.Gravar($"{_sala.Raiz}/vagas/{j.Vaga}", null).GetAwaiter().GetResult();
+            }
+            catch { }
+            ConvidadoMudou?.Invoke(j.Nome, false);
+        }
+        AtualizarJogadores();
+    }
+
+    // o fim do jogo online no modo amigo: todos os convidados saem
+    public void TirarConvidados()
+    {
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa != 0).ToList())
+            if (_j.M.Equipa(j.Equipa) is { } e && _j.M.TreinadorDa(e) is { Humano: not 0 } t && e.ID != TimeDoHost)
+                _naInterface(() => Convidado.Sair(_j, t.ID));
+    }
+
     // na barreira: as ferias de quem esta ausente, e o fim delas para quem voltou
     void Ferias()
     {
+        if (ModoAmigo) { AmigosEntramESaem(); return; }
         foreach (var j in _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid))
         {
             if (_j.M.Equipa(j.Equipa) is not { } e || _j.M.TreinadorDa(e) is not { Humano: not 0 } t) continue;

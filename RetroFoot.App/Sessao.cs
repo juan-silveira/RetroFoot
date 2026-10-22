@@ -211,6 +211,9 @@ public sealed class Sessao
         // (sem janela de leilao no jogo online: um aviso no canto de cada transferencia)
         Mercado.Janela = null;
         host.Transferiu += (t, vendedor) => Dispatcher.UIThread.Post(() => Notificar(global::RetroFoot.App.Online.TextoTransferencia(S, t.W06, t.W0A, vendedor, t.D0C, t.B04)));
+        host.ConvidadoMudou += (nome, entrou) => Dispatcher.UIThread.Post(() => Notificar(entrou
+            ? Idioma.T("👋 {0} entrou no jogo e assumiu um time da 4ª divisão", nome)
+            : Idioma.T("👋 {0} saiu do jogo (o técnico dele foi demitido)", nome)));
         host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
         var bat = h.Batedor;
         h.Batedor = (e, titulares, sugerido) => host.Remota(e) ? sugerido : bat != null ? bat(e, titulares, sugerido) : sugerido;
@@ -368,6 +371,13 @@ public sealed class Sessao
     public void EscolherNovoHost()
     {
         if (Online is not { } host) return;
+        if (host.ModoAmigo)
+        {
+            CUi.Folha fa = null!;
+            fa = CUi.Pergunta(Idioma.T("Passar o host"), Idioma.T("No jogo com amigos o save é seu: o host não passa para outro técnico."), new[] { (Idioma.T("OK"), true, (Action)(() => FecharDialogo(fa))) });
+            AbrirDialogo(fa);
+            return;
+        }
         var outros = jogadoresOnline.Where(x => x.Equipa != 0 && x.Estado != RetroFoot.Motor.Online.Estados.Saiu && Equipa(x.Equipa) is { } e && host.Remota(e)).ToList();
         CUi.Folha f = null!;
         var bs = new List<(string, bool, Action)>();

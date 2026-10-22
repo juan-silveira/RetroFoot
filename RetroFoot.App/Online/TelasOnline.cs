@@ -46,6 +46,18 @@ public static class Online
         catch { return new(); }
     }
 
+    // os saves single player deste aparelho (a pasta dos saves)
+    public static List<string> SavesLocais()
+    {
+        try
+        {
+            if (!Directory.Exists(DadosJogo.Saves)) return new();
+            return Directory.GetFiles(DadosJogo.Saves, "*.e98", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
+                .OrderByDescending(File.GetLastWriteTime).Take(8).ToList();
+        }
+        catch { return new(); }
+    }
+
     static string ArquivoNome => Path.Combine(Path.GetDirectoryName(Configuracoes.Arquivo)!, "online-nome.txt");
     public static string UltimoNome
     {
@@ -185,6 +197,29 @@ public sealed class TelaOnline : UserControl
             },
         };
         if (meus.Children.Count > 0) corpo.Children.Insert(1, CUi.Cartao_(T("Seus jogos online (host)"), meus));
+        // jogar um save seu com um amigo (o amigo assume um time da 4a divisao; depois o save
+        // volta a ser so seu)
+        var amigo = new StackPanel { Spacing = 8 };
+        amigo.Children.Add(CUi.Txt(T("Abra um save seu como sala: cada amigo que entrar assume um time da 4ª divisão. Quando ele sair, é demitido e o seu save volta ao normal."), 13, CUi.Fraco, FontWeight.Normal, true));
+        foreach (var arq in Online.SavesLocais())
+        {
+            var nomeSave = Path.GetFileNameWithoutExtension(arq);
+            amigo.Children.Add(new CUi.Botao(T("Jogar {0} com um amigo", nomeSave), false, async () =>
+            {
+                Online.UltimoNome = nome.Text ?? "";
+                Ocupado(true); aviso.IsVisible = false;
+                try
+                {
+                    var bn = Online.Banco;
+                    await bn.Ler("salas/AAAAAA/info");
+                    var sala = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao);
+                    await sala.DefinirModo(Sala.ModoAmigo);
+                    _mostrar(new TelaSala(_mostrar, _voltar, sala, true, arq, modoAmigo: true));
+                }
+                catch (Exception ex) { Erro(T("Não consegui criar a sala: {0}", Curto(ex))); }
+            }) { HorizontalAlignment = HorizontalAlignment.Stretch });
+        }
+        if (amigo.Children.Count > 1) corpo.Children.Add(CUi.Cartao_(T("Jogar com um amigo"), amigo));
         Content = Online.Pagina(T("Jogo online"), T("Sem login: só a chave da sala"), _voltar, corpo);
     }
 
@@ -195,7 +230,8 @@ public sealed class TelaOnline : UserControl
 public sealed class TelaSala : UserControl
 {
     // arquivo: o jogo online gravado que o host continua (null: um jogo novo)
-    public TelaSala(Action<Control> mostrar, Action voltar, Sala sala, bool host, string? arquivo = null)
+    // modoAmigo: o save single player do host (arquivo) com amigos
+    public TelaSala(Action<Control> mostrar, Action voltar, Sala sala, bool host, string? arquivo = null, bool modoAmigo = false)
     {
         FontFamily = CUi.Fonte;
         var lista = new StackPanel { Spacing = 6 };
@@ -208,7 +244,7 @@ public sealed class TelaSala : UserControl
             obs?.Dispose();
             obsInfo?.Dispose();
             _ = sala.MarcarFase(arquivo == null ? Fases.Criando : Fases.Continuando);
-            mostrar(new TelaInicio(mostrar, new TelaInicio.OnlineNovo(sala, jogadores.ToList(), arquivo)));
+            mostrar(new TelaInicio(mostrar, new TelaInicio.OnlineNovo(sala, jogadores.ToList(), arquivo, null, modoAmigo)));
         }) { HorizontalAlignment = HorizontalAlignment.Stretch };
         string hostUid = host ? sala.Uid : "";
         void Desenhar()
@@ -336,7 +372,7 @@ public sealed class TelaSala : UserControl
             cliente?.Dispose();
             // (o host de um jogo gravado so sai: a sala fica para continuar depois)
             if (host) Online.Sinal(null);
-            try { if (host && arquivo == null) await sala.Apagar(); else if (!host) await sala.Sair(); } catch { }
+            try { if (host && (arquivo == null || modoAmigo)) await sala.Apagar(); else if (!host) await sala.Sair(); } catch { }
             voltar();
         }
         // (host) o sinal de vida desde a sala, antes do jogo (e enquanto ele cria o jogo): os
