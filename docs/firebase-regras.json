@@ -1,0 +1,75 @@
+{
+  "rules": {
+    "salas": {
+      "$sala": {
+        ".validate": "$sala.matches(/^[A-Z0-9]{6}$/)",
+        ".read": "auth != null && data.child('jogadores').child(auth.uid).exists()",
+        ".write": "auth != null && data.exists() && !newData.exists() && (data.child('host').val() == auth.uid || data.child('info/criada').val() < now - 2592000000)",
+
+        "info": {
+          ".read": "auth != null",
+          ".write": "auth != null && ((!data.exists() && newData.child('criador').val() == auth.uid) || root.child('salas').child($sala).child('host').val() == auth.uid)",
+          ".validate": "newData.hasChildren(['criador', 'criada', 'versao']) && newData.child('criada').val() <= now"
+        },
+
+        "host": {
+          ".read": "auth != null",
+          ".write": "auth != null && newData.val() == auth.uid && (!data.exists() || data.val() == auth.uid || (root.child('salas').child($sala).child('jogadores').child(auth.uid).exists() && root.child('salas').child($sala).child('hostVivo').val() < now - 60000))"
+        },
+
+        "hostVivo": {
+          ".read": "auth != null",
+          ".write": "auth != null && newData.parent().child('host').val() == auth.uid",
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+
+        "vagas": {
+          ".read": "auth != null",
+          "$vaga": {
+            ".validate": "$vaga.matches(/^[0-5]$/) && newData.isString()",
+            ".write": "auth != null && ((!data.exists() && newData.val() == auth.uid) || (data.val() == auth.uid && !newData.exists()) || root.child('salas').child($sala).child('host').val() == auth.uid || (!root.child('salas').child($sala).exists() && newData.val() == auth.uid))"
+          }
+        },
+
+        "jogadores": {
+          "$uid": {
+            ".write": "auth != null && (auth.uid == $uid || root.child('salas').child($sala).child('host').val() == auth.uid)",
+            ".validate": "!newData.exists() || (newData.hasChildren(['nome', 'vaga']) && newData.child('nome').isString() && newData.child('nome').val().length <= 30 && newData.parent().parent().child('vagas').child(newData.child('vaga').val() + '').val() == $uid)"
+          }
+        },
+
+        "retrato": {
+          ".write": "auth != null && newData.parent().child('host').val() == auth.uid"
+        },
+        "rodada": {
+          ".write": "auth != null && newData.parent().child('host').val() == auth.uid"
+        },
+
+        "comandos": {
+          "$uid": {
+            ".write": "auth != null && (auth.uid == $uid || root.child('salas').child($sala).child('host').val() == auth.uid)"
+          }
+        },
+        "resultados": {
+          "$uid": {
+            ".write": "auth != null && root.child('salas').child($sala).child('host').val() == auth.uid"
+          }
+        },
+        "perguntas": {
+          "$uid": {
+            ".write": "auth != null && root.child('salas').child($sala).child('host').val() == auth.uid"
+          }
+        },
+        "respostas": {
+          "$uid": {
+            ".write": "auth != null && (auth.uid == $uid || root.child('salas').child($sala).child('host').val() == auth.uid)"
+          }
+        },
+
+        "$outro": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
