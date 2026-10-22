@@ -76,6 +76,21 @@ public sealed class Sala
         return new Sala(b, codigo, uid);
     }
 
+    // assumir o host de uma sala cujo host sumiu (as regras so deixam com o sinal de vida
+    // parado ha mais de 60 s; a escrita condicional faz so um assumir)
+    public async Task<bool> Assumir(CancellationToken ct = default)
+    {
+        try
+        {
+            var (h, etag) = await B.LerComEtag($"{Raiz}/host", ct);
+            if ((string?)h == Uid) return true;
+            if (!await B.GravarSe($"{Raiz}/host", JsonValue.Create(Uid), etag, ct)) return false;
+            await B.Gravar($"{Raiz}/hostVivo", Agora(), ct);
+            return true;
+        }
+        catch (InvalidOperationException) { return false; }   // (as regras recusaram: o host esta vivo)
+    }
+
     public sealed class SalaCheia : Exception { public SalaCheia() : base("sala cheia") { } }
     public sealed class SalaInexistente : Exception { public SalaInexistente() : base("sala nao existe") { } }
 

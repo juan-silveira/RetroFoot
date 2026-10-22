@@ -14,7 +14,7 @@
 
         "host": {
           ".read": "auth != null",
-          ".write": "auth != null && newData.val() == auth.uid && (!data.exists() || data.val() == auth.uid || (root.child('salas').child($sala).child('jogadores').child(auth.uid).exists() && root.child('salas').child($sala).child('hostVivo').val() < now - 60000))"
+          ".write": "auth != null && ((newData.val() == auth.uid && (!data.exists() || data.val() == auth.uid || (root.child('salas').child($sala).child('jogadores').child(auth.uid).exists() && root.child('salas').child($sala).child('hostVivo').val() < now - 60000))) || (data.val() == auth.uid && root.child('salas').child($sala).child('jogadores').child(newData.val() + '').exists()))"
         },
 
         "hostVivo": {

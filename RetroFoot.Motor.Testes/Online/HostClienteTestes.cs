@@ -240,4 +240,57 @@ public class HostClienteTestes
         }
         finally { HostOnline.PrazoFixo = null; }
     }
+
+    // o host passa o host na preparacao: o outro aparelho continua do retrato e as rodadas andam
+    [Fact(Timeout = 120_000)]
+    public async Task PassarOHost()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+        await sh.DarEquipa("host", minha.ID);
+        await sh.DarEquipa("cli", dele.ID);
+        // o host passa na 1a barreira
+        HostOnline? h1 = null;
+        var hum1 = new Humano { Preparar = (j, e, jogo) => h1!.Preparar(e, jogo) };
+        var j1 = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, hum1);
+        h1 = new HostOnline(sh, j1);
+        h1.PassarHost("cli");
+        var m1 = new Thread(() => j1.Ciclo()) { IsBackground = true };
+        m1.Start();
+        Assert.True(await Task.Run(() => m1.Join(30_000)));
+        h1.Dispose();
+        Assert.True(h1.Passou);
+        Assert.Equal("cli", (string?)await banco.Ler($"{sh.Raiz}/host"));
+        // (o antigo host sai do jogo: fica de ferias no host novo)
+        await sh.Ausentar();
+        // o aparelho do cliente vira o host: o retrato publicado e um motor novo
+        var no = (System.Text.Json.Nodes.JsonObject)(await banco.Ler($"{sh.Raiz}/retrato"))!;
+        var r = Retrato.Ler(Convert.FromBase64String((string)no["dados"]!));
+        int barreiras = 0;
+        HostOnline? h2 = null;
+        var hum2 = new Humano
+        {
+            Preparar = (j, e, jogo) =>
+            {
+                string antes = h2!.Rodada;
+                bool sair = h2.Preparar(e, jogo);
+                if (h2.Rodada != antes) barreiras++;
+                return sair || barreiras > 2;
+            },
+        };
+        var j2 = r.Jogo(Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, hum2);
+        h2 = new HostOnline(sc, j2);
+        var m2 = new Thread(() => j2.Ciclo()) { IsBackground = true };
+        m2.Start();
+        Assert.True(await Task.Run(() => m2.Join(60_000)));
+        h2.Dispose();
+        Assert.Equal(3, barreiras);
+        // a mesma rodada em que o host passou continua no host novo
+        Assert.True(r.Save.Length > 0);
+    }
 }

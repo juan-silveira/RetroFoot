@@ -146,6 +146,7 @@ public sealed class HostOnline : IDisposable
             ConferirPrazo();
         }
         _naBarreira = false;
+        if (Passou) return;
         // a rodada comecou: quem nao ficou pronto (o prazo acabou) vai para a espera
         try
         {
@@ -284,6 +285,28 @@ public sealed class HostOnline : IDisposable
         }
         if (mudou && _ultimo.E != null) Publicar(_ultimo.E, _ultimo.Jogo);
     }
+
+    // ---------------------------------------------------------------- passar o host
+    // O host que precisa sair passa o host para outro tecnico (so na preparacao, com o motor
+    // parado na barreira): publica o retrato de agora e grava o novo host na sala. O motor deste
+    // aparelho sai (o gancho devolve "sair"); o aparelho do outro carrega o retrato e continua
+    // dali (ClienteOnline/JogoRemoto). Quem tinha mandado o Preparo prepara de novo (o host novo
+    // recomeca as versoes).
+    public event Action<string>? HostPassado;
+
+    public void PassarHost(string uid) => _fila.Add(() =>
+    {
+        if (!_naBarreira || _ultimo.E == null || uid == _sala.Uid || !_jogadores.ContainsKey(uid)) return;
+        Publicar(_ultimo.E, _ultimo.Jogo);
+        try { _sala.B.Gravar($"{_sala.Raiz}/host", JsonValue.Create(uid)).GetAwaiter().GetResult(); }
+        catch { return; }
+        _sair = true;
+        Passou = true;
+        HostPassado?.Invoke(uid);
+    });
+
+    // este aparelho passou o host (o motor saiu por isso, nao porque o host saiu do jogo)
+    public bool Passou { get; private set; }
 
     public void Dispose()
     {

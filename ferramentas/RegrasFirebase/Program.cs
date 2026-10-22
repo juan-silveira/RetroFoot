@@ -45,6 +45,11 @@ using (B.Observar("salas/" + cod + "/jogadores", (c, v) => { lock (vistos) visto
     await Task.Delay(3000);
 }
 lock (vistos) Ok("B ve o PRONTO de A ao vivo (" + string.Join(" ", vistos) + ")", true, vistos.Contains("/" + A.Uid + "/estado"));
+// o host passa o host para um jogador da sala (e nao para quem esta fora)
+Ok("A (host) passa o host para C (de fora)", false, await Pode(() => A.Gravar("salas/" + cod + "/host", JsonValue.Create(C.Uid))));
+Ok("A (host) passa o host para B", true, await Pode(() => A.Gravar("salas/" + cod + "/host", JsonValue.Create(B.Uid))));
+Ok("B (host novo) da sinal", true, await Pode(() => B.Gravar("salas/" + cod + "/hostVivo", Ts())));
+Ok("B (host) devolve o host para A", true, await Pode(() => B.Gravar("salas/" + cod + "/host", JsonValue.Create(A.Uid))));
 // o host "cai": o sinal de vida fica velho
 Ok("A grava sinal velho", true, await Pode(() => A.Gravar("salas/" + cod + "/hostVivo", JsonValue.Create(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 120000))));
 var (h, etag) = await B.LerComEtag("salas/" + cod + "/host");

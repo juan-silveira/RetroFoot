@@ -43,13 +43,27 @@ public sealed partial class TelaInicio : UserControl
 
     // o jogo novo de uma sala online (TelaSala): os tecnicos sao os da sala, um time cada
     // Arquivo: o jogo online gravado que o host continua (null: um jogo novo)
-    public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores, string? Arquivo = null);
+    // Retrato: o host passado para este aparelho (ou assumido): o jogo continua do retrato
+    public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores, string? Arquivo = null,
+        RetroFoot.Motor.Online.Retrato? Retrato = null);
     readonly OnlineNovo? online;
 
     public TelaInicio(Action<Control> mostrar, OnlineNovo online) : this(mostrar, false)
     {
         this.online = online;
-        if (online.Arquivo != null) ContinuarOnline(online.Arquivo);
+        if (online.Retrato is { } r)
+        {
+            // o host veio para este aparelho: o jogo do retrato, gravado na pasta da sala
+            var arq = online.Arquivo ?? Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98");
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(arq)!);
+                File.WriteAllBytes(arq, r.Save);
+                Comecar(Jogo98.Ler(r.Save), arq, false, r);
+            }
+            catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(new TelaHub(mostrar))); }
+        }
+        else if (online.Arquivo != null) ContinuarOnline(online.Arquivo);
         else NovoJogo(Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98"));
     }
 
@@ -858,7 +872,7 @@ public sealed partial class TelaInicio : UserControl
     }
 
     // ---------------------------------------------------------------- a sessao
-    void Comecar(Jogo98 s, string arquivo, bool novo)
+    void Comecar(Jogo98 s, string arquivo, bool novo, RetroFoot.Motor.Online.Retrato? retrato = null)
     {
         // N do save; versao, amarelos, patrocinios e estrangeiros das Configuracoes
         // (um save com N != 8 abre sempre como Modificada)
@@ -875,7 +889,7 @@ public sealed partial class TelaInicio : UserControl
         Sessao sessao;
         try
         {
-            sessao = new Sessao(s, mostrar, op, arquivo);
+            sessao = new Sessao(s, mostrar, op, arquivo, retrato);
         }
         catch (Exception ex) { Mensagem(T("Erro"), ex.Message, EscolherJogo); return; }
         sessao.J.Treinador = NomesHumanos(s);
@@ -883,15 +897,28 @@ public sealed partial class TelaInicio : UserControl
         // os jogos ja existem, mas ninguem foi preparado. Retomar < 0 prepara todas sem
         // criar os jogos de novo (como IniciarMotor do Go).
         if (novo) sessao.J.M.Retomar = -1;
+        RetroFoot.Motor.Online.HostOnline? hostOnline = null;
         if (online != null)
         {
-            var host = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a));
+            var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a));
             sessao.LigarOnline(host);
             Online.ManterVivo?.Invoke(true);
             sessao.Saiu += () => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
             sessao.Erro += _ => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
         }
-        sessao.Saiu += () => mostrar(online != null ? new TelaHub(mostrar) : new TelaInicio(mostrar));
+        sessao.Saiu += () =>
+        {
+            if (online == null) { mostrar(new TelaInicio(mostrar)); return; }
+            // passou o host: o jogo deste aparelho deixa de ser o oficial (fica de lado) e ele
+            // continua na sala como os outros
+            if (hostOnline?.Passou == true)
+            {
+                try { File.Move(arquivo, arquivo + ".passado", true); } catch { }
+                mostrar(new TelaSala(mostrar, () => mostrar(new TelaHub(mostrar)), online.Sala, false));
+                return;
+            }
+            mostrar(new TelaHub(mostrar));
+        };
         // o motor parou com erro (na thread dele): volta ao inicio com o aviso, sem travar;
         // o detalhe vai para a saida de erro
         sessao.Erro += ex =>

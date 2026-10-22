@@ -132,9 +132,17 @@ public sealed class TelaOnline : UserControl
                 {
                     var bn = Online.Banco;
                     await bn.Ler("salas/AAAAAA/info");
-                    // a mesma sala, se ainda for dele; senao uma sala nova (chave nova)
-                    var sala = await Sala.Reabrir(bn, bn.Uid, codigoJogo) ?? await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao);
-                    _mostrar(new TelaSala(_mostrar, _voltar, sala, true, arq));
+                    // a mesma sala, se ainda for dele; se a sala continua com outro host (ele passou o
+                    // host ou caiu e outro assumiu), entra como os outros; senao uma sala nova
+                    if (await Sala.Reabrir(bn, bn.Uid, codigoJogo) is { } minha) { _mostrar(new TelaSala(_mostrar, _voltar, minha, true, arq)); return; }
+                    if (await bn.Ler($"salas/{codigoJogo}/info") != null)
+                    {
+                        try { File.Move(arq, arq + ".passado", true); } catch { }
+                        _mostrar(new TelaSala(_mostrar, _voltar, await Sala.Entrar(bn, bn.Uid, codigoJogo, nome.Text ?? ""), false));
+                        return;
+                    }
+                    var nova = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao);
+                    _mostrar(new TelaSala(_mostrar, _voltar, nova, true, arq));
                 }
                 catch (Exception ex) { Erro(T("Não consegui abrir a sala: {0}", Curto(ex))); }
             }) { HorizontalAlignment = HorizontalAlignment.Stretch };

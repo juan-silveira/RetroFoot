@@ -367,6 +367,7 @@ public sealed partial class TelaEquipa : UserControl
                 menuJogo.Add(new(T("Configurações..."), "", () => { var t = _tela; var c = new TelaConfiguracoes(emCurso: _s); c.Fechou += _ => { _s.Mostrar(t); Voltar(); }; _s.Mostrar(c); }));
             }
             if (_s.Remoto == null) menuJogo.Add(new(T("Gravar"), "", Gravar));
+            if (_s.Online != null) menuJogo.Add(new(T("Passar o host..."), "", () => _s.EscolherNovoHost()));
             menuJogo.AddRange(Se(Ai(0x46) && !online, new Item(T("Sair sem salvar"), "Shift+Ctrl+F4", SairSemSalvar)));
             // "menu: Sair": grava e sai (pt-PT "Sair", pt-BR "Salvar e sair")
             menuJogo.Add(new(T("menu: Sair"), "Alt+F4", () => _tela.Terminar(true)));

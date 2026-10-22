@@ -211,7 +211,9 @@ public sealed class Sessao
         h.Convite = (t, e) => !host.Remota(J.M.EquipaDoTreinador(t.ID)) && conv != null && conv(t, e);
         var pat = h.Patrocinio;
         h.Patrocinio = p => !host.Remota(PrimeiroHumano()) && pat != null && pat(p);
-        host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => JogadoresOnline?.Invoke(l));
+        host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => { jogadoresOnline = l; JogadoresOnline?.Invoke(l); });
+        // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
+        host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });
         var comeco = h.ComecoJornada;
         h.ComecoJornada = (titulo, jn) => { Dispatcher.UIThread.Post(EsconderRelogio); comeco?.Invoke(titulo, jn); };
     }
@@ -259,6 +261,23 @@ public sealed class Sessao
         relogioTimer?.Stop();
         relogioTimer = null;
         relogio.IsVisible = false;
+    }
+
+    IReadOnlyList<RetroFoot.Motor.Online.JogadorSala> jogadoresOnline = Array.Empty<RetroFoot.Motor.Online.JogadorSala>();
+
+    // "Passar o host...": a lista dos outros tecnicos conectados; o escolhido continua o jogo
+    public void EscolherNovoHost()
+    {
+        if (Online is not { } host) return;
+        var outros = jogadoresOnline.Where(x => x.Equipa != 0 && x.Estado != RetroFoot.Motor.Online.Estados.Saiu && Equipa(x.Equipa) is { } e && host.Remota(e)).ToList();
+        CUi.Folha f = null!;
+        var bs = new List<(string, bool, Action)>();
+        foreach (var j in outros) { var jj = j; bs.Add((jj.Nome, true, () => { FecharDialogo(f); host.PassarHost(jj.Uid); })); }
+        bs.Add((Idioma.T("Cancelar"), false, () => FecharDialogo(f)));
+        f = CUi.Pergunta(Idioma.T("Passar o host"), outros.Count == 0
+            ? Idioma.T("Não há outro técnico conectado para receber o host.")
+            : Idioma.T("Quem continua o jogo no aparelho dele? Você continua na sala como os outros (ou pode sair)."), bs);
+        AbrirDialogo(f);
     }
 
     // os jogadores da sala mudaram (quem esta pronto): a tela de espera do host

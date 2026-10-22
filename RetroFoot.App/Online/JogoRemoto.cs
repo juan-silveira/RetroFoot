@@ -40,6 +40,12 @@ public sealed class JogoRemoto
         // o sinal de vida do host (de 10 em 10 s): parado por 35 s, o aviso de que o host saiu ou
         // caiu (o jogo continua quando ele voltar); voltou, o aviso some
         sala.B.Observar($"{sala.Raiz}/hostVivo", (caminho, v) => _sinalHost = DateTime.UtcNow);
+        // o host passado para este aparelho (ou assumido): este aparelho vira o host
+        sala.B.Observar($"{sala.Raiz}/host", (caminho, v) =>
+        {
+            _hostUid = (string?)v ?? "";
+            if (_hostUid == sala.Uid) Dispatcher.UIThread.Post(() => _ = TornarHost());
+        });
         _vigia = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         _vigia.Tick += (_, _) => VigiarHost();
         _vigia.Start();
@@ -76,13 +82,63 @@ public sealed class JogoRemoto
     CUi.Folha? _avisoHost;
     Sessao? _avisoEm;
 
+    string _hostUid = "";
+    bool _virouHost;
+
+    // este aparelho continua o jogo como host: o ultimo retrato (o da preparacao em que o host
+    // passou ou sumiu) num motor aqui
+    async Task TornarHost()
+    {
+        if (_virouHost) return;
+        _virouHost = true;
+        _vigia.Stop();
+        try
+        {
+            var no = await _sala.B.Ler($"{_sala.Raiz}/retrato");
+            var r = Retrato.Ler(Convert.FromBase64String((string?)no?["dados"] ?? ""));
+            var js = await _sala.Jogadores();
+            _cli.Dispose();
+            Dispatcher.UIThread.Post(() =>
+            {
+                _avisoEm?.FecharDialogo(_avisoHost);
+                _mostrar(new TelaInicio(_mostrar, new TelaInicio.OnlineNovo(_sala, js, null, r)));
+            });
+        }
+        catch (Exception ex)
+        {
+            _virouHost = false;
+            Dispatcher.UIThread.Post(() => _mostrar(Mensagem(T("Jogo online"), T("Não consegui assumir o host: {0}", ex.Message))));
+        }
+    }
+
+    // o host sumiu: depois de 60 s (mais 20 s por quem vem antes na ordem das vagas, para nao
+    // tentarem todos juntos) este aparelho tenta assumir; as regras e a escrita condicional
+    // deixam so um
+    DateTime _tentouAssumir;
+    async Task TalvezAssumir(TimeSpan parado)
+    {
+        if (_virouHost || _rodada.Length == 0 || DateTime.UtcNow - _tentouAssumir < TimeSpan.FromSeconds(15)) return;
+        try
+        {
+            var js = await _sala.Jogadores();
+            var fila = js.Where(x => x.Uid != _hostUid && x.Estado != Estados.Saiu && x.Equipa != 0).OrderBy(x => x.Vaga).ToList();
+            int pos = fila.FindIndex(x => x.Uid == _sala.Uid);
+            if (pos < 0 || parado < TimeSpan.FromSeconds(65 + 20 * pos)) return;
+            _tentouAssumir = DateTime.UtcNow;
+            if (await _sala.Assumir()) Dispatcher.UIThread.Post(() => _ = TornarHost());
+        }
+        catch { }
+    }
+
     void VigiarHost()
     {
-        bool sumiu = DateTime.UtcNow - _sinalHost > TimeSpan.FromSeconds(35);
+        var parado = DateTime.UtcNow - _sinalHost;
+        if (parado > TimeSpan.FromSeconds(60)) _ = TalvezAssumir(parado);
+        bool sumiu = parado > TimeSpan.FromSeconds(35);
         if (sumiu && _avisoHost == null && _sessao is { } ss)
         {
             _avisoHost = CUi.Pergunta(T("Host desconectado"),
-                T("O host saiu do jogo ou perdeu a conexão. O jogo continua quando ele voltar: você pode esperar aqui ou sair (sua vaga e seu time ficam guardados)."),
+                T("O host saiu do jogo ou perdeu a conexão. Se ele não voltar em cerca de 1 minuto, outro técnico da sala assume o host e o jogo continua. Você pode esperar aqui ou sair (sua vaga e seu time ficam guardados)."),
                 new[] { (T("Sair do jogo"), false, (Action)Sair) });
             _avisoEm = ss;
             ss.EsconderRelogio();
