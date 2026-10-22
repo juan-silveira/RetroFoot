@@ -104,6 +104,7 @@ public sealed class Sessao
             Minuto = jn =>
             {
                 Dispatcher.UIThread.Invoke(() => jornada?.Minuto(jn));
+                jornada?.EsperarPausa();
                 int ms = MsPorMinuto;
                 if (ms > 0) Thread.Sleep(ms);
             },

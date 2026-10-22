@@ -66,7 +66,6 @@ public sealed partial class TelaJornada : UserControl
     int pagina;                             // DS:2B38
     Action? continuar;
     bool pausado;
-    DispatcherFrame? pausa;
 
     // relogio (TGauge "clock", gkPie): cor da frente, minimo, maximo e progresso
     Color corRelogio = Rgb(0xFF0000);       // clBlue
@@ -135,17 +134,13 @@ public sealed partial class TelaJornada : UserControl
     }
 
     // um tique do relogio (MinutePassed, seg10:069b), com o motor parado
-    public void Minuto(Jornada jn)
-    {
-        Atualizar(jn);
-        if (pausado)
-        {
-            // o motor espera aqui (o Invoke da Sessao so volta quando a pausa acaba)
-            pausa = new DispatcherFrame();
-            Dispatcher.UIThread.PushFrame(pausa);
-            pausa = null;
-        }
-    }
+    public void Minuto(Jornada jn) => Atualizar(jn);
+
+    // na thread do MOTOR, depois do Minuto: com a pausa ligada, o motor espera aqui ate ela
+    // acabar. (Antes o motor esperava num laco aninhado da interface, o PushFrame, que o Android
+    // nao tem: a pausa derrubava o jogo no celular.)
+    readonly System.Threading.ManualResetEventSlim liberado = new(true);
+    public void EsperarPausa() => liberado.Wait();
 
     // o instantaneo e o relogio, sem a pausa: tambem antes de uma janela que o motor abre no
     // meio de um tique (o intervalo e as lesoes vem antes do Minuto desse tique)
@@ -208,7 +203,7 @@ public sealed partial class TelaJornada : UserControl
     void Pausar(bool p)
     {
         pausado = p;
-        if (!p && pausa != null) pausa.Continue = false;
+        if (p) liberado.Reset(); else liberado.Set();
         Redesenhar();
     }
 
