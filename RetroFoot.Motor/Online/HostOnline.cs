@@ -296,15 +296,20 @@ public sealed class HostOnline : IDisposable
     {
         try
         {
-            foreach (var j in await _sala.Jogadores())
-                if (j.Estado == Estados.Pedindo && j.Uid != _sala.Uid && _pedidosVistos.TryAdd(j.Uid, 0)) PedidoDeEntrada?.Invoke(j);
+            // (cada pedido uma vez: a resposta do host demora um instante a chegar ao banco, e o
+            // pedido nao pode abrir de novo nesse meio; quem voltar a pedir, depois, pergunta de novo)
+            var l = await _sala.Jogadores();
+            var pedindo = l.Where(j => j.Estado == Estados.Pedindo && j.Uid != _sala.Uid).Select(j => j.Uid).ToHashSet();
+            foreach (var uid in _pedidosVistos.Keys)
+                if (!pedindo.Contains(uid)) _pedidosVistos.TryRemove(uid, out _);
+            foreach (var j in l)
+                if (pedindo.Contains(j.Uid) && _pedidosVistos.TryAdd(j.Uid, 0)) PedidoDeEntrada?.Invoke(j);
         }
         catch { }
     }
 
     public async Task ResponderEntrada(string uid, bool permitir)
     {
-        _pedidosVistos.TryRemove(uid, out _);
         try
         {
             if (permitir) { await _sala.B.Atualizar($"{_sala.Raiz}/jogadores/{uid}", new JsonObject { ["estado"] = Estados.Espectador }); return; }
