@@ -465,6 +465,9 @@ public sealed class HostOnline : IDisposable
         dados["id"] = id;
         dados["tipo"] = tipo;
         dados["segundos"] = (int)(prazo ?? PrazoPergunta).TotalSeconds;
+        // antes do primeiro retrato (os patrocinios do comeco do jogo) o outro aparelho ainda nao
+        // tem o jogo: vai junto, para a janela mostrar os nomes
+        if (_versao == 0) dados["save"] = AoVivo.Comprimir(_j.M.S.Gravar());
         try { _sala.B.Gravar($"{_sala.Raiz}/perguntas/{j.Uid}", dados).GetAwaiter().GetResult(); } catch { return null; }
         var fim = DateTime.UtcNow + (prazo ?? PrazoPergunta);
         JsonNode? r = null;

@@ -138,6 +138,7 @@ public sealed class JogoRemoto
     TelaJornada? _jornada;
 
     string? _perguntaAberta;
+    Sessao? _sessaoPergunta;   // a copia de uma pergunta antes da primeira rodada
     Sessao? _perguntaEm;
 
     void Pergunta(JsonObject? q)
@@ -151,7 +152,24 @@ public sealed class JogoRemoto
         string id = (string?)q["id"] ?? "";
         if (id == _perguntaAberta) return;
         var s = _jornada != null ? _sessaoAoVivo : _sessao;
-        if (s == null) return;
+        Control? antes = null;
+        bool copia = false;
+        if (s == null)
+        {
+            // antes da primeira rodada (os patrocinios do comeco do jogo): a janela numa copia do
+            // jogo que veio com a pergunta; respondida, volta a tela que estava (a sala, o sorteio)
+            if ((string?)q["save"] is not { } sv) return;
+            try
+            {
+                var js = Jogo98.Ler(AoVivo.Descomprimir(sv));
+                antes = (App.Raiz as Border)?.Child;
+                s = new Sessao(js, _mostrar, Configuracoes.Ler().OpcoesDoJogo(js, TelaInicio.PastaDoJogo())) { Remoto = this };
+                s.Mostrar(Mensagem(T("Jogo online"), T("O jogo está começando…")));
+                copia = true;
+                _sessaoPergunta = s;
+            }
+            catch (Exception ex) { Console.Error.WriteLine("pergunta: " + ex.Message); return; }
+        }
         _perguntaAberta = id;
         _perguntaEm = s;
         string tipo = (string?)q["tipo"] ?? "";
@@ -162,7 +180,14 @@ public sealed class JogoRemoto
             catch (Exception ex) { Console.Error.WriteLine("pergunta: " + ex.Message); }
             if (r != null && _perguntaAberta == id)
                 try { _sala.B.Gravar($"{_sala.Raiz}/respostas/{_sala.Uid}/{id}", r).GetAwaiter().GetResult(); } catch { }
-            Dispatcher.UIThread.Post(() => { if (_perguntaAberta == id) _perguntaAberta = null; });
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_perguntaAberta == id) _perguntaAberta = null;
+                if (copia && _sessaoPergunta == s) _sessaoPergunta = null;
+                // (a rodada ainda nao chegou: a tela de antes)
+                if (copia && _sessao == null && _jornada == null && _perguntaAberta == null)
+                    _mostrar(antes ?? Mensagem(T("Jogo online"), T("O jogo está começando…")));
+            });
         });
     }
 

@@ -207,7 +207,8 @@ public sealed class Sessao
         static System.Text.Json.Nodes.JsonObject O(params (string K, System.Text.Json.Nodes.JsonNode? V)[] c)
         {
             var o = new System.Text.Json.Nodes.JsonObject();
-            foreach (var (k, v) in c) o[k] = v;
+            // (como volta do banco: um byte ou ushort vira um numero que se le como int)
+            foreach (var (k, v) in c) o[k] = v == null ? null : System.Text.Json.Nodes.JsonNode.Parse(v.ToJsonString());
             return o;
         }
         string intervaloFeito = "";
