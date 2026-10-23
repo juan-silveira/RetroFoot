@@ -60,6 +60,7 @@ public sealed class Humano
     public LanceHumano? Lance;
     // (jogo online) o leilao da CPU para todos os humanos de uma vez (MercadoJogo.LanceDeTodos)
     public Func<IReadOnlyList<Equipa>, Equipa, Jogador, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
+    public Action<MercadoJogo.Leilao, bool>? ResultadoLeilao;
     public Func<Equipa, Jogador, int, int, bool>? PedirAumento;
     public Func<Treinador, Equipa, bool>? Convite;
     // depois de cada tique do relogio da jornada (MinutePassed, seg10:069b): a interface
@@ -108,7 +109,7 @@ public sealed class JogoEmCurso
         M = new Mundo(s, semente);
         M.Regras = TRegras.DoSave(s, op.Regras);
         Op = op; H = h;
-        Mc = new MercadoJogo(s, M.R) { Regras = M.Regras, Bosman = op.Bosman, PLOP = op.PLOP, LanceDeTodos = LanceDeTodos };
+        Mc = new MercadoJogo(s, M.R) { Regras = M.Regras, Bosman = op.Bosman, PLOP = op.PLOP, LanceDeTodos = LanceDeTodos, ResultadoDeTodos = (l, v) => H.ResultadoLeilao?.Invoke(l, v) };
         M.Bosman = op.Bosman; M.PLOP = op.PLOP;
         M.OpcaoGestaoCPU = op.AddIn13;
         M.MostrarChicotadas = op.MostrarChicotadas;
@@ -243,7 +244,7 @@ public sealed class JogoEmCurso
         Regras = M.Regras,
         MostrarSorteio = Op.VerSorteio,
         Interacao = Interacao(),
-        Mc = { Bosman = Op.Bosman, PLOP = Op.PLOP, LanceDeTodos = LanceDeTodos },
+        Mc = { Bosman = Op.Bosman, PLOP = Op.PLOP, LanceDeTodos = LanceDeTodos, ResultadoDeTodos = (l, v) => H.ResultadoLeilao?.Invoke(l, v) },
     };
 
     // o save (seg05:124d): o texto do cabecalho e o nome do treinador humano e a data e

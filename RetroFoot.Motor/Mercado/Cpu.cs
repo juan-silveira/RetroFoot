@@ -124,6 +124,7 @@ public sealed partial class MercadoJogo
         {
             Rodada.Listas.Embaralhar(G, S.Equipas);
             // (jogo online) os humanos que licitam, todos de uma vez: cada lance vem da resposta dele
+            bool deTodos = false;
             if (humano != null && LanceDeTodos != null)
             {
                 var quem = S.Equipas.Skip(1).Where(c => HumanoLicita(l, c)).ToList();
@@ -131,8 +132,11 @@ public sealed partial class MercadoJogo
                 // (o lance acima do dinheiro: no original a caixa pergunta de novo; aqui nao ha
                 // de novo, fica sem lance)
                 if (r != null) humano = (c, _, _) => r.TryGetValue(c.ID, out var x) && x.Milhares * 1000 <= (int)c.Dinheiro ? x : (0, false);
+                deTodos = r != null && quem.Count > 0;
             }
             for (l.Licitante = 1; l.Licitante < S.Equipas.Count; l.Licitante++) Licitar(l, S.Equipas[l.Licitante], humano);
+            // (o resultado, antes da venda: o jogador ainda no vendedor)
+            if (deTodos) ResultadoDeTodos?.Invoke(l, l.Vencedor != 0);
             if (l.Vencedor == 0) return false;   // "Nao houve ofertas"
             Vender(l);
             return true;
@@ -195,6 +199,8 @@ public sealed partial class MercadoJogo
     // jogador; devolve o lance de cada um (milhares, ok) pelo id da equipa. null (ou devolve
     // null): um de cada vez, como no original.
     public Func<IReadOnlyList<Equipa>, Equipa, Jogador, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
+    // o fim do leilao de todos (vendido ou nao), para mostrar o resultado a quem deu lance
+    public Action<Leilao, bool>? ResultadoDeTodos;
 
     // 2:3a10: MudarSalario; tira do vendedor (3:383c), poe no vencedor (3:37b4); vendedor
     // recebe, vencedor paga; sai dos observados do vencedor; TLastTransfer tipo 0

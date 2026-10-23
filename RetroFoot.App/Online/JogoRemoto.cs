@@ -73,6 +73,19 @@ public sealed class JogoRemoto
                 s.Notificar(Online.TextoTransferencia(s.S, (int?)o["jogador"] ?? 0, (int?)o["comprador"] ?? 0, (int?)o["vendedor"] ?? 0, (long?)o["preco"] ?? 0, (int?)o["tipo"] ?? 0));
             });
         });
+        // o resultado do leilao de todos: o aviso no canto
+        sala.B.Observar($"{sala.Raiz}/rodada/leilao", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject o || (int?)o["n"] is not int n) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (n <= _leilaoVisto) return;
+                _leilaoVisto = n;
+                var s = _jornada != null ? _sessaoAoVivo : _sessao;
+                if (s == null) return;
+                s.Notificar(Online.TextoLeilao(s.S, (int?)o["jogador"] ?? 0, (int?)o["vendedor"] ?? 0, (int?)o["comprador"] ?? 0, (long?)o["preco"] ?? 0));
+            });
+        });
         // (fase 2) as perguntas do motor para o meu time: a janela de sempre, aqui; a resposta
         // vai para o host (sem resposta no prazo, ele usa o padrao e a janela fecha)
         sala.B.Observar($"{sala.Raiz}/perguntas/{sala.Uid}", (caminho, v) =>
@@ -275,7 +288,7 @@ public sealed class JogoRemoto
 
     bool _pausaMinha;
     bool _viuSorteio;
-    int _noticia;
+    int _noticia, _leilaoVisto;
 
     void Pausa(JsonObject? p)
     {

@@ -528,6 +528,8 @@ public sealed class HostOnline : IDisposable
         foreach (var t in _j.M.S.Transferencias.ToList())
         {
             if (!_transfVistas.Add(t)) continue;
+            // (o leilao de todos ja mostrou o resultado)
+            if (_leiloados.TryRemove(t.W06, out _)) continue;
             ushort vendedor = _timeDe.GetValueOrDefault(t.W06);
             bool humano(ushort id) => _j.M.Equipa(id) is { } e && MercadoJogo.HumanoAtivo(_j.M.TreinadorDa(e));
             if (!humano(t.W0A) && !humano(vendedor)) continue;
@@ -623,6 +625,19 @@ public sealed class HostOnline : IDisposable
             }
             catch { }
         return r;
+    }
+
+    // o resultado do leilao de todos (rodada/leilao): o aviso em cada aparelho (vendido: para quem
+    // e por quanto; senao, sem ofertas). A transferencia dele nao vira outro aviso
+    int _leilao;
+    readonly ConcurrentDictionary<ushort, byte> _leiloados = new();
+    public void AvisarLeilao(ushort jogador, ushort vendedor, ushort comprador, int preco)
+    {
+        if (comprador != 0) _leiloados[jogador] = 0;
+        Enviar($"{_sala.Raiz}/rodada/leilao", new JsonObject
+        {
+            ["n"] = ++_leilao, ["jogador"] = (int)jogador, ["vendedor"] = (int)vendedor, ["comprador"] = (int)comprador, ["preco"] = (long)preco,
+        });
     }
 
     // ---------------------------------------------------------------- a paralisacao

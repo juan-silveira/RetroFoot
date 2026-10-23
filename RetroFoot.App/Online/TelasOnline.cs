@@ -142,6 +142,16 @@ public static class Online
         return T("🔁 {0}{1} vai para o {2} por {3} ({4})", nome, de, time, FormatoDinheiro.Valor(s, preco), tipo == 1 ? T("compra") : T("leilão"));
     }
 
+    // o resultado do leilao de todos: "🔨 Fulano (Vasco) vai para o Palmeiras por $X" ou sem ofertas
+    public static string TextoLeilao(RetroFoot.Motor.Save.Jogo98 s, int jogador, int vendedor, int comprador, long preco)
+    {
+        if (comprador != 0) return "🔨 " + TextoTransferencia(s, jogador, comprador, vendedor, preco, 0).Replace("🔁 ", "");
+        var v = s.Equipas.FirstOrDefault(e => e.ID == vendedor);
+        var p = s.Equipas.SelectMany(e => e.Jogadores).FirstOrDefault(x => x.ID == jogador);
+        string nome = p == null ? "?" : System.Text.Encoding.Latin1.GetString(RetroFoot.Motor.Partida.Jornada.NomeNaTela(p)).Trim();
+        return T("🔨 Leilão de {0}{1}: não houve ofertas", nome, v == null ? "" : " (" + Dlg.Texto(v.NomeCurto) + ")");
+    }
+
     public static string Versao => typeof(Online).Assembly.GetName().Version?.ToString(3) ?? "0";
 
     // a pagina do kit numa coluna no meio (no computador a tela e larga)

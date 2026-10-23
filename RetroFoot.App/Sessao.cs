@@ -310,20 +310,39 @@ public sealed class Sessao
         {
             var prazo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
             var meu = quem.FirstOrDefault(c => !host.Remota(c));
+            var remotos = quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList();
             (int, bool)? local = null;
+            // (o host deu o lance ou pulou e os outros ainda nao: a espera, como nos outros aparelhos)
+            CUi.Folha? espera = null;
+            bool acabou = false;
             Task? t = meu == null || lance == null ? null : Task.Run(() =>
             {
                 PrazoDialogo = prazo;
                 try { local = lance(meu, v, p); }
                 finally { PrazoDialogo = null; }
+                if (remotos.Count > 0)
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        if (acabou) return;
+                        espera = CUi.Pergunta(Idioma.T("Leilão"), Idioma.T("Lance registrado. Aguardando os outros técnicos…"), Array.Empty<(string, bool, Action)>());
+                        AbrirDialogo(espera);
+                    });
             });
-            var rs = host.PerguntarTodos(quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList(), "lance",
-                c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID)), t, prazo);
+            var rs = host.PerguntarTodos(remotos, "lance", c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID)), t, prazo);
             t?.Wait(prazo);
+            Dispatcher.UIThread.Post(() => { acabou = true; if (espera != null) FecharDialogo(espera); });
             var d = new Dictionary<ushort, (int Milhares, bool Ok)>();
             foreach (var (eq, r) in rs) d[eq] = r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
             if (meu != null && local is { } l) d[meu.ID] = l;
             return d;
+        };
+        // o resultado do leilao de todos: o aviso aqui e nos outros aparelhos
+        h.ResultadoLeilao = (l, vendido) =>
+        {
+            ushort comprador = vendido ? l.Vencedor : (ushort)0;
+            var txt = global::RetroFoot.App.Online.TextoLeilao(S, l.Jogador, l.Vendedor, comprador, l.Melhor);
+            host.AvisarLeilao(l.Jogador, l.Vendedor, comprador, l.Melhor);
+            Dispatcher.UIThread.Post(() => Notificar(txt));
         };
         var conv = h.Convite;
         h.Convite = (t, e) =>
