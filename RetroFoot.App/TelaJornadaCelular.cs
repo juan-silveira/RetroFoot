@@ -38,7 +38,7 @@ public sealed partial class TelaJornada
             : titulo.Trim() + (pausado ? "  ·  " + T("Pausa") : "");
         _minutoCel!.Text = StatusRelogio;
         _continuarCel!.IsVisible = acabou;
-        _pausaCel!.IsVisible = !acabou;
+        _pausaCel!.IsVisible = !acabou && s.Remoto == null;
         _pausaCel.Texto = pausado ? "▶" : "❚❚";
     }
 

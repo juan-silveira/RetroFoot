@@ -202,6 +202,10 @@ public sealed partial class TelaJornada : UserControl
 
     void Pausar(bool p)
     {
+        // (jogo online) no aparelho de um convidado a partida roda no host: nao ha o que pausar
+        // aqui; no host, a pausa para a partida de todos e os outros veem o aviso
+        if (s.Remoto != null) return;
+        if (p != pausado) s.Online?.AvisarPausaSimples(p);
         pausado = p;
         if (p) liberado.Reset(); else liberado.Set();
         Redesenhar();

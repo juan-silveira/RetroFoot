@@ -292,6 +292,8 @@ public sealed class JogoRemoto
             else s?.MostrarAviso(T("⏸ Intervalo: os técnicos fazem as substituições"));
             return;
         }
+        // a pausa simples do host (o botao de pausa): so o aviso
+        if ((int?)p["motivo"] == 0) { s?.MostrarAviso(T("⏸ {0} pausou a partida", (string?)p["nome"] ?? "")); return; }
         if (uid != _sala.Uid)
         {
             s?.MostrarAviso(T("⏸ {0} está fazendo substituições…", (string?)p["nome"] ?? ""));

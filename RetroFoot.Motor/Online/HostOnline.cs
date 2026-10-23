@@ -485,7 +485,9 @@ public sealed class HostOnline : IDisposable
             }) { IsBackground = true, Name = "online-envios" };
             _enviador.Start();
         }
-        _envios.Add((caminho, valor));
+        // (depois do Dispose, o host saiu: nada mais vai para o banco)
+        try { if (!_envios.IsAddingCompleted) _envios.Add((caminho, valor)); }
+        catch (InvalidOperationException) { }
     }
 
     // na thread do motor: o comeco da jornada (ComecoJornada) e cada minuto (Minuto)
@@ -756,6 +758,15 @@ public sealed class HostOnline : IDisposable
         }
         Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", null);
         PausaMudou?.Invoke(null);
+    }
+
+    // a pausa simples do host (o botao de pausa da jornada): a partida de todos para e os outros
+    // veem "fulano pausou a partida" (motivo 0: sem janela de trocas para ninguem)
+    public void AvisarPausaSimples(bool comecou)
+    {
+        if (!comecou) { Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", null); return; }
+        var j = _jogadores.GetValueOrDefault(_sala.Uid);
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/pausa", new JsonObject { ["uid"] = _sala.Uid, ["nome"] = j?.Nome ?? "Host", ["motivo"] = 0 });
     }
 
     // a pausa do proprio host (a janela de detalhes dele): o aviso para os outros
