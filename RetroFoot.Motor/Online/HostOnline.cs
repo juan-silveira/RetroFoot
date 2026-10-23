@@ -54,6 +54,8 @@ public sealed class HostOnline : IDisposable
     // avisos para a tela do host (quem esta pronto)
     public event Action<IReadOnlyList<JogadorSala>>? JogadoresMudaram;
 
+    public Sala Sala => _sala;
+
     public HostOnline(Sala sala, JogoEmCurso j, Action<Action>? naInterface = null)
     {
         _sala = sala; _j = j;
@@ -272,8 +274,10 @@ public sealed class HostOnline : IDisposable
 
     void AmigosEntramESaem()
     {
-        // quem chegou: um time da 4a divisao (o sorteio nao gasta o Random do jogo)
-        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && x.Estado != Estados.Saiu).ToList())
+        // quem chegou: um time da 4a divisao (o sorteio nao gasta o Random do jogo). Quem ja tem um
+        // tecnico no jogo e ficou sem clube (demitido) nao ganha outro: espera um convite, como no
+        // jogo local (os desempregados humanos sao chamados primeiro)
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && x.Estado != Estados.Saiu && !_convidados.ContainsKey(x.Uid)).ToList())
         {
             (Treinador T, Equipa E)? r = null;
             _naInterface(() => r = Convidado.Entrar(_j, j.Nome, new Aleatorio((uint)Environment.TickCount)));
@@ -283,11 +287,11 @@ public sealed class HostOnline : IDisposable
             try { _sala.DarEquipa(j.Uid, ok.E.ID).GetAwaiter().GetResult(); } catch { }
             ConvidadoMudou?.Invoke(j.Nome, true);
         }
-        // quem saiu ou sumiu: despedido e fora do jogo; a vaga fica livre (voltando, e outro tecnico)
-        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa != 0 && Ausente(x)).ToList())
+        // quem saiu ou sumiu: despedido e fora do jogo (pelo tecnico dele: o time pode ter mudado, ou
+        // ele estar sem clube); a vaga fica livre (voltando, e outro tecnico)
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && (x.Equipa != 0 || _convidados.ContainsKey(x.Uid)) && Ausente(x)).ToList())
         {
-            if (_j.M.Equipa(j.Equipa) is { } e && _j.M.TreinadorDa(e) is { Humano: not 0 } t && t.ID != (_j.M.Equipa(TimeDoHost ?? 0)?.Treinador ?? 0))
-                _naInterface(() => Convidado.Sair(_j, t.ID));
+            if (TecnicoDoConvidado(j) is ushort tid) _naInterface(() => Convidado.Sair(_j, tid));
             _convidados.Remove(j.Uid);
             _tecnicoDe.Remove(j.Uid);
             try
@@ -304,9 +308,19 @@ public sealed class HostOnline : IDisposable
     // o fim do jogo online no modo amigo: todos os convidados saem
     public void TirarConvidados()
     {
-        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa != 0).ToList())
-            if (_j.M.Equipa(j.Equipa) is { } e && _j.M.TreinadorDa(e) is { Humano: not 0 } t && e.ID != TimeDoHost)
-                _naInterface(() => Convidado.Sair(_j, t.ID));
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid).ToList())
+            if (TecnicoDoConvidado(j) is ushort tid) _naInterface(() => Convidado.Sair(_j, tid));
+        _convidados.Clear();
+    }
+
+    // o tecnico de um amigo: o que ele recebeu ao entrar; sem esse registro (o host mudou), o do
+    // time dele, se for humano e nao o do host
+    ushort? TecnicoDoConvidado(JogadorSala j)
+    {
+        ushort hostTec = _j.M.Equipa(TimeDoHost ?? 0)?.Treinador ?? 0;
+        if (_convidados.TryGetValue(j.Uid, out var tid)) return tid != hostTec && _j.M.S.Treinadores.Any(t => t.ID == tid) ? tid : null;
+        if (j.Equipa != 0 && _j.M.Equipa(j.Equipa) is { } e && _j.M.TreinadorDa(e) is { Humano: not 0 } t && t.ID != hostTec) return t.ID;
+        return null;
     }
 
     // na barreira: as ferias de quem esta ausente, e o fim delas para quem voltou
@@ -339,6 +353,34 @@ public sealed class HostOnline : IDisposable
             ["rodada"] = Rodada, ["versao"] = _versao, ["host"] = _instancia, ["dados"] = Convert.ToBase64String(r.Bytes()),
         }).GetAwaiter().GetResult();
         _ultimo = (e, jogo);
+        Resumir(jogo);
+    }
+
+    // o resumo da sala para a lista das salas de cada um: o ano e a rodada (info) e o time e a
+    // divisao de cada tecnico (jogadores/<uid>); so quando muda
+    string _resumo = "";
+    void Resumir(Jogo? jogo)
+    {
+        var m = _j.M;
+        string rodada = jogo != null && jogo.Taca == TipoJogo.Taca ? $"Taça, rodada {m.Jornada}" : $"rodada {m.Jornada}";
+        var times = _jogadores.Values.Select(j =>
+        {
+            var e = j.Equipa == 0 ? null : m.Equipa(j.Equipa);
+            int d = e == null ? -1 : m.DivisaoDa(e);
+            var dn = d < 0 ? Array.Empty<byte>() : m.S.Divisoes[d].Nome;
+            return (j.Uid, Time: e == null ? "" : MercadoJogo.Texto(e.NomeCurto).Trim(),
+                Div: dn.Length == 0 ? "" : System.Text.Encoding.Latin1.GetString(dn, 1, Math.Min(dn[0], dn.Length - 1)).Trim());
+        }).ToList();
+        string novo = $"{m.Ano}|{rodada}|" + string.Join("|", times.Select(x => $"{x.Uid}:{x.Time}:{x.Div}"));
+        if (novo == _resumo) return;
+        _resumo = novo;
+        try
+        {
+            _sala.B.Atualizar($"{_sala.Raiz}/info", new JsonObject { ["ano"] = m.Ano, ["rodada"] = rodada }).GetAwaiter().GetResult();
+            foreach (var x in times)
+                _sala.B.Atualizar($"{_sala.Raiz}/jogadores/{x.Uid}", new JsonObject { ["time"] = x.Time, ["divisao"] = x.Div }).GetAwaiter().GetResult();
+        }
+        catch { }
     }
 
     (Equipa E, Jogo? Jogo) _ultimo;

@@ -58,6 +58,54 @@ public static class Online
         catch { return new(); }
     }
 
+    // as salas em que este aparelho ja entrou (como host ou convidado), para voltar sem digitar a
+    // chave: codigo -> nome da sala e a ultima vez (online-salas.json, junto das Configuracoes)
+    public sealed record SalaLembrada(string Codigo, string Nome, DateTime Quando);
+    static string ArquivoSalas => Path.Combine(Path.GetDirectoryName(Configuracoes.Arquivo)!, "online-salas.json");
+
+    public static List<SalaLembrada> Salas()
+    {
+        try
+        {
+            if (!File.Exists(ArquivoSalas)) return new();
+            var n = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(ArquivoSalas)) as System.Text.Json.Nodes.JsonArray;
+            return (n ?? new()).OfType<System.Text.Json.Nodes.JsonObject>()
+                .Select(o => new SalaLembrada((string?)o["codigo"] ?? "", (string?)o["nome"] ?? "", DateTime.TryParse((string?)o["quando"], out var q) ? q : DateTime.MinValue))
+                .Where(x => Sala.CodigoValido(x.Codigo)).OrderByDescending(x => x.Quando).ToList();
+        }
+        catch { return new(); }
+    }
+
+    static void GravarSalas(IEnumerable<SalaLembrada> l)
+    {
+        try
+        {
+            var a = new System.Text.Json.Nodes.JsonArray(l.Take(20).Select(x => (System.Text.Json.Nodes.JsonNode)new System.Text.Json.Nodes.JsonObject
+            {
+                ["codigo"] = x.Codigo, ["nome"] = x.Nome, ["quando"] = x.Quando.ToString("o"),
+            }).ToArray());
+            Directory.CreateDirectory(Path.GetDirectoryName(ArquivoSalas)!);
+            File.WriteAllText(ArquivoSalas, a.ToJsonString());
+        }
+        catch { }
+    }
+
+    public static void Lembrar(Sala sala)
+    {
+        var l = Salas().Where(x => x.Codigo != sala.Codigo).ToList();
+        var antes = Salas().FirstOrDefault(x => x.Codigo == sala.Codigo);
+        l.Insert(0, new SalaLembrada(sala.Codigo, sala.Nome.Length > 0 ? sala.Nome : antes?.Nome ?? "", DateTime.Now));
+        GravarSalas(l);
+    }
+
+    public static void Esquecer(string codigo) => GravarSalas(Salas().Where(x => x.Codigo != codigo));
+
+    // o nome da sala do jogo de um host (para a sala nova, se a antiga acabou)
+    public static string NomeLembrado(string codigo) => Salas().FirstOrDefault(x => x.Codigo == codigo)?.Nome ?? "";
+
+    // "Liga dos Amigos · K7MPQ2"
+    public static string Titulo(Sala sala) => sala.Nome.Length > 0 ? $"{sala.Nome} · {sala.Codigo}" : sala.Codigo;
+
     static string ArquivoNome => Path.Combine(Path.GetDirectoryName(Configuracoes.Arquivo)!, "online-nome.txt");
     public static string UltimoNome
     {
@@ -126,6 +174,7 @@ public sealed class TelaOnline : UserControl
         CUi.Botao criar = null!, entrar = null!;
         void Ocupado(bool o) { criar.Habilitado = entrar.Habilitado = !o; }
         void Erro(string s) { aviso.Text = s; aviso.IsVisible = true; Ocupado(false); }
+        var nomeSala = CUi.Caixa("", 40, T("Nome da sala (opcional)"));
         criar = new CUi.Botao(T("Criar sala"), true, async () =>
         {
             Online.UltimoNome = nome.Text ?? "";
@@ -134,12 +183,13 @@ public sealed class TelaOnline : UserControl
             {
                 var b = Online.Banco;
                 await b.Ler("salas/AAAAAA/info");   // (cria a identidade)
-                var sala = await Sala.Criar(b, b.Uid, nome.Text ?? "", Online.Versao);
+                var sala = await Sala.Criar(b, b.Uid, nome.Text ?? "", Online.Versao, nomeSala.Text);
+                Online.Lembrar(sala);
                 _mostrar(new TelaSala(_mostrar, _voltar, sala, true));
             }
             catch (Exception ex) { Erro(T("Não consegui criar a sala: {0}", Curto(ex))); }
         });
-        entrar = new CUi.Botao(T("Entrar"), true, async () =>
+        async Task EntrarNa(string chave)
         {
             Online.UltimoNome = nome.Text ?? "";
             Ocupado(true); aviso.IsVisible = false;
@@ -147,43 +197,96 @@ public sealed class TelaOnline : UserControl
             {
                 var b = Online.Banco;
                 await b.Ler("salas/AAAAAA/info");
-                var sala = await Sala.Entrar(b, b.Uid, codigo.Text ?? "", nome.Text ?? "");
+                var sala = await Sala.Entrar(b, b.Uid, chave, nome.Text ?? "");
+                Online.Lembrar(sala);
                 _mostrar(new TelaSala(_mostrar, _voltar, sala, false));
             }
             catch (Sala.SalaCheia) { Erro(T("A sala está cheia (6 técnicos).")); }
-            catch (Sala.SalaInexistente) { Erro(T("Não existe sala com essa chave.")); }
+            catch (Sala.SalaInexistente) { Online.Esquecer(chave.Trim().ToUpperInvariant()); Erro(T("Não existe sala com essa chave.")); }
             catch (Exception ex) { Erro(T("Não consegui entrar: {0}", Curto(ex))); }
-        });
+        }
+        entrar = new CUi.Botao(T("Entrar"), true, () => _ = EntrarNa(codigo.Text ?? ""));
         criar.HorizontalAlignment = entrar.HorizontalAlignment = HorizontalAlignment.Stretch;
-        // os jogos online deste aparelho como host (data/online/<CHAVE>/JOGO.e98): continuar
-        var meus = new StackPanel { Spacing = 8 };
-        foreach (var arq in Online.JogosDoHost())
+
+        // as suas salas: os jogos online deste aparelho como host (data/online/<CHAVE>/JOGO.e98) e
+        // as salas em que ele entrou como convidado; cada uma com o nome, a chave, o ano e o seu
+        // time (o resumo que o host grava a cada rodada), para voltar sem digitar a chave
+        var meus = new StackPanel { Spacing = 10 };
+        var doHost = Online.JogosDoHost().ToDictionary(arq => Path.GetFileName(Path.GetDirectoryName(arq))!, arq => arq);
+        var lembradas = Online.Salas();
+        var codigos = doHost.Keys.Concat(lembradas.Select(x => x.Codigo)).Distinct()
+            .OrderByDescending(c => doHost.TryGetValue(c, out var f) ? File.GetLastWriteTime(f) : lembradas.FirstOrDefault(x => x.Codigo == c)?.Quando ?? DateTime.MinValue)
+            .ToList();
+        foreach (var codigoJogo in codigos)
         {
-            var codigoJogo = Path.GetFileName(Path.GetDirectoryName(arq))!;
-            var info = $"{codigoJogo} · {File.GetLastWriteTime(arq):dd/MM/yyyy HH:mm}";
-            var b = new CUi.Botao(T("Continuar {0}", codigoJogo), false, async () =>
+            string? arq = doHost.GetValueOrDefault(codigoJogo);
+            string nomeLembrado = lembradas.FirstOrDefault(x => x.Codigo == codigoJogo)?.Nome ?? "";
+            var titulo = CUi.Txt(nomeLembrado.Length > 0 ? $"{nomeLembrado} · {codigoJogo}" : codigoJogo, 15, CUi.Texto, FontWeight.SemiBold);
+            var detalhe = CUi.Txt("…", 13, CUi.Fraco, FontWeight.Normal, true);
+            var papel = CUi.Etiqueta(arq != null ? T("host") : T("convidado"));
+            var cab = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+            cab.Children.Add(titulo);
+            Grid.SetColumn(papel, 1);
+            cab.Children.Add(papel);
+            CUi.Botao b;
+            if (arq != null)
+                b = new CUi.Botao(T("Continuar"), true, async () =>
+                {
+                    Online.UltimoNome = nome.Text ?? "";
+                    Ocupado(true); aviso.IsVisible = false;
+                    try
+                    {
+                        var bn = Online.Banco;
+                        await bn.Ler("salas/AAAAAA/info");
+                        // a mesma sala, se ainda for dele; se a sala continua com outro host (ele passou o
+                        // host ou caiu e outro assumiu), entra como os outros; senao uma sala nova (com a
+                        // mesma chave e o mesmo nome, se der: os outros a acham na lista deles)
+                        if (await Sala.Reabrir(bn, bn.Uid, codigoJogo) is { } minha) { Online.Lembrar(minha); _mostrar(new TelaSala(_mostrar, _voltar, minha, true, arq)); return; }
+                        if (await bn.Ler($"salas/{codigoJogo}/info") != null)
+                        {
+                            try { File.Move(arq, arq + ".passado", true); } catch { }
+                            var outra = await Sala.Entrar(bn, bn.Uid, codigoJogo, nome.Text ?? "");
+                            Online.Lembrar(outra);
+                            _mostrar(new TelaSala(_mostrar, _voltar, outra, false));
+                            return;
+                        }
+                        var nova = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao, nomeLembrado, default, codigoJogo);
+                        Online.Lembrar(nova);
+                        _mostrar(new TelaSala(_mostrar, _voltar, nova, true, arq));
+                    }
+                    catch (Exception ex) { Erro(T("Não consegui abrir a sala: {0}", Curto(ex))); }
+                });
+            else b = new CUi.Botao(T("Entrar"), true, () => _ = EntrarNa(codigoJogo));
+            b.HorizontalAlignment = HorizontalAlignment.Stretch;
+            var item = new StackPanel { Spacing = 4, Children = { cab, detalhe, b } };
+            meus.Children.Add(item);
+            // o resumo, do banco
+            _ = Task.Run(async () =>
             {
-                Online.UltimoNome = nome.Text ?? "";
-                Ocupado(true); aviso.IsVisible = false;
                 try
                 {
                     var bn = Online.Banco;
-                    await bn.Ler("salas/AAAAAA/info");
-                    // a mesma sala, se ainda for dele; se a sala continua com outro host (ele passou o
-                    // host ou caiu e outro assumiu), entra como os outros; senao uma sala nova
-                    if (await Sala.Reabrir(bn, bn.Uid, codigoJogo) is { } minha) { _mostrar(new TelaSala(_mostrar, _voltar, minha, true, arq)); return; }
-                    if (await bn.Ler($"salas/{codigoJogo}/info") != null)
+                    var r = await Sala.LerResumo(bn, bn.Uid, codigoJogo);
+                    Dispatcher.UIThread.Post(() =>
                     {
-                        try { File.Move(arq, arq + ".passado", true); } catch { }
-                        _mostrar(new TelaSala(_mostrar, _voltar, await Sala.Entrar(bn, bn.Uid, codigoJogo, nome.Text ?? ""), false));
-                        return;
-                    }
-                    var nova = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao);
-                    _mostrar(new TelaSala(_mostrar, _voltar, nova, true, arq));
+                        if (r == null)
+                        {
+                            // a sala acabou: o host continua o jogo dele (abre uma sala nova); o convidado
+                            // nao tem mais o que abrir
+                            if (arq != null) { detalhe.Text = T("A sala foi fechada. Continuar abre a sala de novo (com esta chave, se estiver livre)."); return; }
+                            Online.Esquecer(codigoJogo);
+                            meus.Children.Remove(item);
+                            return;
+                        }
+                        if (r.Nome.Length > 0) titulo.Text = $"{r.Nome} · {codigoJogo}";
+                        var partes = new List<string>();
+                        if (r.Ano > 0) partes.Add(r.Rodada.Length > 0 ? $"{r.Ano} · {r.Rodada}" : r.Ano.ToString());
+                        if (r.Time.Length > 0) partes.Add(r.Divisao.Length > 0 ? $"{r.Time} ({r.Divisao})" : r.Time);
+                        detalhe.Text = partes.Count > 0 ? string.Join(" · ", partes) : T("O jogo ainda não começou.");
+                    });
                 }
-                catch (Exception ex) { Erro(T("Não consegui abrir a sala: {0}", Curto(ex))); }
-            }) { HorizontalAlignment = HorizontalAlignment.Stretch };
-            meus.Children.Add(new StackPanel { Spacing = 4, Children = { CUi.Txt(info, 13, CUi.Fraco), b } });
+                catch (Exception ex) { Dispatcher.UIThread.Post(() => detalhe.Text = Curto(ex)); }
+            });
         }
         var corpo = new StackPanel
         {
@@ -192,11 +295,11 @@ public sealed class TelaOnline : UserControl
             {
                 CUi.Cartao_(T("Técnico"), new StackPanel { Spacing = 8, Children = { CUi.Txt(T("O nome que os outros veem na sala."), 13, CUi.Fraco, FontWeight.Normal, true), nome } }),
                 CUi.Cartao_(T("Entrar numa sala"), new StackPanel { Spacing = 8, Children = { CUi.Txt(T("A chave de 6 letras que o host passou."), 13, CUi.Fraco, FontWeight.Normal, true), codigo, entrar } }),
-                CUi.Cartao_(T("Criar uma sala"), new StackPanel { Spacing = 8, Children = { CUi.Txt(T("Você será o host: o jogo roda no seu aparelho. Até 6 técnicos, um por aparelho."), 13, CUi.Fraco, FontWeight.Normal, true), criar } }),
+                CUi.Cartao_(T("Criar uma sala"), new StackPanel { Spacing = 8, Children = { CUi.Txt(T("Você será o host: o jogo roda no seu aparelho. Até 6 técnicos, um por aparelho."), 13, CUi.Fraco, FontWeight.Normal, true), nomeSala, criar } }),
                 aviso,
             },
         };
-        if (meus.Children.Count > 0) corpo.Children.Insert(1, CUi.Cartao_(T("Seus jogos online (host)"), meus));
+        if (meus.Children.Count > 0) corpo.Children.Insert(1, CUi.Cartao_(T("Suas salas"), meus));
         // jogar um save seu com um amigo (o amigo assume um time da 4a divisao; depois o save
         // volta a ser so seu)
         var amigo = new StackPanel { Spacing = 8 };
@@ -212,7 +315,8 @@ public sealed class TelaOnline : UserControl
                 {
                     var bn = Online.Banco;
                     await bn.Ler("salas/AAAAAA/info");
-                    var sala = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao);
+                    var sala = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao,
+                        string.IsNullOrWhiteSpace(nomeSala.Text) ? T("{0} com amigos", nomeSave) : nomeSala.Text);
                     await sala.DefinirModo(Sala.ModoAmigo);
                     _mostrar(new TelaSala(_mostrar, _voltar, sala, true, arq, modoAmigo: true));
                 }
@@ -402,7 +506,8 @@ public sealed class TelaSala : UserControl
             var jogo = new JogoRemoto(mostrar, voltar, sala, cliente);
             jogo.Comecou += () => { obs?.Dispose(); obsInfo?.Dispose(); };
         }
-        Content = Online.Pagina(T("Sala {0}", sala.Codigo), host ? T("Você é o host") : null, Sair, corpo, host ? comecar : null);
+        Content = Online.Pagina(sala.Nome.Length > 0 ? sala.Nome : T("Sala {0}", sala.Codigo),
+            (host ? T("Você é o host") + " · " : "") + T("chave {0}", sala.Codigo), Sair, corpo, host ? comecar : null);
     }
 }
 
@@ -422,7 +527,8 @@ public sealed class TelaAguardandoOnline : UserControl
         Action<IReadOnlyList<JogadorSala>> mudou = l => Desenhar(l);
         s.JogadoresOnline += mudou;
         DetachedFromVisualTree += (_, _) => s.JogadoresOnline -= mudou;
-        Content = Online.Pagina(T("Aguardando os técnicos"), T("A rodada começa quando todos estiverem prontos"), null, CUi.Cartao_(null, lista));
+        Content = Online.Pagina(T("Aguardando os técnicos"),
+            (s.Online?.Sala is { } sala ? Online.Titulo(sala) + " · " : "") + T("A rodada começa quando todos estiverem prontos"), null, CUi.Cartao_(null, lista));
     }
 }
 

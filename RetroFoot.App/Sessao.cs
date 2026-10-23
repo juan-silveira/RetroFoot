@@ -427,8 +427,12 @@ public sealed class Sessao
         }
     }
 
+    // (para os testes) cada aviso mostrado
+    public event Action<string>? Notificou;
+
     public void Notificar(string texto)
     {
+        Notificou?.Invoke(texto);
         bool cel = Celular.Ativo;
         var b = new Border
         {

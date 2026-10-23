@@ -45,6 +45,8 @@ public sealed class Sala
     public readonly IBanco B;
     public readonly string Codigo, Uid;
     public string Raiz => "salas/" + Codigo;
+    // o nome da sala (info/nome), para mostrar junto da chave
+    public string Nome { get; private set; } = "";
 
     Sala(IBanco b, string codigo, string uid) { B = b; Codigo = codigo; Uid = uid; }
 
@@ -53,21 +55,28 @@ public sealed class Sala
     static JsonNode Agora() => new JsonObject { [".sv"] = "timestamp" };
 
     // cria uma sala nova com um codigo livre; quem cria e o host e fica na vaga 0
-    public static async Task<Sala> Criar(IBanco b, string uid, string nome, string versao, CancellationToken ct = default)
+    public static async Task<Sala> Criar(IBanco b, string uid, string nome, string versao, CancellationToken ct = default) =>
+        await Criar(b, uid, nome, versao, null, ct);
+
+    // nomeSala: o nome que todos veem na lista das salas (vazio: "Sala de <nome>")
+    // codigo: a chave que se quer (o host que volta a um jogo cuja sala acabou: a mesma chave,
+    // se estiver livre, para os outros acharem a sala na lista deles)
+    public static async Task<Sala> Criar(IBanco b, string uid, string nome, string versao, string? nomeSala, CancellationToken ct = default, string? codigoDesejado = null)
     {
         for (int tentativa = 0; tentativa < 20; tentativa++)
         {
-            var codigo = new string(Enumerable.Range(0, 6).Select(_ => Letras[Random.Shared.Next(Letras.Length)]).ToArray());
+            var codigo = tentativa == 0 && codigoDesejado != null && CodigoValido(codigoDesejado) ? codigoDesejado
+                : new string(Enumerable.Range(0, 6).Select(_ => Letras[Random.Shared.Next(Letras.Length)]).ToArray());
             if (await b.Ler($"salas/{codigo}/info", ct) != null) continue;
             await b.Atualizar($"salas/{codigo}", new JsonObject
             {
-                ["info"] = new JsonObject { ["criador"] = uid, ["criada"] = Agora(), ["versao"] = versao },
+                ["info"] = new JsonObject { ["criador"] = uid, ["criada"] = Agora(), ["versao"] = versao, ["nome"] = NomeDaSala(nomeSala, nome) },
                 ["host"] = uid,
                 ["hostVivo"] = Agora(),
                 ["vagas/0"] = uid,
-                ["jogadores/" + uid] = new JsonObject { ["nome"] = Nome(nome), ["vaga"] = 0, ["estado"] = Estados.Preparando },
+                ["jogadores/" + uid] = new JsonObject { ["nome"] = NomeTecnico(nome), ["vaga"] = 0, ["estado"] = Estados.Preparando },
             }, ct);
-            return new Sala(b, codigo, uid);
+            return new Sala(b, codigo, uid) { Nome = NomeDaSala(nomeSala, nome) };
         }
         throw new InvalidOperationException("nao achei um codigo livre");
     }
@@ -76,9 +85,9 @@ public sealed class Sala
     // mais ou se o host agora e outro
     public static async Task<Sala?> Reabrir(IBanco b, string uid, string codigo, CancellationToken ct = default)
     {
-        if (!CodigoValido(codigo) || await b.Ler($"salas/{codigo}/info", ct) == null) return null;
+        if (!CodigoValido(codigo) || await b.Ler($"salas/{codigo}/info", ct) is not { } info) return null;
         if ((string?)await b.Ler($"salas/{codigo}/host", ct) != uid) return null;
-        var s = new Sala(b, codigo, uid);
+        var s = new Sala(b, codigo, uid) { Nome = (string?)info["nome"] ?? "" };
         await s.SinalDeVida(ct);
         // (o retrato e a rodada da vez anterior: ninguem entra num jogo velho antes do host
         // continuar)
@@ -109,8 +118,8 @@ public sealed class Sala
     public static async Task<Sala> Entrar(IBanco b, string uid, string codigo, string nome, CancellationToken ct = default)
     {
         codigo = codigo.Trim().ToUpperInvariant();
-        if (!CodigoValido(codigo) || await b.Ler($"salas/{codigo}/info", ct) == null) throw new SalaInexistente();
-        var s = new Sala(b, codigo, uid);
+        if (!CodigoValido(codigo) || await b.Ler($"salas/{codigo}/info", ct) is not { } info) throw new SalaInexistente();
+        var s = new Sala(b, codigo, uid) { Nome = (string?)info["nome"] ?? "" };
         var vagas = Nos.Filhos(await b.Ler($"salas/{codigo}/vagas", ct)).ToDictionary(x => x.Chave, x => (string?)x.Valor);
         int minha = vagas.FirstOrDefault(x => x.Value == uid).Key is { } k ? int.Parse(k) : -1;
         for (int v = 0; v < Vagas && minha < 0; v++)
@@ -125,7 +134,7 @@ public sealed class Sala
         var ja = JogadorSala.De(uid, await Tentar(() => b.Ler($"{s.Raiz}/jogadores/{uid}", ct)));
         await b.Gravar($"{s.Raiz}/jogadores/{uid}", new JsonObject
         {
-            ["nome"] = Nome(nome), ["vaga"] = minha, ["equipa"] = (int)(ja?.Equipa ?? 0), ["estado"] = Estados.Preparando,
+            ["nome"] = NomeTecnico(nome), ["vaga"] = minha, ["equipa"] = (int)(ja?.Equipa ?? 0), ["estado"] = Estados.Preparando,
         }, ct);
         return s;
     }
@@ -135,7 +144,23 @@ public sealed class Sala
         try { return await f(); } catch (InvalidOperationException) { return null; }
     }
 
-    static string Nome(string n) => n.Trim().Length == 0 ? "Técnico" : n.Trim()[..Math.Min(30, n.Trim().Length)];
+    public static string NomeDaSala(string? nomeSala, string tecnico) =>
+        string.IsNullOrWhiteSpace(nomeSala) ? "Sala de " + NomeTecnico(tecnico) : nomeSala.Trim()[..Math.Min(40, nomeSala.Trim().Length)];
+
+    // o que a lista das salas mostra (de quem ja esteve nela): o nome, o ano e a rodada do jogo
+    // (info, o host grava a cada rodada), o time e a divisao deste tecnico. null: a sala acabou
+    public sealed record Resumo(string Codigo, string Nome, int Ano, string Rodada, string Time, string Divisao, bool Host, string Fase);
+
+    public static async Task<Resumo?> LerResumo(IBanco b, string uid, string codigo, CancellationToken ct = default)
+    {
+        if (!CodigoValido(codigo) || await b.Ler($"salas/{codigo}/info", ct) is not JsonObject info) return null;
+        var host = (string?)await Tentar(() => b.Ler($"salas/{codigo}/host", ct));
+        var eu = await Tentar(() => b.Ler($"salas/{codigo}/jogadores/{uid}", ct)) as JsonObject;
+        return new Resumo(codigo, (string?)info["nome"] ?? "", (int?)info["ano"] ?? 0, (string?)info["rodada"] ?? "",
+            (string?)eu?["time"] ?? "", (string?)eu?["divisao"] ?? "", host == uid, (string?)info["fase"] ?? "");
+    }
+
+    static string NomeTecnico(string n) => n.Trim().Length == 0 ? "Técnico" : n.Trim()[..Math.Min(30, n.Trim().Length)];
 
     public async Task<List<JogadorSala>> Jogadores(CancellationToken ct = default) =>
         Nos.Filhos(await B.Ler($"{Raiz}/jogadores", ct)).Select(x => JogadorSala.De(x.Chave, x.Valor)).OfType<JogadorSala>().OrderBy(x => x.Vaga).ToList();

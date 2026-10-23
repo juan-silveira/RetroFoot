@@ -211,6 +211,116 @@ public class HostClienteTestes
         Assert.True(compras == 0 || jg.M.S.Transferencias.Count > 0);
     }
 
+    // a lista das salas de cada um: o nome da sala e, depois da primeira rodada, o ano, a rodada,
+    // o time e a divisao de cada tecnico; a sala refeita com a mesma chave
+    [Fact(Timeout = 120_000)]
+    public async Task ResumoDaSalaParaALista()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0", "Liga dos Amigos");
+        Assert.Equal("Liga dos Amigos", sh.Nome);
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        Assert.Equal("Liga dos Amigos", sc.Nome);
+        var r0 = await Sala.LerResumo(banco, "cli", sh.Codigo);
+        Assert.NotNull(r0);
+        Assert.Equal(0, r0!.Ano);
+        Assert.False(r0.Host);
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+        await sh.DarEquipa("host", minha.ID);
+        await sh.DarEquipa("cli", dele.ID);
+        await sc.Ausentar();
+        int barreiras = 0;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            host.Preparar(e, jogo);
+            if (host.Rodada != antes) barreiras++;
+            return barreiras > 1;
+        };
+        var jg = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg);
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(await Task.Run(() => motor.Join(60_000)));
+        host.Dispose();
+        var r = (await Sala.LerResumo(banco, "cli", sh.Codigo))!;
+        Assert.Equal(jg.M.Ano, r.Ano);
+        Assert.Contains("rodada", r.Rodada);
+        Assert.Equal(MercadoJogo.Texto(dele.NomeCurto).Trim(), r.Time);
+        Assert.NotEqual("", r.Divisao);
+        Assert.True((await Sala.LerResumo(banco, "host", sh.Codigo))!.Host);
+        // a sala acabou: o host a refaz com a mesma chave e o mesmo nome
+        await sh.Apagar();
+        Assert.Null(await Sala.LerResumo(banco, "cli", sh.Codigo));
+        var nova = await Sala.Criar(banco, "host", "Juan", "0.2.0", "Liga dos Amigos", default, sh.Codigo);
+        Assert.Equal(sh.Codigo, nova.Codigo);
+        Assert.Equal("Liga dos Amigos", (await Sala.LerResumo(banco, "host", sh.Codigo))!.Nome);
+    }
+
+    // modo amigo: o amigo demitido (sem clube) nao ganha um segundo tecnico; quando sai, o tecnico
+    // dele (mesmo desempregado) sai do jogo e o save volta ao que era
+    [Fact(Timeout = 120_000)]
+    public async Task ModoAmigoDemitidoNaoGanhaOutroTecnico()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "Amigo");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        int humanosAntes = s.Treinadores.Count(t => t.Humano != 0);
+        await sh.DarEquipa("host", minha.ID);
+        using var cli = new ClienteOnline(sc);
+        string ultima = "";
+        cli.NovoRetrato += (r, rodada, versao, inst) => _ = Task.Run(async () =>
+        {
+            if (rodada == ultima) return;
+            ultima = rodada;
+            var eu = (await sc.Jogadores()).FirstOrDefault(x => x.Uid == "cli");
+            if (eu == null || eu.Equipa == 0) return;
+            var c = Jogo98.Ler(r.Save);
+            var e = c.Equipas.First(x => x.ID == eu.Equipa);
+            Escalacao.Automatico(new Aleatorio(3), e);
+            await cli.Pronto(new Preparo(e.Jogadores.Select(x => new Escalado(x.ID, Memoria.Escalacao(x))).ToList(), 10000, new(), 0));
+        });
+        int barreiras = 0, amigosNoJogo = 0;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            bool sair = host.Preparar(e, jogo);
+            if (host.Rodada != antes)
+            {
+                barreiras++;
+                amigosNoJogo = Math.Max(amigosNoJogo, j.M.S.Treinadores.Count(t => System.Text.Encoding.Latin1.GetString(Cifra.TextoEFT(t.Nome).Texto) == "Amigo"));
+                var eu = sh.Jogadores().GetAwaiter().GetResult().FirstOrDefault(x => x.Uid == "cli");
+                if (barreiras == 2 && eu is { Equipa: not 0 })
+                {
+                    // demitido: o time dele fica com um tecnico do computador sem clube
+                    var t = j.M.Equipa(eu.Equipa)!;
+                    var cpu = j.M.S.Treinadores.First(x => x.Humano == 0 && j.M.EquipaDoTreinador(x.ID) == null);
+                    t.Treinador = cpu.ID;
+                }
+                if (barreiras == 4) sc.Ausentar().GetAwaiter().GetResult();
+            }
+            return sair || barreiras > 5;
+        };
+        var jg = new JogoEmCurso(s, 13, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg) { ModoAmigo = true };
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(await Task.Run(() => motor.Join(90_000)));
+        host.Dispose();
+        Assert.Equal(1, amigosNoJogo);
+        Assert.Equal(humanosAntes, s.Treinadores.Count(t => t.Humano != 0));
+        Assert.DoesNotContain(s.Treinadores, t => System.Text.Encoding.Latin1.GetString(Cifra.TextoEFT(t.Nome).Texto) == "Amigo");
+    }
+
     [Fact]
     public async Task SeteNaoCabem()
     {

@@ -581,6 +581,6 @@ sealed class TelaEsperaRemota : UserControl
         if (aviso != null)
             corpo = new StackPanel { Spacing = 12, Children = { CUi.Cartao_(null, CUi.Txt(aviso, 14, CUi.Texto, FontWeight.Normal, true)), corpo } };
         Content = Online.Pagina(aviso != null ? T("Rodada em andamento") : T("Aguardando os técnicos"),
-            aviso != null ? null : T("A rodada começa quando todos estiverem prontos"), null, corpo);
+            Online.Titulo(sala) + (aviso != null ? "" : " · " + T("A rodada começa quando todos estiverem prontos")), null, corpo);
     }
 }
