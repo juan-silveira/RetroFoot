@@ -417,7 +417,7 @@ public sealed partial class TelaJornada
             var p = e.GetPosition(this);
             if (CUi.Retro)
             {
-                if (JogoRetro(p.Y) is { Jogo: { } jr }) LigacaoPartida.PedirDetalhes(t.s, jr, p.X < Bounds.Width / 2 ? Lado.Casa : Lado.Visit);
+                if (JogoRetro(p.Y) is { Jogo: { } jr }) t.Clicou(jr, p.X < Bounds.Width / 2 ? Lado.Casa : Lado.Visit);
                 return;
             }
             double y = 8;
@@ -428,7 +428,7 @@ public sealed partial class TelaJornada
                 double hj = AlturaM(l);
                 if (p.Y >= y && p.Y < y + hj && l.Jogo is { } jg)
                 {
-                    LigacaoPartida.PedirDetalhes(t.s, jg, p.X < Bounds.Width / 2 ? Lado.Casa : Lado.Visit);
+                    t.Clicou(jg, p.X < Bounds.Width / 2 ? Lado.Casa : Lado.Visit);
                     return;
                 }
                 y += hj + 4;

@@ -136,6 +136,32 @@ public sealed partial class TelaJornada : UserControl
     // um tique do relogio (MinutePassed, seg10:069b), com o motor parado
     public void Minuto(Jornada jn) => Atualizar(jn);
 
+    // ---------------------------------------------------------------- o jogo de outro time (online)
+    // No jogo online a partida e de todos: o clique no jogo de outro time (ou no adversario) so
+    // abre a janela para ver, sem parar o relogio; ela fecha sozinha no intervalo (vem a das
+    // trocas do seu time) e no fim. O clique no seu time e o de sempre (para todos, para trocar).
+    Control? espiando;
+    Jornada? ultima;
+
+    void Clicou(JogoAtual jg, int lado)
+    {
+        bool online = s.Online != null || s.Remoto != null;
+        if (!online || ultima == null || (SoTime is ushort meu && jg.Equipa[lado]?.ID == meu)) { LigacaoPartida.PedirDetalhes(s, jg, lado); return; }
+        if (jg.Equipa[lado] == null) return;
+        PararDeEspiar();
+        Control? c = null;
+        c = LigacaoPartida.DetalhesSoVer(s, jg, lado, ultima, () => { if (espiando == c) espiando = null; if (c != null) s.FecharDialogo(c); });
+        espiando = c;
+        s.AbrirDialogo(c);
+    }
+
+    public void PararDeEspiar()
+    {
+        if (espiando is not { } c) return;
+        espiando = null;
+        s.FecharDialogo(c);
+    }
+
     // na thread do MOTOR, depois do Minuto: com a pausa ligada, o motor espera aqui ate ela
     // acabar. (Antes o motor esperava num laco aninhado da interface, o PushFrame, que o Android
     // nao tem: a pausa derrubava o jogo no celular.)
@@ -146,6 +172,9 @@ public sealed partial class TelaJornada : UserControl
     // meio de um tique (o intervalo e as lesoes vem antes do Minuto desse tique)
     public void Atualizar(Jornada jn)
     {
+        ultima = jn;
+        // (o jogo de outro time aberto: fecha no intervalo, que abre a janela das trocas)
+        if (espiando != null && jn.NoIntervalo) PararDeEspiar();
         Fotografar(jn);
         int m = jn.Minuto;
         if (m > 0 && m <= jn.Fim)
@@ -162,6 +191,7 @@ public sealed partial class TelaJornada : UserControl
     // o relogio acabou: a tela espera o jogador e chama "continuar"
     public void Fim(Jornada jn, Action continuar)
     {
+        PararDeEspiar();
         Fotografar(jn);
         acabou = true;
         this.continuar = continuar;
@@ -214,6 +244,7 @@ public sealed partial class TelaJornada : UserControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        PararDeEspiar();
         Pausar(false);
         SoltarTeclaFim();
     }
@@ -770,7 +801,7 @@ public sealed partial class TelaJornada : UserControl
         if (BotoesVisiveis && Anterior.Contains(c)) { MudarPagina(-1); return; }
         // o clique na caixa de uma equipa: os detalhes do jogo (TsubstitutionDlg, motivo 1),
         // que o motor abre entre dois minutos
-        if (!acabou && EquipaEm(c) is var (jg, lado)) { LigacaoPartida.PedirDetalhes(s, jg, lado); return; }
+        if (!acabou && EquipaEm(c) is var (jg, lado)) { Clicou(jg, lado); return; }
         if (acabou) Seguir();
     }
 

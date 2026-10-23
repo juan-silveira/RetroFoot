@@ -201,12 +201,26 @@ public static class LigacaoPartida
         if (jn != null) s.AtualizarJornada(jn);
     }
 
-    internal static Control DetalhesModernos(Sessao s, JogoAtual jg, int lado, int minuto, int acrescimo, bool noIntervalo, Action fim)
+    // (jogo online) o jogo de outro time aberto so para ver, na thread da interface, sem parar a
+    // partida (o relogio segue; a tela da jornada fecha a janela no intervalo e no fim): sem trocas
+    // e sem reordenar o elenco (o motor do host pode estar mexendo nele)
+    internal static Control DetalhesSoVer(Sessao s, JogoAtual jg, int lado, Jornada jn, Action fim)
+    {
+        if (!Visual.Moderno)
+        {
+            var t = new TelaSubstituicao(jg, lado, 1, s.J.Op, s.J.M.Regras.CartoesAmarelos, false, VerEscalacaoDosOutros);
+            t.Fechou += fim;
+            return t;
+        }
+        return DetalhesModernos(s, jg, lado, jn.Minuto, Math.Min(jn.Acrescimo, jn.AcrescimosDoJogo(jg)), jn.NoIntervalo, fim, false);
+    }
+
+    internal static Control DetalhesModernos(Sessao s, JogoAtual jg, int lado, int minuto, int acrescimo, bool noIntervalo, Action fim, bool trocas = true)
     {
         bool completa = P98.Humano(jg, lado) || VerEscalacaoDosOutros;
         Func<Control>? escalacao = completa ? () =>
         {
-            var c = new TelaSubstituicao(jg, lado, 1, s.J.Op, s.J.M.Regras.CartoesAmarelos, SubstituicoesDuranteJogo, VerEscalacaoDosOutros);
+            var c = new TelaSubstituicao(jg, lado, 1, s.J.Op, s.J.M.Regras.CartoesAmarelos, trocas && SubstituicoesDuranteJogo, VerEscalacaoDosOutros);
             c.Fechou += fim;
             return c;
         } : null;

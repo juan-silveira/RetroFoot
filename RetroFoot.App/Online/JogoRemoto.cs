@@ -298,6 +298,8 @@ public sealed class JogoRemoto
         // o intervalo de todos (30 s): a janela das trocas para quem tem time no jogo; o relogio
         if ((bool?)p["coletivo"] == true)
         {
+            // (o jogo de outro time aberto para ver: fecha, vem a janela das trocas)
+            _jornada?.PararDeEspiar();
             int seg = (int?)p["segundos"] ?? 30;
             s?.MostrarRelogio(TimeSpan.FromSeconds(seg));
             var meus = (p["equipas"] as JsonArray)?.Select(x => (int?)x ?? 0).ToHashSet() ?? new();

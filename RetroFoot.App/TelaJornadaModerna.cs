@@ -342,7 +342,7 @@ public sealed partial class TelaJornada
     {
         if (BotoesVisiveis && proximaM.Contains(p)) { MudarPagina(1); return; }
         if (BotoesVisiveis && anteriorM.Contains(p)) { MudarPagina(-1); return; }
-        if (!acabou && EquipaModerna(p) is var (jg, lado)) { LigacaoPartida.PedirDetalhes(s, jg, lado); return; }
+        if (!acabou && EquipaModerna(p) is var (jg, lado)) { Clicou(jg, lado); return; }
         if (acabou) Seguir();
     }
 
