@@ -75,6 +75,12 @@ public sealed class JogoRemoto
         });
         // (a sala do jogar com um amigo nao fica na lista; se o host a guardou como jogo online, a
         // bifurcacao, ela vira sala normal e entra na lista)
+        // o sorteio dos times, ao mesmo tempo que o do host (antes do primeiro jogo chegar)
+        sala.B.Observar($"{sala.Raiz}/rodada/sorteio", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject o) return;
+            Dispatcher.UIThread.Post(() => SorteioDoHost(o));
+        });
         // a sala acabou (o host encerrou o jogo com o amigo, ou apagou a sala): o aviso e o inicio
         sala.B.Observar($"{sala.Raiz}/info", (caminho, v) =>
         {
@@ -528,6 +534,8 @@ public sealed class JogoRemoto
         }
         Dispatcher.UIThread.Post(() =>
         {
+            // (o sorteio do host ainda na tela: o time depois do Continuar)
+            if (_noSorteio) { _depoisDoSorteio = () => _ = MostrarTime(sessao, false); return; }
             void Time()
             {
                 var jogo = sessao.S.Jogos.FirstOrDefault(x => x.Casa == e.ID || x.Fora == e.ID);
@@ -637,6 +645,30 @@ public sealed class JogoRemoto
                 (T("Desistir"), true, () => { Fechar(); Desistir(); }),
             }, () => { Fechar(); aoCancelar?.Invoke(); });
         s.AbrirDialogo(f);
+    }
+
+    // o sorteio que o host mandou: a tela dele; o jogo que chegar enquanto ela esta aberta espera
+    // o Continuar
+    Action? _depoisDoSorteio;
+    bool _noSorteio;
+    void SorteioDoHost(JsonObject o)
+    {
+        if (_viuSorteio || _sessao != null || (string?)o["save"] is not { } sv || o["times"] is not JsonArray ts) return;
+        try
+        {
+            var js = Jogo98.Ler(AoVivo.Descomprimir(sv));
+            var tecnicos = ts.OfType<JsonObject>().Select(t => ((string?)t["nome"] ?? "", (ushort)((int?)t["equipa"] ?? 0))).ToList();
+            _viuSorteio = true;
+            _noSorteio = true;
+            var antes = (App.Raiz as Border)?.Child;
+            _mostrar(new TelaSorteioTimes(js, tecnicos, () =>
+            {
+                _noSorteio = false;
+                if (_depoisDoSorteio is { } d) { _depoisDoSorteio = null; d(); }
+                else if (antes != null && _sessao == null) _mostrar(antes);
+            }));
+        }
+        catch (Exception ex) { Console.Error.WriteLine("sorteio: " + ex.Message); }
     }
 
     bool _encerrada;

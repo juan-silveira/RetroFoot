@@ -133,8 +133,10 @@ public sealed class HostOnline : IDisposable
         ConferirTransferencias();
         _naRodada = false;
         _naBarreira = true;
-        // (os resultados da rodada passada: ja foram lidos; so o host pode apaga-los)
+        // (os resultados da rodada passada: ja foram lidos; so o host pode apaga-los; e o sorteio
+        // dos times, ja visto)
         try { _sala.B.Gravar($"{_sala.Raiz}/resultados", null).GetAwaiter().GetResult(); } catch { }
+        if (_versao == 0) try { _sala.B.Gravar($"{_sala.Raiz}/rodada/sorteio", null).GetAwaiter().GetResult(); } catch { }
         Rodada = id;
         _preparos.Clear();
         _forcados.Clear();
@@ -302,6 +304,21 @@ public sealed class HostOnline : IDisposable
         AtualizarJogadores();
         AmigosEntramESaem();
         AtualizarJogadores();
+    }
+
+    // o sorteio dos times para os outros aparelhos ao mesmo tempo que o do host (rodada/sorteio:
+    // os tecnicos e o jogo, para os nomes e escudos); sai na 1a barreira
+    public static void PublicarSorteio(Sala sala, Jogo98 s, IReadOnlyList<(string Nome, ushort Equipa)> times)
+    {
+        try
+        {
+            sala.B.Gravar($"{sala.Raiz}/rodada/sorteio", new JsonObject
+            {
+                ["times"] = new JsonArray(times.Select(t => (JsonNode)new JsonObject { ["nome"] = t.Nome, ["equipa"] = (int)t.Equipa }).ToArray()),
+                ["save"] = AoVivo.Comprimir(s.Gravar()),
+            }).GetAwaiter().GetResult();
+        }
+        catch { }
     }
 
     // os tecnicos da sala com o time de cada um, na ordem das vagas (o sorteio dos times)

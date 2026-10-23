@@ -828,7 +828,9 @@ public sealed partial class TelaInicio : UserControl
                 }
             Directory.CreateDirectory(Path.GetDirectoryName(arquivo)!);
             File.WriteAllBytes(arquivo, s.Gravar());
-            // o sorteio dos times (os outros veem o mesmo ao receber o jogo) e entao o jogo
+            // o sorteio dos times (os outros veem o mesmo ao mesmo tempo) e entao o jogo
+            var sala = online!.Sala;
+            _ = Task.Run(() => RetroFoot.Motor.Online.HostOnline.PublicarSorteio(sala, s, sorteio));
             mostrar(new TelaSorteioTimes(s, sorteio, () => Comecar(s, arquivo, true)));
         }
         catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(Inicial())); }
@@ -932,6 +934,7 @@ public sealed partial class TelaInicio : UserControl
                     // motor espera o Continuar (os amigos veem o mesmo ao receber o jogo)
                     var times = host.TimesDaSala();
                     if (times.Count < 2) return;
+                    RetroFoot.Motor.Online.HostOnline.PublicarSorteio(online.Sala, sessao.S, times);
                     using var seguir = new System.Threading.ManualResetEventSlim();
                     Dispatcher.UIThread.Invoke(() => sessao.Mostrar(new TelaSorteioTimes(sessao.S, times, () => seguir.Set())));
                     seguir.Wait();
