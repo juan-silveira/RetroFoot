@@ -124,6 +124,7 @@ public sealed class HostOnline : IDisposable
     {
         // (quem esta na sala e o time de cada um: antes de tudo, o host tambem)
         AtualizarJogadores();
+        if (SeguirTecnicos()) AtualizarJogadores();
         Ferias();
         ConferirTransferencias();
         _naRodada = false;
@@ -235,6 +236,32 @@ public sealed class HostOnline : IDisposable
         return DateTime.UtcNow - v.Quando > PrazoAusente;
     }
 
+    // ---------------------------------------------------------------- o time de cada um
+    // Quem joga e o tecnico, nao o time: aceitou o convite de outro clube, ou foi demitido e
+    // contratado por outro, o aparelho dele passa a mandar no time novo (sem clube: nenhum, ate
+    // o proximo convite). Na barreira, antes de publicar a rodada.
+    readonly Dictionary<string, ushort> _tecnicoDe = new();   // uid -> o tecnico dele
+    public event Action<string, ushort>? TimeMudou;              // nome, o time novo (0 = sem clube)
+
+    bool SeguirTecnicos()
+    {
+        bool mudou = false;
+        foreach (var j in _jogadores.Values.ToList())
+        {
+            if (!_tecnicoDe.TryGetValue(j.Uid, out var tid))
+            {
+                if (j.Equipa == 0 || _j.M.Equipa(j.Equipa) is not { } e0 || _j.M.TreinadorDa(e0) is not { Humano: not 0 } t0) continue;
+                _tecnicoDe[j.Uid] = tid = t0.ID;
+            }
+            ushort agora = _j.M.EquipaDoTreinador(tid)?.ID ?? 0;
+            if (agora == j.Equipa) continue;
+            try { _sala.DarEquipa(j.Uid, agora).GetAwaiter().GetResult(); } catch { continue; }
+            mudou = true;
+            TimeMudou?.Invoke(j.Nome, agora);
+        }
+        return mudou;
+    }
+
     // ---------------------------------------------------------------- o modo amigo
     // (Online/Convidado) um save single player com amigos: quem entra assume um time da 4a
     // divisao; quem sai (ou some) e despedido e sai do jogo (em vez das ferias); no fim do jogo
@@ -252,6 +279,7 @@ public sealed class HostOnline : IDisposable
             _naInterface(() => r = Convidado.Entrar(_j, j.Nome, new Aleatorio((uint)Environment.TickCount)));
             if (r is not { } ok) continue;
             _convidados[j.Uid] = ok.T.ID;
+            _tecnicoDe[j.Uid] = ok.T.ID;
             try { _sala.DarEquipa(j.Uid, ok.E.ID).GetAwaiter().GetResult(); } catch { }
             ConvidadoMudou?.Invoke(j.Nome, true);
         }
@@ -261,6 +289,7 @@ public sealed class HostOnline : IDisposable
             if (_j.M.Equipa(j.Equipa) is { } e && _j.M.TreinadorDa(e) is { Humano: not 0 } t && t.ID != (_j.M.Equipa(TimeDoHost ?? 0)?.Treinador ?? 0))
                 _naInterface(() => Convidado.Sair(_j, t.ID));
             _convidados.Remove(j.Uid);
+            _tecnicoDe.Remove(j.Uid);
             try
             {
                 _sala.B.Gravar($"{_sala.Raiz}/jogadores/{j.Uid}", null).GetAwaiter().GetResult();

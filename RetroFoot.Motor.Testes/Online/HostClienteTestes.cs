@@ -128,6 +128,50 @@ public class HostClienteTestes
                     string.Join(" ", eventos));
     }
 
+    // o tecnico que muda de clube (convite aceito; demitido e contratado por outro) leva o
+    // aparelho junto: na barreira seguinte a sala da a ele o time novo
+    [Fact(Timeout = 120_000)]
+    public async Task TecnicoQueMudaDeClubeLevaOAparelho()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        var nova = s.Equipas.Last(e => e != minha && e != dele && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        s.Treinadores.First(t => t.ID == dele.Treinador).Humano = 1;
+        await sh.DarEquipa("host", minha.ID);
+        await sh.DarEquipa("cli", dele.ID);
+        await sc.Ausentar();
+        int barreiras = 0;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            host.Preparar(e, jogo);
+            if (host.Rodada != antes && ++barreiras == 1)
+            {
+                // depois da 1a rodada preparada: o tecnico dele vai para o outro clube
+                var a = j.M.Equipa(dele.ID)!; var b = j.M.Equipa(nova.ID)!;
+                (a.Treinador, b.Treinador) = (b.Treinador, a.Treinador);
+            }
+            return barreiras > 2;
+        };
+        var jg = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg);
+        string? aviso = null;
+        host.TimeMudou += (nome, eq) => aviso = $"{nome} {eq}";
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(await Task.Run(() => motor.Join(60_000)));
+        host.Dispose();
+        Assert.Equal(nova.ID, (await sh.Jogadores()).First(x => x.Uid == "cli").Equipa);
+        Assert.Equal($"João {nova.ID}", aviso);
+        Assert.Equal(minha.ID, (await sh.Jogadores()).First(x => x.Uid == "host").Equipa);
+    }
+
     [Fact]
     public async Task SeteNaoCabem()
     {

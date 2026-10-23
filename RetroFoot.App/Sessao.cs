@@ -313,6 +313,9 @@ public sealed class Sessao
         host.ConvidadoMudou += (nome, entrou) => Dispatcher.UIThread.Post(() => Notificar(entrou
             ? Idioma.T("👋 {0} entrou no jogo e assumiu um time da 4ª divisão", nome)
             : Idioma.T("👋 {0} saiu do jogo (o técnico dele foi demitido)", nome)));
+        host.TimeMudou += (nome, eq) => Dispatcher.UIThread.Post(() => Notificar(eq == 0
+            ? Idioma.T("🔁 {0} ficou sem clube", nome)
+            : Idioma.T("🔁 {0} agora treina o {1}", nome, Equipa(eq) is { } novo ? Dlg.Texto(novo.NomeCurto) : "?")));
         host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => { jogadoresOnline = l; JogadoresOnline?.Invoke(l); });
         // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
         host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });

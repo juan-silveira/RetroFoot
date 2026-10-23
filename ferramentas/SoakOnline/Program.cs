@@ -169,9 +169,11 @@ static class Programa
             bool dialogo = !e.Contains("dialogos=[]") && !e.Contains("sem-sessao");
             if (parado > 8 && dialogo && (int)(parado * 50) % 400 == 0) Tecla(w, Key.Escape, PhysicalKey.Escape, null);
             if (e.StartsWith("tela=TelaEquipa") && e.Contains("dialogos=[]")) Tecla(w, Key.A, PhysicalKey.A, "a");
-            else if (dialogo && k % 2 == 0) Tecla(w, Key.Down, PhysicalKey.ArrowDown, null);
+            // (no cliente sobre a pagina da sala, o Down levaria o foco para o Sair dela)
+            else if (dialogo && k % 2 == 0 && (w == jh || e.StartsWith("tela=Tela"))) Tecla(w, Key.Down, PhysicalKey.ArrowDown, null);
             // (no cliente, fora da tela da equipa e das janelas, o Enter cairia no Sair da pagina)
-            if (!e.Contains("sem-sessao") && (w == jh || dialogo || e.StartsWith("tela=TelaEquipa"))) Tecla(w, Key.Enter, PhysicalKey.Enter, "\r");
+            // (e so com a tela parada ha 0,3 s: a janela que acabou de fechar ainda aparece um instante)
+            if (!e.Contains("sem-sessao") && (w == jh || ((dialogo || e.StartsWith("tela=TelaEquipa")) && parado > 0.3))) Tecla(w, Key.Enter, PhysicalKey.Enter, "\r");
         }
 
         (int, int) progresso = (-1, -1);
@@ -179,6 +181,7 @@ static class Programa
         var desde = DateTime.UtcNow; var desdeH = DateTime.UtcNow; var desdeC = DateTime.UtcNow;
         var ultimoLog = DateTime.UtcNow;
         long teclas = 0;
+        bool convidou = false;
         var t = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(25) };
         t.Tick += (_, _) =>
         {
@@ -206,6 +209,15 @@ static class Programa
                 Console.WriteLine($"TRAVOU ha {travou}s: ano {m.Ano} jornada {m.Jornada} H {e1} | C {e2}");
                 codigo = 2; cts.Cancel();
                 return;
+            }
+            // SOAK_CONVITE=1: um convite de outro clube ao tecnico do cliente (raro de verdade: um
+            // clube 11 a 19 mais forte demitindo), pelo gancho do motor, numa thread como a do motor
+            if (!convidou && Environment.GetEnvironmentVariable("SOAK_CONVITE") == "1" && m.Jornada >= 3 && e1.StartsWith("tela=TelaEquipa"))
+            {
+                convidou = true;
+                var tc = sessao.J.M.TreinadorDa(sessao.J.M.Equipa(timeCli.ID))!;
+                var outra = sessao.J.M.Equipa(timeHost.ID)!;
+                new Thread(() => Console.WriteLine($"  == convite ao cliente: aceitou={sessao.J.H.Convite!(tc, outra)}")) { IsBackground = true }.Start();
             }
             Jogar(jh, e1, (DateTime.UtcNow - desdeH).TotalSeconds, teclas);
             Jogar(jc, e2, (DateTime.UtcNow - desdeC).TotalSeconds, teclas);
