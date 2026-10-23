@@ -37,15 +37,42 @@ public sealed class TelaDetalhesModerna : UserControl
     public event Action? Fechou;
     bool _fechou;
 
+    readonly JogoAtual _jg;
+    readonly Func<Control>? _escalacao;
+    bool _naEscalacao;
+    ScrollViewer? _rolagem;
+
     // acrescimo: o n de "45'+n'" do jogo agora; noIntervalo: o relogio parado no intervalo
     public TelaDetalhesModerna(JogoAtual jg, int minuto, int acrescimo, bool noIntervalo, Func<Control>? escalacao)
     {
         Focusable = true;
+        _jg = jg; _escalacao = escalacao;
+        Montar(minuto, acrescimo, noIntervalo);
+        // aberta durante o jogo: a linha do tempo mostra os ultimos lances
+        AttachedToVisualTree += (_, _) =>
+        {
+            Focus();
+            if (_rolagem is { } r) Avalonia.Threading.Dispatcher.UIThread.Post(r.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
+        };
+    }
+
+    // (jogo online, o jogo de outro time aberto so para ver) a janela refeita a cada minuto, com o
+    // relogio correndo; na escalacao, fica como esta
+    public void Atualizar(int minuto, int acrescimo, bool noIntervalo)
+    {
+        if (_naEscalacao) return;
+        Montar(minuto, acrescimo, noIntervalo);
+        if (_rolagem is { } r) Avalonia.Threading.Dispatcher.UIThread.Post(r.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
+    }
+
+    void Montar(int minuto, int acrescimo, bool noIntervalo)
+    {
+        var jg = _jg; var escalacao = _escalacao;
         if (Celular.Ativo)
         {
             // o celular (PartidaCelularJanelas.cs): a tela toda; Escalacao troca para a substituicao
             Content = DetalhesCelular.Folha(jg, minuto, acrescimo, noIntervalo, Itens(jg, minuto, noIntervalo),
-                escalacao == null ? null : () => { var t = escalacao(); Content = t; t.Focus(); }, Fechar);
+                escalacao == null ? null : () => { _naEscalacao = true; var t = escalacao(); Content = t; t.Focus(); }, Fechar);
             return;
         }
         Width = 580;
@@ -83,7 +110,7 @@ public sealed class TelaDetalhesModerna : UserControl
             });
 
         var linha = new LinhaDoTempo(Itens(jg, minuto, noIntervalo));
-        var rolagem = new ScrollViewer
+        var rolagem = _rolagem = new ScrollViewer
         {
             Content = linha, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
@@ -94,6 +121,7 @@ public sealed class TelaDetalhesModerna : UserControl
         if (escalacao != null)
             botoes.Children.Add(Botao(Idioma.T("Escalação"), false, () =>
             {
+                _naEscalacao = true;
                 var t = escalacao();
                 Content = t;
                 Width = double.NaN; Height = double.NaN;
@@ -113,12 +141,6 @@ public sealed class TelaDetalhesModerna : UserControl
             Background = Fundo, CornerRadius = new CornerRadius(14), ClipToBounds = true, BorderBrush = TemaVerde.Borda, BorderThickness = new Thickness(1),
             BoxShadow = BoxShadows.Parse("0 8 28 0 #80000000"),
             Child = new ThemeVariantScope { RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark, Child = corpo },
-        };
-        // aberta durante o jogo: a linha do tempo mostra os ultimos lances
-        AttachedToVisualTree += (_, _) =>
-        {
-            Focus();
-            Avalonia.Threading.Dispatcher.UIThread.Post(rolagem.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
         };
     }
 

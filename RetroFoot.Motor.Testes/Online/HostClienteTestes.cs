@@ -190,7 +190,7 @@ public class HostClienteTestes
             Lance = (c, v, p) => { umDeCada++; return (0, false); },
         };
         JogoEmCurso? jg = null;
-        h.LanceDeTodos = (quem, v, p) =>
+        h.LanceDeTodos = (quem, v, p, preco) =>
         {
             chamadas++;
             maior = Math.Max(maior, quem.Count);

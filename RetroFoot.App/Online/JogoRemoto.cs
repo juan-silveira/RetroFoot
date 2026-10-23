@@ -83,7 +83,18 @@ public sealed class JogoRemoto
                 _leilaoVisto = n;
                 var s = _jornada != null ? _sessaoAoVivo : _sessao;
                 if (s == null) return;
-                s.Notificar(Online.TextoLeilao(s.S, (int?)o["jogador"] ?? 0, (int?)o["vendedor"] ?? 0, (int?)o["comprador"] ?? 0, (long?)o["preco"] ?? 0));
+                int jogador = (int?)o["jogador"] ?? 0, comprador = (int?)o["comprador"] ?? 0;
+                long preco = (long?)o["preco"] ?? 0;
+                // quem licitou: o resultado na janela do leilao (2 s); os outros, o aviso no canto
+                if (_leilaoTodos is { } dt && dt.Jogador == jogador)
+                {
+                    _leilaoTodos = null;
+                    var c = comprador == 0 ? null : s.Equipa((ushort)comprador);
+                    var txt = TelaLeilao.DeTodos.Texto(s, c, preco);
+                    _ = Task.Run(() => dt.Resultado(txt, c));
+                    return;
+                }
+                s.Notificar(Online.TextoLeilao(s.S, jogador, (int?)o["vendedor"] ?? 0, comprador, preco));
             });
         });
         // (fase 2) as perguntas do motor para o meu time: a janela de sempre, aqui; a resposta
@@ -154,14 +165,20 @@ public sealed class JogoRemoto
     Sessao? _sessaoPergunta;   // a copia de uma pergunta antes da primeira rodada
     Sessao? _perguntaEm;
     string? _respondida;
-    CUi.Folha? _esperaTodos;   // a espera pelos outros tecnicos no leilao de todos
+    TelaLeilao.DeTodos? _leilaoTodos;   // a janela do leilao de todos, ate o resultado
 
     void Pergunta(JsonObject? q)
     {
         if (q == null)
         {
-            // (o leilao de todos acabou: a espera fecha)
-            if (_esperaTodos != null) { _perguntaEm?.FecharDialogo(_esperaTodos); _esperaTodos = null; _perguntaAberta = null; return; }
+            // (o leilao de todos acabou: o resultado vem em seguida, na janela; se nao vier, ela
+            // fecha sozinha)
+            if (_leilaoTodos is { } dt)
+            {
+                _perguntaAberta = null;
+                _ = Task.Run(async () => { await Task.Delay(10_000); if (_leilaoTodos == dt) { _leilaoTodos = null; dt.Fechar(); } });
+                return;
+            }
             // (o prazo acabou com a janela aberta: fecha)
             if (_perguntaAberta != null && _perguntaAberta != _respondida) _perguntaEm?.FecharDialogo();
             _perguntaAberta = null;
@@ -197,7 +214,7 @@ public sealed class JogoRemoto
         {
             JsonObject? r = null;
             if (todos) Sessao.PrazoDialogo = TimeSpan.FromSeconds(Math.Max(1, ((int?)q["segundos"] ?? 45) - 1));
-            try { r = Responder(s, tipo, q); }
+            try { r = Responder(s, tipo, q, dt => _leilaoTodos = dt); }
             catch (Exception ex) { Console.Error.WriteLine("pergunta: " + ex.Message); }
             finally { Sessao.PrazoDialogo = null; }
             if (todos) r ??= new JsonObject { ["milhares"] = 0, ["ok"] = false };
@@ -207,8 +224,8 @@ public sealed class JogoRemoto
             {
                 if (todos && _perguntaAberta == id)
                 {
-                    _esperaTodos = CUi.Pergunta(T("Leilão"), T("Lance registrado. Aguardando os outros técnicos…"), Array.Empty<(string, bool, Action)>());
-                    s.AbrirDialogo(_esperaTodos);
+                    // (a espera pelos outros sobre a janela do leilao, ate o resultado)
+                    _leilaoTodos?.Aguardar();
                     return;
                 }
                 if (_perguntaAberta == id) _perguntaAberta = null;
@@ -221,7 +238,7 @@ public sealed class JogoRemoto
     }
 
     // a janela de cada pergunta (na thread de uma tarefa: as janelas esperam com EsperarDialogo)
-    static JsonObject? Responder(Sessao s, string tipo, JsonObject q)
+    static JsonObject? Responder(Sessao s, string tipo, JsonObject q, Action<TelaLeilao.DeTodos>? abriu = null)
     {
         Equipa? Eq(string k) => s.Equipa((ushort)((int?)q[k] ?? 0));
         Jogador? Jg(Equipa? e, string k) => e?.Jogadores.FirstOrDefault(x => x.ID == (int?)q[k]) ?? s.S.Equipas.SelectMany(x => x.Jogadores).FirstOrDefault(x => x.ID == (int?)q[k]);
@@ -237,6 +254,14 @@ public sealed class JogoRemoto
             {
                 var c = Eq("comprador"); var v = Eq("vendedor"); var p = Jg(v, "jogador");
                 if (c == null || v == null || p == null) return null;
+                if ((bool?)q["todos"] == true)
+                {
+                    // o leilao de todos: a janela de sempre, que fica aberta ate o resultado
+                    var dt = TelaLeilao.DeTodos.Abrir(s, v, p, (int?)q["preco"] ?? 0);
+                    abriu?.Invoke(dt);
+                    var (m, k) = dt.Lance(c);
+                    return new JsonObject { ["milhares"] = m, ["ok"] = k };
+                }
                 var (mil, ok) = TelaLeilao.Lance(s)(c, v, p);
                 return new JsonObject { ["milhares"] = mil, ["ok"] = ok };
             }
@@ -571,7 +596,7 @@ public sealed class JogoRemoto
         if (s == null) { SairPorAgora(); return; }
         CUi.Folha? f = null;
         void Fechar() { if (f != null) s.FecharDialogo(f); }
-        f = CUi.Pergunta(T("Sair do jogo"),
+        f = CUi.PerguntaEmColuna(T("Sair do jogo"),
             T("Você volta depois? Saindo por agora, seu técnico fica de férias (o computador cuida do time) e você continua de onde parou, com a mesma chave. Desistindo, seu técnico sai do jogo e o computador assume o time de vez."),
             new (string, bool, Action)[]
             {

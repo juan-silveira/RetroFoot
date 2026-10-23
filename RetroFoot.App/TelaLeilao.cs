@@ -180,6 +180,62 @@ sealed class TelaLeilao : DialogoMercado
         if (r.Comprador != null && Mem.Humano(s.TreinadorDa(r.Comprador))) Som.Tocar(Som.Efeito.Compra);
     }
 
+    // ------------------------------------------------------------ o leilao de todos (online)
+    // A janela de sempre, aberta em cada aparelho que licita: o lance (com o prazo do host); depois
+    // o fundo escurecido com "aguardando os outros tecnicos" por cima dela; quando todos deram o
+    // lance (ou pularam), o resultado nela, como no jogo sozinho, por 2 s; e fecha. Nos metodos,
+    // a thread nao e a da interface (a do motor no host; uma tarefa nos outros).
+    internal sealed class DeTodos
+    {
+        readonly Sessao _s;
+        readonly TelaLeilao _t;
+        Control? _veu;
+        bool _fechada;
+        public readonly ushort Jogador;
+
+        DeTodos(Sessao s, TelaLeilao t, ushort jogador) { _s = s; _t = t; Jogador = jogador; }
+
+        public static DeTodos Abrir(Sessao s, SEquipa v, SJogador p, int preco)
+        {
+            int salario = s.Mercado.Salario(p, Ext.Bytes(v.B79));
+            TelaLeilao t = null!;
+            Dispatcher.UIThread.Invoke(() => { t = new TelaLeilao(s, v, p, preco / 1000 * 1000, salario); s.AbrirDialogo(t); });
+            return new DeTodos(s, t, p.ID);
+        }
+
+        // o painel do lance (Sessao.PrazoDialogo nesta thread: o prazo)
+        public (int, bool) Lance(SEquipa c) => _t.PedirLance(c);
+
+        public void Aguardar() => Dispatcher.UIThread.Post(() =>
+        {
+            if (_fechada || _veu != null) return;
+            _veu = Sessao.Espera(Idioma.T("Lance registrado. Aguardando os outros técnicos…"));
+            _s.AbrirDialogo(_veu);
+        });
+
+        public void Resultado(string texto, SEquipa? comprador)
+        {
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                if (_veu != null) { _s.FecharDialogo(_veu); _veu = null; }
+                if (!_fechada) _t.MostrarResultado((texto, comprador));
+            });
+            Thread.Sleep(2000);
+            Fechar();
+        }
+
+        public void Fechar() => Dispatcher.UIThread.Invoke(() =>
+        {
+            if (_veu != null) { _s.FecharDialogo(_veu); _veu = null; }
+            if (!_fechada) { _fechada = true; _s.FecharDialogo(_t); }
+        });
+
+        // o texto do resultado, como o da janela do jogo sozinho
+        public static string Texto(Sessao s, SEquipa? comprador, long preco) => comprador == null
+            ? Idioma.T("Não houve ofertas")
+            : Idioma.T("Vendido ao {0} por {1}", T.NomeEquipa(comprador), FormatoDinheiro.Valor(s.S, preco));
+    }
+
     // ------------------------------------------------------------ o ciclo do leilao
     [ThreadStatic] static TelaLeilao? aberta;
     static int mostrados;

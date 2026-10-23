@@ -59,7 +59,7 @@ public sealed class Humano
     public Action<JogoAtual, int, Jogador?, int>? Substituicao;
     public LanceHumano? Lance;
     // (jogo online) o leilao da CPU para todos os humanos de uma vez (MercadoJogo.LanceDeTodos)
-    public Func<IReadOnlyList<Equipa>, Equipa, Jogador, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
+    public Func<IReadOnlyList<Equipa>, Equipa, Jogador, int, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
     public Action<MercadoJogo.Leilao, bool>? ResultadoLeilao;
     public Func<Equipa, Jogador, int, int, bool>? PedirAumento;
     public Func<Treinador, Equipa, bool>? Convite;
@@ -295,7 +295,7 @@ public sealed class JogoEmCurso
     }
 
     // (o gancho do Humano lido na hora: o jogo online o liga depois de criar o jogo)
-    Dictionary<ushort, (int Milhares, bool Ok)>? LanceDeTodos(IReadOnlyList<Equipa> quem, Equipa v, Jogador p) => H.LanceDeTodos?.Invoke(quem, v, p);
+    Dictionary<ushort, (int Milhares, bool Ok)>? LanceDeTodos(IReadOnlyList<Equipa> quem, Equipa v, Jogador p, int preco) => H.LanceDeTodos?.Invoke(quem, v, p, preco);
 
     Interacao Interacao() => new()
     {

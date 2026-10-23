@@ -145,11 +145,11 @@ public static class Online
     // o resultado do leilao de todos: "🔨 Fulano (Vasco) vai para o Palmeiras por $X" ou sem ofertas
     public static string TextoLeilao(RetroFoot.Motor.Save.Jogo98 s, int jogador, int vendedor, int comprador, long preco)
     {
-        if (comprador != 0) return "🔨 " + TextoTransferencia(s, jogador, comprador, vendedor, preco, 0).Replace("🔁 ", "");
+        if (comprador != 0) return T("Leilão: ") + TextoTransferencia(s, jogador, comprador, vendedor, preco, 0).Replace("🔁 ", "");
         var v = s.Equipas.FirstOrDefault(e => e.ID == vendedor);
         var p = s.Equipas.SelectMany(e => e.Jogadores).FirstOrDefault(x => x.ID == jogador);
         string nome = p == null ? "?" : System.Text.Encoding.Latin1.GetString(RetroFoot.Motor.Partida.Jornada.NomeNaTela(p)).Trim();
-        return T("🔨 Leilão de {0}{1}: não houve ofertas", nome, v == null ? "" : " (" + Dlg.Texto(v.NomeCurto) + ")");
+        return T("Leilão de {0}{1}: não houve ofertas", nome, v == null ? "" : " (" + Dlg.Texto(v.NomeCurto) + ")");
     }
 
     public static string Versao => typeof(Online).Assembly.GetName().Version?.ToString(3) ?? "0";

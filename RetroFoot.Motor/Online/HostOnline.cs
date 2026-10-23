@@ -548,6 +548,8 @@ public sealed class HostOnline : IDisposable
     // dono (perguntas/<uid>), o motor espera a resposta (respostas/<uid>/<id>) ate o prazo; sem
     // resposta (ou ele ausente), o padrao do motor.
     public static TimeSpan PrazoPergunta = TimeSpan.FromSeconds(45);
+    // o motor espera a resposta de outro tecnico (nome, tipo); null: acabou
+    public event Action<string?, string>? AguardandoResposta;
     readonly ConcurrentDictionary<string, JsonNode?> _respostas = new();
     int _pergunta;
 
@@ -580,7 +582,10 @@ public sealed class HostOnline : IDisposable
         var fim = DateTime.UtcNow + (prazo ?? PrazoPergunta);
         JsonNode? r = null;
         string chave = j.Uid + "/" + id;
-        while (DateTime.UtcNow < fim && !_respostas.TryRemove(chave, out r)) Thread.Sleep(150);
+        // (a tela do host: "aguardando fulano responder", ate a resposta ou o prazo)
+        AguardandoResposta?.Invoke(j.Nome, tipo);
+        try { while (DateTime.UtcNow < fim && !_respostas.TryRemove(chave, out r)) Thread.Sleep(150); }
+        finally { AguardandoResposta?.Invoke(null, tipo); }
         try
         {
             _sala.B.Gravar($"{_sala.Raiz}/perguntas/{j.Uid}", null).GetAwaiter().GetResult();

@@ -670,6 +670,15 @@ public static class CUi
     }
 
     // uma pergunta ou aviso como folha (Sim/Nao, OK): para as janelas que so perguntam
+    // a mesma pergunta com um botao por linha (o principal em cima): para textos de botao compridos
+    public static Folha PerguntaEmColuna(string titulo, string texto, IReadOnlyList<(string Texto, bool Principal, Action Acao)> botoes, Action? voltar = null)
+    {
+        var col = new StackPanel { Spacing = 8 };
+        foreach (var (t, pr, a) in System.Linq.Enumerable.OrderByDescending(botoes, x => x.Principal))
+            col.Children.Add(new Botao(t, pr, a) { HorizontalAlignment = HorizontalAlignment.Stretch });
+        return new Folha(titulo, Txt(texto, 15.5, null, FontWeight.Normal, true), col, fechar: null) { AoVoltar = voltar };
+    }
+
     public static Folha Pergunta(string titulo, string texto, IReadOnlyList<(string Texto, bool Principal, Action Acao)> botoes, Action? voltar = null)
     {
         var bs = new List<Control>();

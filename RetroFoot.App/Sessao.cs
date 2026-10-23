@@ -306,43 +306,64 @@ public sealed class Sessao
         // o leilao da CPU para todos os tecnicos ao mesmo tempo: a janela de cada um (a do host
         // aqui, a dos outros nos aparelhos deles) fica ate todos darem o lance ou pularem (ou o
         // prazo); so entao o leilao decide
-        h.LanceDeTodos = (quem, v, p) =>
+        // o motor esperando a resposta de outro tecnico (o pedido de aumento, o convite, a lesao...):
+        // o fundo escurecido com o aviso, em vez da tela parada sem explicacao
+        Control? aguardando = null;
+        host.AguardandoResposta += (nome, tipo) => Dispatcher.UIThread.Post(() =>
+        {
+            if (aguardando != null) { FecharDialogo(aguardando); aguardando = null; }
+            if (nome == null) return;
+            string oque = tipo switch
+            {
+                "aumento" => Idioma.T("Aguardando {0} responder ao pedido de aumento…", nome),
+                "convite" => Idioma.T("Aguardando {0} responder ao convite de outro clube…", nome),
+                "patrocinio" => Idioma.T("Aguardando {0} responder à proposta de patrocínio…", nome),
+                "batedor" => Idioma.T("Aguardando {0} escolher o batedor do pênalti…", nome),
+                "lesao" => Idioma.T("Aguardando {0} escolher quem entra no lugar do lesionado…", nome),
+                _ => Idioma.T("Aguardando {0} responder…", nome),
+            };
+            aguardando = Espera(oque);
+            AbrirDialogo(aguardando);
+        });
+        TelaLeilao.DeTodos? leilaoAberto = null;
+        h.LanceDeTodos = (quem, v, p, preco) =>
         {
             var prazo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
             var meu = quem.FirstOrDefault(c => !host.Remota(c));
             var remotos = quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList();
             (int, bool)? local = null;
-            // (o host deu o lance ou pulou e os outros ainda nao: a espera, como nos outros aparelhos)
-            CUi.Folha? espera = null;
-            bool acabou = false;
-            Task? t = meu == null || lance == null ? null : Task.Run(() =>
+            // a janela do host (se ele licita): o lance; depois, a espera pelos outros sobre ela
+            var dt = leilaoAberto = meu == null ? null : TelaLeilao.DeTodos.Abrir(this, v, p, preco);
+            Task? t = dt == null ? null : Task.Run(() =>
             {
                 PrazoDialogo = prazo;
-                try { local = lance(meu, v, p); }
+                try { local = dt.Lance(meu!); }
                 finally { PrazoDialogo = null; }
-                if (remotos.Count > 0)
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        if (acabou) return;
-                        espera = CUi.Pergunta(Idioma.T("Leilão"), Idioma.T("Lance registrado. Aguardando os outros técnicos…"), Array.Empty<(string, bool, Action)>());
-                        AbrirDialogo(espera);
-                    });
+                if (remotos.Count > 0) dt.Aguardar();
             });
-            var rs = host.PerguntarTodos(remotos, "lance", c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID)), t, prazo);
+            var rs = host.PerguntarTodos(remotos, "lance", c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID), ("preco", preco)), t, prazo);
             t?.Wait(prazo);
-            Dispatcher.UIThread.Post(() => { acabou = true; if (espera != null) FecharDialogo(espera); });
             var d = new Dictionary<ushort, (int Milhares, bool Ok)>();
             foreach (var (eq, r) in rs) d[eq] = r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
             if (meu != null && local is { } l) d[meu.ID] = l;
             return d;
         };
-        // o resultado do leilao de todos: o aviso aqui e nos outros aparelhos
+        // o resultado do leilao de todos: na janela do leilao de quem licitou (aqui e nos outros
+        // aparelhos), 2 s; quem nao licitou ve o aviso no canto
         h.ResultadoLeilao = (l, vendido) =>
         {
             ushort comprador = vendido ? l.Vencedor : (ushort)0;
-            var txt = global::RetroFoot.App.Online.TextoLeilao(S, l.Jogador, l.Vendedor, comprador, l.Melhor);
             host.AvisarLeilao(l.Jogador, l.Vendedor, comprador, l.Melhor);
-            Dispatcher.UIThread.Post(() => Notificar(txt));
+            if (leilaoAberto is { } dt && dt.Jogador == l.Jogador)
+            {
+                leilaoAberto = null;
+                dt.Resultado(TelaLeilao.DeTodos.Texto(this, comprador == 0 ? null : Equipa(comprador), l.Melhor), comprador == 0 ? null : Equipa(comprador));
+            }
+            else
+            {
+                var txt = global::RetroFoot.App.Online.TextoLeilao(S, l.Jogador, l.Vendedor, comprador, l.Melhor);
+                Dispatcher.UIThread.Post(() => Notificar(txt));
+            }
         };
         var conv = h.Convite;
         h.Convite = (t, e) =>
@@ -458,6 +479,18 @@ public sealed class Sessao
             avisosCanto.MaxWidth = 380;
         }
     }
+
+    // o aviso de espera do jogo online sobre a tela (o fundo da camada escurece o resto)
+    public static Control Espera(string texto) => new Border
+    {
+        Background = new ImmutableSolidColorBrush(Avalonia.Media.Color.FromArgb(0xD0, 0x0A, 0x2A, 0x16)), CornerRadius = new Avalonia.CornerRadius(12),
+        BorderBrush = TemaVerde.Destaque, BorderThickness = new Avalonia.Thickness(1), Padding = new Avalonia.Thickness(22, 14),
+        Child = new TextBlock
+        {
+            Text = texto, FontSize = 16, FontWeight = Avalonia.Media.FontWeight.SemiBold, Foreground = Avalonia.Media.Brushes.White,
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap, MaxWidth = 420, TextAlignment = Avalonia.Media.TextAlignment.Center,
+        },
+    };
 
     // (para os testes) cada aviso mostrado
     public event Action<string>? Notificou;

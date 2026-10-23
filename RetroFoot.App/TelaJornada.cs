@@ -141,6 +141,7 @@ public sealed partial class TelaJornada : UserControl
     // abre a janela para ver, sem parar o relogio; ela fecha sozinha no intervalo (vem a das
     // trocas do seu time) e no fim. O clique no seu time e o de sempre (para todos, para trocar).
     Control? espiando;
+    JogoAtual? espiandoJogo;
     Jornada? ultima;
 
     void Clicou(JogoAtual jg, int lado)
@@ -152,6 +153,7 @@ public sealed partial class TelaJornada : UserControl
         Control? c = null;
         c = LigacaoPartida.DetalhesSoVer(s, jg, lado, ultima, () => { if (espiando == c) espiando = null; if (c != null) s.FecharDialogo(c); });
         espiando = c;
+        espiandoJogo = jg;
         s.AbrirDialogo(c);
     }
 
@@ -173,8 +175,11 @@ public sealed partial class TelaJornada : UserControl
     public void Atualizar(Jornada jn)
     {
         ultima = jn;
-        // (o jogo de outro time aberto: fecha no intervalo, que abre a janela das trocas)
+        // (o jogo de outro time aberto: fecha no intervalo, que abre a janela das trocas; senao o
+        // minuto a minuto nela tambem)
         if (espiando != null && jn.NoIntervalo) PararDeEspiar();
+        else if (espiando is TelaDetalhesModerna dm && espiandoJogo is { } ej)
+            dm.Atualizar(jn.Minuto, Math.Min(jn.Acrescimo, jn.AcrescimosDoJogo(ej)), jn.NoIntervalo);
         Fotografar(jn);
         int m = jn.Minuto;
         if (m > 0 && m <= jn.Fim)

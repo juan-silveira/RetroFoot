@@ -128,7 +128,7 @@ public sealed partial class MercadoJogo
             if (humano != null && LanceDeTodos != null)
             {
                 var quem = S.Equipas.Skip(1).Where(c => HumanoLicita(l, c)).ToList();
-                var r = quem.Count == 0 ? new Dictionary<ushort, (int Milhares, bool Ok)>() : LanceDeTodos(quem, v, v.Jogadores[k]);
+                var r = quem.Count == 0 ? new Dictionary<ushort, (int Milhares, bool Ok)>() : LanceDeTodos(quem, v, v.Jogadores[k], l.Base);
                 // (o lance acima do dinheiro: no original a caixa pergunta de novo; aqui nao ha
                 // de novo, fica sem lance)
                 if (r != null) humano = (c, _, _) => r.TryGetValue(c.ID, out var x) && x.Milhares * 1000 <= (int)c.Dinheiro ? x : (0, false);
@@ -195,10 +195,10 @@ public sealed partial class MercadoJogo
         return PodeComprar(c, v, p) && (int)c.Dinheiro >= l.Base && HumanoAtivo(t) && QuerLicitar(t!, c, p);
     }
 
-    // (jogo online) o leilao para todos os humanos ao mesmo tempo: os que licitam, o vendedor e o
-    // jogador; devolve o lance de cada um (milhares, ok) pelo id da equipa. null (ou devolve
+    // (jogo online) o leilao para todos os humanos ao mesmo tempo: os que licitam, o vendedor, o
+    // jogador e o preco base; devolve o lance de cada um (milhares, ok) pelo id da equipa. null (ou devolve
     // null): um de cada vez, como no original.
-    public Func<IReadOnlyList<Equipa>, Equipa, Jogador, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
+    public Func<IReadOnlyList<Equipa>, Equipa, Jogador, int, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
     // o fim do leilao de todos (vendido ou nao), para mostrar o resultado a quem deu lance
     public Action<Leilao, bool>? ResultadoDeTodos;
 
