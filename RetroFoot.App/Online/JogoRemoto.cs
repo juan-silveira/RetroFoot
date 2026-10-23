@@ -75,13 +75,18 @@ public sealed class JogoRemoto
         });
         // (a sala do jogar com um amigo nao fica na lista; se o host a guardou como jogo online, a
         // bifurcacao, ela vira sala normal e entra na lista)
-        bool eraAmigo = false;
+        // a sala acabou (o host encerrou o jogo com o amigo, ou apagou a sala): o aviso e o inicio
+        sala.B.Observar($"{sala.Raiz}/info", (caminho, v) =>
+        {
+            if (caminho != "/" || v != null) return;
+            Dispatcher.UIThread.Post(Encerrada);
+        });
         sala.B.Observar($"{sala.Raiz}/info/modo", (caminho, v) =>
         {
             if (caminho != "/") return;
             string modo = (string?)v ?? "";
-            if (modo == Sala.ModoAmigo) eraAmigo = true;
-            else if (eraAmigo) Online.Lembrar(sala);
+            if (modo == Sala.ModoAmigo) _modoAmigo = true;
+            else if (_modoAmigo) { _modoAmigo = false; Online.Lembrar(sala); }
         });
         // o resultado do leilao de todos: o aviso no canto
         sala.B.Observar($"{sala.Raiz}/rodada/leilao", (caminho, v) =>
@@ -323,6 +328,7 @@ public sealed class JogoRemoto
 
     bool _pausaMinha;
     bool _viuSorteio;
+    volatile bool _modoAmigo;   // a sala do jogar com um amigo (o save do host, a meio da temporada)
     int _noticia, _leilaoVisto;
 
     void Pausa(JsonObject? p)
@@ -469,8 +475,10 @@ public sealed class JogoRemoto
         bool sumiu = parado > TimeSpan.FromSeconds(35);
         if (sumiu && _avisoHost == null && _sessao is { } ss)
         {
-            _avisoHost = CUi.Pergunta(T("Host desconectado"),
-                T("O host saiu do jogo ou perdeu a conexão. Se ele não voltar em cerca de 1 minuto, outro técnico da sala assume o host e o jogo continua. Você pode esperar aqui ou sair (sua vaga e seu time ficam guardados)."),
+            // (no jogar com um amigo o jogo e o save do host: ninguem assume; sem ele, nao ha jogo)
+            _avisoHost = CUi.Pergunta(T("Host desconectado"), _modoAmigo
+                ? T("O host perdeu a conexão. O jogo é o save dele: quando ele voltar, o jogo continua daqui. Você pode esperar ou sair.")
+                : T("O host saiu do jogo ou perdeu a conexão. Se ele não voltar em cerca de 1 minuto, outro técnico da sala assume o host e o jogo continua. Você pode esperar aqui ou sair (sua vaga e seu time ficam guardados)."),
                 new[] { (T("Sair do jogo"), false, (Action)Sair) });
             _avisoEm = ss;
             ss.EsconderRelogio();
@@ -535,7 +543,8 @@ public sealed class JogoRemoto
                 sessao.Mostrar(t);
             }
             // o jogo novo (a 1a rodada, o primeiro jogo que chega): o sorteio dos times
-            if (nova && !_viuSorteio && sessao.J.M.Jornada == 1)
+            // (no jogar com um amigo, o save do host esta a meio da temporada: o sorteio no 1o jogo)
+            if (nova && !_viuSorteio && (sessao.J.M.Jornada == 1 || _modoAmigo))
             {
                 _viuSorteio = true;
                 var tecnicos = js.Where(x => x.Equipa != 0).OrderBy(x => x.Vaga).Select(x => (x.Nome, x.Equipa)).ToList();
@@ -628,6 +637,28 @@ public sealed class JogoRemoto
                 (T("Desistir"), true, () => { Fechar(); Desistir(); }),
             }, () => { Fechar(); aoCancelar?.Invoke(); });
         s.AbrirDialogo(f);
+    }
+
+    bool _encerrada;
+    void Encerrada()
+    {
+        if (_encerrada) return;
+        _encerrada = true;
+        _vigia.Stop();
+        _cli.Dispose();
+        Online.Esquecer(_sala.Codigo);
+        _sessao?.EsconderRelogio();
+        _sessao = null; _sessaoAoVivo = null; _jornada = null;
+        _mostrar(Online.Pagina(T("Jogo encerrado"), Online.Titulo(_sala), _voltar,
+            CUi.Cartao_(null, new StackPanel
+            {
+                Spacing = 12,
+                Children =
+                {
+                    CUi.Txt(T("O host encerrou o jogo."), 15, CUi.Texto, FontWeight.Normal, true),
+                    new CUi.Botao(T("Voltar ao início"), true, _voltar) { HorizontalAlignment = HorizontalAlignment.Stretch },
+                },
+            })));
     }
 
     async void SairPorAgora()

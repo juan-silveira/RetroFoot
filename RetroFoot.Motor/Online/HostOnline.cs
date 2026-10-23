@@ -182,7 +182,8 @@ public sealed class HostOnline : IDisposable
             _naInterface(ConferirTransferencias);
         }
         _naBarreira = false;
-        if (Passou) return;
+        // (o host saiu do jogo: a rodada nao comeca)
+        if (Passou || _sair) return;
         // a rodada comecou: quem nao ficou pronto (o prazo acabou) vai para a espera
         try
         {
@@ -302,6 +303,10 @@ public sealed class HostOnline : IDisposable
         AmigosEntramESaem();
         AtualizarJogadores();
     }
+
+    // os tecnicos da sala com o time de cada um, na ordem das vagas (o sorteio dos times)
+    public IReadOnlyList<(string Nome, ushort Equipa)> TimesDaSala() =>
+        _jogadores.Values.Where(x => x.Equipa != 0).OrderBy(x => x.Vaga).Select(x => (x.Nome, x.Equipa)).ToList();
 
     void AmigosEntramESaem()
     {
