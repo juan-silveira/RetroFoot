@@ -307,7 +307,25 @@ public sealed class TelaOnline : UserControl
         foreach (var arq in Online.SavesLocais())
         {
             var nomeSave = Path.GetFileNameWithoutExtension(arq);
-            amigo.Children.Add(new CUi.Botao(T("Jogar {0} com um amigo", nomeSave), false, async () =>
+            // o que e cada save: o ano, os tecnicos humanos (time e divisao) e quando foi gravado
+            var tituloSave = CUi.Txt(nomeSave.ToUpperInvariant(), 15, CUi.Texto, FontWeight.SemiBold);
+            var detalheSave = CUi.Txt("…", 13, CUi.Fraco, FontWeight.Normal, true);
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    var g = TelaInicio.LerJogo(arq);
+                    var partes = new List<string>();
+                    if (g.Ano > 0) partes.Add(g.Ano.ToString());
+                    partes.AddRange(g.Humanos.Select(x => x.ToString()));
+                    if (g.Quando.Length > 0) partes.Add(T("gravado {0}", g.Quando));
+                    Dispatcher.UIThread.Post(() => detalheSave.Text = partes.Count > 0 ? string.Join(" · ", partes) : T("save ilegível"));
+                }
+                catch { Dispatcher.UIThread.Post(() => detalheSave.Text = ""); }
+            });
+            var item = new StackPanel { Spacing = 4, Children = { tituloSave, detalheSave } };
+            amigo.Children.Add(item);
+            item.Children.Add(new CUi.Botao(T("Jogar com um amigo"), false, async () =>
             {
                 Online.UltimoNome = nome.Text ?? "";
                 Ocupado(true); aviso.IsVisible = false;

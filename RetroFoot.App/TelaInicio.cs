@@ -386,14 +386,14 @@ public sealed partial class TelaInicio : UserControl
 
     // ---------------------------------------------------------------- TselectGameDlg
     // um treinador humano do jogo gravado: o nome, a equipa e a divisao dela ("" fora delas)
-    sealed record HumanoGravado(string Treinador, string Equipa, string Divisao)
+    internal sealed record HumanoGravado(string Treinador, string Equipa, string Divisao)
     {
         public override string ToString() => Divisao.Length > 0 ? $"{Treinador} — {Equipa} ({Divisao})" : $"{Treinador} — {Equipa}";
     }
 
     // Descricao: o texto do cabecalho (humanos e data); Humanos, Ano e Equipa (o logo) lidos do
     // save. Save ilegivel: so o nome (Humanos vazio, Ano 0).
-    sealed record JogoGravado(string Nome, string Caminho, string Descricao, IReadOnlyList<HumanoGravado> Humanos, int Ano,
+    internal sealed record JogoGravado(string Nome, string Caminho, string Descricao, IReadOnlyList<HumanoGravado> Humanos, int Ano,
         RetroFoot.Motor.Save.Equipa? Equipa)
     {
         // as linhas do cabecalho depois dos nomes: a data e a hora
@@ -430,7 +430,7 @@ public sealed partial class TelaInicio : UserControl
         return r;
     }
 
-    static JogoGravado LerJogo(string p)
+    internal static JogoGravado LerJogo(string p)
     {
         var nome = Path.GetFileNameWithoutExtension(p).ToUpperInvariant();
         Jogo98 s;
