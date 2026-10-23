@@ -57,6 +57,13 @@ public sealed partial class Mundo
         if (rever && !Sair) ReverSalariosHumanos();
         foreach (var x in humanos)
             if (!Sair) PrepararEquipa(x.E, x.J);
+        // (online o tecnico de um time pode mudar no meio da preparacao: quem desistiu ou foi
+        // expulso, quem entrou agora. Um time sem escalacao que feche nao entra em campo vazio
+        // (a disputa de penaltis sem titulares parava o jogo): a automatica)
+        if (!Sair)
+            foreach (var x in times)
+                if (!x.E.Jogadores.Any(p => RetroFoot.Motor.Partida.Memoria.Escalacao(p) == RetroFoot.Motor.Partida.Memoria.EscTitular))
+                { Escalacao.Automatico(R, x.E); ForcaDosSetores(x.E); }
     }
 
     // seg03:a67f: com as duas equipas, prepara o mandante e, se ninguem pediu para sair, o
