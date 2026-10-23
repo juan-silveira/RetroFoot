@@ -133,6 +133,8 @@ public sealed class HostOnline : IDisposable
         ConferirTransferencias();
         _naRodada = false;
         _naBarreira = true;
+        // (os resultados da rodada passada: ja foram lidos; so o host pode apaga-los)
+        try { _sala.B.Gravar($"{_sala.Raiz}/resultados", null).GetAwaiter().GetResult(); } catch { }
         Rodada = id;
         _preparos.Clear();
         _forcados.Clear();

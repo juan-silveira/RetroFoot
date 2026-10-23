@@ -24,6 +24,19 @@ public class MainActivity : AvaloniaMainActivity
     // a tela em primeiro plano (o instalador da atualizacao abre a partir dela)
     internal static MainActivity? Atual;
 
+    // o Voltar do Android: as janelas do app respondem (a folha de cima, a pagina e, no fim, a
+    // pergunta se quer sair). A tecla chega aqui, mas a vista do Avalonia a engolia como uma tecla
+    // qualquer (nem fechava o app nem avisava): tratada antes dela
+    public override bool DispatchKeyEvent(global::Android.Views.KeyEvent? e)
+    {
+        if (e?.KeyCode == global::Android.Views.Keycode.Back && RetroFoot.App.App.Voltar is { } v)
+        {
+            if (e.Action == global::Android.Views.KeyEventActions.Up) Avalonia.Threading.Dispatcher.UIThread.Post(v);
+            return true;
+        }
+        return base.DispatchKeyEvent(e);
+    }
+
     protected override void OnPause()
     {
         if (Atual == this) Atual = null;
@@ -34,6 +47,8 @@ public class MainActivity : AvaloniaMainActivity
     {
         base.OnResume();
         Atual = this;
+        // o Sair da pergunta do Voltar (App.PerguntarSair): fecha o app
+        RetroFoot.App.App.FecharApp = () => Atual?.FinishAndRemoveTask();
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             if (RetroFoot.App.App.Raiz is { } v) Redesenhar(v);

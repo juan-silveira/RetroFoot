@@ -81,7 +81,7 @@ public sealed class ClienteOnline : IDisposable
             var resp = new Resposta((bool?)r["ok"] ?? false, (string?)r["motivo"] ?? "");
             _chegaram[chave] = resp;
             if (_esperando.TryRemove(chave, out var t)) t.TrySetResult(resp);
-            _ = _sala.B.Gravar($"{_sala.Raiz}/resultados/{_sala.Uid}/{chave}", null);
+            // (so o host apaga os resultados: as regras recusam o do cliente; o host limpa na barreira)
         }
     }
 
