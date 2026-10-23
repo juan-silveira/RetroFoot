@@ -385,10 +385,16 @@ public sealed partial class TelaInicio
     static Control Preparando(string texto)
     {
         var c = new CaixaModerna(T("Jogo novo"), 380);
+        // o texto em cima (quebra a linha: os textos traduzidos sao compridos) e a barra embaixo,
+        // na largura da caixa
         c.Corpo.Children.Add(new StackPanel
         {
-            Orientation = Orientation.Horizontal, Spacing = 12,
-            Children = { new ProgressBar { IsIndeterminate = true, Width = 80, VerticalAlignment = VerticalAlignment.Center }, new TextBlock { Text = texto, FontSize = 14, Foreground = Texto, VerticalAlignment = VerticalAlignment.Center } },
+            Spacing = 12,
+            Children =
+            {
+                new TextBlock { Text = texto, FontSize = 14, Foreground = Texto, TextWrapping = TextWrapping.Wrap },
+                new ProgressBar { IsIndeterminate = true, HorizontalAlignment = HorizontalAlignment.Stretch },
+            },
         });
         return c;
     }
