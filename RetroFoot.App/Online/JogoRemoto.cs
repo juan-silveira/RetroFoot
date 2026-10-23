@@ -73,6 +73,16 @@ public sealed class JogoRemoto
                 s.Notificar(Online.TextoTransferencia(s.S, (int?)o["jogador"] ?? 0, (int?)o["comprador"] ?? 0, (int?)o["vendedor"] ?? 0, (long?)o["preco"] ?? 0, (int?)o["tipo"] ?? 0));
             });
         });
+        // (a sala do jogar com um amigo nao fica na lista; se o host a guardou como jogo online, a
+        // bifurcacao, ela vira sala normal e entra na lista)
+        bool eraAmigo = false;
+        sala.B.Observar($"{sala.Raiz}/info/modo", (caminho, v) =>
+        {
+            if (caminho != "/") return;
+            string modo = (string?)v ?? "";
+            if (modo == Sala.ModoAmigo) eraAmigo = true;
+            else if (eraAmigo) Online.Lembrar(sala);
+        });
         // o resultado do leilao de todos: o aviso no canto
         sala.B.Observar($"{sala.Raiz}/rodada/leilao", (caminho, v) =>
         {

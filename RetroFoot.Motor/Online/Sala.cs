@@ -151,7 +151,7 @@ public sealed class Sala
 
     // o que a lista das salas mostra (de quem ja esteve nela): o nome, o ano e a rodada do jogo
     // (info, o host grava a cada rodada), o time e a divisao deste tecnico. null: a sala acabou
-    public sealed record Resumo(string Codigo, string Nome, int Ano, string Rodada, string Time, string Divisao, bool Host, string Fase);
+    public sealed record Resumo(string Codigo, string Nome, int Ano, string Rodada, string Time, string Divisao, bool Host, string Fase, string Modo = "");
 
     public static async Task<Resumo?> LerResumo(IBanco b, string uid, string codigo, CancellationToken ct = default)
     {
@@ -159,7 +159,7 @@ public sealed class Sala
         var host = (string?)await Tentar(() => b.Ler($"salas/{codigo}/host", ct));
         var eu = await Tentar(() => b.Ler($"salas/{codigo}/jogadores/{uid}", ct)) as JsonObject;
         return new Resumo(codigo, (string?)info["nome"] ?? "", (int?)info["ano"] ?? 0, (string?)info["rodada"] ?? "",
-            (string?)eu?["time"] ?? "", (string?)eu?["divisao"] ?? "", host == uid, (string?)info["fase"] ?? "");
+            (string?)eu?["time"] ?? "", (string?)eu?["divisao"] ?? "", host == uid, (string?)info["fase"] ?? "", (string?)info["modo"] ?? "");
     }
 
     static string NomeTecnico(string n) => n.Trim().Length == 0 ? "Técnico" : n.Trim()[..Math.Min(30, n.Trim().Length)];

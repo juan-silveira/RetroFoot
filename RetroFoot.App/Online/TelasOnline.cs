@@ -208,7 +208,9 @@ public sealed class TelaOnline : UserControl
                 var b = Online.Banco;
                 await b.Ler("salas/AAAAAA/info");
                 var sala = await Sala.Entrar(b, b.Uid, chave, nome.Text ?? "");
-                Online.Lembrar(sala);
+                // (a sala do jogar com um amigo e de uma vez so: nao fica na lista)
+                if (await sala.Modo() == Sala.ModoAmigo) Online.Esquecer(sala.Codigo);
+                else Online.Lembrar(sala);
                 _mostrar(new TelaSala(_mostrar, _voltar, sala, false));
             }
             catch (Sala.SalaCheia) { Erro(T("A sala está cheia (6 técnicos).")); }
@@ -330,6 +332,8 @@ public sealed class TelaOnline : UserControl
                     var r = await Sala.LerResumo(bn, bn.Uid, codigoJogo);
                     Dispatcher.UIThread.Post(() =>
                     {
+                        // (a sala do jogar com um amigo, de uma vez so, gravada antes: sai da lista)
+                        if (r != null && arq == null && r.Modo == Sala.ModoAmigo) r = null;
                         if (r == null)
                         {
                             // a sala acabou: o host continua o jogo dele (abre uma sala nova); o convidado
