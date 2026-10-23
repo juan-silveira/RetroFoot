@@ -268,7 +268,58 @@ public sealed class TelaOnline : UserControl
                 });
             else b = new CUi.Botao(T("Entrar"), true, () => _ = EntrarNa(codigoJogo));
             b.HorizontalAlignment = HorizontalAlignment.Stretch;
-            var item = new StackPanel { Spacing = 4, Children = { cab, detalhe, b } };
+            // excluir a sala da lista (com a confirmacao no lugar dos botoes): o host apaga o jogo
+            // online gravado e a sala (some para todos); o convidado sai dela de vez (o tecnico
+            // dele sai do jogo e o computador assume o time)
+            var botoes = new Grid { ColumnDefinitions = new ColumnDefinitions("*,8,Auto") };
+            var excluir = new CUi.Botao(T("Excluir"), false, () => { });
+            Grid.SetColumn(excluir, 2);
+            botoes.Children.Add(b);
+            botoes.Children.Add(excluir);
+            var confirmar = new StackPanel { Spacing = 6, IsVisible = false };
+            var item = new StackPanel { Spacing = 4, Children = { cab, detalhe, botoes, confirmar } };
+            excluir.Clique += () =>
+            {
+                confirmar.Children.Clear();
+                confirmar.Children.Add(CUi.Txt(arq != null
+                    ? T("Apagar este jogo online? A sala fecha para todos os técnicos e o jogo gravado neste aparelho é apagado.")
+                    : T("Sair desta sala de vez? Seu técnico sai do jogo e o computador assume o time."), 13, CUi.Texto, FontWeight.Normal, true));
+                var nao = new CUi.Botao(T("Cancelar"), false, () => { confirmar.IsVisible = false; botoes.IsVisible = true; });
+                var sim = new CUi.Botao(arq != null ? T("Apagar") : T("Sair de vez"), true, async () =>
+                {
+                    Ocupado(true); aviso.IsVisible = false;
+                    try
+                    {
+                        var bn = Online.Banco;
+                        await bn.Ler("salas/AAAAAA/info");
+                        if (arq != null)
+                        {
+                            // (a sala so se ainda for dele; o jogo gravado sempre)
+                            if (await Sala.Reabrir(bn, bn.Uid, codigoJogo) is { } minha) await minha.Apagar();
+                            try { Directory.Delete(Path.GetDirectoryName(arq)!, true); } catch { }
+                        }
+                        else if (await bn.Ler($"salas/{codigoJogo}/info") is { } info)
+                        {
+                            // (com o jogo comecado, desiste: o host tira o tecnico; antes, so sai da sala)
+                            var sala = await Sala.Entrar(bn, bn.Uid, codigoJogo, nome.Text ?? "");
+                            if ((string?)info["fase"] is Fases.Jogando or Fases.Pausado or Fases.Continuando) await sala.Desistir();
+                            else await sala.Sair();
+                        }
+                        Online.Esquecer(codigoJogo);
+                        meus.Children.Remove(item);
+                        Ocupado(false);
+                    }
+                    catch (Exception ex) { Erro(T("Não consegui excluir: {0}", Curto(ex))); }
+                });
+                nao.HorizontalAlignment = sim.HorizontalAlignment = HorizontalAlignment.Stretch;
+                var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,8,*") };
+                Grid.SetColumn(sim, 2);
+                g.Children.Add(nao);
+                g.Children.Add(sim);
+                confirmar.Children.Add(g);
+                botoes.IsVisible = false;
+                confirmar.IsVisible = true;
+            };
             meus.Children.Add(item);
             // o resumo, do banco
             _ = Task.Run(async () =>
