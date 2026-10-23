@@ -25,6 +25,18 @@ public sealed partial class Mundo
         if (Online) { PrepararOnline(); return; }
         foreach (var j in S.Jogos.ToArray())
             if (!Sair) PrepararJogo(j);
+        if (!Sair) SemTitulares();
+    }
+
+    // (fora do original) um time sem nenhum titular nao entra em campo vazio: a escalacao
+    // automatica. Num save gravado no ponto errado, ou com o tecnico trocado no meio da preparacao,
+    // a disputa de penaltis sem titulares parava o jogo (o original ficava em laco infinito)
+    void SemTitulares()
+    {
+        foreach (var j in S.Jogos.ToArray())
+            foreach (var e in new[] { Equipa(j.Casa), Equipa(j.Fora) })
+                if (e != null && !e.Jogadores.Any(p => RetroFoot.Motor.Partida.Memoria.Escalacao(p) == RetroFoot.Motor.Partida.Memoria.EscTitular))
+                { Escalacao.Automatico(R, e); ForcaDosSetores(e); }
     }
 
     // Jogo online: logo depois da rodada, a preparacao dos times da CPU (os leiloes deles) e a
@@ -60,10 +72,7 @@ public sealed partial class Mundo
         // (online o tecnico de um time pode mudar no meio da preparacao: quem desistiu ou foi
         // expulso, quem entrou agora. Um time sem escalacao que feche nao entra em campo vazio
         // (a disputa de penaltis sem titulares parava o jogo): a automatica)
-        if (!Sair)
-            foreach (var x in times)
-                if (!x.E.Jogadores.Any(p => RetroFoot.Motor.Partida.Memoria.Escalacao(p) == RetroFoot.Motor.Partida.Memoria.EscTitular))
-                { Escalacao.Automatico(R, x.E); ForcaDosSetores(x.E); }
+        if (!Sair) SemTitulares();
     }
 
     // seg03:a67f: com as duas equipas, prepara o mandante e, se ninguem pediu para sair, o

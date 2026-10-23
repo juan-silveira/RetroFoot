@@ -977,8 +977,14 @@ public sealed partial class TelaInicio : UserControl
                         var copia = Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98");
                         Directory.CreateDirectory(Path.GetDirectoryName(copia)!);
                         File.WriteAllBytes(copia, comAmigos);
-                        h.TirarConvidados();
-                        File.WriteAllBytes(arquivo, sessao.J.Gravar());
+                        // o save do host: o mesmo jogo gravado (com o ponto em que ele parou), sem os
+                        // amigos. (Gravar de novo depois de o motor parar perdia esse ponto: o fim do
+                        // ciclo zera a retomada, e o save ficava com os jogos da Taca pendentes e sem
+                        // escalacao: os penaltis paravam o jogo)
+                        var sozinho = Jogo98.Ler(comAmigos);
+                        var mc = new RetroFoot.Motor.Mercado.MercadoJogo(sozinho, new RetroFoot.Motor.Base.Aleatorio(0));
+                        foreach (var tid in h.Convidados.Values) mc.RemoverTreinador(tid);
+                        File.WriteAllBytes(arquivo, sozinho.Gravar());
                         _ = online.Sala.DefinirModo("");
                         _ = online.Sala.Pausar();
                         Online.Lembrar(online.Sala);
