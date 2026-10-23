@@ -107,65 +107,75 @@ public static class Online
     // esta conectado; o host pode expulsar (o tecnico sai do jogo e o computador assume o time)
     public static void TecnicosNaSala(Sessao s, Sala sala, RetroFoot.Motor.Online.HostOnline? host)
     {
-        var lista = new StackPanel { Spacing = 8 };
-        lista.Children.Add(CUi.Txt("…", 13, CUi.Fraco));
+        // como a Gestao de Tecnicos (TreinadoresCelular.Gestao): a lista com o escudo, o nome, o
+        // time e a situacao; tocar escolhe; embaixo o Expulsar (so o host) e o OK
+        var lista = new ContentControl { Content = CUi.Txt("…", 13, CUi.Fraco) };
+        var expulsar = new CUi.Botao(T("Expulsar"), false, () => { }) { Habilitado = false };
         CUi.Folha f = null!;
-        f = new CUi.Folha(T("Técnicos na sala"), lista, new CUi.Botao(T("Fechar"), true, () => s.FecharDialogo(f)) { HorizontalAlignment = HorizontalAlignment.Stretch },
-            sub: Titulo(sala)) { AoVoltar = () => s.FecharDialogo(f) };
+        var ok = new CUi.Botao(T("OK"), true, () => s.FecharDialogo(f)) { HorizontalAlignment = HorizontalAlignment.Stretch };
+        var corpo = new StackPanel { Spacing = 12, Children = { lista } };
+        if (host != null) corpo.Children.Add(CUi.Botoes(expulsar));
+        f = new CUi.Folha(T("Técnicos na sala"), corpo, ok, Titulo(sala), fechar: () => s.FecharDialogo(f));
         s.AbrirDialogo(f);
+        List<JogadorSala> js = new();
+        int sel = -1;
+        string hostUid = "";
+        long dif = 0;
+        void Desenhar()
+        {
+            var linhas = new List<Control>();
+            foreach (var j in js)
+            {
+                bool eu = j.Uid == sala.Uid, on = eu || Sala.Conectado(j, dif);
+                var e = j.Equipa != 0 ? s.Equipa(j.Equipa) : null;
+                string situacao = j.Estado switch
+                {
+                    Estados.Pedindo => T("pedindo para entrar"),
+                    Estados.Espectador => T("espectador: recebe um time na próxima preparação"),
+                    Estados.Saiu => T("saiu por agora (de férias)"),
+                    Estados.Expulso => T("expulso"),
+                    _ => on ? T("conectado") : T("desconectado"),
+                };
+                var nome = CUi.Txt(j.Nome + (eu ? " " + T("(você)") : ""), 15, null, FontWeight.SemiBold);
+                var sub = CUi.Txt((e == null ? T("sem time") : P98.NomeEquipa(e)) + " · " + situacao, 12.5, on ? CUi.Bom : CUi.Fraco);
+                var txt = new StackPanel { Spacing = 1, Children = { nome, sub }, Margin = new Thickness(10, 0, 0, 0) };
+                Control? et = j.Uid == hostUid ? CUi.Etiqueta(T("host")) : null;
+                linhas.Add(ListasCelular.Grade("Auto,*,Auto", CUi.Escudo(e, 34), txt, et));
+            }
+            var (l, marcar) = CUi.ListaEscolha(linhas, i =>
+            {
+                sel = i;
+                expulsar.Habilitado = host != null && i >= 0 && i < js.Count && js[i].Uid != sala.Uid && js[i].Estado != Estados.Expulso;
+            });
+            if (sel >= 0 && sel < js.Count) marcar(sel);
+            lista.Content = js.Count == 0 ? CUi.Txt(T("Nada a mostrar."), 14, CUi.Fraco) : l;
+        }
+        expulsar.Clique += () =>
+        {
+            if (host == null || !expulsar.Habilitado || sel < 0 || sel >= js.Count) return;
+            var jj = js[sel];
+            CUi.Folha c = null!;
+            c = CUi.PerguntaEmColuna(T("Expulsar"), jj.Equipa != 0
+                ? T("Tirar {0} do jogo? O aparelho dele sai na hora; o técnico dele sai do jogo e o computador assume o time na próxima preparação.", jj.Nome)
+                : T("Tirar {0} da sala?", jj.Nome),
+                new (string, bool, Action)[]
+                {
+                    (T("Expulsar"), true, () => { s.FecharDialogo(c); s.FecharDialogo(f); _ = host.Expulsar(jj.Uid); }),
+                    (T("Cancelar"), false, () => s.FecharDialogo(c)),
+                }, () => s.FecharDialogo(c));
+            s.AbrirDialogo(c);
+        };
         async void Encher()
         {
             try
             {
-                var js = await sala.Jogadores();
-                long dif = 0;
-                try { dif = await sala.DiferencaDoRelogio(); } catch { }
-                var hostUid = (string?)await sala.Host() ?? "";
-                Dispatcher.UIThread.Post(() =>
-                {
-                    lista.Children.Clear();
-                    foreach (var j in js.OrderBy(x => x.Vaga))
-                    {
-                        bool eu = j.Uid == sala.Uid, on = eu || Sala.Conectado(j, dif);
-                        string time = j.Equipa != 0 && s.Equipa(j.Equipa) is { } e ? Dlg.Texto(e.NomeCurto) : "";
-                        string situacao = j.Estado switch
-                        {
-                            Estados.Pedindo => T("pedindo para entrar"),
-                            Estados.Espectador => T("espectador (recebe um time na próxima preparação)"),
-                            Estados.Saiu => T("saiu por agora (de férias)"),
-                            Estados.Expulso => T("expulso"),
-                            _ => on ? T("conectado") : T("desconectado"),
-                        };
-                        var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 44 };
-                        var txt = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
-                        txt.Children.Add(CUi.Txt(j.Nome + (eu ? " " + T("(você)") : "") + (j.Uid == hostUid ? " · " + T("host") : ""), 15, CUi.Texto, FontWeight.SemiBold));
-                        txt.Children.Add(CUi.Txt((time.Length > 0 ? time + " · " : "") + situacao, 12.5, on ? CUi.Bom : CUi.Fraco));
-                        g.Children.Add(txt);
-                        if (host != null && !eu && j.Estado != Estados.Expulso)
-                        {
-                            var jj = j;
-                            var b = new CUi.Botao(T("Expulsar"), false, () => { });
-                            b.Clique += () =>
-                            {
-                                CUi.Folha c = null!;
-                                c = CUi.PerguntaEmColuna(T("Expulsar"), jj.Equipa != 0
-                                    ? T("Tirar {0} do jogo? O aparelho dele sai na hora; o técnico dele sai do jogo e o computador assume o time na próxima preparação.", jj.Nome)
-                                    : T("Tirar {0} da sala?", jj.Nome),
-                                    new (string, bool, Action)[]
-                                    {
-                                        (T("Expulsar"), true, () => { s.FecharDialogo(c); s.FecharDialogo(f); _ = host.Expulsar(jj.Uid); }),
-                                        (T("Cancelar"), false, () => s.FecharDialogo(c)),
-                                    }, () => s.FecharDialogo(c));
-                                s.AbrirDialogo(c);
-                            };
-                            Grid.SetColumn(b, 1);
-                            g.Children.Add(b);
-                        }
-                        lista.Children.Add(g);
-                    }
-                });
+                var l = (await sala.Jogadores()).OrderBy(x => x.Vaga).ToList();
+                long d = 0;
+                try { d = await sala.DiferencaDoRelogio(); } catch { }
+                var h = (string?)await sala.Host() ?? "";
+                Dispatcher.UIThread.Post(() => { js = l; dif = d; hostUid = h; Desenhar(); });
             }
-            catch (Exception ex) { Dispatcher.UIThread.Post(() => { lista.Children.Clear(); lista.Children.Add(CUi.Txt(TelaOnline.Curto(ex), 13, CUi.Erro)); }); }
+            catch (Exception ex) { Dispatcher.UIThread.Post(() => lista.Content = CUi.Txt(TelaOnline.Curto(ex), 13, CUi.Erro)); }
         }
         Encher();
     }
