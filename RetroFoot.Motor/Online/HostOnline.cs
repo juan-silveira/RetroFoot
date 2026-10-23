@@ -699,7 +699,16 @@ public sealed class HostOnline : IDisposable
         string chave = j.Uid + "/" + id;
         // (a tela do host: "aguardando fulano responder", ate a resposta ou o prazo)
         AguardandoResposta?.Invoke(j.Nome, tipo);
-        try { while (DateTime.UtcNow < fim && !_respostas.TryRemove(chave, out r)) Thread.Sleep(150); }
+        try
+        {
+            var conferido = DateTime.UtcNow;
+            while (DateTime.UtcNow < fim && !_respostas.TryRemove(chave, out r))
+            {
+                // (quem saiu do jogo nao responde mais)
+                if (DateTime.UtcNow - conferido > TimeSpan.FromSeconds(1)) { conferido = DateTime.UtcNow; if (!AindaNoJogo(j.Uid)) break; }
+                Thread.Sleep(150);
+            }
+        }
         finally { AguardandoResposta?.Invoke(null, tipo); }
         try
         {
@@ -731,10 +740,18 @@ public sealed class HostOnline : IDisposable
         }
         var fim = DateTime.UtcNow + (prazo ?? PrazoPergunta);
         var faltam = abertas.ToList();
+        var conferido = DateTime.UtcNow;
         while (DateTime.UtcNow < fim && (faltam.Count > 0 || local is { IsCompleted: false }))
         {
             foreach (var a in faltam.ToList())
                 if (_respostas.TryRemove(a.Uid + "/" + a.Id, out var x)) { r[a.Equipa] = x; faltam.Remove(a); }
+            // (quem saiu do jogo nao responde mais: de segundo em segundo, sai da espera)
+            if (DateTime.UtcNow - conferido > TimeSpan.FromSeconds(1))
+            {
+                conferido = DateTime.UtcNow;
+                foreach (var a in faltam.ToList())
+                    if (!AindaNoJogo(a.Uid)) faltam.Remove(a);
+            }
             Thread.Sleep(150);
         }
         foreach (var a in abertas)
@@ -758,6 +775,17 @@ public sealed class HostOnline : IDisposable
         {
             ["n"] = ++_leilao, ["jogador"] = (int)jogador, ["vendedor"] = (int)vendedor, ["comprador"] = (int)comprador, ["preco"] = (long)preco,
         });
+    }
+
+    // o dono ainda esta no jogo (nao saiu, nao desistiu, nao foi expulso)
+    bool AindaNoJogo(string uid)
+    {
+        try
+        {
+            var e = _sala.B.Ler($"{_sala.Raiz}/jogadores/{uid}/estado").GetAwaiter().GetResult();
+            return e != null && (string?)e is not (Estados.Saiu or Estados.Desistiu or Estados.Expulso);
+        }
+        catch { return true; }
     }
 
     // ---------------------------------------------------------------- a paralisacao
