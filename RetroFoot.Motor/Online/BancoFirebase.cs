@@ -234,8 +234,16 @@ public sealed class BancoFirebase : IBanco
         return new Saida(cts);
     }
 
+    // (pode ser chamado mais de uma vez: uma tela que sai e volta e sai de novo da arvore; o Cancel
+    // de um CancellationTokenSource ja descartado derrubava o app)
     sealed class Saida(CancellationTokenSource cts) : IDisposable
     {
-        public void Dispose() { cts.Cancel(); cts.Dispose(); }
+        int _feito;
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _feito, 1) != 0) return;
+            try { cts.Cancel(); } catch (ObjectDisposedException) { }
+            cts.Dispose();
+        }
     }
 }
