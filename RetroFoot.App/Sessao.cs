@@ -391,6 +391,27 @@ public sealed class Sessao
         host.TimeMudou += (nome, eq) => Dispatcher.UIThread.Post(() => Notificar(eq == 0
             ? Idioma.T("🔁 {0} ficou sem clube", nome)
             : Idioma.T("🔁 {0} agora treina o {1}", nome, Equipa(eq) is { } novo ? Dlg.Texto(novo.NomeCurto) : "?")));
+        // alguem quer entrar com o jogo comecado: o host permite (ele assiste e recebe um time na
+        // proxima preparacao) ou recusa
+        host.PedidoDeEntrada += j => Dispatcher.UIThread.Post(() =>
+        {
+            CUi.Folha f = null!;
+            f = CUi.PerguntaEmColuna(Idioma.T("Pedido para entrar"),
+                Idioma.T("{0} quer entrar no jogo. Se você permitir, ele assiste às rodadas como espectador e recebe um time da 4ª divisão na próxima preparação dos times.", j.Nome),
+                new (string, bool, Action)[]
+                {
+                    (Idioma.T("Permitir"), true, () => { FecharDialogo(f); _ = host.ResponderEntrada(j.Uid, true); }),
+                    (Idioma.T("Recusar"), false, () => { FecharDialogo(f); _ = host.ResponderEntrada(j.Uid, false); }),
+                }, () => { });
+            AbrirDialogo(f);
+        });
+        // os times de quem entrou agora: o sorteio para todos (aqui por cima da tela)
+        host.NovosTimes += l => Dispatcher.UIThread.Post(() =>
+        {
+            Control? t = null;
+            t = new TelaSorteioTimes(S, l, () => { if (t != null) FecharDialogo(t); });
+            AbrirDialogo(t);
+        });
         host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => { jogadoresOnline = l; JogadoresOnline?.Invoke(l); });
         // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
         host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });

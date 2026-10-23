@@ -364,6 +364,68 @@ public class HostClienteTestes
         Assert.DoesNotContain(await sh.Jogadores(), x => x.Uid == "cli");
     }
 
+    // entrar com o jogo comecado: o pedido ao host; permitido, espectador e, na preparacao seguinte,
+    // um time da 4a divisao com o sorteio; expulso, sai da sala e o computador assume o time
+    [Fact(Timeout = 120_000)]
+    public async Task EntrarComOJogoComecadoEExpulsar()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        int humanos = s.Treinadores.Count(t => t.Humano != 0);
+        await sh.DarEquipa("host", minha.ID);
+        await sh.MarcarFase(Fases.Jogando);
+        var pedidos = new System.Collections.Concurrent.ConcurrentQueue<string>();
+        System.Collections.Generic.IReadOnlyList<(string Nome, ushort Equipa)>? novos = null;
+        int barreiras = 0;
+        ushort timeDele = 0;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            host.Preparar(e, jogo);
+            if (host.Rodada != antes)
+            {
+                barreiras++;
+                var eu = sh.Jogadores().GetAwaiter().GetResult().FirstOrDefault(x => x.Uid == "cli");
+                if (barreiras == 1)
+                {
+                    // entra com o jogo comecado: pedindo; o host permite
+                    var sc = Sala.Entrar(banco, "cli", sh.Codigo, "Novo").GetAwaiter().GetResult();
+                    Assert.Equal(Estados.Pedindo, sh.Jogadores().GetAwaiter().GetResult().First(x => x.Uid == "cli").Estado);
+                    for (int k = 0; k < 50 && pedidos.IsEmpty; k++) Thread.Sleep(20);
+                    host.ResponderEntrada("cli", true).GetAwaiter().GetResult();
+                }
+                if (barreiras == 3 && eu != null) { timeDele = eu.Equipa; host.Expulsar("cli").GetAwaiter().GetResult(); }
+            }
+            return barreiras > 4;
+        };
+        var jg = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg);
+        host.PedidoDeEntrada += j => pedidos.Enqueue(j.Uid);
+        host.NovosTimes += l => novos = l;
+        HostOnline.PrazoFixo = TimeSpan.FromSeconds(1);
+        try
+        {
+            var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+            motor.Start();
+            Assert.True(await Task.Run(() => motor.Join(90_000)));
+        }
+        finally { HostOnline.PrazoFixo = null; }
+        host.Dispose();
+        Assert.Contains("cli", pedidos);
+        Assert.NotNull(novos);
+        Assert.Equal("Novo", novos![0].Nome);
+        Assert.NotEqual(0, timeDele);
+        Assert.Contains(timeDele, s.Divisoes[3].Equipas);
+        // expulso: fora da sala, o time com um tecnico do computador
+        Assert.DoesNotContain(await sh.Jogadores(), x => x.Uid == "cli");
+        Assert.Equal(0, jg.M.TreinadorDa(jg.M.Equipa(timeDele)!)!.Humano);
+        Assert.Equal(humanos, jg.M.S.Treinadores.Count(t => t.Humano != 0));
+    }
+
     [Fact]
     public async Task SeteNaoCabem()
     {

@@ -387,6 +387,9 @@ public sealed partial class TelaEquipa : UserControl
             var tecnico = new List<Item> { new(T("História..."), "", () => Campeonato.Historia(_s, _e)) };
             tecnico.AddRange(Se(Ai(0x0E) && !online, new Item(T("Gestão de técnicos..."), "", () => Campeonato.Gestao(_s, Voltar))));
             tecnico.Add(new(T("Ranking..."), "", () => Campeonato.Ranking(_s)));
+            // (jogo online) quem esta no jogo; o host pode expulsar
+            if ((_s.Online?.Sala ?? _s.Remoto?.Sala) is { } salaOnline)
+                tecnico.Add(new(T("Técnicos na sala..."), "", () => Online.TecnicosNaSala(_s, salaOnline, _s.Online)));
             tecnico.Add(new("-"));
             tecnico.Add(new(T("Perfil..."), "", () => Campeonato.Perfil(_s, _e, Voltar)));
             return new List<Menu>

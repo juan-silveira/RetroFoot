@@ -67,6 +67,8 @@ public sealed class HostOnline : IDisposable
         // (fora da preparacao o motor esta jogando: os comandos sao recusados na hora, sem fila)
         _observando.Add(sala.B.Observar($"{sala.Raiz}/comandos", (c, v) => { if (_naBarreira) _fila.Add(() => Comandos(c, v)); else Comandos(c, v); }));
         _observando.Add(sala.B.Observar($"{sala.Raiz}/respostas", Respostas));
+        // os pedidos para entrar (a qualquer hora, nao so na preparacao)
+        _observando.Add(sala.B.Observar($"{sala.Raiz}/jogadores", (_, _) => _ = VerPedidos()));
         // (fora da preparacao e da rodada, so recusa; na rodada, parar/trocar/retomar vao para a
         // fila da rodada, atendida pelo motor entre os minutos)
         _vida = new Timer(_ => _ = Vida(), null, 0, 10_000);
@@ -136,7 +138,7 @@ public sealed class HostOnline : IDisposable
         // (os resultados da rodada passada: ja foram lidos; so o host pode apaga-los; e o sorteio
         // dos times, ja visto)
         try { _sala.B.Gravar($"{_sala.Raiz}/resultados", null).GetAwaiter().GetResult(); } catch { }
-        if (_versao == 0) try { _sala.B.Gravar($"{_sala.Raiz}/rodada/sorteio", null).GetAwaiter().GetResult(); } catch { }
+        if (_versao == 0 && _sorteios == 0) try { _sala.B.Gravar($"{_sala.Raiz}/rodada/sorteio", null).GetAwaiter().GetResult(); } catch { }
         Rodada = id;
         _preparos.Clear();
         _forcados.Clear();
@@ -248,7 +250,7 @@ public sealed class HostOnline : IDisposable
 
     bool Ausente(JogadorSala j)
     {
-        if (j.Estado is Estados.Saiu or Estados.Desistiu) return true;
+        if (j.Estado is Estados.Saiu or Estados.Desistiu or Estados.Expulso or Estados.Pedindo) return true;
         if (!_vistos.TryGetValue(j.Uid, out var v) || v.Visto != j.Visto) { _vistos[j.Uid] = (j.Visto, DateTime.UtcNow); return false; }
         return DateTime.UtcNow - v.Quando > PrazoAusente;
     }
@@ -280,6 +282,78 @@ public sealed class HostOnline : IDisposable
     }
 
     // ---------------------------------------------------------------- o modo amigo
+    // ---------------------------------------------------------------- entrar com o jogo comecado
+    // Quem entra com a chave depois de o jogo comecar fica Pedindo; o host permite (Espectador:
+    // assiste as rodadas e recebe um time da 4a divisao na proxima preparacao, com o sorteio para
+    // todos) ou recusa (sai da sala). O host tambem pode expulsar: o aparelho dele sai na hora e o
+    // tecnico sai do jogo na proxima preparacao (um do computador assume o time).
+    public event Action<JogadorSala>? PedidoDeEntrada;
+    // os times dos que entraram agora (o sorteio para todos)
+    public event Action<IReadOnlyList<(string Nome, ushort Equipa)>>? NovosTimes;
+    readonly ConcurrentDictionary<string, byte> _pedidosVistos = new();
+
+    async Task VerPedidos()
+    {
+        try
+        {
+            foreach (var j in await _sala.Jogadores())
+                if (j.Estado == Estados.Pedindo && j.Uid != _sala.Uid && _pedidosVistos.TryAdd(j.Uid, 0)) PedidoDeEntrada?.Invoke(j);
+        }
+        catch { }
+    }
+
+    public async Task ResponderEntrada(string uid, bool permitir)
+    {
+        _pedidosVistos.TryRemove(uid, out _);
+        try
+        {
+            if (permitir) { await _sala.B.Atualizar($"{_sala.Raiz}/jogadores/{uid}", new JsonObject { ["estado"] = Estados.Espectador }); return; }
+            var j = JogadorSala.De(uid, await _sala.B.Ler($"{_sala.Raiz}/jogadores/{uid}"));
+            await _sala.B.Gravar($"{_sala.Raiz}/jogadores/{uid}", null);
+            if (j != null && j.Vaga >= 0) await _sala.B.Gravar($"{_sala.Raiz}/vagas/{j.Vaga}", null);
+        }
+        catch { }
+    }
+
+    public Task Expulsar(string uid) =>
+        uid == _sala.Uid ? Task.CompletedTask : _sala.B.Atualizar($"{_sala.Raiz}/jogadores/{uid}", new JsonObject { ["estado"] = Estados.Expulso });
+
+    // na barreira: os espectadores recebem um time da 4a divisao (no modo amigo, AmigosEntramESaem)
+    readonly List<(string Nome, ushort Equipa)> _novos = new();
+    void Espectadores()
+    {
+        if (ModoAmigo) return;
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && x.Estado == Estados.Espectador && !Ausente(x)).ToList())
+        {
+            (Treinador T, Equipa E)? r = null;
+            _naInterface(() => r = Convidado.Entrar(_j, j.Nome, new Aleatorio((uint)Environment.TickCount)));
+            if (r is not { } ok) continue;
+            _tecnicoDe[j.Uid] = ok.T.ID;
+            ComTime(j, ok.E.ID);
+        }
+    }
+
+    void ComTime(JogadorSala j, ushort equipa)
+    {
+        try
+        {
+            _sala.B.Atualizar($"{_sala.Raiz}/jogadores/{j.Uid}", new JsonObject { ["equipa"] = (int)equipa, ["estado"] = Estados.Preparando }).GetAwaiter().GetResult();
+        }
+        catch { }
+        _novos.Add((j.Nome, equipa));
+    }
+
+    // os novos desta barreira: o sorteio para todos (rodada/sorteio, com o n para ser visto uma vez)
+    int _sorteios;
+    void SortearNovos()
+    {
+        if (_novos.Count == 0) return;
+        var l = _novos.ToList();
+        _novos.Clear();
+        PublicarSorteio(_sala, _j.M.S, l, ++_sorteios);
+        NovosTimes?.Invoke(l);
+    }
+
     // (Online/Convidado) um save single player com amigos, por uma sessao: quem entra assume um
     // time da 4a divisao; quem cai ou sai por agora fica de ferias (o computador cuida do time) e,
     // voltando na mesma sessao, continua com o tecnico dele; quem desiste sai do jogo. Quando o
@@ -308,12 +382,13 @@ public sealed class HostOnline : IDisposable
 
     // o sorteio dos times para os outros aparelhos ao mesmo tempo que o do host (rodada/sorteio:
     // os tecnicos e o jogo, para os nomes e escudos); sai na 1a barreira
-    public static void PublicarSorteio(Sala sala, Jogo98 s, IReadOnlyList<(string Nome, ushort Equipa)> times)
+    public static void PublicarSorteio(Sala sala, Jogo98 s, IReadOnlyList<(string Nome, ushort Equipa)> times, int n = 0)
     {
         try
         {
             sala.B.Gravar($"{sala.Raiz}/rodada/sorteio", new JsonObject
             {
+                ["n"] = n,
                 ["times"] = new JsonArray(times.Select(t => (JsonNode)new JsonObject { ["nome"] = t.Nome, ["equipa"] = (int)t.Equipa }).ToArray()),
                 ["save"] = AoVivo.Comprimir(s.Gravar()),
             }).GetAwaiter().GetResult();
@@ -330,7 +405,7 @@ public sealed class HostOnline : IDisposable
         // quem chegou sem time: o tecnico dele (se ja entrou nesta sessao) ou um novo, num time da 4a divisao
         // (o sorteio nao gasta o Random do jogo). Quem tem tecnico e ficou sem clube (demitido)
         // nao ganha outro: espera um convite, como no jogo local
-        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && !Ausente(x)).ToList())
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && !Ausente(x) && x.Estado != Estados.Pedindo).ToList())
         {
             if (_convidados.TryGetValue(j.Uid, out var tid) && TecnicoExiste(tid))
             {
@@ -347,7 +422,9 @@ public sealed class HostOnline : IDisposable
             if (r is not { } ok) continue;
             _convidados[j.Uid] = ok.T.ID;
             _tecnicoDe[j.Uid] = ok.T.ID;
-            try { _sala.DarEquipa(j.Uid, ok.E.ID).GetAwaiter().GetResult(); } catch { }
+            // (quem entrou com o jogo ja comecado: o sorteio para todos; os do comeco ja o viram)
+            if (j.Estado == Estados.Espectador) ComTime(j, ok.E.ID);
+            else try { _sala.DarEquipa(j.Uid, ok.E.ID).GetAwaiter().GetResult(); } catch { }
             ConvidadoMudou?.Invoke(j.Nome, true);
         }
     }
@@ -356,7 +433,7 @@ public sealed class HostOnline : IDisposable
     // time) e a vaga fica livre; voltando, entra como um tecnico novo
     void Desistencias()
     {
-        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Estado == Estados.Desistiu).ToList())
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Estado is Estados.Desistiu or Estados.Expulso).ToList())
         {
             if (TecnicoDoConvidado(j) is ushort tid) _naInterface(() => Convidado.Sair(_j, tid));
             _convidados.Remove(j.Uid);
@@ -396,6 +473,8 @@ public sealed class HostOnline : IDisposable
     {
         Desistencias();
         if (ModoAmigo) AmigosEntramESaem();
+        else Espectadores();
+        SortearNovos();
         foreach (var j in _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid))
         {
             if (_j.M.Equipa(j.Equipa) is not { } e || _j.M.TreinadorDa(e) is not { Humano: not 0 } t) continue;

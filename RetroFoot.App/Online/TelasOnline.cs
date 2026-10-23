@@ -103,6 +103,73 @@ public static class Online
     // o nome da sala do jogo de um host (para a sala nova, se a antiga acabou)
     public static string NomeLembrado(string codigo) => Salas().FirstOrDefault(x => x.Codigo == codigo)?.Nome ?? "";
 
+    // "Tecnicos na sala..." (o menu Tecnico, no jogo online): quem esta no jogo, com o time e se
+    // esta conectado; o host pode expulsar (o tecnico sai do jogo e o computador assume o time)
+    public static void TecnicosNaSala(Sessao s, Sala sala, RetroFoot.Motor.Online.HostOnline? host)
+    {
+        var lista = new StackPanel { Spacing = 8 };
+        lista.Children.Add(CUi.Txt("…", 13, CUi.Fraco));
+        CUi.Folha f = null!;
+        f = new CUi.Folha(T("Técnicos na sala"), lista, new CUi.Botao(T("Fechar"), true, () => s.FecharDialogo(f)) { HorizontalAlignment = HorizontalAlignment.Stretch },
+            sub: Titulo(sala)) { AoVoltar = () => s.FecharDialogo(f) };
+        s.AbrirDialogo(f);
+        async void Encher()
+        {
+            try
+            {
+                var js = await sala.Jogadores();
+                long dif = 0;
+                try { dif = await sala.DiferencaDoRelogio(); } catch { }
+                var hostUid = (string?)await sala.Host() ?? "";
+                Dispatcher.UIThread.Post(() =>
+                {
+                    lista.Children.Clear();
+                    foreach (var j in js.OrderBy(x => x.Vaga))
+                    {
+                        bool eu = j.Uid == sala.Uid, on = eu || Sala.Conectado(j, dif);
+                        string time = j.Equipa != 0 && s.Equipa(j.Equipa) is { } e ? Dlg.Texto(e.NomeCurto) : "";
+                        string situacao = j.Estado switch
+                        {
+                            Estados.Pedindo => T("pedindo para entrar"),
+                            Estados.Espectador => T("espectador (recebe um time na próxima preparação)"),
+                            Estados.Saiu => T("saiu por agora (de férias)"),
+                            Estados.Expulso => T("expulso"),
+                            _ => on ? T("conectado") : T("desconectado"),
+                        };
+                        var g = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), MinHeight = 44 };
+                        var txt = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
+                        txt.Children.Add(CUi.Txt(j.Nome + (eu ? " " + T("(você)") : "") + (j.Uid == hostUid ? " · " + T("host") : ""), 15, CUi.Texto, FontWeight.SemiBold));
+                        txt.Children.Add(CUi.Txt((time.Length > 0 ? time + " · " : "") + situacao, 12.5, on ? CUi.Bom : CUi.Fraco));
+                        g.Children.Add(txt);
+                        if (host != null && !eu && j.Estado != Estados.Expulso)
+                        {
+                            var jj = j;
+                            var b = new CUi.Botao(T("Expulsar"), false, () => { });
+                            b.Clique += () =>
+                            {
+                                CUi.Folha c = null!;
+                                c = CUi.PerguntaEmColuna(T("Expulsar"), jj.Equipa != 0
+                                    ? T("Tirar {0} do jogo? O aparelho dele sai na hora; o técnico dele sai do jogo e o computador assume o time na próxima preparação.", jj.Nome)
+                                    : T("Tirar {0} da sala?", jj.Nome),
+                                    new (string, bool, Action)[]
+                                    {
+                                        (T("Expulsar"), true, () => { s.FecharDialogo(c); s.FecharDialogo(f); _ = host.Expulsar(jj.Uid); }),
+                                        (T("Cancelar"), false, () => s.FecharDialogo(c)),
+                                    }, () => s.FecharDialogo(c));
+                                s.AbrirDialogo(c);
+                            };
+                            Grid.SetColumn(b, 1);
+                            g.Children.Add(b);
+                        }
+                        lista.Children.Add(g);
+                    }
+                });
+            }
+            catch (Exception ex) { Dispatcher.UIThread.Post(() => { lista.Children.Clear(); lista.Children.Add(CUi.Txt(TelaOnline.Curto(ex), 13, CUi.Erro)); }); }
+        }
+        Encher();
+    }
+
     // "Liga dos Amigos · K7MPQ2"
     public static string Titulo(Sala sala) => sala.Nome.Length > 0 ? $"{sala.Nome} · {sala.Codigo}" : sala.Codigo;
 

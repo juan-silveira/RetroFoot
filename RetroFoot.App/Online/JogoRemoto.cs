@@ -32,6 +32,7 @@ public sealed class JogoRemoto
     Sessao? _sessao;
 
     public event Action? Comecou;
+    public Sala Sala => _sala;
 
     public JogoRemoto(Action<Control> mostrar, Action voltar, Sala sala, ClienteOnline cli)
     {
@@ -80,6 +81,23 @@ public sealed class JogoRemoto
         {
             if (caminho != "/" || v is not JsonObject o) return;
             Dispatcher.UIThread.Post(() => SorteioDoHost(o));
+        });
+        // o meu lugar na sala: pedindo para entrar (a espera do host), espectador, expulso ou fora
+        // (recusado, ou expulso ja tirado)
+        sala.B.Observar($"{sala.Raiz}/jogadores/{sala.Uid}", (caminho, v) =>
+        {
+            if (caminho != "/" && caminho != "/estado") return;
+            Dispatcher.UIThread.Post(async () =>
+            {
+                JsonNode? eu = caminho == "/" ? v : await Ler($"{sala.Raiz}/jogadores/{sala.Uid}");
+                string estado = (string?)eu?["estado"] ?? "";
+                if (eu == null && _estado != "")
+                    Fora(_estado == Estados.Pedindo ? T("O host não permitiu sua entrada no jogo.") : T("O host tirou você do jogo."));
+                else if (estado == Estados.Expulso) Fora(T("O host tirou você do jogo. Seu técnico sai e o computador assume o time."));
+                else if (estado == Estados.Pedindo && _sessao == null)
+                    _mostrar(Mensagem(T("Jogo online"), T("O jogo já começou: o host precisa permitir sua entrada. Aguarde…")));
+                if (eu != null) _estado = estado;
+            });
         });
         // a sala acabou (o host encerrou o jogo com o amigo, ou apagou a sala): o aviso e o inicio
         sala.B.Observar($"{sala.Raiz}/info", (caminho, v) =>
@@ -404,6 +422,8 @@ public sealed class JogoRemoto
 
     void ComecarAoVivo(JsonObject ini)
     {
+        // (quem ainda pede para entrar nao assiste)
+        if (_estado == Estados.Pedindo) return;
         try
         {
             var av = new AoVivo.Receptor(ini);
@@ -536,7 +556,10 @@ public sealed class JogoRemoto
         var minha = js.FirstOrDefault(x => x.Uid == _sala.Uid);
         if (minha == null || minha.Equipa == 0 || sessao.Equipa(minha.Equipa) is not { } e)
         {
-            Dispatcher.UIThread.Post(() => _mostrar(Mensagem(T("Jogo online"), T("Aguardando o host dar um time para você…"))));
+            Dispatcher.UIThread.Post(() => _mostrar(Mensagem(T("Jogo online"), minha?.Estado == Estados.Espectador
+                ? T("Você entrou como espectador: assiste às rodadas e recebe um time na próxima preparação dos times.")
+                : minha?.Estado == Estados.Pedindo ? T("O jogo já começou: o host precisa permitir sua entrada. Aguarde…")
+                : T("Aguardando o host dar um time para você…"))));
             return;
         }
         Dispatcher.UIThread.Post(() =>
@@ -658,8 +681,28 @@ public sealed class JogoRemoto
     // o Continuar
     Action? _depoisDoSorteio;
     bool _noSorteio;
+    int _sorteioVisto;
     void SorteioDoHost(JsonObject o)
     {
+        // (o sorteio de quem entrou com o jogo comecado: por cima da tela de agora)
+        if ((int?)o["n"] is int n && n > 0)
+        {
+            if (n <= _sorteioVisto || o["times"] is not JsonArray ts2) return;
+            _sorteioVisto = n;
+            var s = _jornada != null ? _sessaoAoVivo : _sessao;
+            if (s == null) return;
+            var l = ts2.OfType<JsonObject>().Select(t => ((string?)t["nome"] ?? "", (ushort)((int?)t["equipa"] ?? 0))).ToList();
+            Control? tela = null;
+            try
+            {
+                // (o time novo ainda nao esta no jogo deste aparelho: o jogo que veio com o sorteio)
+                var js = (string?)o["save"] is { } sv2 ? Jogo98.Ler(AoVivo.Descomprimir(sv2)) : s.S;
+                tela = new TelaSorteioTimes(js, l, () => { if (tela != null) s.FecharDialogo(tela); });
+                s.AbrirDialogo(tela);
+            }
+            catch (Exception ex) { Console.Error.WriteLine("sorteio: " + ex.Message); }
+            return;
+        }
         if (_viuSorteio || _sessao != null || (string?)o["save"] is not { } sv || o["times"] is not JsonArray ts) return;
         try
         {
@@ -678,8 +721,16 @@ public sealed class JogoRemoto
         catch (Exception ex) { Console.Error.WriteLine("sorteio: " + ex.Message); }
     }
 
+    string _estado = "";
+    async Task<JsonNode?> Ler(string caminho) { try { return await _sala.B.Ler(caminho); } catch { return null; } }
+
+    // fora da sala (recusado ou expulso): o aviso e o inicio
+    void Fora(string texto) => Encerrada(texto);
+
     bool _encerrada;
-    void Encerrada()
+    void Encerrada() => Encerrada(T("O host encerrou o jogo."));
+
+    void Encerrada(string texto)
     {
         if (_encerrada) return;
         _encerrada = true;
@@ -694,7 +745,7 @@ public sealed class JogoRemoto
                 Spacing = 12,
                 Children =
                 {
-                    CUi.Txt(T("O host encerrou o jogo."), 15, CUi.Texto, FontWeight.Normal, true),
+                    CUi.Txt(texto, 15, CUi.Texto, FontWeight.Normal, true),
                     new CUi.Botao(T("Voltar ao início"), true, _voltar) { HorizontalAlignment = HorizontalAlignment.Stretch },
                 },
             })));

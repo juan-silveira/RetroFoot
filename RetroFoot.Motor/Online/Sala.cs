@@ -36,6 +36,9 @@ public static class Estados
     // Saiu: por agora (o tecnico fica de ferias e volta com a mesma chave); Desistiu: de vez (o
     // tecnico sai do jogo e o computador assume o time)
     public const string Preparando = "preparando", Pronto = "pronto", Saiu = "saiu", Desistiu = "desistiu";
+    // quem entra com o jogo ja comecado: Pedindo (o host ainda nao permitiu), Espectador (permitido:
+    // assiste e recebe um time na proxima preparacao); Expulso (o host tirou do jogo)
+    public const string Pedindo = "pedindo", Espectador = "espectador", Expulso = "expulso";
 }
 
 public sealed class Sala
@@ -134,9 +137,14 @@ public sealed class Sala
         }
         if (minha < 0) throw new SalaCheia();
         var ja = JogadorSala.De(uid, await Tentar(() => b.Ler($"{s.Raiz}/jogadores/{uid}", ct)));
+        // (com o jogo ja comecado, quem chega pela 1a vez pede para entrar; o espectador e o
+        // expulso continuam como estavam)
+        bool comecou = (string?)info["fase"] is Fases.Jogando or Fases.Pausado or Fases.Continuando;
+        string estado = ja?.Estado is Estados.Espectador or Estados.Expulso or Estados.Pedindo ? ja.Estado
+            : ja == null && comecou ? Estados.Pedindo : Estados.Preparando;
         await b.Gravar($"{s.Raiz}/jogadores/{uid}", new JsonObject
         {
-            ["nome"] = NomeTecnico(nome), ["vaga"] = minha, ["equipa"] = (int)(ja?.Equipa ?? 0), ["estado"] = Estados.Preparando,
+            ["nome"] = NomeTecnico(nome), ["vaga"] = minha, ["equipa"] = (int)(ja?.Equipa ?? 0), ["estado"] = estado,
         }, ct);
         return s;
     }
