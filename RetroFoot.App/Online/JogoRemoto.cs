@@ -578,6 +578,8 @@ public sealed class JogoRemoto
             {
                 var jogo = sessao.S.Jogos.FirstOrDefault(x => x.Casa == e.ID || x.Fora == e.ID);
                 _time = e;
+                // (com o time na tela, o sorteio do comeco ja passou: nao volta nas rodadas seguintes)
+                _viuSorteio = true;
                 // o time nao joga nesta rodada (fora da Taca): so a espera
                 if (jogo == null) { sessao.Mostrar(new TelaEsperaRemota(_sala, _rodada, sessao)); return; }
                 var t = new TelaEquipa(sessao, e, jogo);
@@ -695,6 +697,7 @@ public sealed class JogoRemoto
         {
             if (n <= _sorteioVisto || o["times"] is not JsonArray ts2) return;
             _sorteioVisto = n;
+            _viuSorteio = true;   // (o do comeco do jogo nao vem mais: este aparelho ja tem o seu)
             var s = _jornada != null ? _sessaoAoVivo : _sessao;
             if (s == null) return;
             var l = ts2.OfType<JsonObject>().Select(t => ((string?)t["nome"] ?? "", (ushort)((int?)t["equipa"] ?? 0))).ToList();
