@@ -61,8 +61,33 @@ public sealed class TelaDetalhesModerna : UserControl
     public void Atualizar(int minuto, int acrescimo, bool noIntervalo)
     {
         if (_naEscalacao) return;
+        // (no computador so o relogio, o placar e a linha do tempo mudam: refazer a janela inteira
+        // a cada minuto a fazia piscar)
+        if (!Celular.Ativo && _minutoTxt != null && _placarTxt != null && _rolagem != null)
+        {
+            _minutoTxt.Text = TextoMinuto(minuto, acrescimo, noIntervalo);
+            _placarTxt.Text = Placar(_jg);
+            var itens = Itens(_jg, minuto, noIntervalo);
+            if (itens.Count != _nItens)
+            {
+                _nItens = itens.Count;
+                _rolagem.Content = new LinhaDoTempo(itens);
+                Avalonia.Threading.Dispatcher.UIThread.Post(_rolagem.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
+            }
+            return;
+        }
         Montar(minuto, acrescimo, noIntervalo);
         if (_rolagem is { } r) Avalonia.Threading.Dispatcher.UIThread.Post(r.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
+    }
+
+    TextBlock? _minutoTxt, _placarTxt;
+    int _nItens;
+    static string TextoMinuto(int minuto, int acrescimo, bool noIntervalo) =>
+        noIntervalo ? Idioma.T("Intervalo") : minuto <= 0 ? "0'" : MinutoTexto.Texto(minuto, acrescimo);
+    static string Placar(JogoAtual jg)
+    {
+        var casa = jg.Equipa[Lado.Casa]; var fora = jg.Equipa[Lado.Visit];
+        return $"{(casa == null ? 0 : Mem.Golos(casa))} - {(fora == null ? 0 : Mem.Golos(fora))}";
     }
 
     void Montar(int minuto, int acrescimo, bool noIntervalo)
@@ -85,12 +110,12 @@ public sealed class TelaDetalhesModerna : UserControl
         var topo = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,*"), Margin = new Thickness(16, 18, 16, 12) };
         topo.Children.Add(Equipa(casa));
         var placar = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0) };
-        placar.Children.Add(new TextBlock
+        placar.Children.Add(_minutoTxt = new TextBlock
         {
-            Text = noIntervalo ? Idioma.T("Intervalo") : minuto <= 0 ? "0'" : MinutoTexto.Texto(minuto, acrescimo), FontSize = 13, FontWeight = FontWeight.Bold,
+            Text = TextoMinuto(minuto, acrescimo, noIntervalo), FontSize = 13, FontWeight = FontWeight.Bold,
             Foreground = Azul, HorizontalAlignment = HorizontalAlignment.Center,
         });
-        placar.Children.Add(new TextBlock
+        placar.Children.Add(_placarTxt = new TextBlock
         {
             Text = $"{gc} - {gf}", FontSize = 34, FontWeight = FontWeight.Bold, Foreground = Texto,
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -109,7 +134,9 @@ public sealed class TelaDetalhesModerna : UserControl
                 HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 0, 0, 12),
             });
 
-        var linha = new LinhaDoTempo(Itens(jg, minuto, noIntervalo));
+        var itens0 = Itens(jg, minuto, noIntervalo);
+        _nItens = itens0.Count;
+        var linha = new LinhaDoTempo(itens0);
         var rolagem = _rolagem = new ScrollViewer
         {
             Content = linha, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,

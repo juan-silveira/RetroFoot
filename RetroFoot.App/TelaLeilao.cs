@@ -122,7 +122,8 @@ sealed class TelaLeilao : DialogoMercado
         var t = s.J.M.TreinadorDa(c);
         var (letra, fundo) = T.Cores(c);
         if (!Moderno) painel.Background = fundo;
-        foreach (var x in new[] { coachName, label7, cash }) { x.Cor = letra; x.InvalidateVisual(); }
+        // (no Moderno o painel e do tema: as cores dele, nao a letra da equipa)
+        foreach (var x in new[] { coachName, label7, cash }) { x.Cor = Moderno ? (x == coachName ? MM.TextoEscolhido : MM.Texto) : letra; x.InvalidateVisual(); }
         coachName.Texto = T.NomeTreinador(t);
         cash.Texto = Idioma.T("Dinheiro em caixa: ") + FormatoDinheiro.Valor(s.S, (int)c.Dinheiro);
         // +0x1E do treinador (B1A[4]): esconder as ofertas -> PasswordChar 'X'

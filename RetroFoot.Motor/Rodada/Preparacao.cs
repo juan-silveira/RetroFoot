@@ -27,8 +27,8 @@ public sealed partial class Mundo
             if (!Sair) PrepararJogo(j);
     }
 
-    // Jogo online: logo depois da rodada, a revisao de salarios dos humanos (o pedido de aumento)
-    // e a preparacao dos times da CPU (os leiloes deles); so depois os humanos preparam (a
+    // Jogo online: logo depois da rodada, a preparacao dos times da CPU (os leiloes deles) e a
+    // revisao de salarios dos humanos (o pedido de aumento); so depois os humanos preparam (a
     // barreira: cada um na sua tela, ate o PRONTO). No original tudo vem na ordem dos jogos: online,
     // as perguntas chegavam a quem ja tinha dado PRONTO. A ordem nao muda ao retomar (outro host).
     void PrepararOnline()
@@ -43,12 +43,19 @@ public sealed partial class Mundo
             return;
         }
         RetomarNaOrdemDosJogos = false;
-        if (Retomar == 0) ReverSalariosHumanos();
+        bool rever = Retomar == 0;
         var times = new List<(Equipa E, Jogo J)>();
         foreach (var j in S.Jogos.ToArray())
             if (Equipa(j.Casa) is { } c && Equipa(j.Fora) is { } f) { times.Add((c, j)); times.Add((f, j)); }
         bool humano((Equipa E, Jogo J) x) => TreinadorDa(x.E) is { } t && HumanoAtivo(t);
-        foreach (var x in times.Where(x => !humano(x)).Concat(times.Where(humano)).ToList())
+        var cpu = times.Where(x => !humano(x)).ToList();
+        var humanos = times.Where(humano).ToList();
+        // primeiro os times da CPU (os leiloes deles), depois o pedido de aumento dos humanos e so
+        // entao a preparacao deles
+        foreach (var x in cpu)
+            if (!Sair) PrepararEquipa(x.E, x.J);
+        if (rever && !Sair) ReverSalariosHumanos();
+        foreach (var x in humanos)
             if (!Sair) PrepararEquipa(x.E, x.J);
     }
 
