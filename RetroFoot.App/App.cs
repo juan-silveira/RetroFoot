@@ -140,6 +140,7 @@ public class App : Application
                 // mudou nas Configuracoes: a janela passa ao outro formato (se nao estiver maximizada)
                 Formato.Mudou += () => { if (janela.WindowState == WindowState.Normal) Dimensionar(true); };
             }
+            janela.Closing += (_, _) => AvisarFechando();
             desktop.MainWindow = janela;
         }
         else if (ApplicationLifetime is IActivityApplicationLifetime atividade)
@@ -153,6 +154,11 @@ public class App : Application
     // vertical, o conteudo ganha FolgaBarra pontos a direita (somados ao Padding que ele ja
     // tinha), para nada ficar debaixo da barra; sem barra, o Padding de antes.
     public const double FolgaBarra = 18;
+
+    // o app vai fechar (a janela do computador fechando; a atividade do Android terminando): o
+    // jogo com amigo apaga a sala, para os amigos serem desconectados
+    public static event Action? Fechando;
+    public static void AvisarFechando() { try { Fechando?.Invoke(); } catch { } }
 
     // fecha o app (o Android liga: termina a atividade); sem ele, o fim do programa do computador
     public static Action? FecharApp;

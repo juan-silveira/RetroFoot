@@ -37,6 +37,13 @@ public class MainActivity : AvaloniaMainActivity
         return base.DispatchKeyEvent(e);
     }
 
+    protected override void OnDestroy()
+    {
+        // o app terminando (o Sair, ou o app fechado pelo usuario): o jogo com amigo apaga a sala
+        if (IsFinishing) RetroFoot.App.App.AvisarFechando();
+        base.OnDestroy();
+    }
+
     protected override void OnPause()
     {
         if (Atual == this) Atual = null;

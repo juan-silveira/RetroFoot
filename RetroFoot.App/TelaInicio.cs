@@ -941,7 +941,15 @@ public sealed partial class TelaInicio : UserControl
                 };
             Online.Sinal(null);   // (o HostOnline manda o sinal de vida daqui em diante)
             Online.ManterVivo?.Invoke(true);
-            sessao.Saiu += () => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
+            // (modo amigo: o app fechado no meio do jogo apaga a sala; os amigos sao desconectados)
+            Action? aoFechar = null;
+            if (online.ModoAmigo)
+            {
+                var salaAmigo = online.Sala;
+                aoFechar = () => { try { Task.Run(() => salaAmigo.Apagar()).Wait(3000); } catch { } };
+                App.Fechando += aoFechar;
+            }
+            sessao.Saiu += () => { if (aoFechar != null) App.Fechando -= aoFechar; host.Dispose(); Online.ManterVivo?.Invoke(false); };
             sessao.Erro += _ => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
         }
         sessao.Saiu += () =>

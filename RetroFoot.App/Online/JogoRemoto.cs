@@ -477,6 +477,13 @@ public sealed class JogoRemoto
     void VigiarHost()
     {
         var parado = DateTime.UtcNow - _sinalHost;
+        // (no jogar com um amigo, o host que some por 90 s fechou o jogo: o amigo e desconectado)
+        if (_modoAmigo && _rodada.Length > 0 && parado > TimeSpan.FromSeconds(90))
+        {
+            if (_avisoHost != null) { _avisoEm?.FecharDialogo(_avisoHost); _avisoHost = null; }
+            Encerrada();
+            return;
+        }
         if (parado > TimeSpan.FromSeconds(60)) _ = TalvezAssumir(parado);
         bool sumiu = parado > TimeSpan.FromSeconds(35);
         if (sumiu && _avisoHost == null && _sessao is { } ss)
