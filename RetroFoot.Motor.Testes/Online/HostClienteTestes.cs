@@ -792,6 +792,27 @@ public class HostClienteTestes
         host.Dispose();
     }
 
+    // modo amigo: quem ja esta na sala recebe o time antes de o motor comecar (participa dos
+    // leiloes de antes da 1a preparacao)
+    [Fact]
+    public async Task ModoAmigoTimeAntesDoMotor()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        await Sala.Entrar(banco, "cli", sh.Codigo, "Amigo");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        await sh.DarEquipa("host", minha.ID);
+        var jg = new JogoEmCurso(s, 13, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, new Humano());
+        using var host = new HostOnline(sh, jg) { ModoAmigo = true };
+        host.ComecarModoAmigo();
+        var eu = (await sh.Jogadores()).First(x => x.Uid == "cli");
+        Assert.NotEqual(0, eu.Equipa);
+        Assert.Contains(eu.Equipa, s.Divisoes[3].Equipas);
+        Assert.True(MercadoJogo.HumanoAtivo(jg.M.TreinadorDa(jg.M.Equipa(eu.Equipa)!)));
+        Assert.True(jg.M.RetomarNaOrdemDosJogos);
+    }
+
     // modo amigo: quem desiste de vez sai do jogo; um tecnico do computador assume o time
     [Fact(Timeout = 120_000)]
     public async Task ModoAmigoDesisteDeVez()

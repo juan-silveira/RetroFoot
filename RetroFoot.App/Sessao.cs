@@ -588,12 +588,16 @@ public sealed class Sessao
     Control TelaAguardando() => new TelaAguardandoOnline(this);
 
     // comeca (ou continua) o jogo na thread do motor
+    // na thread do motor, antes do ciclo (o modo amigo: os amigos da sala recebem o time)
+    public Action? NoComecoDoMotor;
+
     public void Comecar()
     {
         motor = new Thread(() =>
         {
             try
             {
+                NoComecoDoMotor?.Invoke();
                 J.Ciclo(Campeonato.AoFim(this));
                 if (J.Gravado != null && Arquivo != null && !SemGravar) File.WriteAllBytes(Arquivo, J.Gravado);
                 Dispatcher.UIThread.Post(() => Saiu?.Invoke());

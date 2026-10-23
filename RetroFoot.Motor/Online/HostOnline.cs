@@ -289,6 +289,18 @@ public sealed class HostOnline : IDisposable
 
     bool TecnicoExiste(ushort tid) => _j.M.S.Treinadores.Any(t => t.ID == tid);
 
+    // (modo amigo) antes de o motor comecar: quem ja esta na sala recebe o time, para participar
+    // desde o comeco (os leiloes e as perguntas de antes da 1a preparacao) e o save vindo do
+    // jogo sozinho termina a rodada em que parou na ordem dele
+    public void ComecarModoAmigo()
+    {
+        if (!ModoAmigo) return;
+        _j.M.RetomarNaOrdemDosJogos = true;
+        AtualizarJogadores();
+        AmigosEntramESaem();
+        AtualizarJogadores();
+    }
+
     void AmigosEntramESaem()
     {
         // quem chegou sem time: o tecnico dele (se ja entrou nesta sessao) ou um novo, num time da 4a divisao

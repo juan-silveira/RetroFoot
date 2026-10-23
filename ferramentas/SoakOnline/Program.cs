@@ -173,6 +173,7 @@ static class Programa
 
         var host = new HostOnline(sh, sessao.J, x => Dispatcher.UIThread.Invoke(x)) { ModoAmigo = amigo };
         sessao.LigarOnline(host);
+        if (amigo) sessao.NoComecoDoMotor = host.ComecarModoAmigo;
         sessao.Erro += ex => { Console.WriteLine("EXCECAO no motor: " + ex); codigo = 1; cts.Cancel(); };
         sessao.Saiu += () => { Console.WriteLine("o motor saiu"); cts.Cancel(); };
         sessao.Notificou += txt => Console.WriteLine("  [aviso no host] " + txt);

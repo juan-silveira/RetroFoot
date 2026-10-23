@@ -923,6 +923,8 @@ public sealed partial class TelaInicio : UserControl
         {
             var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a)) { ModoAmigo = online.ModoAmigo };
             sessao.LigarOnline(host);
+            // (modo amigo: os amigos que ja estao na sala recebem o time antes de o motor comecar)
+            if (online.ModoAmigo) sessao.NoComecoDoMotor = host.ComecarModoAmigo;
             Online.Sinal(null);   // (o HostOnline manda o sinal de vida daqui em diante)
             Online.ManterVivo?.Invoke(true);
             sessao.Saiu += () => { host.Dispose(); Online.ManterVivo?.Invoke(false); };

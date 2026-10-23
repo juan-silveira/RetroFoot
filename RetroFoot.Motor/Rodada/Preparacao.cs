@@ -33,6 +33,16 @@ public sealed partial class Mundo
     // as perguntas chegavam a quem ja tinha dado PRONTO. A ordem nao muda ao retomar (outro host).
     void PrepararOnline()
     {
+        // (o save de um jogo sozinho retomado no meio da preparacao, o modo amigo: as equipas
+        // depois da que parou ainda nao prepararam, na ordem dos jogos; esta rodada termina nela)
+        if (Retomar > 0 && RetomarNaOrdemDosJogos)
+        {
+            RetomarNaOrdemDosJogos = false;
+            foreach (var j in S.Jogos.ToArray())
+                if (!Sair) PrepararJogo(j);
+            return;
+        }
+        RetomarNaOrdemDosJogos = false;
         if (Retomar == 0) ReverSalariosHumanos();
         var times = new List<(Equipa E, Jogo J)>();
         foreach (var j in S.Jogos.ToArray())
@@ -85,6 +95,9 @@ public sealed partial class Mundo
     // Jogo online (PrepararOnline): a parte 1 dos times humanos (o pedido de aumento) antes de
     // todos prepararem. Ao retomar no meio da preparacao (outro host), os humanos nao revem de novo.
     public bool Online;
+    // o save veio de um jogo sozinho (o modo amigo): retomado no meio da preparacao, a rodada
+    // termina na ordem dos jogos (no jogo sozinho, as equipas depois da que parou nao prepararam)
+    public bool RetomarNaOrdemDosJogos;
     readonly Dictionary<ushort, bool> _revistas = new();
 
     void ReverSalariosHumanos()
