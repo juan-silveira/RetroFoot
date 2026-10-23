@@ -566,8 +566,14 @@ public sealed class JogoRemoto
         {
             // (o destaque so do meu time, na classificacao e na jornada)
             TelaJornada.SoTime = e.ID;
-            // (o sorteio do host ainda na tela: o time depois do Continuar)
-            if (_noSorteio) { _depoisDoSorteio = () => _ = MostrarTime(sessao, false); return; }
+            // (o sorteio do host ainda na tela: ele passa para dentro da tela do jogo, para as
+            // perguntas que chegarem abrirem por cima dele; o time depois do Continuar)
+            if (_noSorteio)
+            {
+                _depoisDoSorteio = () => _ = MostrarTime(sessao, false);
+                if (_telaSorteio is { } ts) { (ts.Parent as Border)?.SetValue(Border.ChildProperty, null); sessao.Mostrar(ts); }
+                return;
+            }
             void Time()
             {
                 var jogo = sessao.S.Jogos.FirstOrDefault(x => x.Casa == e.ID || x.Fora == e.ID);
@@ -683,6 +689,7 @@ public sealed class JogoRemoto
     // o Continuar
     Action? _depoisDoSorteio;
     bool _noSorteio;
+    Control? _telaSorteio;
     int _sorteioVisto;
     void SorteioDoHost(JsonObject o)
     {
@@ -713,12 +720,14 @@ public sealed class JogoRemoto
             _viuSorteio = true;
             _noSorteio = true;
             var antes = (App.Raiz as Border)?.Child;
-            _mostrar(new TelaSorteioTimes(js, tecnicos, () =>
+            _telaSorteio = new TelaSorteioTimes(js, tecnicos, () =>
             {
                 _noSorteio = false;
+                _telaSorteio = null;
                 if (_depoisDoSorteio is { } d) { _depoisDoSorteio = null; d(); }
                 else if (antes != null && _sessao == null) _mostrar(antes);
-            }));
+            });
+            _mostrar(_telaSorteio);
         }
         catch (Exception ex) { Console.Error.WriteLine("sorteio: " + ex.Message); }
     }
