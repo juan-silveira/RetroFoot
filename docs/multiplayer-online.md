@@ -42,10 +42,18 @@ prontos ("Jogador 1 PRONTO · Jogador 2 AGUARDANDO…").
   substituições…"; o relógio volta quando ele confirma.
 - **Intervalo, lesão, goleiro expulso, batedor de pênalti:** a janela abre no aparelho do dono
   do time; os outros aguardam.
-- **Pedido de aumento, convite para outro clube, patrocínio:** perguntados ao dono do time.
+- **Pedido de aumento, convite para outro clube, patrocínio:** perguntados ao dono do time. O
+  pedido de aumento e os leilões dos times do computador vêm **logo depois da rodada**, antes de
+  os técnicos prepararem (`Mundo.Online`: a CPU prepara primeiro, depois os humanos), para nada
+  chegar a quem já deu PRONTO. Antes da 1ª rodada (patrocínios do começo) o jogo vai junto com
+  a pergunta, para a janela abrir no outro aparelho.
 - **Leilões:** humanos nunca dão lance em jogador de outro humano (`PodeComprar`); só disputam
-  leilões de times do computador. Cada humano que pode dar lance recebe o leilão ao mesmo tempo
-  (lance fechado); o host registra na ordem sorteada do motor, então o desempate não muda.
+  leilões de times do computador. O leilão abre **para todos os técnicos ao mesmo tempo**
+  (`MercadoJogo.LanceDeTodos`, lance fechado) e fica aberto até todos darem o lance ou pularem
+  (ou o prazo); quem já deu o lance vê "aguardando os outros técnicos". O host registra os lances
+  na ordem sorteada do motor, então o desempate não muda.
+- **Troca de clube:** o aparelho segue o técnico; quem aceita um convite (ou é demitido e
+  contratado por outro) passa a mandar no time novo na rodada seguinte, com um aviso.
 - **Tempo para responder:** cada pergunta tem um prazo (ex.: 45 s) com contagem na tela. Sem
   resposta, vale o padrão do motor: aumento aceito, sem lance, convite e patrocínio recusados,
   substituição automática, melhor batedor.

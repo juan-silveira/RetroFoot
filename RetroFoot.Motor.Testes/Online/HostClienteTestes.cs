@@ -102,7 +102,7 @@ public class HostClienteTestes
     // o pedido de aumento de um time humano vem logo depois da rodada, antes de qualquer humano
     // preparar (no original vem na vez de cada time: online chegava a quem ja tinha dado PRONTO)
     [Fact]
-    public void PedidoDeAumentoAntesDaPreparacao()
+    public void PedidoDeAumentoELeiloesAntesDaPreparacao()
     {
         var s = Jogo98.Ler(Entrada());
         // todos os treinadores da 1a divisao humanos: muitos pedidos, de times em todos os jogos
@@ -112,19 +112,22 @@ public class HostClienteTestes
         int preparos = 0;
         var h = new Humano
         {
-            Preparar = (j, e, jogo) => { eventos.Add($"{j.M.Jornada}{jogo?.Taca}:p"); return ++preparos > 60; },
+            Preparar = (j, e, jogo) => { eventos.Add($"{j.M.Jornada}{jogo?.Taca}:p"); Escalacao.Automatico(j.R, e); return ++preparos > 60; },
         };
         h.PedirAumento = (e, p, atual, novo) => { lock (eventos) eventos.Add("aumento"); return true; };
+        // (o lance de um humano num leilao da CPU: os leiloes da CPU tambem vem antes)
+        h.Lance = (c, v, p) => { lock (eventos) eventos.Add("lance"); return (0, false); };
         var jg = new JogoEmCurso(s, 7, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
-        jg.M.RevisaoAntes = true;
+        jg.M.Online = true;
         var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
         motor.Start();
         Assert.True(motor.Join(100_000));
-        Assert.Contains("aumento", eventos);
-        // entre dois preparos da mesma rodada, nenhum pedido
+        Assert.True(eventos.Contains("lance"), string.Join(" ", eventos));
+        // entre dois preparos da mesma rodada, nenhum pedido nem lance
+        bool pergunta(string x) => x is "aumento" or "lance";
         for (int i = 1; i < eventos.Count - 1; i++)
-            if (eventos[i] == "aumento")
-                Assert.False(eventos[i - 1] != "aumento" && eventos.Skip(i + 1).FirstOrDefault(x => x != "aumento") == eventos[i - 1],
+            if (pergunta(eventos[i]))
+                Assert.False(!pergunta(eventos[i - 1]) && eventos.Skip(i + 1).FirstOrDefault(x => !pergunta(x)) == eventos[i - 1],
                     string.Join(" ", eventos));
     }
 
@@ -170,6 +173,42 @@ public class HostClienteTestes
         Assert.Equal(nova.ID, (await sh.Jogadores()).First(x => x.Uid == "cli").Equipa);
         Assert.Equal($"João {nova.ID}", aviso);
         Assert.Equal(minha.ID, (await sh.Jogadores()).First(x => x.Uid == "host").Equipa);
+    }
+
+    // o leilao da CPU no jogo online: os humanos que licitam vem todos de uma vez (uma pergunta
+    // para todos, cada lance da resposta dele), nao um de cada vez
+    [Fact]
+    public void LeilaoDaCpuParaTodosDeUmaVez()
+    {
+        var s = Jogo98.Ler(Entrada());
+        foreach (var e in s.Equipas.Where(e => s.Divisoes[0].Equipas.Contains(e.ID)))
+            if (s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador) is { } t) t.Humano = 1;
+        int umDeCada = 0, preparos = 0, maior = 0, chamadas = 0, compras = 0;
+        var h = new Humano
+        {
+            Preparar = (j, e, jogo) => { Escalacao.Automatico(j.R, e); return ++preparos > 40; },
+            Lance = (c, v, p) => { umDeCada++; return (0, false); },
+        };
+        JogoEmCurso? jg = null;
+        h.LanceDeTodos = (quem, v, p) =>
+        {
+            chamadas++;
+            maior = Math.Max(maior, quem.Count);
+            Assert.Equal(quem.Count, quem.Select(x => x.ID).Distinct().Count());
+            Assert.DoesNotContain(quem, x => x.ID == v.ID);
+            // o primeiro da lista da um lance alto (leva o jogador); os outros pulam
+            var d = quem.ToDictionary(x => x.ID, x => (0, false));
+            if (quem.Count > 0 && (int)quem[0].Dinheiro > 5_000_000) { d[quem[0].ID] = ((int)quem[0].Dinheiro / 1000, true); compras++; }
+            return d;
+        };
+        jg = new JogoEmCurso(s, 7, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        jg.M.Online = true;
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(motor.Join(100_000));
+        Assert.Equal(0, umDeCada);
+        Assert.True(chamadas > 0 && maior >= 2, $"chamadas {chamadas} maior {maior}");
+        Assert.True(compras == 0 || jg.M.S.Transferencias.Count > 0);
     }
 
     [Fact]

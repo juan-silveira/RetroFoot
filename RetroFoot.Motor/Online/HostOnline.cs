@@ -57,8 +57,8 @@ public sealed class HostOnline : IDisposable
     public HostOnline(Sala sala, JogoEmCurso j, Action<Action>? naInterface = null)
     {
         _sala = sala; _j = j;
-        // (o pedido de aumento dos humanos logo depois da rodada, antes da preparacao de todos)
-        j.M.RevisaoAntes = true;
+        // (o pedido de aumento dos humanos e os leiloes da CPU logo depois da rodada, antes da preparacao dos humanos)
+        j.M.Online = true;
         _ex = new ExecutorComandos(j);
         _naInterface = naInterface ?? (a => a());
         _observando.Add(sala.B.Observar($"{sala.Raiz}/jogadores", (_, _) => _fila.Add(AtualizarJogadores)));
@@ -490,7 +490,7 @@ public sealed class HostOnline : IDisposable
         // (fora da barreira a lista dos jogadores pode estar velha)
         AtualizarJogadores();
         if (DonoDe(equipa) is not { } j || j.Uid == _sala.Uid || Ausente(j)) return null;
-        string id = (++_pergunta).ToString("D6");
+        string id = Interlocked.Increment(ref _pergunta).ToString("D6");
         dados["id"] = id;
         dados["tipo"] = tipo;
         dados["segundos"] = (int)(prazo ?? PrazoPergunta).TotalSeconds;
@@ -508,6 +508,43 @@ public sealed class HostOnline : IDisposable
             _sala.B.Gravar($"{_sala.Raiz}/respostas/{j.Uid}/{id}", null).GetAwaiter().GetResult();
         }
         catch { }
+        return r;
+    }
+
+    // varias perguntas de uma vez (o leilao da CPU para todos os tecnicos): cada dono recebe a
+    // dele, e todas ficam abertas ate todos responderem (ou o prazo; e a tarefa local, a janela
+    // do host, terminar); so entao as janelas fecham. Sem resposta: null.
+    public Dictionary<ushort, JsonNode?> PerguntarTodos(IReadOnlyList<ushort> equipas, string tipo, Func<ushort, JsonObject> dados, Task? local = null, TimeSpan? prazo = null)
+    {
+        AtualizarJogadores();
+        var abertas = new List<(ushort Equipa, string Uid, string Id)>();
+        var r = new Dictionary<ushort, JsonNode?>();
+        foreach (var eq in equipas)
+        {
+            r[eq] = null;
+            if (DonoDe(eq) is not { } j || j.Uid == _sala.Uid || Ausente(j)) continue;
+            var d = dados(eq);
+            string id = Interlocked.Increment(ref _pergunta).ToString("D6");
+            d["id"] = id; d["tipo"] = tipo; d["todos"] = true;
+            d["segundos"] = (int)(prazo ?? PrazoPergunta).TotalSeconds;
+            try { _sala.B.Gravar($"{_sala.Raiz}/perguntas/{j.Uid}", d).GetAwaiter().GetResult(); } catch { continue; }
+            abertas.Add((eq, j.Uid, id));
+        }
+        var fim = DateTime.UtcNow + (prazo ?? PrazoPergunta);
+        var faltam = abertas.ToList();
+        while (DateTime.UtcNow < fim && (faltam.Count > 0 || local is { IsCompleted: false }))
+        {
+            foreach (var a in faltam.ToList())
+                if (_respostas.TryRemove(a.Uid + "/" + a.Id, out var x)) { r[a.Equipa] = x; faltam.Remove(a); }
+            Thread.Sleep(150);
+        }
+        foreach (var a in abertas)
+            try
+            {
+                _sala.B.Gravar($"{_sala.Raiz}/perguntas/{a.Uid}", null).GetAwaiter().GetResult();
+                _sala.B.Gravar($"{_sala.Raiz}/respostas/{a.Uid}/{a.Id}", null).GetAwaiter().GetResult();
+            }
+            catch { }
         return r;
     }
 

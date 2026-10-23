@@ -22,9 +22,24 @@ public sealed partial class Mundo
     // equipas (seg03:a67f)
     public void PrepararJogos()
     {
-        if (RevisaoAntes && Retomar == 0) ReverSalariosHumanos();
+        if (Online) { PrepararOnline(); return; }
         foreach (var j in S.Jogos.ToArray())
             if (!Sair) PrepararJogo(j);
+    }
+
+    // Jogo online: logo depois da rodada, a revisao de salarios dos humanos (o pedido de aumento)
+    // e a preparacao dos times da CPU (os leiloes deles); so depois os humanos preparam (a
+    // barreira: cada um na sua tela, ate o PRONTO). No original tudo vem na ordem dos jogos: online,
+    // as perguntas chegavam a quem ja tinha dado PRONTO. A ordem nao muda ao retomar (outro host).
+    void PrepararOnline()
+    {
+        if (Retomar == 0) ReverSalariosHumanos();
+        var times = new List<(Equipa E, Jogo J)>();
+        foreach (var j in S.Jogos.ToArray())
+            if (Equipa(j.Casa) is { } c && Equipa(j.Fora) is { } f) { times.Add((c, j)); times.Add((f, j)); }
+        bool humano((Equipa E, Jogo J) x) => TreinadorDa(x.E) is { } t && HumanoAtivo(t);
+        foreach (var x in times.Where(x => !humano(x)).Concat(times.Where(humano)).ToList())
+            if (!Sair) PrepararEquipa(x.E, x.J);
     }
 
     // seg03:a67f: com as duas equipas, prepara o mandante e, se ninguem pediu para sair, o
@@ -57,7 +72,7 @@ public sealed partial class Mundo
         bool vendeu = true;
         var t = TreinadorDa(e);
         if (_revistas.Remove(e.ID, out var v)) vendeu = v;
-        else if (RevisaoAntes && t != null && HumanoAtivo(t)) { }
+        else if (Online && t != null && HumanoAtivo(t)) { }
         else if (Retomar == 0 && t != null && (short)t.W0C > 1) vendeu = ReverSalarios(e, t) != null;
         Retomar = 0;
         System.Array.Clear(e.B4D);
@@ -67,11 +82,9 @@ public sealed partial class Mundo
         Traco?.Invoke(e, "fim");
     }
 
-    // Jogo online: a parte 1 dos times humanos (o pedido de aumento) logo depois da rodada,
-    // antes de todos prepararem (no original vem na vez de cada time, ja na preparacao: online,
-    // a pergunta chegava a quem ja tinha dado PRONTO). Ao retomar no meio da preparacao (outro
-    // host), os humanos nao revem de novo.
-    public bool RevisaoAntes;
+    // Jogo online (PrepararOnline): a parte 1 dos times humanos (o pedido de aumento) antes de
+    // todos prepararem. Ao retomar no meio da preparacao (outro host), os humanos nao revem de novo.
+    public bool Online;
     readonly Dictionary<ushort, bool> _revistas = new();
 
     void ReverSalariosHumanos()

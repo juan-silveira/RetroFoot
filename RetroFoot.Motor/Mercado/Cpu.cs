@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Collections.Generic;
 using System;
 using RetroFoot.Motor.Base;
 using RetroFoot.Motor.Save;
@@ -121,6 +123,15 @@ public sealed partial class MercadoJogo
         bool Rodar()
         {
             Rodada.Listas.Embaralhar(G, S.Equipas);
+            // (jogo online) os humanos que licitam, todos de uma vez: cada lance vem da resposta dele
+            if (humano != null && LanceDeTodos != null)
+            {
+                var quem = S.Equipas.Skip(1).Where(c => HumanoLicita(l, c)).ToList();
+                var r = quem.Count == 0 ? new Dictionary<ushort, (int Milhares, bool Ok)>() : LanceDeTodos(quem, v, v.Jogadores[k]);
+                // (o lance acima do dinheiro: no original a caixa pergunta de novo; aqui nao ha
+                // de novo, fica sem lance)
+                if (r != null) humano = (c, _, _) => r.TryGetValue(c.ID, out var x) && x.Milhares * 1000 <= (int)c.Dinheiro ? x : (0, false);
+            }
             for (l.Licitante = 1; l.Licitante < S.Equipas.Count; l.Licitante++) Licitar(l, S.Equipas[l.Licitante], humano);
             if (l.Vencedor == 0) return false;   // "Nao houve ofertas"
             Vender(l);
@@ -147,12 +158,7 @@ public sealed partial class MercadoJogo
         if ((int)c.Dinheiro < l.Base) return;
         var t = Treinador(S, c.Treinador);
         if (!HumanoAtivo(t)) { l.RegistrarLance(c.ID, Oferta(c, l.Salario, p)); return; }
-        switch (t!.B1A[3])
-        {
-            case 0: break;
-            case 1: if (!Maior(Interesse(c, p), Ext.F32(1))) return; break;
-            default: return;
-        }
+        if (!QuerLicitar(t!, c, p)) return;
         if (humano == null) return;
         while (true)   // 2:3bda (OKBtnClick)
         {
@@ -164,6 +170,31 @@ public sealed partial class MercadoJogo
             if (m * 1000 <= (int)c.Dinheiro) { l.RegistrarLance(c.ID, m * 1000); return; }
         }
     }
+
+    // a opcao +0x1D do treinador humano (2:3787): 0 pergunta sempre; 1 se Interesse > 1,0;
+    // outro valor nao licita
+    bool QuerLicitar(Treinador t, Equipa c, Jogador p) => t.B1A[3] switch
+    {
+        0 => true,
+        1 => Maior(Interesse(c, p), Ext.F32(1)),
+        _ => false,
+    };
+
+    // o humano que Licitar perguntaria (as mesmas condicoes, sem perguntar)
+    bool HumanoLicita(Leilao l, Equipa c)
+    {
+        if (c.ID == l.Vendedor) return false;
+        var v = Equipa(S, l.Vendedor)!;
+        var (ve, k) = EquipaDoJogador(S, l.Jogador);
+        var p = ve!.Jogadores[k];
+        var t = Treinador(S, c.Treinador);
+        return PodeComprar(c, v, p) && (int)c.Dinheiro >= l.Base && HumanoAtivo(t) && QuerLicitar(t!, c, p);
+    }
+
+    // (jogo online) o leilao para todos os humanos ao mesmo tempo: os que licitam, o vendedor e o
+    // jogador; devolve o lance de cada um (milhares, ok) pelo id da equipa. null (ou devolve
+    // null): um de cada vez, como no original.
+    public Func<IReadOnlyList<Equipa>, Equipa, Jogador, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
 
     // 2:3a10: MudarSalario; tira do vendedor (3:383c), poe no vencedor (3:37b4); vendedor
     // recebe, vencedor paga; sai dos observados do vencedor; TLastTransfer tipo 0

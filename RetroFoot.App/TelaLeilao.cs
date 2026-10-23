@@ -165,6 +165,8 @@ sealed class TelaLeilao : DialogoMercado
     {
         var tcs = new TaskCompletionSource<(int, bool)>();
         Dispatcher.UIThread.Invoke(() => MostrarPainel(c, x => tcs.TrySetResult(x)));
+        // (jogo online: o leilao de todos tem prazo; acabou, sem lance)
+        if (Sessao.PrazoDialogo is { } prazo && !tcs.Task.Wait(prazo)) return (0, false);
         return tcs.Task.GetAwaiter().GetResult();
     }
 

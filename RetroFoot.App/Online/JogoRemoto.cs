@@ -140,13 +140,18 @@ public sealed class JogoRemoto
     string? _perguntaAberta;
     Sessao? _sessaoPergunta;   // a copia de uma pergunta antes da primeira rodada
     Sessao? _perguntaEm;
+    string? _respondida;
+    CUi.Folha? _esperaTodos;   // a espera pelos outros tecnicos no leilao de todos
 
     void Pergunta(JsonObject? q)
     {
         if (q == null)
         {
+            // (o leilao de todos acabou: a espera fecha)
+            if (_esperaTodos != null) { _perguntaEm?.FecharDialogo(_esperaTodos); _esperaTodos = null; _perguntaAberta = null; return; }
             // (o prazo acabou com a janela aberta: fecha)
-            if (_perguntaAberta != null) { _perguntaEm?.FecharDialogo(); _perguntaAberta = null; }
+            if (_perguntaAberta != null && _perguntaAberta != _respondida) _perguntaEm?.FecharDialogo();
+            _perguntaAberta = null;
             return;
         }
         string id = (string?)q["id"] ?? "";
@@ -173,15 +178,26 @@ public sealed class JogoRemoto
         _perguntaAberta = id;
         _perguntaEm = s;
         string tipo = (string?)q["tipo"] ?? "";
+        // (o leilao para todos os tecnicos: com o prazo do host; respondido, a espera pelos outros)
+        bool todos = (bool?)q["todos"] == true;
         _ = Task.Run(() =>
         {
             JsonObject? r = null;
+            if (todos) Sessao.PrazoDialogo = TimeSpan.FromSeconds(Math.Max(1, ((int?)q["segundos"] ?? 45) - 1));
             try { r = Responder(s, tipo, q); }
             catch (Exception ex) { Console.Error.WriteLine("pergunta: " + ex.Message); }
+            finally { Sessao.PrazoDialogo = null; }
+            if (todos) r ??= new JsonObject { ["milhares"] = 0, ["ok"] = false };
             if (r != null && _perguntaAberta == id)
-                try { _sala.B.Gravar($"{_sala.Raiz}/respostas/{_sala.Uid}/{id}", r).GetAwaiter().GetResult(); } catch { }
+                try { _sala.B.Gravar($"{_sala.Raiz}/respostas/{_sala.Uid}/{id}", r).GetAwaiter().GetResult(); _respondida = id; } catch { }
             Dispatcher.UIThread.Post(() =>
             {
+                if (todos && _perguntaAberta == id)
+                {
+                    _esperaTodos = CUi.Pergunta(T("Leilão"), T("Lance registrado. Aguardando os outros técnicos…"), Array.Empty<(string, bool, Action)>());
+                    s.AbrirDialogo(_esperaTodos);
+                    return;
+                }
                 if (_perguntaAberta == id) _perguntaAberta = null;
                 if (copia && _sessaoPergunta == s) _sessaoPergunta = null;
                 // (a rodada ainda nao chegou: a tela de antes)

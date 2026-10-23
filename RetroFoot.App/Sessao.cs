@@ -290,6 +290,28 @@ public sealed class Sessao
             var r = host.Perguntar(c.ID, "lance", O(("comprador", c.ID), ("vendedor", v.ID), ("jogador", p.ID)));
             return r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
         };
+        // o leilao da CPU para todos os tecnicos ao mesmo tempo: a janela de cada um (a do host
+        // aqui, a dos outros nos aparelhos deles) fica ate todos darem o lance ou pularem (ou o
+        // prazo); so entao o leilao decide
+        h.LanceDeTodos = (quem, v, p) =>
+        {
+            var prazo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
+            var meu = quem.FirstOrDefault(c => !host.Remota(c));
+            (int, bool)? local = null;
+            Task? t = meu == null || lance == null ? null : Task.Run(() =>
+            {
+                PrazoDialogo = prazo;
+                try { local = lance(meu, v, p); }
+                finally { PrazoDialogo = null; }
+            });
+            var rs = host.PerguntarTodos(quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList(), "lance",
+                c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID)), t, prazo);
+            t?.Wait(prazo);
+            var d = new Dictionary<ushort, (int Milhares, bool Ok)>();
+            foreach (var (eq, r) in rs) d[eq] = r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
+            if (meu != null && local is { } l) d[meu.ID] = l;
+            return d;
+        };
         var conv = h.Convite;
         h.Convite = (t, e) =>
         {

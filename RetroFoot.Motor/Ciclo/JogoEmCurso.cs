@@ -58,6 +58,8 @@ public sealed class Humano
     // a janela de substituicao (seg03:a5ad)
     public Action<JogoAtual, int, Jogador?, int>? Substituicao;
     public LanceHumano? Lance;
+    // (jogo online) o leilao da CPU para todos os humanos de uma vez (MercadoJogo.LanceDeTodos)
+    public Func<IReadOnlyList<Equipa>, Equipa, Jogador, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
     public Func<Equipa, Jogador, int, int, bool>? PedirAumento;
     public Func<Treinador, Equipa, bool>? Convite;
     // depois de cada tique do relogio da jornada (MinutePassed, seg10:069b): a interface
@@ -106,7 +108,7 @@ public sealed class JogoEmCurso
         M = new Mundo(s, semente);
         M.Regras = TRegras.DoSave(s, op.Regras);
         Op = op; H = h;
-        Mc = new MercadoJogo(s, M.R) { Regras = M.Regras, Bosman = op.Bosman, PLOP = op.PLOP };
+        Mc = new MercadoJogo(s, M.R) { Regras = M.Regras, Bosman = op.Bosman, PLOP = op.PLOP, LanceDeTodos = LanceDeTodos };
         M.Bosman = op.Bosman; M.PLOP = op.PLOP;
         M.OpcaoGestaoCPU = op.AddIn13;
         M.MostrarChicotadas = op.MostrarChicotadas;
@@ -241,7 +243,7 @@ public sealed class JogoEmCurso
         Regras = M.Regras,
         MostrarSorteio = Op.VerSorteio,
         Interacao = Interacao(),
-        Mc = { Bosman = Op.Bosman, PLOP = Op.PLOP },
+        Mc = { Bosman = Op.Bosman, PLOP = Op.PLOP, LanceDeTodos = LanceDeTodos },
     };
 
     // o save (seg05:124d): o texto do cabecalho e o nome do treinador humano e a data e
@@ -290,6 +292,9 @@ public sealed class JogoEmCurso
             (c.Texto, c.G271E, c.G271A) = (texto, g271e, g271a);
         }
     }
+
+    // (o gancho do Humano lido na hora: o jogo online o liga depois de criar o jogo)
+    Dictionary<ushort, (int Milhares, bool Ok)>? LanceDeTodos(IReadOnlyList<Equipa> quem, Equipa v, Jogador p) => H.LanceDeTodos?.Invoke(quem, v, p);
 
     Interacao Interacao() => new()
     {
