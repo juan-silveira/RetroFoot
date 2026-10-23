@@ -477,7 +477,7 @@ public sealed class JogoRemoto
                 var t = new TelaEquipa(sessao, e, jogo);
                 t.Terminou += sair =>
                 {
-                    if (sair) { Sair(); return; }
+                    if (sair) { Sair(() => _ = MostrarTime(sessao, false)); return; }
                     _ = Pronto(sessao, e);
                 };
                 sessao.Mostrar(t);
@@ -543,11 +543,55 @@ public sealed class JogoRemoto
     }
 
     // sai do jogo: a vaga e o time ficam (volta em Jogo online > Entrar, com a mesma chave)
-    async void Sair()
+    // sair do jogo: por agora (o tecnico fica de ferias, o computador cuida do time, e ele volta
+    // com a mesma chave, pela lista Suas salas) ou de vez (o tecnico sai do jogo e o computador
+    // assume o time). aoCancelar: a tela de antes (a da equipa fecha ao pedir para sair)
+    void Sair() => Sair(null);
+
+    void Sair(Action? aoCancelar)
+    {
+        var s = _jornada != null ? _sessaoAoVivo : _sessao;
+        if (s == null) { SairPorAgora(); return; }
+        CUi.Folha? f = null;
+        void Fechar() { if (f != null) s.FecharDialogo(f); }
+        f = CUi.Pergunta(T("Sair do jogo"),
+            T("Você volta depois? Saindo por agora, seu técnico fica de férias (o computador cuida do time) e você continua de onde parou, com a mesma chave. Desistindo, seu técnico sai do jogo e o computador assume o time de vez."),
+            new (string, bool, Action)[]
+            {
+                (T("Cancelar"), false, () => { Fechar(); aoCancelar?.Invoke(); }),
+                (T("Desistir de vez"), false, () => { Fechar(); ConfirmarDesistir(s, aoCancelar); }),
+                (T("Sair por agora"), true, () => { Fechar(); SairPorAgora(); }),
+            }, () => { Fechar(); aoCancelar?.Invoke(); });
+        s.AbrirDialogo(f);
+    }
+
+    void ConfirmarDesistir(Sessao s, Action? aoCancelar)
+    {
+        CUi.Folha? f = null;
+        void Fechar() { if (f != null) s.FecharDialogo(f); }
+        f = CUi.Pergunta(T("Desistir do jogo"), T("Seu técnico sai do jogo e o computador assume o time. Não dá para voltar com este técnico. Desistir mesmo?"),
+            new (string, bool, Action)[]
+            {
+                (T("Não"), false, () => { Fechar(); aoCancelar?.Invoke(); }),
+                (T("Desistir"), true, () => { Fechar(); Desistir(); }),
+            }, () => { Fechar(); aoCancelar?.Invoke(); });
+        s.AbrirDialogo(f);
+    }
+
+    async void SairPorAgora()
     {
         _vigia.Stop();
         _cli.Dispose();
         try { await _sala.Ausentar(); } catch { }
+        _voltar();
+    }
+
+    async void Desistir()
+    {
+        _vigia.Stop();
+        _cli.Dispose();
+        try { await _sala.Desistir(); } catch { }
+        Online.Esquecer(_sala.Codigo);
         _voltar();
     }
 

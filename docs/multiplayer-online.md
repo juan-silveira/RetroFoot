@@ -59,6 +59,16 @@ prontos ("Jogador 1 PRONTO · Jogador 2 AGUARDANDO…").
   substituição automática, melhor batedor.
 - **Quem cai:** fica AGUARDANDO; se não voltar a tempo, o time entra de férias (a CPU dirige) até
   ele voltar.
+- **Sair por agora ou desistir:** ao sair, o técnico escolhe. *Por agora*: o técnico dele fica de
+  férias (o computador cuida do time) e ele volta pela lista **Suas salas**, sem digitar a chave.
+  *Desistir de vez*: o técnico sai do jogo e um técnico do computador assume o time.
+- **Suas salas:** cada aparelho lembra as salas em que entrou; a lista mostra o nome da sala, a
+  chave, o ano, a rodada, o time e a divisão (o host grava o resumo a cada rodada). O host que
+  volta a um jogo cuja sala acabou a refaz com a mesma chave.
+- **Jogar com um amigo:** um save single player do host vira sala. Quem entra pela 1ª vez assume
+  um time da 4ª divisão; quem falta fica de férias e volta outro dia ao mesmo time (a sala e os
+  amigos ficam ao lado do save, `<save>.amigos.json`); quem desiste sai do jogo. Amigo demitido
+  fica sem clube até um convite (não ganha outro técnico).
 
 ## Regras (anti-trapaça)
 

@@ -8,9 +8,10 @@ using RetroFoot.Motor.Save;
 namespace RetroFoot.Motor.Online;
 
 // O modo "jogar com um amigo" (docs/multiplayer-online.md): um save single player vira um jogo
-// online por um tempo. O amigo que entra assume um time da 4a divisao (o tecnico do computador
-// e despedido); quando ele sai, o tecnico dele e despedido e sai do jogo (RemoverTreinador: um
-// tecnico desempregado do computador assume o time), e o save volta a ser single player.
+// online quando o host quiser. O amigo que entra pela 1a vez assume um time da 4a divisao (o
+// tecnico do computador e despedido); quando ele falta, o tecnico dele fica de ferias no save;
+// quando desiste de vez, o tecnico sai do jogo (RemoverTreinador: um tecnico desempregado do
+// computador assume o time).
 public static class Convidado
 {
     // um time da 4a divisao com tecnico do computador, sorteado; null se nao ha

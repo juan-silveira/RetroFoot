@@ -193,6 +193,9 @@ public sealed class Sessao
         // o prazo: o relogio; acabou com a tela do host aberta, ela fecha (o time vai com a
         // escalacao que tiver; se nao fecha, a automatica)
         host.PrazoComecou += falta => Dispatcher.UIThread.Post(() => MostrarRelogio(falta));
+        host.SemTimeNaRodada += semClube => Dispatcher.UIThread.Post(() => mostrar(new TelaAguardandoOnline(this, semClube
+            ? Idioma.T("Você está sem clube. Os outros técnicos preparam os times; um convite de outro clube pode chegar depois de uma rodada.")
+            : Idioma.T("Seu time não joga nesta rodada."))));
         host.PrazoAcabou += () => Dispatcher.UIThread.Post(() =>
         {
             FecharDialogo();

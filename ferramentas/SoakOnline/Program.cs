@@ -214,7 +214,7 @@ static class Programa
             else if (dialogo && k % 2 == 0 && (w == jh || e.StartsWith("tela=Tela"))) Tecla(w, Key.Down, PhysicalKey.ArrowDown, null);
             // (no convidado, fora da tela da equipa e das janelas, o Enter cairia no Sair da pagina;
             // e so com a tela parada ha 0,3 s: a janela que acabou de fechar ainda aparece um instante)
-            if (!e.Contains("sem-sessao") && (w == jh || ((dialogo || e.StartsWith("tela=TelaEquipa") || e.StartsWith("tela=TelaSorteioTimes")) && parado > 0.3))) Tecla(w, Key.Enter, PhysicalKey.Enter, "\r");
+            if (!e.Contains("sem-sessao") && (w == jh || ((dialogo || e.StartsWith("tela=TelaEquipa") || e.StartsWith("tela=TelaSorteioTimes") || e.StartsWith("tela=TelaClassificacao")) && parado > 0.3))) Tecla(w, Key.Enter, PhysicalKey.Enter, "\r");
         }
 
         (int, int) progresso = (-1, -1);
@@ -224,7 +224,8 @@ static class Programa
         var desde = DateTime.UtcNow; var desdeH = DateTime.UtcNow;
         var ultimoLog = DateTime.UtcNow;
         long teclas = 0;
-        bool convidou = false;
+        bool convidou = false, demitiu = false;
+        string ultimoHost = "";
         var t = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(25) };
         t.Tick += (_, _) =>
         {
@@ -275,6 +276,15 @@ static class Programa
                     new Thread(() => Console.WriteLine($"  == convite ao {clientes[0].Nome}: aceitou={sessao.J.H.Convite!(tc, outra)}")) { IsBackground = true }.Start();
                 }
             }
+            // SOAK_DEMITIR_HOST=1: o tecnico do host demitido (fica sem clube) na jornada 3
+            if (!demitiu && Environment.GetEnvironmentVariable("SOAK_DEMITIR_HOST") == "1" && m.Jornada >= 3 && e1.StartsWith("tela=TelaEquipa"))
+            {
+                demitiu = true;
+                var cpu = m.S.Treinadores.First(x => x.Humano == 0 && m.EquipaDoTreinador(x.ID) == null);
+                m.Equipa(timeHost.ID)!.Treinador = cpu.ID;
+                Console.WriteLine("  == o tecnico do host foi demitido");
+            }
+            if (demitiu && e1 != ultimoHost) { ultimoHost = e1; Console.WriteLine($"  .. host: {e1}"); }
             Jogar(jh, e1, (DateTime.UtcNow - desdeH).TotalSeconds, teclas);
             for (int i = 0; i < clientes.Count; i++) Jogar(clientes[i].W, es[i], (DateTime.UtcNow - desdeC[i]).TotalSeconds, teclas);
             teclas++;

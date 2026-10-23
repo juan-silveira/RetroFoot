@@ -262,8 +262,8 @@ public class HostClienteTestes
         Assert.Equal("Liga dos Amigos", (await Sala.LerResumo(banco, "host", sh.Codigo))!.Nome);
     }
 
-    // modo amigo: o amigo demitido (sem clube) nao ganha um segundo tecnico; quando sai, o tecnico
-    // dele (mesmo desempregado) sai do jogo e o save volta ao que era
+    // modo amigo: o amigo demitido (sem clube) nao ganha um segundo tecnico; quando desiste, o
+    // tecnico dele (mesmo desempregado) sai do jogo e o save volta ao que era
     [Fact(Timeout = 120_000)]
     public async Task ModoAmigoDemitidoNaoGanhaOutroTecnico()
     {
@@ -306,7 +306,7 @@ public class HostClienteTestes
                     var cpu = j.M.S.Treinadores.First(x => x.Humano == 0 && j.M.EquipaDoTreinador(x.ID) == null);
                     t.Treinador = cpu.ID;
                 }
-                if (barreiras == 4) sc.Ausentar().GetAwaiter().GetResult();
+                if (barreiras == 4) sc.Desistir().GetAwaiter().GetResult();
             }
             return sair || barreiras > 5;
         };
@@ -319,6 +319,49 @@ public class HostClienteTestes
         Assert.Equal(1, amigosNoJogo);
         Assert.Equal(humanosAntes, s.Treinadores.Count(t => t.Humano != 0));
         Assert.DoesNotContain(s.Treinadores, t => System.Text.Encoding.Latin1.GetString(Cifra.TextoEFT(t.Nome).Texto) == "Amigo");
+    }
+
+    // a sala normal: quem desiste de vez sai do jogo (o computador assume o time) e libera a vaga
+    [Fact(Timeout = 120_000)]
+    public async Task QuemDesisteSaiDoJogo()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "João");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        var dele = s.Equipas.First(e => e != minha && s.Divisoes.Take(4).Any(d => d.Equipas.Contains(e.ID)));
+        var tecnicoDele = s.Treinadores.First(t => t.ID == dele.Treinador);
+        tecnicoDele.Humano = 1;
+        int humanos = s.Treinadores.Count(t => t.Humano != 0);
+        await sh.DarEquipa("host", minha.ID);
+        await sh.DarEquipa("cli", dele.ID);
+        int barreiras = 0;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            host.Preparar(e, jogo);
+            if (host.Rodada != antes && ++barreiras == 1) sc.Desistir().GetAwaiter().GetResult();
+            return barreiras > 2;
+        };
+        var jg = new JogoEmCurso(s, 5, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg);
+        // (a 1a rodada sem o PRONTO dele: o prazo curto)
+        HostOnline.PrazoFixo = TimeSpan.FromSeconds(2);
+        try
+        {
+            var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+            motor.Start();
+            Assert.True(await Task.Run(() => motor.Join(60_000)));
+        }
+        finally { HostOnline.PrazoFixo = null; }
+        host.Dispose();
+        Assert.DoesNotContain(jg.M.S.Treinadores, t => t.ID == tecnicoDele.ID);
+        Assert.Equal(humanos - 1, jg.M.S.Treinadores.Count(t => t.Humano != 0));
+        Assert.Equal(0, jg.M.TreinadorDa(jg.M.Equipa(dele.ID)!)!.Humano);
+        Assert.DoesNotContain(await sh.Jogadores(), x => x.Uid == "cli");
     }
 
     [Fact]
@@ -632,8 +675,10 @@ public class HostClienteTestes
 
     // o modo amigo: o amigo que entra assume um time da 4a divisao (tecnico humano novo); quando
     // sai, e despedido e sai do jogo (um tecnico do computador assume) e o save volta a ser so do host
+    // modo amigo: o amigo entra (um time da 4a divisao), sai por agora (o tecnico fica de ferias no
+    // save do host) e volta outro dia (outra sessao do host): o mesmo tecnico, o mesmo time, sem ferias
     [Fact(Timeout = 120_000)]
-    public async Task ModoAmigoEntraESai()
+    public async Task ModoAmigoSaiPorAgoraEVolta()
     {
         var banco = new BancoMemoria();
         var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
@@ -641,23 +686,23 @@ public class HostClienteTestes
         var s = Jogo98.Ler(Entrada());
         var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
         int humanosAntes = s.Treinadores.Count(t => t.Humano != 0);
-        int treinadoresAntes = s.Treinadores.Count;
         await sh.DarEquipa("host", minha.ID);
         using var cli = new ClienteOnline(sc);
         ushort timeDoAmigo = 0;
         int rodadasDoAmigo = 0;
+        bool jogando = true;
         cli.NovoRetrato += (r, rodada, versao, inst) => _ = Task.Run(async () =>
         {
-            var eu = (await sc.Jogadores()).First(x => x.Uid == "cli");
-            if (eu.Equipa == 0 || rodadasDoAmigo >= 2) return;
+            var eu = (await sc.Jogadores()).FirstOrDefault(x => x.Uid == "cli");
+            if (eu == null || eu.Equipa == 0 || !jogando || rodadasDoAmigo >= 2) return;
             timeDoAmigo = eu.Equipa;
             rodadasDoAmigo++;
             var c = Jogo98.Ler(r.Save);
             var e = c.Equipas.First(x => x.ID == eu.Equipa);
             Escalacao.Automatico(new Aleatorio(3), e);
             await cli.Pronto(new Preparo(e.Jogadores.Select(x => new Escalado(x.ID, Memoria.Escalacao(x))).ToList(), 10000, new(), 0));
-            // depois da 2a rodada, sai do jogo
-            if (rodadasDoAmigo == 2) await sc.Ausentar();
+            // depois da 2a rodada, sai por agora
+            if (rodadasDoAmigo == 2) { jogando = false; await sc.Ausentar(); }
         });
         int barreiras = 0;
         bool humanoNoMeio = false;
@@ -679,20 +724,93 @@ public class HostClienteTestes
         var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
         motor.Start();
         Assert.True(await Task.Run(() => motor.Join(90_000)));
+        var amigos = host.Convidados.ToDictionary(x => x.Key, x => x.Value);
         host.Dispose();
         Assert.NotEqual(0, timeDoAmigo);
         Assert.Contains(timeDoAmigo, s.Divisoes[3].Equipas);
         Assert.True(humanoNoMeio);
-        // saiu: o tecnico dele saiu do jogo; o time ficou com um tecnico do computador
-        Assert.Equal(humanosAntes, s.Treinadores.Count(t => t.Humano != 0));
-        Assert.DoesNotContain(s.Treinadores, t => System.Text.Encoding.Latin1.GetString(Cifra.TextoEFT(t.Nome).Texto) == "Amigo");
-        var tc = s.Treinadores.FirstOrDefault(t => t.ID == s.Equipas.First(x => x.ID == timeDoAmigo).Treinador);
-        Assert.NotNull(tc);
-        Assert.Equal(0, tc!.Humano);
+        // saiu por agora: o tecnico dele continua no time, de ferias (o computador cuida)
+        var tecnico = amigos["cli"];
+        var t1 = jg.M.TreinadorDa(jg.M.Equipa(timeDoAmigo)!)!;
+        Assert.Equal(tecnico, t1.ID);
+        Assert.Equal(humanosAntes + 1, jg.M.S.Treinadores.Count(t => t.Humano != 0));
+        Assert.Equal(1, t1.B06);
+
+        // outro dia: o host abre o save de novo, o amigo entra com a mesma chave
+        var s2 = Jogo98.Ler(jg.Gravado!);
+        var sc2 = await Sala.Entrar(banco, "cli", sh.Codigo, "Amigo");
+        int barreiras2 = 0;
+        HostOnline? host2 = null;
+        var h2 = new Humano();
+        h2.Preparar = (j, e, jogo) =>
+        {
+            string antes = host2!.Rodada;
+            bool sair = host2.Preparar(e, jogo);
+            if (host2.Rodada != antes) barreiras2++;
+            return sair || barreiras2 > 1;
+        };
+        var jg2 = new JogoEmCurso(s2, 14, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h2);
+        host2 = new HostOnline(sh, jg2) { ModoAmigo = true, Amigos = amigos };
+        HostOnline.PrazoFixo = TimeSpan.FromSeconds(2);
+        try
+        {
+            var motor2 = new Thread(() => jg2.Ciclo()) { IsBackground = true };
+            motor2.Start();
+            Assert.True(await Task.Run(() => motor2.Join(90_000)));
+        }
+        finally { HostOnline.PrazoFixo = null; }
+        host2.Dispose();
+        Assert.Equal(timeDoAmigo, (await sh.Jogadores()).First(x => x.Uid == "cli").Equipa);
+        var t2 = jg2.M.TreinadorDa(jg2.M.Equipa(timeDoAmigo)!)!;
+        Assert.Equal(tecnico, t2.ID);
+        Assert.Equal(0, t2.B06);
+        Assert.Equal(humanosAntes + 1, jg2.M.S.Treinadores.Count(t => t.Humano != 0));
     }
 
-    // as perguntas do motor ao dono de um time de outro aparelho: a resposta dele volta; sem
-    // resposta no prazo, null (o padrao do motor)
+    // modo amigo: quem desiste de vez sai do jogo; um tecnico do computador assume o time
+    [Fact(Timeout = 120_000)]
+    public async Task ModoAmigoDesisteDeVez()
+    {
+        var banco = new BancoMemoria();
+        var sh = await Sala.Criar(banco, "host", "Juan", "0.2.0");
+        var sc = await Sala.Entrar(banco, "cli", sh.Codigo, "Amigo");
+        var s = Jogo98.Ler(Entrada());
+        var minha = s.Equipas.First(e => MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+        int humanosAntes = s.Treinadores.Count(t => t.Humano != 0);
+        await sh.DarEquipa("host", minha.ID);
+        using var cli = new ClienteOnline(sc);
+        ushort timeDoAmigo = 0;
+        cli.NovoRetrato += (r, rodada, versao, inst) => _ = Task.Run(async () =>
+        {
+            var eu = (await sc.Jogadores()).FirstOrDefault(x => x.Uid == "cli");
+            if (eu == null || eu.Equipa == 0 || timeDoAmigo != 0) return;
+            timeDoAmigo = eu.Equipa;
+            await sc.Desistir();
+        });
+        int barreiras = 0;
+        HostOnline? host = null;
+        var h = new Humano();
+        h.Preparar = (j, e, jogo) =>
+        {
+            string antes = host!.Rodada;
+            bool sair = host.Preparar(e, jogo);
+            if (host.Rodada != antes) barreiras++;
+            return sair || barreiras > 3;
+        };
+        var jg = new JogoEmCurso(s, 13, Opcoes.Padrao with { Regras = TRegras.Launcher(8) }, h);
+        host = new HostOnline(sh, jg) { ModoAmigo = true };
+        var motor = new Thread(() => jg.Ciclo()) { IsBackground = true };
+        motor.Start();
+        Assert.True(await Task.Run(() => motor.Join(90_000)));
+        host.Dispose();
+        Assert.NotEqual(0, timeDoAmigo);
+        Assert.Equal(humanosAntes, jg.M.S.Treinadores.Count(t => t.Humano != 0));
+        Assert.DoesNotContain(jg.M.S.Treinadores, t => System.Text.Encoding.Latin1.GetString(Cifra.TextoEFT(t.Nome).Texto) == "Amigo");
+        Assert.Equal(0, jg.M.TreinadorDa(jg.M.Equipa(timeDoAmigo)!)!.Humano);
+        Assert.DoesNotContain(await sh.Jogadores(), x => x.Uid == "cli");
+        Assert.Empty(host.Convidados);
+    }
+
     [Fact(Timeout = 60_000)]
     public async Task PerguntaVaiAoDonoEVolta()
     {

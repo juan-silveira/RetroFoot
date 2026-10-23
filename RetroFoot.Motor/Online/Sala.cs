@@ -33,7 +33,9 @@ public static class Fases
 
 public static class Estados
 {
-    public const string Preparando = "preparando", Pronto = "pronto", Saiu = "saiu";
+    // Saiu: por agora (o tecnico fica de ferias e volta com a mesma chave); Desistiu: de vez (o
+    // tecnico sai do jogo e o computador assume o time)
+    public const string Preparando = "preparando", Pronto = "pronto", Saiu = "saiu", Desistiu = "desistiu";
 }
 
 public sealed class Sala
@@ -247,6 +249,11 @@ public sealed class Sala
     // de ferias (o computador cuida do time) e a rodada nao espera por ele
     public Task Ausentar(CancellationToken ct = default) =>
         B.Atualizar($"{Raiz}/jogadores/{Uid}", new JsonObject { ["estado"] = Estados.Saiu }, ct);
+
+    // desiste do jogo de vez: o host tira o tecnico dele do jogo (um do computador assume o time)
+    // e libera a vaga
+    public Task Desistir(CancellationToken ct = default) =>
+        B.Atualizar($"{Raiz}/jogadores/{Uid}", new JsonObject { ["estado"] = Estados.Desistiu }, ct);
 
     // sai da sala antes do jogo: a vaga fica livre (o host apaga a sala inteira)
     public async Task Sair(CancellationToken ct = default)

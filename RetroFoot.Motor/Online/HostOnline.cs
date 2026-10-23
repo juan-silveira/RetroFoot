@@ -105,7 +105,7 @@ public sealed class HostOnline : IDisposable
         if (_sair)
         {
             // (o modo amigo: o save volta a ser single player antes de gravar)
-            if (ModoAmigo && !Passou) TirarConvidados();
+            if (ModoAmigo && !Passou) FeriasDosAmigos();
             return true;
         }
         if (Remota(e))
@@ -159,15 +159,19 @@ public sealed class HostOnline : IDisposable
             })));
         }
         AtualizarJogadores();
+        // (o host sem time nesta rodada: a espera pelos outros na tela dele)
+        if (_localPronto) SemTimeNaRodada?.Invoke(TimeDoHost == null);
         while (!TodosProntos() && !_sair)
         {
             // (de segundo em segundo, mesmo sem novidade: o prazo e quem sumiu)
             if (_fila.TryTake(out var a, 1000)) a();
             if (_jogadores.Values.Any(x => x.Uid != _sala.Uid && (Ausente(x) || (ModoAmigo && x.Equipa == 0))))
             {
+                int antes = _jogadores.Values.Count(x => x.Equipa != 0);
                 Ferias();
+                if (ModoAmigo) AtualizarJogadores();
                 // (no modo amigo, quem chegou recebe o jogo com o time dele)
-                if (ModoAmigo && _ultimo.E != null) Publicar(_ultimo.E, _ultimo.Jogo);
+                if (ModoAmigo && _ultimo.E != null && _jogadores.Values.Count(x => x.Equipa != 0) != antes) Publicar(_ultimo.E, _ultimo.Jogo);
             }
             ConferirPrazo();
             // (as vendas e compras do host, na tela dele: o aviso para os outros na hora)
@@ -191,8 +195,10 @@ public sealed class HostOnline : IDisposable
         _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid && _jogam.Contains(x.Equipa) && !Ausente(x) && !_forcados.Contains(x.Uid)
             && !(x.Estado == Estados.Pronto && x.Rodada == Rodada)).ToList();
 
+    // (o host sem time na rodada, sem clube ou fora da Taca, nao tem PRONTO para dar: o prazo
+    // comeca ja, senao a rodada esperaria para sempre por quem nao aperta Jogar)
     bool AlguemPronto() =>
-        (_localPronto && _hostJoga) || _jogadores.Values.Any(x => x.Uid != _sala.Uid && x.Estado == Estados.Pronto && x.Rodada == Rodada);
+        _localPronto || _jogadores.Values.Any(x => x.Uid != _sala.Uid && x.Estado == Estados.Pronto && x.Rodada == Rodada);
 
     // ---------------------------------------------------------------- o prazo
     // Depois do primeiro PRONTO da rodada, todos tem o prazo da sala (Sala.Prazo, 1 a 5 min); ele
@@ -206,6 +212,8 @@ public sealed class HostOnline : IDisposable
     bool _hostJoga;
     // o relogio comecou (o tempo que falta) e o prazo acabou (a tela do host fecha sozinha)
     public event Action<TimeSpan>? PrazoComecou;
+    // a barreira sem nada para o host preparar (true: ele esta sem clube; false: o time dele nao joga)
+    public event Action<bool>? SemTimeNaRodada;
     public event Action? PrazoAcabou;
 
     void ConferirPrazo()
@@ -233,7 +241,7 @@ public sealed class HostOnline : IDisposable
 
     bool Ausente(JogadorSala j)
     {
-        if (j.Estado == Estados.Saiu) return true;
+        if (j.Estado is Estados.Saiu or Estados.Desistiu) return true;
         if (!_vistos.TryGetValue(j.Uid, out var v) || v.Visto != j.Visto) { _vistos[j.Uid] = (j.Visto, DateTime.UtcNow); return false; }
         return DateTime.UtcNow - v.Quando > PrazoAusente;
     }
@@ -265,20 +273,38 @@ public sealed class HostOnline : IDisposable
     }
 
     // ---------------------------------------------------------------- o modo amigo
-    // (Online/Convidado) um save single player com amigos: quem entra assume um time da 4a
-    // divisao; quem sai (ou some) e despedido e sai do jogo (em vez das ferias); no fim do jogo
-    // online todos os convidados saem e o save volta a ser so do host
+    // (Online/Convidado) um save single player com amigos: quem entra pela 1a vez assume um time
+    // da 4a divisao; quem falta ou sai por agora fica de ferias (o computador cuida do time) e,
+    // voltando (mesmo outro dia, com a mesma chave), continua com o tecnico dele; quem desiste
+    // de vez sai do jogo (um tecnico do computador assume). O tecnico de cada amigo fica no save
+    // do host e o registro uid -> tecnico ao lado dele (Amigos, que o aplicativo guarda)
     public bool ModoAmigo { get; init; }
+    // os amigos de sessoes anteriores deste save (uid -> o tecnico dele)
+    public IReadOnlyDictionary<string, ushort> Amigos { init { foreach (var (k, v) in value) _convidados[k] = v; } }
     readonly Dictionary<string, ushort> _convidados = new();   // uid -> o tecnico dele
+    public IReadOnlyDictionary<string, ushort> Convidados => _convidados;
     public event Action<string, bool>? ConvidadoMudou;           // nome, entrou
+    public event Action? AmigosMudaram;                          // (para gravar o registro)
+
+    bool TecnicoExiste(ushort tid) => _j.M.S.Treinadores.Any(t => t.ID == tid);
 
     void AmigosEntramESaem()
     {
-        // quem chegou: um time da 4a divisao (o sorteio nao gasta o Random do jogo). Quem ja tem um
-        // tecnico no jogo e ficou sem clube (demitido) nao ganha outro: espera um convite, como no
-        // jogo local (os desempregados humanos sao chamados primeiro)
-        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && x.Estado != Estados.Saiu && !_convidados.ContainsKey(x.Uid)).ToList())
+        // quem chegou sem time: o tecnico dele (de outra vez) ou um novo, num time da 4a divisao
+        // (o sorteio nao gasta o Random do jogo). Quem tem tecnico e ficou sem clube (demitido)
+        // nao ganha outro: espera um convite, como no jogo local
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && !Ausente(x)).ToList())
         {
+            if (_convidados.TryGetValue(j.Uid, out var tid) && TecnicoExiste(tid))
+            {
+                if (_j.M.EquipaDoTreinador(tid) is { } eq)
+                {
+                    try { _sala.DarEquipa(j.Uid, eq.ID).GetAwaiter().GetResult(); } catch { }
+                    _tecnicoDe[j.Uid] = tid;
+                    ConvidadoMudou?.Invoke(j.Nome, true);
+                }
+                continue;
+            }
             (Treinador T, Equipa E)? r = null;
             _naInterface(() => r = Convidado.Entrar(_j, j.Nome, new Aleatorio((uint)Environment.TickCount)));
             if (r is not { } ok) continue;
@@ -286,10 +312,15 @@ public sealed class HostOnline : IDisposable
             _tecnicoDe[j.Uid] = ok.T.ID;
             try { _sala.DarEquipa(j.Uid, ok.E.ID).GetAwaiter().GetResult(); } catch { }
             ConvidadoMudou?.Invoke(j.Nome, true);
+            AmigosMudaram?.Invoke();
         }
-        // quem saiu ou sumiu: despedido e fora do jogo (pelo tecnico dele: o time pode ter mudado, ou
-        // ele estar sem clube); a vaga fica livre (voltando, e outro tecnico)
-        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && (x.Equipa != 0 || _convidados.ContainsKey(x.Uid)) && Ausente(x)).ToList())
+    }
+
+    // quem desistiu de vez (nos dois modos): o tecnico dele sai do jogo (um do computador assume o
+    // time) e a vaga fica livre; voltando, entra como um tecnico novo
+    void Desistencias()
+    {
+        foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Estado == Estados.Desistiu).ToList())
         {
             if (TecnicoDoConvidado(j) is ushort tid) _naInterface(() => Convidado.Sair(_j, tid));
             _convidados.Remove(j.Uid);
@@ -301,11 +332,20 @@ public sealed class HostOnline : IDisposable
             }
             catch { }
             ConvidadoMudou?.Invoke(j.Nome, false);
+            AmigosMudaram?.Invoke();
         }
-        AtualizarJogadores();
     }
 
-    // o fim do jogo online no modo amigo: todos os convidados saem
+    // o host saiu do jogo (modo amigo): os tecnicos dos amigos de ferias no save (no jogo sozinho
+    // do host, o computador cuida dos times deles); voltando, as ferias acabam
+    void FeriasDosAmigos()
+    {
+        foreach (var tid in _convidados.Values.ToList())
+            if (_j.M.S.Treinadores.FirstOrDefault(t => t.ID == tid) is { Humano: not 0 } t && t.B06 == 0)
+                _naInterface(() => MercadoJogo.Ferias(t, true));
+    }
+
+    // todos os amigos saem do jogo (o save sem eles)
     public void TirarConvidados()
     {
         foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid).ToList())
@@ -318,7 +358,8 @@ public sealed class HostOnline : IDisposable
     ushort? TecnicoDoConvidado(JogadorSala j)
     {
         ushort hostTec = _j.M.Equipa(TimeDoHost ?? 0)?.Treinador ?? 0;
-        if (_convidados.TryGetValue(j.Uid, out var tid)) return tid != hostTec && _j.M.S.Treinadores.Any(t => t.ID == tid) ? tid : null;
+        if (_convidados.TryGetValue(j.Uid, out var tid)) return tid != hostTec && TecnicoExiste(tid) ? tid : null;
+        if (_tecnicoDe.TryGetValue(j.Uid, out tid) && tid != hostTec && TecnicoExiste(tid)) return tid;
         if (j.Equipa != 0 && _j.M.Equipa(j.Equipa) is { } e && _j.M.TreinadorDa(e) is { Humano: not 0 } t && t.ID != hostTec) return t.ID;
         return null;
     }
@@ -326,7 +367,8 @@ public sealed class HostOnline : IDisposable
     // na barreira: as ferias de quem esta ausente, e o fim delas para quem voltou
     void Ferias()
     {
-        if (ModoAmigo) { AmigosEntramESaem(); return; }
+        Desistencias();
+        if (ModoAmigo) AmigosEntramESaem();
         foreach (var j in _jogadores.Values.Where(x => x.Equipa != 0 && x.Uid != _sala.Uid))
         {
             if (_j.M.Equipa(j.Equipa) is not { } e || _j.M.TreinadorDa(e) is not { Humano: not 0 } t) continue;
