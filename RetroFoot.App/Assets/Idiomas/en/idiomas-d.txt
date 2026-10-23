@@ -5,6 +5,7 @@ Guarda-redes	Goalkeeper
 Defesa	Defender
 Médio	Midfielder
 Avançado	Forward
+Não marcad	Missed
 GOLO	GOAL
 Defendeu	Saved
 Ao poste	Post

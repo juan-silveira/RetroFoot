@@ -88,7 +88,8 @@ public sealed partial class TelaJornada : UserControl
         // jeito de tirar de ferias um tecnico que esta sozinho); o relogio para enquanto ela esta aberta
         AddHandler(PointerPressedEvent, (_, e) =>
         {
-            if (!e.GetCurrentPoint(this).Properties.IsRightButtonPressed || acabou || gestaoAberta) return;
+            // (no jogo online nao ha Gestao de Tecnicos: os tecnicos sao os da sala)
+            if (!e.GetCurrentPoint(this).Properties.IsRightButtonPressed || acabou || gestaoAberta || s.Online != null || s.Remoto != null) return;
             e.Handled = true;
             gestaoAberta = true;
             bool estava = pausado;

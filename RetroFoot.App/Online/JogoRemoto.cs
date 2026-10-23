@@ -86,7 +86,7 @@ public sealed class JogoRemoto
         // (recusado, ou expulso ja tirado)
         sala.B.Observar($"{sala.Raiz}/jogadores/{sala.Uid}", (caminho, v) =>
         {
-            if (caminho != "/" && caminho != "/estado") return;
+            if (caminho != "/" && caminho != "/estado" && caminho != "/equipa") return;
             Dispatcher.UIThread.Post(async () =>
             {
                 JsonNode? eu = caminho == "/" ? v : await Ler($"{sala.Raiz}/jogadores/{sala.Uid}");
@@ -97,6 +97,8 @@ public sealed class JogoRemoto
                 else if (estado == Estados.Pedindo && _sessao == null)
                     _mostrar(Mensagem(T("Jogo online"), T("O jogo já começou: o host precisa permitir sua entrada. Aguarde…")));
                 if (eu != null) _estado = estado;
+                // (o destaque so do meu time, na jornada e na classificacao: o time da sala)
+                if ((int?)eu?["equipa"] is int eq && eq != 0) TelaJornada.SoTime = (ushort)eq;
             });
         });
         // a sala acabou (o host encerrou o jogo com o amigo, ou apagou a sala): o aviso e o inicio
@@ -441,8 +443,7 @@ public sealed class JogoRemoto
     }
     DateTime _sinalHost = DateTime.UtcNow;
     readonly DispatcherTimer _vigia;
-    CUi.Folha? _avisoHost;
-    Sessao? _avisoEm;
+    Action? _avisoHost;   // fecha o aviso de host desconectado
 
     string _hostUid = "";
     bool _virouHost;
@@ -462,7 +463,7 @@ public sealed class JogoRemoto
             _cli.Dispose();
             Dispatcher.UIThread.Post(() =>
             {
-                _avisoEm?.FecharDialogo(_avisoHost);
+                _avisoHost?.Invoke(); _avisoHost = null;
                 _mostrar(new TelaInicio(_mostrar, new TelaInicio.OnlineNovo(_sala, js, null, r)));
             });
         }
@@ -500,7 +501,7 @@ public sealed class JogoRemoto
         // (no jogar com um amigo, o host que some por 90 s fechou o jogo: o amigo e desconectado)
         if (_modoAmigo && _rodada.Length > 0 && parado > TimeSpan.FromSeconds(90))
         {
-            if (_avisoHost != null) { _avisoEm?.FecharDialogo(_avisoHost); _avisoHost = null; }
+            if (_avisoHost != null) { _avisoHost(); _avisoHost = null; }
             Encerrada();
             return;
         }
@@ -509,17 +510,15 @@ public sealed class JogoRemoto
         if (sumiu && _avisoHost == null && _sessao is { } ss)
         {
             // (no jogar com um amigo o jogo e o save do host: ninguem assume; sem ele, nao ha jogo)
-            _avisoHost = CUi.Pergunta(T("Host desconectado"), _modoAmigo
-                ? T("O host perdeu a conexão. O jogo é o save dele: quando ele voltar, o jogo continua daqui. Você pode esperar ou sair.")
-                : T("O host saiu do jogo ou perdeu a conexão. Se ele não voltar em cerca de 1 minuto, outro técnico da sala assume o host e o jogo continua. Você pode esperar aqui ou sair (sua vaga e seu time ficam guardados)."),
-                new[] { (T("Sair do jogo"), false, (Action)Sair) });
-            _avisoEm = ss;
             ss.EsconderRelogio();
-            ss.AbrirDialogo(_avisoHost);
+            _avisoHost = Online.Janela(ss, T("Host desconectado"), null, Online.Texto(_modoAmigo
+                ? T("O host perdeu a conexão. O jogo é o save dele: quando ele voltar, o jogo continua daqui. Você pode esperar ou sair.")
+                : T("O host saiu do jogo ou perdeu a conexão. Se ele não voltar em cerca de 1 minuto, outro técnico da sala assume o host e o jogo continua. Você pode esperar aqui ou sair (sua vaga e seu time ficam guardados).")),
+                new (string, bool, Action)[] { (T("Sair do jogo"), false, Sair) }, () => { });
         }
         else if (!sumiu && _avisoHost != null)
         {
-            _avisoEm?.FecharDialogo(_avisoHost);
+            _avisoHost();
             _avisoHost = null;
         }
     }
@@ -534,7 +533,8 @@ public sealed class JogoRemoto
         _instancia = instancia;
         // (o retrato novo da mesma rodada vem de um comando: so refaz a tela de quem mandou; os
         // outros seguem mexendo no time sem a tela recarregar no meio)
-        if (!nova && !_esperandoRetrato && _sessao != null) return;
+        // (sem time ainda, o espectador: o jogo novo da mesma rodada traz o time dele)
+        if (!nova && !_esperandoRetrato && _sessao != null && _time != null) return;
         _esperandoRetrato = false;
         if (!nova && _pronto) return;   // (ja mandou o Preparo desta rodada)
         if (_rodada.Length == 0) Comecou?.Invoke();
@@ -659,30 +659,27 @@ public sealed class JogoRemoto
     {
         var s = _jornada != null ? _sessaoAoVivo : _sessao;
         if (s == null) { SairPorAgora(); return; }
-        CUi.Folha? f = null;
-        void Fechar() { if (f != null) s.FecharDialogo(f); }
-        f = CUi.PerguntaEmColuna(T("Sair do jogo"),
-            T("Você volta depois? Saindo por agora, seu técnico fica de férias (o computador cuida do time) e você continua de onde parou, com a mesma chave. Desistindo, seu técnico sai do jogo e o computador assume o time de vez."),
+        Action fechar = () => { };
+        fechar = Online.Janela(s, T("Sair do jogo"), null,
+            Online.Texto(T("Você volta depois? Saindo por agora, seu técnico fica de férias (o computador cuida do time) e você continua de onde parou, com a mesma chave. Desistindo, seu técnico sai do jogo e o computador assume o time de vez.")),
             new (string, bool, Action)[]
             {
-                (T("Cancelar"), false, () => { Fechar(); aoCancelar?.Invoke(); }),
-                (T("Desistir de vez"), false, () => { Fechar(); ConfirmarDesistir(s, aoCancelar); }),
-                (T("Sair por agora"), true, () => { Fechar(); SairPorAgora(); }),
-            }, () => { Fechar(); aoCancelar?.Invoke(); });
-        s.AbrirDialogo(f);
+                (T("Cancelar"), false, () => { fechar(); aoCancelar?.Invoke(); }),
+                (T("Desistir de vez"), false, () => { fechar(); ConfirmarDesistir(s, aoCancelar); }),
+                (T("Sair por agora"), true, () => { fechar(); SairPorAgora(); }),
+            }, () => { fechar(); aoCancelar?.Invoke(); }, emColuna: true);
     }
 
     void ConfirmarDesistir(Sessao s, Action? aoCancelar)
     {
-        CUi.Folha? f = null;
-        void Fechar() { if (f != null) s.FecharDialogo(f); }
-        f = CUi.Pergunta(T("Desistir do jogo"), T("Seu técnico sai do jogo e o computador assume o time. Não dá para voltar com este técnico. Desistir mesmo?"),
+        Action fechar = () => { };
+        fechar = Online.Janela(s, T("Desistir do jogo"), null,
+            Online.Texto(T("Seu técnico sai do jogo e o computador assume o time. Não dá para voltar com este técnico. Desistir mesmo?")),
             new (string, bool, Action)[]
             {
-                (T("Não"), false, () => { Fechar(); aoCancelar?.Invoke(); }),
-                (T("Desistir"), true, () => { Fechar(); Desistir(); }),
-            }, () => { Fechar(); aoCancelar?.Invoke(); });
-        s.AbrirDialogo(f);
+                (T("Não"), false, () => { fechar(); aoCancelar?.Invoke(); }),
+                (T("Desistir"), true, () => { fechar(); Desistir(); }),
+            }, () => { fechar(); aoCancelar?.Invoke(); });
     }
 
     // o sorteio que o host mandou: a tela dele; o jogo que chegar enquanto ela esta aberta espera
@@ -701,13 +698,12 @@ public sealed class JogoRemoto
             var s = _jornada != null ? _sessaoAoVivo : _sessao;
             if (s == null) return;
             var l = ts2.OfType<JsonObject>().Select(t => ((string?)t["nome"] ?? "", (ushort)((int?)t["equipa"] ?? 0))).ToList();
-            Control? tela = null;
             try
             {
-                // (o time novo ainda nao esta no jogo deste aparelho: o jogo que veio com o sorteio)
+                // (o time novo ainda nao esta no jogo deste aparelho: o jogo que veio com o sorteio).
+                // Depois, se este aparelho ainda esta sem time, o time (que chegou no jogo novo)
                 var js = (string?)o["save"] is { } sv2 ? Jogo98.Ler(AoVivo.Descomprimir(sv2)) : s.S;
-                tela = new TelaSorteioTimes(js, l, () => { if (tela != null) s.FecharDialogo(tela); });
-                s.AbrirDialogo(tela);
+                TelaSorteioTimes.EmJanela(s, js, l, () => { if (_time == null && _sessao is { } ss && _jornada == null) _ = MostrarTime(ss, false); });
             }
             catch (Exception ex) { Console.Error.WriteLine("sorteio: " + ex.Message); }
             return;

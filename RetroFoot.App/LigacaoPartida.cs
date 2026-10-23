@@ -256,6 +256,9 @@ public static class LigacaoPartida
 
     static int Previsto(Sessao s, SEquipa? defensor, SJogador batedor)
     {
+        // (no aparelho de um convidado o penalti e cobrado no host: o resultado nao e conhecido
+        // aqui; -1 = sem resultado na janela, ele aparece na partida)
+        if (s.Remoto != null) return -1;
         var gk = defensor == null ? null : Penaltis.Goleiro(defensor);
         if (gk == null) return 0;
         return Penaltis.CobrarPenalti(new Aleatorio(s.J.R.Semente), gk, batedor);

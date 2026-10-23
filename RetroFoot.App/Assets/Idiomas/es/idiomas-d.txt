@@ -5,6 +5,7 @@ Guarda-redes	Portero
 Defesa	Defensa
 Médio	Centrocampista
 Avançado	Delantero
+Não marcad	Falló
 GOLO	GOL
 Defendeu	Parada
 Ao poste	Poste

@@ -111,12 +111,10 @@ public static class Online
         // time e a situacao; tocar escolhe; embaixo o Expulsar (so o host) e o OK
         var lista = new ContentControl { Content = CUi.Txt("…", 13, CUi.Fraco) };
         var expulsar = new CUi.Botao(T("Expulsar"), false, () => { }) { Habilitado = false };
-        CUi.Folha f = null!;
-        var ok = new CUi.Botao(T("OK"), true, () => s.FecharDialogo(f)) { HorizontalAlignment = HorizontalAlignment.Stretch };
-        var corpo = new StackPanel { Spacing = 12, Children = { lista } };
+        var corpo = new StackPanel { Spacing = 12, MinWidth = 380, Children = { lista } };
         if (host != null) corpo.Children.Add(CUi.Botoes(expulsar));
-        f = new CUi.Folha(T("Técnicos na sala"), corpo, ok, Titulo(sala), fechar: () => s.FecharDialogo(f));
-        s.AbrirDialogo(f);
+        Action fecharLista = () => { };
+        fecharLista = Janela(s, T("Técnicos na sala"), Titulo(sala), corpo, new (string, bool, Action)[] { (T("OK"), true, () => fecharLista()) }, largura: 520);
         List<JogadorSala> js = new();
         int sel = -1;
         string hostUid = "";
@@ -154,16 +152,15 @@ public static class Online
         {
             if (host == null || !expulsar.Habilitado || sel < 0 || sel >= js.Count) return;
             var jj = js[sel];
-            CUi.Folha c = null!;
-            c = CUi.PerguntaEmColuna(T("Expulsar"), jj.Equipa != 0
+            Action fecharC = () => { };
+            fecharC = Janela(s, T("Expulsar"), null, Texto(jj.Equipa != 0
                 ? T("Tirar {0} do jogo? O aparelho dele sai na hora; o técnico dele sai do jogo e o computador assume o time na próxima preparação.", jj.Nome)
-                : T("Tirar {0} da sala?", jj.Nome),
+                : T("Tirar {0} da sala?", jj.Nome)),
                 new (string, bool, Action)[]
                 {
-                    (T("Expulsar"), true, () => { s.FecharDialogo(c); s.FecharDialogo(f); _ = host.Expulsar(jj.Uid); }),
-                    (T("Cancelar"), false, () => s.FecharDialogo(c)),
-                }, () => s.FecharDialogo(c));
-            s.AbrirDialogo(c);
+                    (T("Expulsar"), true, () => { fecharC(); fecharLista(); _ = host.Expulsar(jj.Uid); }),
+                    (T("Cancelar"), false, () => fecharC()),
+                }, emColuna: true);
         };
         async void Encher()
         {
@@ -179,6 +176,41 @@ public static class Online
         }
         Encher();
     }
+
+    // a janela do jogo online: no computador a janela moderna (o padrao das janelas do jogo, com os
+    // botoes no rodape); no celular a folha de baixo (os botoes um por linha com emColuna). Devolve
+    // o fechar
+    public static Action Janela(Sessao s, string titulo, string? sub, Control corpo, IReadOnlyList<(string Texto, bool Principal, Action Acao)> botoes,
+        Action? aoVoltar = null, double largura = 480, bool emColuna = false)
+    {
+        if (Celular.Ativo)
+        {
+            CUi.Folha f = null!;
+            Control rodape;
+            if (emColuna)
+            {
+                var col = new StackPanel { Spacing = 8 };
+                foreach (var (t, pr, a) in botoes.OrderByDescending(x => x.Principal))
+                    col.Children.Add(new CUi.Botao(t, pr, a) { HorizontalAlignment = HorizontalAlignment.Stretch });
+                rodape = col;
+            }
+            else rodape = CUi.Botoes(botoes.Select(b => (Control)new CUi.Botao(b.Texto, b.Principal, b.Acao)).ToArray());
+            f = new CUi.Folha(titulo, corpo, rodape, sub, fechar: aoVoltar ?? (() => s.FecharDialogo(f))) { AoVoltar = aoVoltar ?? (() => s.FecharDialogo(f)) };
+            s.AbrirDialogo(f);
+            return () => s.FecharDialogo(f);
+        }
+        if (corpo is TextBlock tb) tb.TextWrapping = TextWrapping.Wrap;
+        var j = new JanelaModerna(titulo, sub, null, corpo, largura, double.NaN);
+        foreach (var (t, pr, a) in botoes.OrderBy(x => x.Principal)) j.Botao(t, pr, a);
+        var principal = botoes.FirstOrDefault(x => x.Principal);
+        if (principal.Acao != null) j.AoEnter = principal.Acao;
+        j.AoFechar = aoVoltar ?? (() => s.FecharDialogo(j));
+        s.AbrirDialogo(j);
+        return () => s.FecharDialogo(j);
+    }
+
+    // um texto de janela (quebra a linha)
+    public static Control Texto(string t) => CUi.Txt(t, 15, CUi.Texto, FontWeight.Normal, true);
 
     // "Liga dos Amigos · K7MPQ2"
     public static string Titulo(Sala sala) => sala.Nome.Length > 0 ? $"{sala.Nome} · {sala.Codigo}" : sala.Codigo;
@@ -718,7 +750,8 @@ public static class TelaEsperaOnline
 // para ele, um de cada vez; depois o Continuar
 public sealed class TelaSorteioTimes : UserControl
 {
-    public TelaSorteioTimes(RetroFoot.Motor.Save.Jogo98 s, IReadOnlyList<(string Nome, ushort Equipa)> tecnicos, Action continuar)
+    // emJanela: so a lista (o sorteio de quem entrou com o jogo comecado, numa janela: Online.Janela)
+    public TelaSorteioTimes(RetroFoot.Motor.Save.Jogo98 s, IReadOnlyList<(string Nome, ushort Equipa)> tecnicos, Action continuar, bool emJanela = false)
     {
         FontFamily = CUi.Fonte;
         var lista = new StackPanel { Spacing = 10 };
@@ -753,6 +786,15 @@ public sealed class TelaSorteioTimes : UserControl
         };
         t.Start();
         DetachedFromVisualTree += (_, _) => t.Stop();
-        Content = Online.Pagina(T("Sorteio dos times"), T("O time de cada técnico da sala"), null, lista, botao);
+        Content = emJanela ? lista : Online.Pagina(T("Sorteio dos times"), T("O time de cada técnico da sala"), null, lista, botao);
+    }
+
+    // o sorteio de quem entrou com o jogo comecado: a janela do jogo online (por cima da tela)
+    public static void EmJanela(Sessao s, RetroFoot.Motor.Save.Jogo98 jogo, IReadOnlyList<(string Nome, ushort Equipa)> tecnicos, Action? depois = null)
+    {
+        Action fechar = () => { };
+        var corpo = new TelaSorteioTimes(jogo, tecnicos, () => { }, true) { MinWidth = 360 };
+        fechar = Online.Janela(s, T("Sorteio dos times"), T("O time de quem entrou no jogo"), corpo,
+            new (string, bool, Action)[] { (T("Continuar"), true, () => { fechar(); depois?.Invoke(); }) });
     }
 }

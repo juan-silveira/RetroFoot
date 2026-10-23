@@ -394,23 +394,17 @@ public sealed class Sessao
         // proxima preparacao) ou recusa
         host.PedidoDeEntrada += j => Dispatcher.UIThread.Post(() =>
         {
-            CUi.Folha f = null!;
-            f = CUi.PerguntaEmColuna(Idioma.T("Pedido para entrar"),
-                Idioma.T("{0} quer entrar no jogo. Se você permitir, ele assiste às rodadas como espectador e recebe um time da 4ª divisão na próxima preparação dos times.", j.Nome),
+            Action fechar = () => { };
+            fechar = global::RetroFoot.App.Online.Janela(this, Idioma.T("Pedido para entrar"), null,
+                global::RetroFoot.App.Online.Texto(Idioma.T("{0} quer entrar no jogo. Se você permitir, ele assiste às rodadas como espectador e recebe um time da 4ª divisão na próxima preparação dos times.", j.Nome)),
                 new (string, bool, Action)[]
                 {
-                    (Idioma.T("Permitir"), true, () => { FecharDialogo(f); _ = host.ResponderEntrada(j.Uid, true); }),
-                    (Idioma.T("Recusar"), false, () => { FecharDialogo(f); _ = host.ResponderEntrada(j.Uid, false); }),
-                }, () => { });
-            AbrirDialogo(f);
+                    (Idioma.T("Permitir"), true, () => { fechar(); _ = host.ResponderEntrada(j.Uid, true); }),
+                    (Idioma.T("Recusar"), false, () => { fechar(); _ = host.ResponderEntrada(j.Uid, false); }),
+                }, () => { }, emColuna: true);
         });
         // os times de quem entrou agora: o sorteio para todos (aqui por cima da tela)
-        host.NovosTimes += l => Dispatcher.UIThread.Post(() =>
-        {
-            Control? t = null;
-            t = new TelaSorteioTimes(S, l, () => { if (t != null) FecharDialogo(t); });
-            AbrirDialogo(t);
-        });
+        host.NovosTimes += l => Dispatcher.UIThread.Post(() => TelaSorteioTimes.EmJanela(this, S, l));
         // (o destaque so do time deste aparelho, na jornada e na classificacao)
         TelaJornada.SoTime = host.MeuTime;
         host.JogadoresMudaram += l => TelaJornada.SoTime = host.MeuTime;
@@ -429,7 +423,13 @@ public sealed class Sessao
             comeco?.Invoke(titulo, jn);
         };
         var minuto = h.Minuto;
-        h.Minuto = jn => { host.NoMinuto(jn); host.TransmitirMinuto(jn); minuto?.Invoke(jn); };
+        h.Minuto = jn =>
+        {
+            host.NoMinuto(jn); host.TransmitirMinuto(jn);
+            // (o destaque so do time deste aparelho)
+            if (host.MeuTime is ushort meu) TelaJornada.SoTime = meu;
+            minuto?.Invoke(jn);
+        };
     }
 
     // ---------------------------------------------------------------- o relogio do prazo
