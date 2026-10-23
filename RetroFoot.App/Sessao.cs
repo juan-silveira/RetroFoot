@@ -184,6 +184,16 @@ public sealed class Sessao
             var t = telaLocal = new TelaEquipa(this, e, jogo);
             t.Terminou += sair =>
             {
+                // (modo amigo) ao fechar: os amigos saem do save; antes, a opcao de guardar uma copia
+                // com eles como jogo online
+                if (sair && host.ModoAmigo && host.Convidados.Count > 0)
+                {
+                    Dlg.Perguntar(this, Idioma.T("Jogar com um amigo"),
+                        Idioma.T("Seu save volta a ser só seu: os amigos são demitidos e o computador assume os times deles. Quer guardar também uma cópia deste jogo como jogo online, com os amigos, para continuarem juntos outro dia (com a mesma chave)?"),
+                        () => { host.Bifurcar = true; tcs.TrySetResult(true); },
+                        () => tcs.TrySetResult(true));
+                    return;
+                }
                 tcs.TrySetResult(sair);
                 if (!sair) Dispatcher.UIThread.Post(() => { if (camadaTela.Child == t) mostrar(TelaAguardando()); });
             };

@@ -103,36 +103,6 @@ public static class Online
     // o nome da sala do jogo de um host (para a sala nova, se a antiga acabou)
     public static string NomeLembrado(string codigo) => Salas().FirstOrDefault(x => x.Codigo == codigo)?.Nome ?? "";
 
-    // (modo amigo) a sala de um save e os amigos dele (uid -> tecnico), ao lado do save
-    // (<save>.amigos.json): os amigos voltam com a mesma chave e continuam com o tecnico deles
-    public sealed record AmigosDoSave(string Codigo, string Nome, Dictionary<string, ushort> Amigos);
-    static string ArquivoAmigos(string save) => save + ".amigos.json";
-
-    public static AmigosDoSave? LerAmigos(string save)
-    {
-        try
-        {
-            if (!File.Exists(ArquivoAmigos(save))) return null;
-            if (System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(ArquivoAmigos(save))) is not System.Text.Json.Nodes.JsonObject o) return null;
-            var d = new Dictionary<string, ushort>();
-            if (o["amigos"] is System.Text.Json.Nodes.JsonObject a)
-                foreach (var (k, v) in a) if ((int?)v is int t) d[k] = (ushort)t;
-            return new AmigosDoSave((string?)o["codigo"] ?? "", (string?)o["nome"] ?? "", d);
-        }
-        catch { return null; }
-    }
-
-    public static void GravarAmigos(string save, Sala sala, IReadOnlyDictionary<string, ushort> amigos)
-    {
-        try
-        {
-            var a = new System.Text.Json.Nodes.JsonObject();
-            foreach (var (k, v) in amigos) a[k] = (int)v;
-            File.WriteAllText(ArquivoAmigos(save), new System.Text.Json.Nodes.JsonObject { ["codigo"] = sala.Codigo, ["nome"] = sala.Nome, ["amigos"] = a }.ToJsonString());
-        }
-        catch { }
-    }
-
     // "Liga dos Amigos · K7MPQ2"
     public static string Titulo(Sala sala) => sala.Nome.Length > 0 ? $"{sala.Nome} · {sala.Codigo}" : sala.Codigo;
 
@@ -333,13 +303,11 @@ public sealed class TelaOnline : UserControl
         // jogar um save seu com um amigo (o amigo assume um time da 4a divisao; depois o save
         // volta a ser so seu)
         var amigo = new StackPanel { Spacing = 8 };
-        amigo.Children.Add(CUi.Txt(T("Abra um save seu como sala: cada amigo que entrar assume um time da 4ª divisão. Se ele faltar ou sair por agora, o técnico dele fica de férias (o computador cuida do time) e ele volta com a mesma chave; se desistir, sai do jogo e o computador assume o time."), 13, CUi.Fraco, FontWeight.Normal, true));
+        amigo.Children.Add(CUi.Txt(T("Abra um save seu como sala, para jogar uma vez: cada amigo que entrar assume um time da 4ª divisão (se cair, o técnico dele fica de férias até ele voltar). Quando você fechar o jogo, os amigos são demitidos e saem do save, e o computador assume os times deles."), 13, CUi.Fraco, FontWeight.Normal, true));
         foreach (var arq in Online.SavesLocais())
         {
             var nomeSave = Path.GetFileNameWithoutExtension(arq);
-            // (a sala de outra vez deste save: a mesma chave, para os amigos voltarem ao time deles)
-            var antes = Online.LerAmigos(arq);
-            var bt = new CUi.Botao(T("Jogar {0} com um amigo", nomeSave), false, async () =>
+            amigo.Children.Add(new CUi.Botao(T("Jogar {0} com um amigo", nomeSave), false, async () =>
             {
                 Online.UltimoNome = nome.Text ?? "";
                 Ocupado(true); aviso.IsVisible = false;
@@ -347,22 +315,13 @@ public sealed class TelaOnline : UserControl
                 {
                     var bn = Online.Banco;
                     await bn.Ler("salas/AAAAAA/info");
-                    Sala? sala = antes != null && Sala.CodigoValido(antes.Codigo) ? await Sala.Reabrir(bn, bn.Uid, antes.Codigo) : null;
-                    if (sala == null)
-                    {
-                        sala = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao,
-                            !string.IsNullOrWhiteSpace(nomeSala.Text) ? nomeSala.Text : antes?.Nome is { Length: > 0 } n ? n : T("{0} com amigos", nomeSave),
-                            default, antes?.Codigo);
-                        await sala.DefinirModo(Sala.ModoAmigo);
-                    }
-                    Online.GravarAmigos(arq, sala, antes?.Amigos ?? new());
+                    var sala = await Sala.Criar(bn, bn.Uid, nome.Text ?? "", Online.Versao,
+                        string.IsNullOrWhiteSpace(nomeSala.Text) ? T("{0} com amigos", nomeSave) : nomeSala.Text);
+                    await sala.DefinirModo(Sala.ModoAmigo);
                     _mostrar(new TelaSala(_mostrar, _voltar, sala, true, arq, modoAmigo: true));
                 }
                 catch (Exception ex) { Erro(T("Não consegui criar a sala: {0}", Curto(ex))); }
-            }) { HorizontalAlignment = HorizontalAlignment.Stretch };
-            if (antes != null && Sala.CodigoValido(antes.Codigo))
-                amigo.Children.Add(new StackPanel { Spacing = 4, Children = { CUi.Txt(T("Sala {0} · {1} amigo(s): eles voltam com esta chave", antes.Codigo, antes.Amigos.Count), 13, CUi.Fraco), bt } });
-            else amigo.Children.Add(bt);
+            }) { HorizontalAlignment = HorizontalAlignment.Stretch });
         }
         if (amigo.Children.Count > 1) corpo.Children.Add(CUi.Cartao_(T("Jogar com um amigo"), amigo));
         Content = Online.Pagina(T("Jogo online"), T("Sem login: só a chave da sala"), _voltar, corpo);
@@ -534,8 +493,9 @@ public sealed class TelaSala : UserControl
             cliente?.Dispose();
             // (o host de um jogo gravado so sai: a sala fica para continuar depois)
             if (host) Online.Sinal(null);
-            // (o host de um jogo gravado, e o do modo amigo, so sai: a sala fica para continuar depois)
-            try { if (host && arquivo == null) await sala.Apagar(); else if (host) await sala.Pausar(); else await sala.Sair(); } catch { }
+            // (o host de um jogo gravado so sai: a sala fica para continuar depois; a do modo amigo
+            // e de uma sessao so)
+            try { if (host && (arquivo == null || modoAmigo)) await sala.Apagar(); else if (host) await sala.Pausar(); else await sala.Sair(); } catch { }
             voltar();
         }
         // (host) o sinal de vida desde a sala, antes do jogo (e enquanto ele cria o jogo): os

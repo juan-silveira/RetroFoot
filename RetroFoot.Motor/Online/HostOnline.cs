@@ -105,7 +105,9 @@ public sealed class HostOnline : IDisposable
         if (_sair)
         {
             // (o modo amigo: o save volta a ser single player antes de gravar)
-            if (ModoAmigo && !Passou) FeriasDosAmigos();
+            // (Bifurcar: o aplicativo grava antes uma copia com os amigos, o jogo online, e tira
+            // os amigos do save ele mesmo)
+            if (ModoAmigo && !Passou && !Bifurcar) TirarConvidados();
             return true;
         }
         if (Remota(e))
@@ -273,24 +275,23 @@ public sealed class HostOnline : IDisposable
     }
 
     // ---------------------------------------------------------------- o modo amigo
-    // (Online/Convidado) um save single player com amigos: quem entra pela 1a vez assume um time
-    // da 4a divisao; quem falta ou sai por agora fica de ferias (o computador cuida do time) e,
-    // voltando (mesmo outro dia, com a mesma chave), continua com o tecnico dele; quem desiste
-    // de vez sai do jogo (um tecnico do computador assume). O tecnico de cada amigo fica no save
-    // do host e o registro uid -> tecnico ao lado dele (Amigos, que o aplicativo guarda)
+    // (Online/Convidado) um save single player com amigos, por uma sessao: quem entra assume um
+    // time da 4a divisao; quem cai ou sai por agora fica de ferias (o computador cuida do time) e,
+    // voltando na mesma sessao, continua com o tecnico dele; quem desiste sai do jogo. Quando o
+    // host fecha o jogo, todos os amigos sao demitidos e saem do save (TirarConvidados)
     public bool ModoAmigo { get; init; }
-    // os amigos de sessoes anteriores deste save (uid -> o tecnico dele)
-    public IReadOnlyDictionary<string, ushort> Amigos { init { foreach (var (k, v) in value) _convidados[k] = v; } }
+    // o host quis, ao fechar, guardar tambem uma copia do jogo com os amigos como jogo online
+    // (uma bifurcacao: o save dele volta a ser single player; a copia continua online com eles)
+    public bool Bifurcar { get; set; }
     readonly Dictionary<string, ushort> _convidados = new();   // uid -> o tecnico dele
     public IReadOnlyDictionary<string, ushort> Convidados => _convidados;
     public event Action<string, bool>? ConvidadoMudou;           // nome, entrou
-    public event Action? AmigosMudaram;                          // (para gravar o registro)
 
     bool TecnicoExiste(ushort tid) => _j.M.S.Treinadores.Any(t => t.ID == tid);
 
     void AmigosEntramESaem()
     {
-        // quem chegou sem time: o tecnico dele (de outra vez) ou um novo, num time da 4a divisao
+        // quem chegou sem time: o tecnico dele (se ja entrou nesta sessao) ou um novo, num time da 4a divisao
         // (o sorteio nao gasta o Random do jogo). Quem tem tecnico e ficou sem clube (demitido)
         // nao ganha outro: espera um convite, como no jogo local
         foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid && x.Equipa == 0 && !Ausente(x)).ToList())
@@ -312,7 +313,6 @@ public sealed class HostOnline : IDisposable
             _tecnicoDe[j.Uid] = ok.T.ID;
             try { _sala.DarEquipa(j.Uid, ok.E.ID).GetAwaiter().GetResult(); } catch { }
             ConvidadoMudou?.Invoke(j.Nome, true);
-            AmigosMudaram?.Invoke();
         }
     }
 
@@ -332,20 +332,11 @@ public sealed class HostOnline : IDisposable
             }
             catch { }
             ConvidadoMudou?.Invoke(j.Nome, false);
-            AmigosMudaram?.Invoke();
         }
     }
 
-    // o host saiu do jogo (modo amigo): os tecnicos dos amigos de ferias no save (no jogo sozinho
-    // do host, o computador cuida dos times deles); voltando, as ferias acabam
-    void FeriasDosAmigos()
-    {
-        foreach (var tid in _convidados.Values.ToList())
-            if (_j.M.S.Treinadores.FirstOrDefault(t => t.ID == tid) is { Humano: not 0 } t && t.B06 == 0)
-                _naInterface(() => MercadoJogo.Ferias(t, true));
-    }
-
-    // todos os amigos saem do jogo (o save sem eles)
+    // o host fechou o jogo: todos os amigos sao demitidos e saem do save (um tecnico do computador
+    // assume cada time)
     public void TirarConvidados()
     {
         foreach (var j in _jogadores.Values.Where(x => x.Uid != _sala.Uid).ToList())

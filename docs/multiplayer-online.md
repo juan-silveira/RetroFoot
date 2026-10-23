@@ -65,10 +65,14 @@ prontos ("Jogador 1 PRONTO · Jogador 2 AGUARDANDO…").
 - **Suas salas:** cada aparelho lembra as salas em que entrou; a lista mostra o nome da sala, a
   chave, o ano, a rodada, o time e a divisão (o host grava o resumo a cada rodada). O host que
   volta a um jogo cuja sala acabou a refaz com a mesma chave.
-- **Jogar com um amigo:** um save single player do host vira sala. Quem entra pela 1ª vez assume
-  um time da 4ª divisão; quem falta fica de férias e volta outro dia ao mesmo time (a sala e os
-  amigos ficam ao lado do save, `<save>.amigos.json`); quem desiste sai do jogo. Amigo demitido
-  fica sem clube até um convite (não ganha outro técnico).
+- **Jogar com um amigo:** um save single player do host vira sala por **uma sessão**. Quem entra
+  assume um time da 4ª divisão; se cai ou sai por agora, o técnico dele fica de férias até ele
+  voltar (na mesma sessão); se desiste, sai do jogo. Quando o host fecha o jogo, todos os amigos
+  são demitidos e saem do save (um técnico do computador assume cada time), o save volta a ser um
+  save single player normal e a sala é apagada. Ao fechar, o host pode também **guardar uma cópia
+  como jogo online** (uma bifurcação): a cópia, com os amigos nos times deles, vira um jogo online
+  normal (`data/online/<chave>`, a mesma sala e a mesma chave) e o save dele, sem os amigos, segue
+  single player. Amigo demitido fica sem clube até um convite (não ganha outro técnico).
 
 ## Regras (anti-trapaça)
 

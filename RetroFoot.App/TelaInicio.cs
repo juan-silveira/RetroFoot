@@ -44,8 +44,9 @@ public sealed partial class TelaInicio : UserControl
     // o jogo novo de uma sala online (TelaSala): os tecnicos sao os da sala, um time cada
     // Arquivo: o jogo online gravado que o host continua (null: um jogo novo)
     // Retrato: o host passado para este aparelho (ou assumido): o jogo continua do retrato
-    // ModoAmigo: um save single player do host com amigos (cada amigo assume um time da 4a
-    // divisao; quem falta fica de ferias; quem desiste sai do jogo)
+    // ModoAmigo: um save single player do host com amigos, por uma sessao (cada amigo assume um
+    // time da 4a divisao; quem cai fica de ferias; quem desiste, e todos quando o host fecha o
+    // jogo, saem do save)
     public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores, string? Arquivo = null,
         RetroFoot.Motor.Online.Retrato? Retrato = null, bool ModoAmigo = false);
     readonly OnlineNovo? online;
@@ -920,13 +921,7 @@ public sealed partial class TelaInicio : UserControl
         RetroFoot.Motor.Online.HostOnline? hostOnline = null;
         if (online != null)
         {
-            var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a))
-            {
-                ModoAmigo = online.ModoAmigo,
-                // (modo amigo) os amigos de outras vezes voltam com o tecnico deles
-                Amigos = online.ModoAmigo ? Online.LerAmigos(arquivo)?.Amigos ?? new() : new(),
-            };
-            if (online.ModoAmigo) host.AmigosMudaram += () => Online.GravarAmigos(arquivo, online.Sala, host.Convidados);
+            var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a)) { ModoAmigo = online.ModoAmigo };
             sessao.LigarOnline(host);
             Online.Sinal(null);   // (o HostOnline manda o sinal de vida daqui em diante)
             Online.ManterVivo?.Invoke(true);
@@ -944,9 +939,31 @@ public sealed partial class TelaInicio : UserControl
                 mostrar(new TelaSala(mostrar, () => mostrar(Inicial()), online.Sala, false));
                 return;
             }
-            // o host saiu do jogo: quem esta na sala espera ele continuar (no modo amigo, os amigos
-            // ficam de ferias no save; na proxima vez, a mesma sala e o mesmo time de cada um)
-            if (online.ModoAmigo) Online.GravarAmigos(arquivo, online.Sala, hostOnline!.Convidados);
+            // o modo amigo acabou: o save (ja sem os amigos) volta a ser single player e a sala some.
+            // Com a bifurcacao: o jogo com os amigos vira um jogo online (data/online/<chave>, a sala
+            // fica, agora sala normal) e o save do host, sem eles, volta a ser single player
+            if (online.ModoAmigo)
+            {
+                if (hostOnline is { Bifurcar: true } h && sessao.J.Gravado is { } comAmigos && !sessao.SemGravar)
+                {
+                    try
+                    {
+                        var copia = Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98");
+                        Directory.CreateDirectory(Path.GetDirectoryName(copia)!);
+                        File.WriteAllBytes(copia, comAmigos);
+                        h.TirarConvidados();
+                        File.WriteAllBytes(arquivo, sessao.J.Gravar());
+                        _ = online.Sala.DefinirModo("");
+                        _ = online.Sala.Pausar();
+                        Online.Lembrar(online.Sala);
+                        mostrar(Inicial());
+                        return;
+                    }
+                    catch (Exception ex) { Console.Error.WriteLine("bifurcacao: " + ex.Message); }
+                }
+                _ = online.Sala.Apagar(); mostrar(Inicial()); return;
+            }
+            // o host saiu do jogo: quem esta na sala espera ele continuar
             _ = online.Sala.Pausar();
             mostrar(Inicial());
         };
