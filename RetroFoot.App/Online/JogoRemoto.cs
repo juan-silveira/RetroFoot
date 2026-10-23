@@ -564,6 +564,8 @@ public sealed class JogoRemoto
         }
         Dispatcher.UIThread.Post(() =>
         {
+            // (o destaque so do meu time, na classificacao e na jornada)
+            TelaJornada.SoTime = e.ID;
             // (o sorteio do host ainda na tela: o time depois do Continuar)
             if (_noSorteio) { _depoisDoSorteio = () => _ = MostrarTime(sessao, false); return; }
             void Time()

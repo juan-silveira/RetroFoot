@@ -64,7 +64,6 @@ public sealed class Sessao
         host.Children.Add(camadaTela);
         host.Children.Add(camadaDialogo);
         host.Children.Add(relogio);
-        TelaJornada.SoTime = null;   // (o jogo online liga o time deste aparelho)
         host.Children.Add(aviso);
         host.Children.Add(avisosCanto);
         MontarAvisos();
@@ -412,6 +411,9 @@ public sealed class Sessao
             t = new TelaSorteioTimes(S, l, () => { if (t != null) FecharDialogo(t); });
             AbrirDialogo(t);
         });
+        // (o destaque so do time deste aparelho, na jornada e na classificacao)
+        TelaJornada.SoTime = host.MeuTime;
+        host.JogadoresMudaram += l => TelaJornada.SoTime = host.MeuTime;
         host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => { jogadoresOnline = l; JogadoresOnline?.Invoke(l); });
         // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
         host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });

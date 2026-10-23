@@ -921,6 +921,8 @@ public sealed partial class TelaInicio : UserControl
         // criar os jogos de novo (como IniciarMotor do Go).
         if (novo) sessao.J.M.Retomar = -1;
         RetroFoot.Motor.Online.HostOnline? hostOnline = null;
+        // (o jogo sozinho: o destaque de todos os times humanos; o online liga o deste aparelho)
+        if (online == null) TelaJornada.SoTime = null;
         if (online != null)
         {
             var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a)) { ModoAmigo = online.ModoAmigo };

@@ -108,7 +108,8 @@ sealed class TelaClassificacaoModerna : UserControl
     }
 
     // ---------------------------------------------------------------- dados
-    bool Humana(Equipa e) => _treinadores.TryGetValue(e.Treinador, out var t) && t.Humano != 0;
+    // (no jogo online, so o time deste aparelho: TelaJornada.SoTime)
+    bool Humana(Equipa e) => _treinadores.TryGetValue(e.Treinador, out var t) && t.Humano != 0 && (TelaJornada.SoTime is not ushort meu || e.ID == meu);
 
     // a divisao com mais equipas de treinadores humanos (empate: a de cima; nenhum: a 1a)
     int DivisaoDosHumanos()

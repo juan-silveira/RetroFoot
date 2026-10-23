@@ -231,8 +231,8 @@ public sealed partial class TelaJornada
         for (int k = 0; k < Math.Min(l.VermCasa, 3); k++) Cartao(dc, Vermelho, mc - meia + 3 + 3 * k, yv);
         for (int k = 0; k < Math.Min(l.VermFora, 3); k++) Cartao(dc, Vermelho, mc + meia - 9 - 3 * k, yv);
         // os nomes, a casa encostada ao logo dela
-        bool humCasa = l.Jogo?.Treinador[Lado.Casa] is { Humano: not 0 };
-        bool humFora = l.Jogo?.Treinador[Lado.Visit] is { Humano: not 0 };
+        bool humCasa = l.Jogo is { } jc && EDestaque(jc, Lado.Casa);
+        bool humFora = l.Jogo is { } jf && EDestaque(jf, Lado.Visit);
         var nc = TxtM(l.Casa, 13, MTexto, humCasa);
         var nf = TxtM(l.Fora, 13, MTexto, humFora);
         using (dc.PushClip(new Rect(cx + 8, ry, Math.Max(0, xc - 8 - cx - 8), passoM)))
