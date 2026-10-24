@@ -474,7 +474,9 @@ public sealed class JogoRemoto
             {
                 var e = Eq("equipa");
                 if (e == null || q["titulares"] is not JsonArray ts) return null;
-                var tit = ts.Select(x => e.Jogadores.FirstOrDefault(p => p.ID == (int?)x)).OfType<Jogador>().ToList();
+                // (na ordem da tela: por posicao e nome, como no jogo sozinho)
+                var tit = ts.Select(x => e.Jogadores.FirstOrDefault(p => p.ID == (int?)x)).OfType<Jogador>()
+                    .OrderBy(p => p.Posicao).ThenBy(p => P98.NomeJogador(p), StringComparer.Ordinal).ToList();
                 var sug = e.Jogadores.FirstOrDefault(p => p.ID == (int?)q["sugerido"]);
                 var b = LigacaoPartida.BatedorOnline(s, e, tit, sug);
                 return new JsonObject { ["jogador"] = (int)(b?.ID ?? 0) };
