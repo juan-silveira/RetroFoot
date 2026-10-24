@@ -201,7 +201,8 @@ static class Programa
             var tela = (camadaTela.GetValue(ss) as Border)?.Child;
             var dl = (camadaDialogo.GetValue(ss) as Grid)!.Children.Select(c => c.Tag?.GetType().Name ?? c.GetType().Name).ToList();
             foreach (var d in dl) janelas.TryAdd(d, 0);
-            return $"tela={tela?.GetType().Name} dialogos=[{string.Join(",", dl)}]";
+            bool rel = (typeof(Sessao).GetField("relogio", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(ss) as Control)?.IsVisible == true;
+            return $"tela={tela?.GetType().Name} dialogos=[{string.Join(",", dl)}]" + (rel ? " RELOGIO" : "");
         }
         Sessao? SessaoCli(JogoRemoto r) => (remJornada.GetValue(r) != null ? remAoVivo.GetValue(r) : remSessao.GetValue(r) ?? remPergunta.GetValue(r)) as Sessao;
 
@@ -248,7 +249,7 @@ static class Programa
             for (int i = 0; i < clientes.Count; i++)
             {
                 es[i] = Estado(SessaoCli(clientes[i].Rem), clientes[i].F.Child, clientes[i].Janelas);
-                if (es[i] != ec[i]) { ec[i] = es[i]; desdeC[i] = DateTime.UtcNow; desde = DateTime.UtcNow; }
+                if (es[i] != ec[i]) { ec[i] = es[i]; desdeC[i] = DateTime.UtcNow; desde = DateTime.UtcNow; if (Environment.GetEnvironmentVariable("SOAK_VER_CLIENTE") == "1") Console.WriteLine($"  .. {clientes[i].Nome}: {es[i]}  (host: {e1})"); }
                 // o goleiro expulso: a janela das trocas aberta no aparelho do dono
                 if (goleiroDe == clientes[i].Uid && es[i].Contains("TelaSubstituicao"))
                 {
@@ -295,8 +296,15 @@ static class Programa
                 Console.WriteLine("  == o tecnico do host foi demitido");
             }
             if (demitiu && e1 != ultimoHost) { ultimoHost = e1; Console.WriteLine($"  .. host: {e1}"); }
+            // (as janelas do online no host, como o pedido ja permitido e o sorteio: fechadas)
+            if (e1.Contains("JanelaModerna")) sessao.FecharDialogo();
             Jogar(jh, e1, (DateTime.UtcNow - desdeH).TotalSeconds, teclas);
-            for (int i = 0; i < clientes.Count; i++) Jogar(clientes[i].W, es[i], (DateTime.UtcNow - desdeC[i]).TotalSeconds, teclas);
+            // SOAK_CLIENTE_DEMORA=s: o convidado so mexe na tela da equipa depois de s segundos (o host
+            // fica PRONTO antes: o prazo e o relogio no convidado)
+            int demora = int.TryParse(Environment.GetEnvironmentVariable("SOAK_CLIENTE_DEMORA"), out var dm) ? dm : 0;
+            for (int i = 0; i < clientes.Count; i++)
+                if (!(es[i].StartsWith("tela=TelaEquipa") && (DateTime.UtcNow - desdeC[i]).TotalSeconds < demora))
+                    Jogar(clientes[i].W, es[i], (DateTime.UtcNow - desdeC[i]).TotalSeconds, teclas);
             teclas++;
         };
         t.Start();

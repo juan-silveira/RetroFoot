@@ -595,14 +595,17 @@ public sealed class JogoRemoto
         var minha = js.FirstOrDefault(x => x.Uid == _sala.Uid);
         if (minha == null || minha.Equipa == 0 || sessao.Equipa(minha.Equipa) is not { } e)
         {
-            Dispatcher.UIThread.Post(() => _mostrar(Mensagem(T("Jogo online"), minha?.Estado == Estados.Espectador
+            Dispatcher.UIThread.Post(() => { if (sessao == _sessao) _mostrar(Mensagem(T("Jogo online"), minha?.Estado == Estados.Espectador
                 ? T("Você entrou como espectador: assiste às rodadas e recebe um time na próxima preparação dos times.")
                 : minha?.Estado == Estados.Pedindo ? T("O jogo já começou: o host precisa permitir sua entrada. Aguarde…")
-                : T("Aguardando o host dar um time para você…"))));
+                : T("Aguardando o host dar um time para você…"))); });
             return;
         }
         Dispatcher.UIThread.Post(() =>
         {
+            // (o jogo de uma rodada pode chegar duas vezes seguidas: a tela do mais velho, montada por
+            // ultimo, ficava por cima da do mais novo, e o relogio ia para a escondida)
+            if (sessao != _sessao) return;
             // (o destaque so do meu time, na classificacao e na jornada)
             TelaJornada.SoTime = e.ID;
             // (o sorteio do host ainda na tela: ele passa para dentro da tela do jogo, para as
