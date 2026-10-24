@@ -794,6 +794,19 @@ public sealed class HostOnline : IDisposable
         return r;
     }
 
+    // a classificacao depois da rodada (rodada/classificacao): os outros a veem ao mesmo tempo que
+    // o host, com o jogo deste momento (a rodada que acabou ja na tabela)
+    int _classificacoes;
+    public void PublicarClassificacao()
+    {
+        string save = "";
+        _naInterface(() => save = AoVivo.Comprimir(_j.M.S.Gravar()));
+        Enviar($"{_sala.Raiz}/rodada/classificacao", new JsonObject
+        {
+            ["n"] = ++_classificacoes, ["ano"] = (int)_j.M.Ano, ["jornada"] = (int)_j.M.Jornada, ["save"] = save,
+        });
+    }
+
     // o jogo parado esperando um tecnico (rodada/espera): a janela do host (j null) ou a pergunta
     // a outro aparelho; os outros veem o aviso. null: acabou
     int _esperas;

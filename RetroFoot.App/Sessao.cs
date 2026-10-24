@@ -297,6 +297,9 @@ public sealed class Sessao
             : nome == "*" ? Idioma.T("⏸ Intervalo: os técnicos fazem as substituições") : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
         // o penalti contra um time humano (a janela de quem defende, com o batedor e o resultado):
         // a do host aqui; a de outro aparelho la (com o prazo; os outros veem o aviso)
+        // a classificacao depois da rodada: nos outros aparelhos ao mesmo tempo
+        var classif = J.M.G.Classificacao;
+        J.M.G.Classificacao = (m, x) => { host.PublicarClassificacao(); classif?.Invoke(m, x); };
         var pen = h.Penalti;
         h.Penalti = (atacante, defensor, batedor, res) =>
         {

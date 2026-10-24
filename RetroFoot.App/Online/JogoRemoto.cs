@@ -132,6 +132,32 @@ public sealed class JogoRemoto
             if (modo == Sala.ModoAmigo) _modoAmigo = true;
             else if (_modoAmigo) { _modoAmigo = false; Online.Lembrar(sala); }
         });
+        // a classificacao depois da rodada, ao mesmo tempo que a do host (sobre a partida que
+        // acabou); fechada, o fundo verde ate o jogo novo. Depois ela nao volta (_classificacaoVista)
+        bool primeiraClassificacao = true;
+        sala.B.Observar($"{sala.Raiz}/rodada/classificacao", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject o) return;
+            bool velha = primeiraClassificacao;   // (a que ja estava no banco ao entrar)
+            primeiraClassificacao = false;
+            if (velha) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                var s = _jornada != null ? _sessaoAoVivo : _sessao;
+                if (s == null || (string?)o["save"] is not { } sv) return;
+                var chave = ((int?)o["ano"] ?? 0, (int?)o["jornada"] ?? 0);
+                if (_classificacaoVista == chave) return;
+                try
+                {
+                    var js = Jogo98.Ler(AoVivo.Descomprimir(sv));
+                    _classificacaoVista = chave;
+                    var c = new TelaClassificacao(js, Math.Max(chave.Item2, 1), true);
+                    c.Fechou += () => s.FundoVerdeDepoisDaRodada();
+                    s.Mostrar(c);
+                }
+                catch (Exception ex) { Console.Error.WriteLine("classificacao: " + ex.Message); }
+            });
+        });
         // o jogo parado esperando outro tecnico (a janela do host, a pergunta a outro aparelho):
         // o aviso aqui, em vez da tela parada sem explicacao
         sala.B.Observar($"{sala.Raiz}/rodada/espera", (caminho, v) =>
@@ -467,7 +493,7 @@ public sealed class JogoRemoto
 
     bool _pausaMinha;
     bool _viuSorteio;
-    (int, int) _classificacaoVista;   // a rodada (ano, jornada) cuja classificacao ja foi mostrada
+    (int, int) _classificacaoVista;   // a rodada jogada (ano, jornada) cuja classificacao ja foi mostrada
     bool _anteriorTaca;   // a rodada que passou foi da Taca (sem a classificacao depois dela)
     volatile bool _modoAmigo;   // a sala do jogar com um amigo (o save do host, a meio da temporada)
     int _noticia, _leilaoVisto, _penaltisVistos, _leilaoAbertoVisto;
@@ -746,9 +772,9 @@ public sealed class JogoRemoto
             // passou); na Taca e logo depois dela, direto ao time
             // (uma vez por rodada: o jogo novo da mesma rodada, depois dos leiloes, nao a mostra de novo)
             else if (nova && sessao.J.M.Jornada > 1 && !_rodada.EndsWith("-T") && !_anteriorTaca
-                && _classificacaoVista != (sessao.J.M.Ano, sessao.J.M.Jornada))
+                && _classificacaoVista != (sessao.J.M.Ano, sessao.J.M.Jornada - 1))
             {
-                _classificacaoVista = (sessao.J.M.Ano, sessao.J.M.Jornada);
+                _classificacaoVista = (sessao.J.M.Ano, sessao.J.M.Jornada - 1);
                 var c = new TelaClassificacao(sessao, sessao.J.M.Jornada - 1, false);
                 c.Fechou += Time;
                 sessao.Mostrar(c);
