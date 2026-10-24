@@ -793,12 +793,12 @@ public sealed class HostOnline : IDisposable
     }
 
     // o leilao de todos comecou (rodada/leilaoAberto): quem nao licita ve a espera ate o resultado
-    public void AvisarLeilaoAberto(ushort jogador, ushort vendedor, IEnumerable<ushort> licitantes)
+    public void AvisarLeilaoAberto(ushort jogador, ushort vendedor, int preco, IEnumerable<ushort> licitantes)
     {
         var uids = licitantes.Select(e => DonoDe(e)?.Uid).OfType<string>().ToList();
         Enviar($"{_sala.Raiz}/rodada/leilaoAberto", new JsonObject
         {
-            ["n"] = _leilao + 1, ["jogador"] = (int)jogador, ["vendedor"] = (int)vendedor,
+            ["n"] = _leilao + 1, ["jogador"] = (int)jogador, ["vendedor"] = (int)vendedor, ["preco"] = preco,
             ["licitam"] = new JsonArray(uids.Select(u => (JsonNode)u).ToArray()),
         });
     }

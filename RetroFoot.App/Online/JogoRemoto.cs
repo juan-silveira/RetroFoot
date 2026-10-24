@@ -146,8 +146,15 @@ public sealed class JogoRemoto
                 FecharEsperaLeilao();
                 s.FundoVerdeDepoisDaRodada();
                 var p = s.S.Equipas.SelectMany(e => e.Jogadores).FirstOrDefault(x => x.ID == (int?)o["jogador"]);
-                _esperaLeilao = Sessao.Espera(p == null ? T("Leilão: aguardando os outros técnicos…")
-                    : T("Leilão de {0}: aguardando os outros técnicos…", P98.NomeJogador(p)));
+                // (o motivo de ficar de fora: quase sempre o dinheiro abaixo do preco base)
+                int preco = (int?)o["preco"] ?? 0;
+                var meu = _time == null ? null : s.Equipa(_time.ID);
+                string nome = p == null ? "" : P98.NomeJogador(p);
+                string motivo = meu == null ? "" : (int)meu.Dinheiro < preco
+                    ? T("Seu time não pode licitar: o preço base é {0} e você tem {1} em caixa.", FormatoDinheiro.Valor(s.S, preco), FormatoDinheiro.Valor(s.S, (int)meu.Dinheiro))
+                    : T("Seu time não entra neste leilão.");
+                _esperaLeilao = Sessao.Espera((p == null ? T("Leilão: aguardando os outros técnicos…") : T("Leilão de {0}: aguardando os outros técnicos…", nome))
+                    + (motivo.Length > 0 ? "\n" + motivo : ""));
                 _esperaLeilaoEm = s;
                 s.AbrirDialogo(_esperaLeilao);
                 // (sem resultado em 40 s, fecha)

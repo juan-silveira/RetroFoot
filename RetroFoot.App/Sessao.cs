@@ -350,7 +350,7 @@ public sealed class Sessao
             var meu = quem.FirstOrDefault(c => !host.Remota(c));
             var remotos = quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList();
             // (os outros aparelhos que nao licitam: a espera ate o resultado)
-            host.AvisarLeilaoAberto(p.ID, v.ID, quem.Select(c => c.ID));
+            host.AvisarLeilaoAberto(p.ID, v.ID, preco, quem.Select(c => c.ID));
             (int, bool)? local = null;
             // a janela do host (se ele licita): o lance; depois, a espera pelos outros sobre ela
             var dt = leilaoAberto = meu == null ? null : TelaLeilao.DeTodos.Abrir(this, v, p, preco);
