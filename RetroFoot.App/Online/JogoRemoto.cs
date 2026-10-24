@@ -149,7 +149,15 @@ public sealed class JogoRemoto
                     var js = Jogo98.Ler(AoVivo.Descomprimir(sv));
                     _classificacaoVista = chave;
                     var c = new TelaClassificacao(js, Math.Max(chave.Item2, 1), true);
-                    c.Fechou += () => s.FundoVerdeDepoisDaRodada();
+                    // (fechada antes do host: o aviso ate o que vier depois, o leilao ou o jogo novo)
+                    c.Fechou += () =>
+                    {
+                        s.FundoVerdeDepoisDaRodada();
+                        FecharEsperaClassif();
+                        _esperaClassif = Sessao.Espera(T("Aguardando os outros técnicos…"));
+                        _esperaClassifEm = s;
+                        s.AbrirDialogo(_esperaClassif);
+                    };
                     s.Mostrar(c);
                 }
                 catch (Exception ex) { Console.Error.WriteLine("classificacao: " + ex.Message); }
@@ -165,6 +173,7 @@ public sealed class JogoRemoto
             {
                 FecharEsperaOutro();
                 if (o == null || (string?)o["uid"] == _sala.Uid) return;
+                FecharEsperaClassif();
                 var s = (_jornada != null ? _sessaoAoVivo : _sessao) ?? _sessaoPergunta;
                 if (s == null) return;
                 string tipo = (string?)o["tipo"] ?? "";
@@ -186,6 +195,7 @@ public sealed class JogoRemoto
                 var s = _jornada != null ? _sessaoAoVivo : _sessao;
                 if (s == null) return;
                 FecharEsperaLeilao();
+                FecharEsperaClassif();
                 s.FundoVerdeDepoisDaRodada();
                 var p = s.S.Equipas.SelectMany(e => e.Jogadores).FirstOrDefault(x => x.ID == (int?)o["jogador"]);
                 // (o motivo de ficar de fora: quase sempre o dinheiro abaixo do preco base)
@@ -340,6 +350,7 @@ public sealed class JogoRemoto
         }
         string id = (string?)q["id"] ?? "";
         if (id == _perguntaAberta) return;
+        FecharEsperaClassif();
         var s = _jornada != null ? _sessaoAoVivo : _sessao;
         Control? antes = null;
         bool copia = false;
@@ -495,6 +506,13 @@ public sealed class JogoRemoto
     volatile bool _modoAmigo;   // a sala do jogar com um amigo (o save do host, a meio da temporada)
     int _noticia, _leilaoVisto, _penaltisVistos, _leilaoAbertoVisto;
     Control? _esperaLeilao;
+    Control? _esperaClassif;
+    Sessao? _esperaClassifEm;
+    void FecharEsperaClassif()
+    {
+        if (_esperaClassif != null) _esperaClassifEm?.FecharDialogo(_esperaClassif);
+        _esperaClassif = null;
+    }
     Control? _esperaOutro;
     Sessao? _esperaOutroEm;
     void FecharEsperaOutro()
@@ -679,6 +697,7 @@ public sealed class JogoRemoto
 
     void Novo(Retrato r, string rodada, string instancia)
     {
+        FecharEsperaClassif();
         _aoVivo = null; _jornada = null;
         // (o host voltou ou mudou: o Preparo mandado se perdeu, prepara de novo)
         bool nova = rodada != _rodada || instancia != _instancia;

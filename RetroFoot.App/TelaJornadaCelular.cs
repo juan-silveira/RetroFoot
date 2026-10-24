@@ -49,7 +49,12 @@ public sealed partial class TelaJornada
     void SeguirHumano()
     {
         if (_rolarCel == null || _listaCel == null || _jogadorRolou) return;
-        _rolarCel.Offset = new Vector(0, _listaCel.InicioHumano());
+        double y = _listaCel.InicioHumano();
+        // (o jogo do humano fora da tela com o alto da divisao no topo, como na Taca, uma lista so:
+        // o proprio jogo no terco de cima)
+        double jogo = _listaCel.JogoHumano(), alto = _rolarCel.Viewport.Height;
+        if (alto > 0 && jogo > y + alto * 0.6) y = Math.Max(0, jogo - alto / 3);
+        _rolarCel.Offset = new Vector(0, y);
     }
 
     void MontarCelular()
@@ -260,6 +265,24 @@ public sealed partial class TelaJornada
                 foreach (var l in jogos) y += AlturaM(l) + 4;
             }
             return 0;
+        }
+
+        // o alto do jogo destacado (o do humano); -1 sem ele
+        public double JogoHumano()
+        {
+            bool retro = CUi.Retro;
+            double y = retro ? RTopo : 8;
+            foreach (var (cab, jogos, _) in Blocos())
+            {
+                if (cab != null) y += retro ? RCab : ACab;
+                foreach (var l in jogos)
+                {
+                    if (Humano(l, 0) || Humano(l, 1)) return y;
+                    y += retro ? AlturaJogo(l) : AlturaM(l) + 4;
+                }
+                if (retro) y += RFim;
+            }
+            return -1;
         }
 
         // a divisao do humano (o cabecalho fica destacado no Moderno)
