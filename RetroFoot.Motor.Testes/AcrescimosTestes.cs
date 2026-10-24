@@ -42,6 +42,7 @@ public partial class PartidaTestes
     [Fact]
     public void SemAcrescimosIgualAoOriginal()
     {
+        RetroFoot.Motor.Partida.Memoria.SemJogosDaTemporada = true;   // (igual ao jogo classico)
         if (Saves().Count == 0) return;
         Assert.Equal(ImpressaoOriginal, Impressao(false));
         Assert.NotEqual(ImpressaoOriginal, Impressao(true));

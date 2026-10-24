@@ -947,7 +947,10 @@ public sealed partial class TelaEquipa
                 (T("Força"), j.Forca.ToString()),
                 (T("Salário"), _p.DinheiroCelular(j.Salario)),
                 (T("Comportamento"), j.Comportamento < Comportamentos.Length ? T(Comportamentos[j.Comportamento]) : j.Comportamento.ToString()),
+                (T("Valor de mercado"), TextosMercado.TextoValorMercado(_s, j)),
                 (T("Gols na Temporada"), Mem.Golos14(j).ToString()),
+                (T("Jogos na Temporada"), TextosMercado.JogosTemporada(j).ToString()),
+                (T("Média na Temporada"), TextosMercado.MediaGols(j, true)),
             };
             if (_s.J.M.Regras.CartoesAmarelos) { dados.Add((T("Nota"), j.Nota.ToString())); dados.Add((T("Risco de lesão"), j.Lesao.ToString())); }
             p.Children.Add(Pares(dados));
@@ -955,6 +958,7 @@ public sealed partial class TelaEquipa
             {
                 (T("Jogos"), _p.HistCelular(j, Mem.HistJogos).ToString()),
                 (T("Gols"), _p.HistCelular(j, Mem.HistGolos).ToString()),
+                (T("Média de gols"), TextosMercado.MediaGols(j, false)),
             };
             if (_s.J.M.Regras.CartoesAmarelos) hist.Add((T("Cartões amarelos"), Painel.AmarelosCelular(j).ToString()));
             hist.Add((T("Cartões vermelhos"), _p.HistCelular(j, Mem.HistVermelhos).ToString()));

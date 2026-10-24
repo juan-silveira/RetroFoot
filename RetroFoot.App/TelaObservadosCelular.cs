@@ -153,7 +153,7 @@ public static partial class TelaObservados
                 int v = s.Mercado.PrecoDeVenda(eq, _f._e, j, MercadoJogo.ForcaMedia(eq));
                 var corpo = new StackPanel { Spacing = 12 };
                 corpo.Children.Add(CUi.Cartao_(null, MercadoCelular.Cabecalho(j, eq, Texto(eq.NomeCurto))));
-                corpo.Children.Add(MercadoCelular.Ficha(j, s.J.M.Regras.CartoesAmarelos, new[] { (T("Preço"), v > 0 ? _f.Dinheiro(v) : "–") }));
+                corpo.Children.Add(MercadoCelular.Ficha(j, s.J.M.Regras.CartoesAmarelos, new[] { (T("Preço"), v > 0 ? _f.Dinheiro(v) : "–") }, TextosMercado.TextoValorMercado(s, j)));
                 var remover = new CUi.Botao(T("Remover"), false, () =>
                 {
                     FecharFicha();

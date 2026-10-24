@@ -771,10 +771,13 @@ public sealed partial class TelaEquipa
             string comp = p.Comportamento < Comportamentos.Length ? T(Comportamentos[p.Comportamento]) : p.Comportamento.ToString();
             // a Forca vai no selo do topo; os gols da temporada abrem a tabela
             var ficha = new List<(string, string)> { (_largo ? "Gols na temporada" : "Gols na temp.", Mem.Golos14(p).ToString()),
-                ("Salário", Dinheiro(p.Salario)), ("Comportamento", comp) };
+                (_largo ? "Jogos na temporada" : "Jogos na temp.", TextosMercado.JogosTemporada(p).ToString()),
+                (_largo ? "Média na temporada" : "Média na temp.", TextosMercado.MediaGols(p, true)),
+                ("Salário", Dinheiro(p.Salario)), ("Valor de mercado", TextosMercado.TextoValorMercado(_s, p)), ("Comportamento", comp) };
             if (_launcher) { ficha.Add(("Nota", p.Nota.ToString())); ficha.Add(("Risco de lesão", p.Lesao.ToString())); }
             // o Historial do original como uma tabela: rotulo a esquerda, numero a direita
-            var hist = new List<(string, string)> { ("Jogos", Hist(p, Mem.HistJogos).ToString()), ("Gols", Hist(p, Mem.HistGolos).ToString()) };
+            var hist = new List<(string, string)> { ("Jogos", Hist(p, Mem.HistJogos).ToString()), ("Gols", Hist(p, Mem.HistGolos).ToString()),
+                ("Média de gols", TextosMercado.MediaGols(p, false)) };
             if (_launcher) hist.Add(("Cartões amarelos", Amarelos(p).ToString()));
             hist.Add(("Cartões vermelhos", Hist(p, Mem.HistVermelhos).ToString()));
             hist.Add(("Lesões", Hist(p, Mem.HistLesoes).ToString()));

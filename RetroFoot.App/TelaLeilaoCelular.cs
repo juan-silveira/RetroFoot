@@ -29,10 +29,13 @@ sealed class LeilaoCelular : UserControl
     public TextBox? Caixa { get; private set; }
     TextBlock? _erro;
 
+    readonly string _valorMercado;
+
     public LeilaoCelular(Sessao s, SEquipa v, SJogador p, int? preco, int salario, bool launcher)
     {
         _v = v; _preco = preco;
         _moeda = Moeda.DoSave(s.S);
+        _valorMercado = TextosMercado.TextoValorMercado(s, p);
         if (CUi.Retro)
         {
             // no Retro, a janela amarela do computador (TsellPlayerDlg) em pe
@@ -49,7 +52,7 @@ sealed class LeilaoCelular : UserControl
             (T("Salário pretendido"), FormatoDinheiro.Valor(_moeda, salario)),
             (T("Preço base"), preco is int b ? FormatoDinheiro.Valor(_moeda, b) : "–"),
         };
-        corpo.Children.Add(MercadoCelular.Ficha(p, launcher, linhas));
+        corpo.Children.Add(MercadoCelular.Ficha(p, launcher, linhas, TextosMercado.TextoValorMercado(s, p)));
         _folha = new CUi.Folha(T("Venda de jogador por leilão"), corpo, Esperando(), TM.NomeEquipa(v), CUi.Escudo(v, 32), fechar: null);
         Content = _folha;
     }
@@ -86,7 +89,7 @@ sealed class LeilaoCelular : UserControl
         Grid.SetColumn(dir, 1); topo.Children.Add(dir);
         s.Children.Add(topo);
         MercadoRetro.Avisos(s, p, W95.Vermelho);
-        var ficha = MercadoRetro.Ficha(p, launcher, W95.Amarelo, preto);
+        var ficha = MercadoRetro.Ficha(p, launcher, W95.Amarelo, preto, _valorMercado);
         ficha.Margin = new Thickness(0, 4, 0, 0);
         s.Children.Add(ficha);
         return s;

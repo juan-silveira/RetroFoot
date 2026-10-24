@@ -291,11 +291,12 @@ public static partial class TelaPlantel
                     Escreve(dc, comp, px + 104, py, t, _letra);
                     Escreve(dc, p.Nota.ToString(), px + 104, py + 15, t, _letra);
                     Escreve(dc, p.Lesao.ToString(), px + 104, py + 30, t, _letra);
-                    Escreve(dc, Mem.Golos14(p).ToString(), px + 104, py + 45, t, _letra);
+                    Escreve(dc, TextosMercado.GolsComMedia(p, true), px + 104, py + 45, t, _letra);
                 }
                 grupo = new Rect(px, 164, 185, 97);
                 foreach (var (rot, y, qual) in new[] { (T("Jogos"), 16.0, Mem.HistJogos), (T("Gols"), 32, Mem.HistGolos), (T("Cartões amarelos"), 48, -1), (T("Cartões vermelhos"), 64, Mem.HistVermelhos), (T("Lesões"), 80, Mem.HistLesoes) })
-                    linhas.Add((rot, p == null ? "" : qual < 0 ? RetroFoot.Motor.Rodada.Campos.JgB(p, RetroFoot.Motor.Rodada.Campos.JgAmarelosAcumulados).ToString() : Hist(p, qual).ToString(), y));
+                    linhas.Add((rot, p == null ? "" : qual < 0 ? RetroFoot.Motor.Rodada.Campos.JgB(p, RetroFoot.Motor.Rodada.Campos.JgAmarelosAcumulados).ToString()
+                        : qual == Mem.HistGolos ? TextosMercado.GolsComMedia(p, false) : Hist(p, qual).ToString(), y));
                 ySus = py + 158; yLes = py + 172; ySal = 291;
             }
             else
@@ -306,11 +307,11 @@ public static partial class TelaPlantel
                 {
                     Escreve(dc, comp, px + 88, py, t, _letra);
                     // o valor em 104 como no launcher: "Gols na Temporada" nao cabe antes de 96
-                    Escreve(dc, Mem.Golos14(p).ToString(), px + 104, py + 20, t, _letra);
+                    Escreve(dc, TextosMercado.GolsComMedia(p, true), px + 104, py + 20, t, _letra);
                 }
                 grupo = new Rect(px, 140, 185, 105);
                 foreach (var (rot, y, qual) in new[] { (T("Jogos"), 24.0, Mem.HistJogos), (T("Gols"), 43, Mem.HistGolos), (T("Cartões vermelhos"), 61, Mem.HistVermelhos), (T("Lesões"), 80, Mem.HistLesoes) })
-                    linhas.Add((rot, p == null ? "" : Hist(p, qual).ToString(), y));
+                    linhas.Add((rot, p == null ? "" : qual == Mem.HistGolos ? TextosMercado.GolsComMedia(p, false) : Hist(p, qual).ToString(), y));
                 ySus = py + 143; yLes = py + 159; ySal = 284;
             }
             Grupo(dc, grupo, T("Histórico"), t, _letra, _fundo);
@@ -328,11 +329,16 @@ public static partial class TelaPlantel
             }
             // "Salario pretendido:" + o salario que o jogador pediria na compradora (3:7ff4) +
             // o nome da moeda, com o Comprar ligado
+            bool salario = false;
             if (p != null && _preco > 0 && _comprar.EstaVisivel && Compradora() is { } c)
             {
                 int sal = S.Mercado.Salario(p, Ext.Bytes(c.B79));
                 Rotulo(dc, T("Salário pretendido:") + "\n" + FormatoDinheiro.Valor(S.S, sal), new Rect(388 + d, ySal, 137, 32), t, _letra);
+                salario = true;
             }
+            // (RetroFoot) o valor de mercado, no espaco livre abaixo (depois do salario pretendido)
+            if (p != null)
+                Rotulo(dc, T("Valor de mercado:") + "\n" + TextosMercado.TextoValorMercado(S, p), new Rect(388 + d, ySal + (salario ? 36 : 0), 137, 32), t, _letra);
         }
 
         // historial (4 bytes); os 2 de cima das lesoes e das expulsoes guardam os amarelos do

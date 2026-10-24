@@ -212,7 +212,9 @@ public static class TelaListas
         // (com ele escolhido), como nas ultimas transferencias
         bool compra = Registo.AddIn(Registo.AddInCompraDirecta);
         Action<int>? abrir = compra ? i => AbrirPlantel?.Invoke(ms[i].E, ms[i].P.ID) : null;
-        if (Celular.Ativo) { ListasCelular.Marcadores(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms, abrir); return; }
+        // (RetroFoot) a media de gols por jogo: da carreira (de sempre) ou da temporada
+        string Media(int i) => TextosMercado.MediaGols(ms[i].P, !deSempre);
+        if (Celular.Ativo) { ListasCelular.Marcadores(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms, abrir, Media); return; }
         Lista(d, deSempre ? T("Artilheiros de todos os tempos") : T("Artilheiros desta temporada"), ms.Count, i =>
         {
             var (p, e, g) = ms[i];
@@ -220,6 +222,7 @@ public static class TelaListas
             Formatado.Col(b, " ", 0);
             Formatado.Col(b, Jornada.NomeNaTela(p), 2, (byte)'x');
             Formatado.Col(b, g.ToString(), 6, 0x14);
+            Formatado.Col(b, "(" + Media(i) + ")", 6, 0x34);
             Formatado.Logo(b, e);
             Formatado.Col(b, Dlg.Bytes(e.NomeCurto), 4, 0x8C);
             return b.ToArray();

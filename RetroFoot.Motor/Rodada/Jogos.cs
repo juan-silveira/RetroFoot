@@ -338,8 +338,17 @@ public sealed partial class Mundo
     }
 
     // a primeira parte de seg10:03ea: cada titular ganha 1 jogo no historico (+0x17)
-    public void ContarJogos() =>
-        TodosJogadores((_, p) => { if (JgW(p, JgEscalacao) == 1) SetJgD(p, JgJogos, JgD(p, JgJogos) + 1); });
+    // (os jogos da temporada, do RetroFoot: so dos times que jogam nesta rodada)
+    public void ContarJogos()
+    {
+        var jogam = S.Jogos.SelectMany(j => new[] { j.Casa, j.Fora }).ToHashSet();
+        TodosJogadores((e, p) =>
+        {
+            if (JgW(p, JgEscalacao) != 1) return;
+            SetJgD(p, JgJogos, JgD(p, JgJogos) + 1);
+            if (jogam.Contains(e.ID)) Partida.Memoria.SomaJogoNaTemporada(p);
+        });
+    }
 
     // seg05:0e22 (e 1166 na Taca)
     void ZerarEscalacoes() => TodosJogadores((_, p) => SetJgW(p, JgEscalacao, 0));

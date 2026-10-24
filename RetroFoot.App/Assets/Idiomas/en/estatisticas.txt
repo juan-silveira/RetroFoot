@@ -1,0 +1,11 @@
+# Valor de mercado e media de gols (0.2.1)
+Valor de mercado	Market value
+Valor de mercado:	Market value:
+Jogos na Temporada	Season matches
+Média na Temporada	Season average
+Jogos na temporada	Season matches
+Média na temporada	Season average
+Jogos na temp.	Season matches
+Média na temp.	Season avg.
+Média de gols	Goals per match
+Média	Avg.

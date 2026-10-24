@@ -301,7 +301,7 @@ public static partial class TelaProcura
                 int v = s.Mercado.PrecoDeVenda(eq, _f._e, p, MercadoJogo.ForcaMedia(eq));
                 var corpo = new StackPanel { Spacing = 12 };
                 corpo.Children.Add(CUi.Cartao_(null, MercadoCelular.Cabecalho(p, eq, Texto(eq.NomeCurto))));
-                corpo.Children.Add(MercadoCelular.Ficha(p, _f._launcher, new[] { (T("Preço"), v > 0 ? _f.Dinheiro(v) : "–") }));
+                corpo.Children.Add(MercadoCelular.Ficha(p, _f._launcher, new[] { (T("Preço"), v > 0 ? _f.Dinheiro(v) : "–") }, TextosMercado.TextoValorMercado(s, p)));
                 var bs = new List<Control>();
                 if (_f._launcher)
                     bs.Add(new CUi.Botao(T("Comprar"), false, () =>

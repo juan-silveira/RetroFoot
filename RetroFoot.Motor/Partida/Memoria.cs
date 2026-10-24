@@ -35,7 +35,28 @@ public static class Memoria
     // historial (+0x17, 4 contadores de 32 bits)
     public const int HistJogos = 0, HistGolos = 1, HistLesoes = 2, HistVermelhos = 3;
 
-    public static int Historial(Jogador j, int qual) => (int)Le32(j.Historial, 4 * qual);
+    // (os jogos: so os 16 bits de baixo; os de cima sao os jogos da temporada, do RetroFoot)
+    public static int Historial(Jogador j, int qual) => qual == HistJogos ? Le16(j.Historial, 0) : (int)Le32(j.Historial, 4 * qual);
+
+    // (RetroFoot, fora do original) os jogos da temporada: os 16 bits de cima do contador de jogos
+    // (+0x19), que o jogo classico deixa a zero, como os amarelos nas lesoes e expulsoes. Zerados
+    // com os gols da temporada; somam com os da carreira, so dos times que jogam na rodada.
+    // Desligado (nesta thread), o save fica igual ao do jogo classico (os testes do oraculo).
+    [ThreadStatic] public static bool SemJogosDaTemporada;
+    public static int JogosNaTemporada(Jogador j) => Le16(j.Historial, 2);
+    public static void SomaJogoNaTemporada(Jogador j)
+    {
+        if (!SemJogosDaTemporada) Poe16(j.Historial, 2, (ushort)(Le16(j.Historial, 2) + 1));
+    }
+    public static void ZerarJogosNaTemporada(Jogador j) => Poe16(j.Historial, 2, 0);
+
+    // a media de gols (gols / jogos), da carreira ou da temporada; null sem jogos
+    public static double? MediaGols(Jogador j, bool temporada)
+    {
+        int jogos = temporada ? JogosNaTemporada(j) : Historial(j, HistJogos);
+        int gols = temporada ? Golos14(j) : Historial(j, HistGolos);
+        return jogos > 0 ? (double)gols / jogos : null;
+    }
     internal static void SomaHistorial(Jogador j, int qual, int d) => Poe32(j.Historial, 4 * qual, Le32(j.Historial, 4 * qual) + (uint)d);
 
     internal static void SomaGolosJogador(Jogador j, short d)

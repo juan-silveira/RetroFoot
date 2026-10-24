@@ -336,6 +336,16 @@ public sealed partial class MercadoJogo
         return preco / 1000 * 1000;
     }
 
+    // (RetroFoot) o valor de mercado mostrado ao tecnico: o preco de venda da CPU a um comprador
+    // do mesmo pais (valor x 3,5 x 1,6) sem a permanencia (o quanto o clube quer segurar o
+    // jogador), arredondado nas mesmas faixas. Em temporadas simuladas os leiloes pagam em
+    // mediana perto disso (SoakTestes.PrecosDeMercado)
+    public int ValorDeMercado(Jogador p) => Arredondar(Arred(Xi(ValorDoJogador(p)).Mul(X(5.6))));
+
+    static int Arredondar(int preco) =>
+        preco >= 2000000 ? preco / 100000 * 100000 : preco >= 1000000 ? preco / 50000 * 50000
+        : preco > 500000 ? preco / 25000 * 25000 : preco > 100000 ? preco / 10000 * 10000 : preco / 1000 * 1000;
+
     // 10:1939 (UpdateBuyBtn): o preco para a equipa humana c, ou 0 com o Comprar desligado
     public int PrecoParaComprar(Equipa? c, Equipa v, Jogador p)
     {

@@ -20,6 +20,7 @@
     <!-- o soak da interface (ferramentas/SoakUI) mexe nas esperas do leilao -->
     <InternalsVisibleTo Include="SoakUI" />
     <InternalsVisibleTo Include="SoakOnline" />
+    <InternalsVisibleTo Include="FichasPrint" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RetroFoot.Motor\RetroFoot.Motor.csproj" />

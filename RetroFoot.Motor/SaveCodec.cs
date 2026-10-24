@@ -415,7 +415,7 @@ namespace RetroFoot.Motor.Codec
                         JogosLesionado = BitConverter.ToInt16(bytes, lesJogosOff),
                         SuspensaoOffsetInFile = suspOff,
                         JogosLesionadoOffsetInFile = lesJogosOff,
-                        Jogos = BitConverter.ToInt32(bytes, bodyStart + recOff + recSize - 18),
+                        Jogos = BitConverter.ToUInt16(bytes, bodyStart + recOff + recSize - 18),   // (os 16 de cima: jogos da temporada)
                         Gols = BitConverter.ToInt32(bytes, bodyStart + recOff + recSize - 14),
                         Lesoes = BitConverter.ToUInt16(bytes, bodyStart + recOff + recSize - 10),
                         AmarelosCarreira = BitConverter.ToUInt16(bytes, bodyStart + recOff + recSize - 8),

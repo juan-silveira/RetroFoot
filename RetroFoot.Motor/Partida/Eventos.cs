@@ -171,6 +171,7 @@ public static class Eventos
         MudarEscalacao(saiu, EscFora);
         MudarEscalacao(entra!, EscTitular);
         SomaHistorial(entra!, HistJogos, 1);
+        SomaJogoNaTemporada(entra!);
         MudarSubstituicoes(e, (short)(Substituicoes(e) - 1));
         ForcaDosSetores(e);
         trocou?.Invoke(saiu, entra!);

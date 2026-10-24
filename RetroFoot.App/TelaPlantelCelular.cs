@@ -201,7 +201,7 @@ public static partial class TelaPlantel
                     antes.Add((T("Salário pretendido"), FormatoDinheiro.Valor(s.S, s.Mercado.Salario(p, Ext.Bytes(c.B79)))));
                 var corpo = new StackPanel { Spacing = 12 };
                 corpo.Children.Add(CUi.Cartao_(null, MercadoCelular.Cabecalho(p, e, Texto(e.NomeCurto))));
-                corpo.Children.Add(MercadoCelular.Ficha(p, launcher, antes));
+                corpo.Children.Add(MercadoCelular.Ficha(p, launcher, antes, TextosMercado.TextoValorMercado(s, p)));
                 var bs = new List<Control>();
                 if (c != null)
                 {
@@ -366,7 +366,7 @@ public static partial class TelaPlantel
                     int v = s.Mercado.PrecoDeVenda(e, c, p, MercadoJogo.ForcaMedia(e));
                     corpo.Children.Add(MercadoRetro.Linha(T("Preço"), v > 0 ? _f.Dinheiro(v) : "–", letra, 170, 14, true));
                 }
-                corpo.Children.Add(MercadoRetro.Ficha(p, launcher, fundo, letra));
+                corpo.Children.Add(MercadoRetro.Ficha(p, launcher, fundo, letra, TextosMercado.TextoValorMercado(s, p)));
                 MercadoRetro.Avisos(corpo, p, letra);
                 if (c != null && _f._preco > 0 && _f.PodeComprarAqui())
                     corpo.Children.Add(MercadoRetro.Linha(T("Salário pretendido:"), FormatoDinheiro.Valor(s.S, s.Mercado.Salario(p, Ext.Bytes(c.B79))), letra, 170, 14, true));
