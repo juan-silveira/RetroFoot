@@ -643,9 +643,8 @@ public sealed class JogoRemoto
                 depois?.Invoke(r);
                 if (!r.Ok && _sessao is { } ss)
                 {
-                    CUi.Folha f = null!;
-                    f = CUi.Pergunta(T("Jogo online"), T("O host recusou: {0}", r.Motivo), new[] { (T("OK"), true, (Action)(() => ss.FecharDialogo(f))) });
-                    ss.AbrirDialogo(f);
+                    Action fechar = () => { };
+                    fechar = Online.Janela(ss, T("Jogo online"), null, Online.Texto(T("O host recusou: {0}", r.Motivo)), new (string, bool, Action)[] { (T("OK"), true, () => fechar()) });
                 }
             });
         });

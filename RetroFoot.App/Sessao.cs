@@ -577,22 +577,17 @@ public sealed class Sessao
     public void EscolherNovoHost()
     {
         if (Online is not { } host) return;
-        if (host.ModoAmigo)
-        {
-            CUi.Folha fa = null!;
-            fa = CUi.Pergunta(Idioma.T("Passar o host"), Idioma.T("No jogo com amigos o save é seu: o host não passa para outro técnico."), new[] { (Idioma.T("OK"), true, (Action)(() => FecharDialogo(fa))) });
-            AbrirDialogo(fa);
-            return;
-        }
         var outros = jogadoresOnline.Where(x => x.Equipa != 0 && x.Estado != RetroFoot.Motor.Online.Estados.Saiu && Equipa(x.Equipa) is { } e && host.Remota(e)).ToList();
-        CUi.Folha f = null!;
+        Action fechar = () => { };
         var bs = new List<(string, bool, Action)>();
-        foreach (var j in outros) { var jj = j; bs.Add((jj.Nome, true, () => { FecharDialogo(f); host.PassarHost(jj.Uid); })); }
-        bs.Add((Idioma.T("Cancelar"), false, () => FecharDialogo(f)));
-        f = CUi.Pergunta(Idioma.T("Passar o host"), outros.Count == 0
+        foreach (var j in outros) { var jj = j; bs.Add((jj.Nome, true, () => { fechar(); host.PassarHost(jj.Uid); })); }
+        bs.Add((Idioma.T("Cancelar"), false, () => fechar()));
+        fechar = global::RetroFoot.App.Online.Janela(this, Idioma.T("Passar o host"), null, global::RetroFoot.App.Online.Texto(host.ModoAmigo
+            ? Idioma.T("No jogo com amigos o save é seu: o host não passa para outro técnico.")
+            : outros.Count == 0
             ? Idioma.T("Não há outro técnico conectado para receber o host.")
-            : Idioma.T("Quem continua o jogo no aparelho dele? Você continua na sala como os outros (ou pode sair)."), bs);
-        AbrirDialogo(f);
+            : Idioma.T("Quem continua o jogo no aparelho dele? Você continua na sala como os outros (ou pode sair).")),
+            host.ModoAmigo ? new (string, bool, Action)[] { (Idioma.T("OK"), true, () => fechar()) } : bs, emColuna: true);
     }
 
     // os jogadores da sala mudaram (quem esta pronto): a tela de espera do host

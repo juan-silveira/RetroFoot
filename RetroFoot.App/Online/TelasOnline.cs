@@ -209,6 +209,28 @@ public static class Online
         return () => s.FecharDialogo(j);
     }
 
+    // "Som..." (o convidado do jogo online: as Opcoes sao do host): ligar e o volume, deste aparelho
+    public static void Som(Sessao s)
+    {
+        var ligado = new CheckBox { Content = T("Efeitos sonoros"), IsChecked = global::RetroFoot.App.Som.Ligado, Foreground = CUi.Texto };
+        var vol = new Slider { Minimum = 0, Maximum = 100, Value = global::RetroFoot.App.Som.Volume, MinWidth = 260 };
+        var corpo = new StackPanel { Spacing = 12, Children = { ligado, CUi.Txt(T("Volume"), 13, CUi.Fraco), vol } };
+        Action fechar = () => { };
+        fechar = Janela(s, T("Som"), T("Neste aparelho"), corpo, new (string, bool, Action)[]
+        {
+            (T("OK"), true, () =>
+            {
+                global::RetroFoot.App.Som.Ligado = ligado.IsChecked == true;
+                global::RetroFoot.App.Som.Volume = (int)vol.Value;
+                var o = OpcoesDoJogo.Ler() ?? new OpcoesDoJogo();
+                o.Som = global::RetroFoot.App.Som.Ligado; o.Volume = global::RetroFoot.App.Som.Volume;
+                try { o.Gravar(); } catch { }
+                fechar();
+            }),
+            (T("Cancelar"), false, () => fechar()),
+        }, largura: 400);
+    }
+
     // um texto de janela (quebra a linha)
     public static Control Texto(string t) => CUi.Txt(t, 15, CUi.Texto, FontWeight.Normal, true);
 

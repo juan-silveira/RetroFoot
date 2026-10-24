@@ -361,13 +361,16 @@ public sealed partial class TelaEquipa : UserControl
             // (jogo online: as regras ficam fixas e so o host grava; docs/multiplayer-online.md)
             bool online = _s.Online != null || _s.Remoto != null;
             var menuJogo = new List<Item>();
-            if (!online)
+            // (jogo online) o host controla as Opcoes e as Configuracoes (o jogo roda no aparelho
+            // dele: o sorteio da Taca, a disputa de penaltis, a velocidade...); os outros, so o som
+            if (!online || _s.Online != null)
             {
                 menuJogo.Add(new(T("Opções..."), "", () => Campeonato.Opcoes(_s, Voltar)));
                 menuJogo.Add(new(T("Configurações..."), "", () => { var t = _tela; var c = new TelaConfiguracoes(emCurso: _s); c.Fechou += _ => { _s.Mostrar(t); Voltar(); }; _s.Mostrar(c); }));
             }
+            else menuJogo.Add(new(T("Som..."), "", () => Online.Som(_s)));
             if (_s.Remoto == null) menuJogo.Add(new(T("Gravar"), "", Gravar));
-            if (_s.Online != null) menuJogo.Add(new(T("Passar o host..."), "", () => _s.EscolherNovoHost()));
+            if (_s.Online is { ModoAmigo: false }) menuJogo.Add(new(T("Passar o host..."), "", () => _s.EscolherNovoHost()));
             menuJogo.AddRange(Se(Ai(0x46) && !online, new Item(T("Sair sem salvar"), "Shift+Ctrl+F4", SairSemSalvar)));
             // "menu: Sair": grava e sai (pt-PT "Sair", pt-BR "Salvar e sair")
             menuJogo.Add(new(T("menu: Sair"), "Alt+F4", () => _tela.Terminar(true)));
