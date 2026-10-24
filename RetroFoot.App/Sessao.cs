@@ -362,8 +362,20 @@ public sealed class Sessao
                 finally { PrazoDialogo = null; }
                 if (remotos.Count > 0) dt.Aguardar();
             });
+            // (o host nao licita e espera os outros: o aviso, em vez da tela parada sem explicacao)
+            Control? esperaHost = null;
+            if (dt == null && remotos.Count > 0)
+                Dispatcher.UIThread.Post(() =>
+                {
+                    var nomes = string.Join(", ", jogadoresOnline.Where(j => remotos.Contains(j.Equipa)).Select(j => j.Nome));
+                    esperaHost = Espera(Idioma.T("Leilão de {0}: aguardando {1} dar o lance…", P98.NomeJogador(p), nomes));
+                    AbrirDialogo(esperaHost);
+                });
+            var inicioDiag = DateTime.UtcNow;
             var rs = host.PerguntarTodos(remotos, "lance", c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID), ("preco", preco)), t, prazo);
             t?.Wait(prazo);
+            Dispatcher.UIThread.Post(() => { if (esperaHost != null) FecharDialogo(esperaHost); });
+            App.Anotar($"diag leilao: jogador {p.ID} respostas {string.Join(", ", rs.Select(x => $"{x.Key}={x.Value?.ToJsonString() ?? "nada"}"))} em {(DateTime.UtcNow - inicioDiag).TotalSeconds:0.0}s", null);
             var d = new Dictionary<ushort, (int Milhares, bool Ok)>();
             foreach (var (eq, r) in rs) d[eq] = r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
             if (meu != null && local is { } l) d[meu.ID] = l;

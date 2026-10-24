@@ -298,6 +298,7 @@ public sealed class JogoRemoto
             catch (Exception ex) { Console.Error.WriteLine("pergunta: " + ex.Message); }
             finally { Sessao.PrazoDialogo = null; }
             if (todos) r ??= new JsonObject { ["milhares"] = 0, ["ok"] = false };
+            if (todos) App.Anotar($"diag leilao convidado: pergunta {id} resposta {r?.ToJsonString()} esgotou {Sessao.PrazoEsgotou}", null);
             if (r != null && _perguntaAberta == id)
                 try { _sala.B.Gravar($"{_sala.Raiz}/respostas/{_sala.Uid}/{id}", r).GetAwaiter().GetResult(); _respondida = id; } catch { }
             Dispatcher.UIThread.Post(() =>
