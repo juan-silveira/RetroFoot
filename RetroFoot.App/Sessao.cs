@@ -259,6 +259,11 @@ public sealed class Sessao
                 Dispatcher.UIThread.Post(EsconderRelogio);
                 return;
             }
+            // a lesao sem ninguem no banco (ou sem substituicoes): nao ha o que escolher; sem a
+            // janela, o jogo nao para todos por 30 s
+            if (motivo == 2 && jg.Equipa[lado] is { } el
+                && (Memoria.Substituicoes(el) <= 0 || !el.Jogadores.Any(p => Memoria.Escalacao(p) == Memoria.EscReserva)))
+                return;
             if (!host.Remota(jg.Equipa[lado]))
             {
                 // (a janela do proprio host tambem para todos: o mesmo prazo; acabou, a lesao tem a
