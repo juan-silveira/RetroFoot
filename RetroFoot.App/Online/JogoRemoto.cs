@@ -453,6 +453,7 @@ public sealed class JogoRemoto
 
     bool _pausaMinha;
     bool _viuSorteio;
+    (int, int) _classificacaoVista;   // a rodada (ano, jornada) cuja classificacao ja foi mostrada
     bool _anteriorTaca;   // a rodada que passou foi da Taca (sem a classificacao depois dela)
     volatile bool _modoAmigo;   // a sala do jogar com um amigo (o save do host, a meio da temporada)
     int _noticia, _leilaoVisto, _penaltisVistos, _leilaoAbertoVisto;
@@ -729,8 +730,11 @@ public sealed class JogoRemoto
             }
             // a cada rodada nova do campeonato, a classificacao primeiro (o resultado da rodada que
             // passou); na Taca e logo depois dela, direto ao time
-            else if (nova && sessao.J.M.Jornada > 1 && !_rodada.EndsWith("-T") && !_anteriorTaca)
+            // (uma vez por rodada: o jogo novo da mesma rodada, depois dos leiloes, nao a mostra de novo)
+            else if (nova && sessao.J.M.Jornada > 1 && !_rodada.EndsWith("-T") && !_anteriorTaca
+                && _classificacaoVista != (sessao.J.M.Ano, sessao.J.M.Jornada))
             {
+                _classificacaoVista = (sessao.J.M.Ano, sessao.J.M.Jornada);
                 var c = new TelaClassificacao(sessao, sessao.J.M.Jornada - 1, false);
                 c.Fechou += Time;
                 sessao.Mostrar(c);
