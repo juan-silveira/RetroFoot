@@ -49,9 +49,19 @@ public sealed partial class Mundo
         // depois da que parou ainda nao prepararam, na ordem dos jogos; esta rodada termina nela)
         if (Retomar > 0 && RetomarNaOrdemDosJogos)
         {
+            // no jogo sozinho, as equipas antes da que parou ja prepararam (na ordem dos jogos); das
+            // que faltam, as da CPU primeiro (os leiloes antes do PRONTO) e depois as humanas
             RetomarNaOrdemDosJogos = false;
+            var ordem = new List<(Equipa E, Jogo J)>();
             foreach (var j in S.Jogos.ToArray())
-                if (!Sair) PrepararJogo(j);
+                if (Equipa(j.Casa) is { } c && Equipa(j.Fora) is { } f) { ordem.Add((c, j)); ordem.Add((f, j)); }
+            int k = ordem.FindIndex(x => x.E.ID == Retomar);
+            var faltam = k < 0 ? ordem : ordem.Skip(k).ToList();
+            bool hum((Equipa E, Jogo J) x) => TreinadorDa(x.E) is { } t && HumanoAtivo(t);
+            Retomar = 0;
+            foreach (var x in faltam.Where(x => !hum(x)).Concat(faltam.Where(hum)).ToList())
+                if (!Sair) PrepararEquipa(x.E, x.J);
+            if (!Sair) SemTitulares();
             return;
         }
         RetomarNaOrdemDosJogos = false;

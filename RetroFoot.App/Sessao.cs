@@ -299,6 +299,7 @@ public sealed class Sessao
         var aum = h.PedirAumento;
         h.PedirAumento = (e, p, novo, modo) =>
         {
+            FundoVerdeDepoisDaRodada();
             // (acabou o prazo sem resposta: o padrao do motor, aceito)
             if (!host.Remota(e)) return aum == null || ComPrazo(() => aum(e, p, novo, modo)) || PrazoEsgotou;
             var r = host.Perguntar(e.ID, "aumento", O(("equipa", e.ID), ("jogador", p.ID), ("novo", novo), ("modo", modo)));
@@ -321,6 +322,7 @@ public sealed class Sessao
         {
             if (aguardando != null) { FecharDialogo(aguardando); aguardando = null; }
             if (nome == null) return;
+            if (tipo is "aumento" or "convite" or "patrocinio") FundoVerdeDepoisDaRodada();
             string oque = tipo switch
             {
                 "aumento" => Idioma.T("Aguardando {0} responder ao pedido de aumento…", nome),
@@ -336,6 +338,17 @@ public sealed class Sessao
         TelaLeilao.DeTodos? leilaoAberto = null;
         h.LanceDeTodos = (quem, v, p, preco) =>
         {
+            FundoVerdeDepoisDaRodada();
+            // (diagnostico temporario: por que cada tecnico humano entra ou fica de fora do leilao)
+            try
+            {
+                foreach (var eq in S.Equipas.Where(x => x.ID != v.ID && J.M.TreinadorDa(x) is { Humano: not 0 }))
+                {
+                    var td = J.M.TreinadorDa(eq)!;
+                    App.Anotar($"diag leilao: jogador {p.ID} base {preco} -> {Dlg.Texto(eq.NomeCurto)} caixa {(int)eq.Dinheiro} ferias {td.B06} opcao {td.B1A[3]} chamado {quem.Any(x => x.ID == eq.ID)}", null);
+                }
+            }
+            catch { }
             var prazo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
             var meu = quem.FirstOrDefault(c => !host.Remota(c));
             var remotos = quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList();
@@ -514,6 +527,14 @@ public sealed class Sessao
             avisosCanto.MaxWidth = 380;
         }
     }
+
+    // (jogo online) as janelas de depois da rodada (leilao, salario...) sobre o fundo verde, nao sobre
+    // a tela da partida que acabou. Em qualquer thread
+    public void FundoVerdeDepoisDaRodada() => Dispatcher.UIThread.Invoke(() =>
+    {
+        if (camadaTela.Child is TelaJornada or TelaClassificacao)
+            mostrar(new Border { Background = new ImmutableSolidColorBrush(Avalonia.Media.Color.FromRgb(0, 128, 0)) });
+    });
 
     // o aviso de espera do jogo online sobre a tela (o fundo da camada escurece o resto)
     public static Control Espera(string texto) => new Border

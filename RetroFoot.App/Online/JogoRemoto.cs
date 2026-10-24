@@ -286,6 +286,8 @@ public sealed class JogoRemoto
         _perguntaAberta = id;
         _perguntaEm = s;
         string tipo = (string?)q["tipo"] ?? "";
+        // (o leilao e o salario depois da rodada: sobre o fundo verde, nao sobre a partida que acabou)
+        if (tipo is "lance" or "aumento" or "convite" or "patrocinio") s.FundoVerdeDepoisDaRodada();
         // (o leilao para todos os tecnicos: com o prazo do host; respondido, a espera pelos outros)
         bool todos = (bool?)q["todos"] == true;
         _ = Task.Run(() =>
