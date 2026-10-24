@@ -722,8 +722,10 @@ public sealed class HostOnline : IDisposable
         var fim = DateTime.UtcNow + (prazo ?? PrazoPergunta);
         JsonNode? r = null;
         string chave = j.Uid + "/" + id;
-        // (a tela do host: "aguardando fulano responder", ate a resposta ou o prazo)
+        // (a tela do host: "aguardando fulano responder", ate a resposta ou o prazo; e a dos
+        // outros aparelhos, menos o de quem responde)
         AguardandoResposta?.Invoke(j.Nome, tipo);
+        AvisarEspera(tipo, j);
         try
         {
             var conferido = DateTime.UtcNow;
@@ -734,7 +736,7 @@ public sealed class HostOnline : IDisposable
                 Thread.Sleep(150);
             }
         }
-        finally { AguardandoResposta?.Invoke(null, tipo); }
+        finally { AguardandoResposta?.Invoke(null, tipo); AvisarEspera(null); }
         try
         {
             _sala.B.Gravar($"{_sala.Raiz}/perguntas/{j.Uid}", null).GetAwaiter().GetResult();
@@ -790,6 +792,17 @@ public sealed class HostOnline : IDisposable
             }
             catch { }
         return r;
+    }
+
+    // o jogo parado esperando um tecnico (rodada/espera): a janela do host (j null) ou a pergunta
+    // a outro aparelho; os outros veem o aviso. null: acabou
+    int _esperas;
+    public void AvisarEspera(string? tipo, JogadorSala? j = null)
+    {
+        if (tipo == null) { Enviar($"{_sala.Raiz}/rodada/espera", null); return; }
+        string uid = j?.Uid ?? _sala.Uid;
+        string nome = j?.Nome ?? (_jogadores.TryGetValue(_sala.Uid, out var eu) ? eu.Nome : "host");
+        Enviar($"{_sala.Raiz}/rodada/espera", new JsonObject { ["n"] = ++_esperas, ["uid"] = uid, ["nome"] = nome, ["tipo"] = tipo });
     }
 
     // o leilao de todos comecou (rodada/leilaoAberto): quem nao licita ve a espera ate o resultado

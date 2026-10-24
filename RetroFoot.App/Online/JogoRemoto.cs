@@ -132,6 +132,25 @@ public sealed class JogoRemoto
             if (modo == Sala.ModoAmigo) _modoAmigo = true;
             else if (_modoAmigo) { _modoAmigo = false; Online.Lembrar(sala); }
         });
+        // o jogo parado esperando outro tecnico (a janela do host, a pergunta a outro aparelho):
+        // o aviso aqui, em vez da tela parada sem explicacao
+        sala.B.Observar($"{sala.Raiz}/rodada/espera", (caminho, v) =>
+        {
+            if (caminho != "/") return;
+            var o = v as JsonObject;
+            Dispatcher.UIThread.Post(() =>
+            {
+                FecharEsperaOutro();
+                if (o == null || (string?)o["uid"] == _sala.Uid) return;
+                var s = (_jornada != null ? _sessaoAoVivo : _sessao) ?? _sessaoPergunta;
+                if (s == null) return;
+                string tipo = (string?)o["tipo"] ?? "";
+                if (tipo is "aumento" or "convite" or "patrocinio") s.FundoVerdeDepoisDaRodada();
+                _esperaOutro = Sessao.Espera(Online.TextoEspera((string?)o["nome"] ?? "", tipo));
+                _esperaOutroEm = s;
+                s.AbrirDialogo(_esperaOutro);
+            });
+        });
         // um leilao de todos em que este aparelho nao licita: o fundo verde e a espera ate o resultado
         sala.B.Observar($"{sala.Raiz}/rodada/leilaoAberto", (caminho, v) =>
         {
@@ -438,6 +457,13 @@ public sealed class JogoRemoto
     volatile bool _modoAmigo;   // a sala do jogar com um amigo (o save do host, a meio da temporada)
     int _noticia, _leilaoVisto, _penaltisVistos, _leilaoAbertoVisto;
     Control? _esperaLeilao;
+    Control? _esperaOutro;
+    Sessao? _esperaOutroEm;
+    void FecharEsperaOutro()
+    {
+        if (_esperaOutro != null) _esperaOutroEm?.FecharDialogo(_esperaOutro);
+        _esperaOutro = null;
+    }
     Sessao? _esperaLeilaoEm;
     void FecharEsperaLeilao()
     {

@@ -268,7 +268,7 @@ public sealed class Sessao
             {
                 // (a janela do proprio host tambem para todos: o mesmo prazo; acabou, a lesao tem a
                 // troca automatica)
-                ComPrazo(() => sub?.Invoke(jg, lado, saiu, motivo));
+                EsperaDoHost(host, motivo == 2 ? "lesao" : null, () => ComPrazo(() => sub?.Invoke(jg, lado, saiu, motivo)));
                 if (motivo == 2 && saiu != null && jg.Equipa[lado] is { } eh && Memoria.Escalacao(saiu) == Memoria.EscTitular && Memoria.Substituicoes(eh) > 0)
                     JogoEmCurso.SubstituicaoForcada(eh, saiu, 0);
                 return;
@@ -298,7 +298,7 @@ public sealed class Sessao
         var bat = h.Batedor;
         h.Batedor = (e, titulares, sugerido) =>
         {
-            if (!host.Remota(e)) return bat != null ? ComPrazo(() => bat(e, titulares, sugerido)) ?? sugerido : sugerido;
+            if (!host.Remota(e)) return bat != null ? EsperaDoHost(host, "batedor", () => ComPrazo(() => bat(e, titulares, sugerido))) ?? sugerido : sugerido;
             var r = host.Perguntar(e.ID, "batedor", O(("equipa", e.ID), ("titulares", new System.Text.Json.Nodes.JsonArray(titulares.Select(x => (System.Text.Json.Nodes.JsonNode)(int)x.ID).ToArray())),
                 ("sugerido", (int)(sugerido?.ID ?? 0))), RetroFoot.Motor.Online.HostOnline.PrazoPergunta);
             return (int?)r?["jogador"] is int id ? titulares.FirstOrDefault(x => x.ID == id) ?? sugerido : sugerido;
@@ -308,7 +308,7 @@ public sealed class Sessao
         {
             FundoVerdeDepoisDaRodada();
             // (acabou o prazo sem resposta: o padrao do motor, aceito)
-            if (!host.Remota(e)) return aum == null || ComPrazo(() => aum(e, p, novo, modo)) || PrazoEsgotou;
+            if (!host.Remota(e)) return aum == null || EsperaDoHost(host, "aumento", () => ComPrazo(() => aum(e, p, novo, modo))) || PrazoEsgotou;
             var r = host.Perguntar(e.ID, "aumento", O(("equipa", e.ID), ("jogador", p.ID), ("novo", novo), ("modo", modo)));
             return (bool?)r?["ok"] ?? true;
         };
@@ -330,15 +330,7 @@ public sealed class Sessao
             if (aguardando != null) { FecharDialogo(aguardando); aguardando = null; }
             if (nome == null) return;
             if (tipo is "aumento" or "convite" or "patrocinio") FundoVerdeDepoisDaRodada();
-            string oque = tipo switch
-            {
-                "aumento" => Idioma.T("Aguardando {0} responder ao pedido de aumento…", nome),
-                "convite" => Idioma.T("Aguardando {0} responder ao convite de outro clube…", nome),
-                "patrocinio" => Idioma.T("Aguardando {0} responder à proposta de patrocínio…", nome),
-                "batedor" => Idioma.T("Aguardando {0} escolher o batedor do pênalti…", nome),
-                "lesao" => Idioma.T("Aguardando {0} escolher quem entra no lugar do lesionado…", nome),
-                _ => Idioma.T("Aguardando {0} responder…", nome),
-            };
+            string oque = RetroFoot.App.Online.TextoEspera(nome, tipo);
             aguardando = Espera(oque);
             AbrirDialogo(aguardando);
         });
@@ -367,7 +359,13 @@ public sealed class Sessao
                 Dispatcher.UIThread.Post(() =>
                 {
                     var nomes = string.Join(", ", jogadoresOnline.Where(j => remotos.Contains(j.Equipa)).Select(j => j.Nome));
-                    esperaHost = Espera(Idioma.T("Leilão de {0}: aguardando {1} dar o lance…", P98.NomeJogador(p), nomes));
+                    // (o motivo de o host ficar de fora: quase sempre o dinheiro abaixo do preco base)
+                    string motivo = "";
+                    if (host.MeuTime is ushort mt && Equipa(mt) is { } meuTime && meuTime.ID != v.ID)
+                        motivo = "\n" + ((int)meuTime.Dinheiro < preco
+                            ? Idioma.T("Seu time não pode licitar: o preço base é {0} e você tem {1} em caixa.", FormatoDinheiro.Valor(S, preco), FormatoDinheiro.Valor(S, (int)meuTime.Dinheiro))
+                            : Idioma.T("Seu time não entra neste leilão."));
+                    esperaHost = Espera(Idioma.T("Leilão de {0}: aguardando {1} dar o lance…", P98.NomeJogador(p), nomes) + motivo);
                     AbrirDialogo(esperaHost);
                 });
             var rs = host.PerguntarTodos(remotos, "lance", c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID), ("preco", preco)), t, prazo);
@@ -399,7 +397,7 @@ public sealed class Sessao
         h.Convite = (t, e) =>
         {
             var dele = J.M.EquipaDoTreinador(t.ID);
-            if (!host.Remota(dele)) return conv != null && ComPrazo(() => conv(t, e));
+            if (!host.Remota(dele)) return conv != null && EsperaDoHost(host, "convite", () => ComPrazo(() => conv(t, e)));
             var r = host.Perguntar(dele!.ID, "convite", O(("treinador", t.ID), ("equipa", e.ID)));
             return (bool?)r?["ok"] ?? false;
         };
@@ -407,7 +405,7 @@ public sealed class Sessao
         h.Patrocinio = p =>
         {
             var quem = PrimeiroHumano();
-            if (!host.Remota(quem)) return pat != null && ComPrazo(() => pat(p));
+            if (!host.Remota(quem)) return pat != null && EsperaDoHost(host, "patrocinio", () => ComPrazo(() => pat(p)));
             var r = host.Perguntar(quem!.ID, "patrocinio", O(("nome", Convert.ToBase64String(p.NomeBruto)), ("quantidade", p.Quantidade), ("valor", p.Valor),
                 ("tipoP", p.Tipo), ("marca", p.Marca), ("multa", p.Multa), ("registro", p.Registro == null ? null : Convert.ToBase64String(p.Registro.Registro))));
             return (bool?)r?["ok"] ?? false;
@@ -825,6 +823,16 @@ public sealed class Sessao
         finally { PrazoDialogo = antes; }
     }
     static void ComPrazo(Action f) => ComPrazo(() => { f(); return 0; });
+
+    // (online) a janela do proprio host que para o jogo de todos: os outros aparelhos veem
+    // "aguardando fulano..." enquanto ela esta aberta
+    static T EsperaDoHost<T>(RetroFoot.Motor.Online.HostOnline host, string? tipo, Func<T> f)
+    {
+        if (tipo != null) host.AvisarEspera(tipo);
+        try { return f(); }
+        finally { if (tipo != null) host.AvisarEspera(null); }
+    }
+    static void EsperaDoHost(RetroFoot.Motor.Online.HostOnline host, string? tipo, Action f) => EsperaDoHost(host, tipo, () => { f(); return 0; });
 
     // troca a tela mostrada (ex.: as Configuracoes por cima da tela da equipa e a volta)
     public void Mostrar(Control tela) => mostrar(tela);

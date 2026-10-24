@@ -274,6 +274,17 @@ public static class Online
     }
 
     // o resultado do leilao de todos: "🔨 Fulano (Vasco) vai para o Palmeiras por $X" ou sem ofertas
+    // o aviso de quem espera outro tecnico responder (o host e os outros aparelhos)
+    public static string TextoEspera(string nome, string tipo) => tipo switch
+    {
+        "aumento" => T("Aguardando {0} responder ao pedido de aumento…", nome),
+        "convite" => T("Aguardando {0} responder ao convite de outro clube…", nome),
+        "patrocinio" => T("Aguardando {0} responder à proposta de patrocínio…", nome),
+        "batedor" => T("Aguardando {0} escolher o batedor do pênalti…", nome),
+        "lesao" => T("Aguardando {0} escolher quem entra no lugar do lesionado…", nome),
+        _ => T("Aguardando {0} responder…", nome),
+    };
+
     public static string TextoLeilao(RetroFoot.Motor.Save.Jogo98 s, int jogador, int vendedor, int comprador, long preco)
     {
         if (comprador != 0) return T("Leilão: ") + TextoTransferencia(s, jogador, comprador, vendedor, preco, 0).Replace("🔁 ", "");
