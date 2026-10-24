@@ -1,0 +1,1 @@
+Copie o arquivo .e98 para a pasta dos jogos:\n{0}	Copie o ficheiro .e98 para a pasta dos jogos:\n{0}

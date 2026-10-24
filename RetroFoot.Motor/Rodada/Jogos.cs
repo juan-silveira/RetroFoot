@@ -180,6 +180,18 @@ public sealed partial class Mundo
     // ocupacao media do estadio antes dele; so na memoria (nao vai para o save)
     readonly Dictionary<Jogo, (Ext Procura, byte[]? Ocupacao)> _demanda = new(ReferenceEqualityComparer.Instance);
 
+    // (o retrato do jogo online, Online/Retrato) a procura de cada jogo de S.Jogos pela posicao
+    // na lista; null = sem procura guardada
+    internal List<(byte[] Procura, byte[]? Ocupacao)?> DemandaPorPosicao() =>
+        S.Jogos.Select(j => _demanda.TryGetValue(j, out var d) ? ((byte[], byte[]?)?)(d.Procura.Bytes(), d.Ocupacao) : null).ToList();
+
+    internal void DemandaPorPosicao(List<(byte[] Procura, byte[]? Ocupacao)?> l)
+    {
+        _demanda.Clear();
+        for (int i = 0; i < l.Count && i < S.Jogos.Count; i++)
+            if (l[i] is { } d) _demanda[S.Jogos[i]] = (Ext.Bytes(d.Procura), d.Ocupacao);
+    }
+
     // O preco do ingresso mudado na tela da equipa (a versao Atual) vale ja para o jogo desta
     // jornada: o publico e refeito com a mesma procura sorteada ao criar o jogo (o sorteio nao
     // muda) e o fator do preco novo, limitado ao estadio, e a ocupacao media volta a de antes
@@ -242,6 +254,11 @@ public sealed partial class Mundo
     //   para jornada = DS:271C ate R: se ninguem pediu para sair: se a jornada ainda nao foi
     //   jogada, JogarJornada; se a jornada e par, JogarTaca; DS:271A = 0
     //   fim da temporada (seg05:038e) ou saida
+    // (o retrato do jogo online, Online/Retrato) a jornada retomada ja passou pelo AntesDaJornada
+    // (as propostas de patrocinio, que gastam o Random) antes do retrato: nao repete. Um save
+    // carregado repete, como o launcher
+    public bool PularAntesDaJornada;
+
     public void Temporada(Action<Mundo>? inicio)
     {
         if (Retomar == 0) inicio?.Invoke(this);
@@ -250,9 +267,11 @@ public sealed partial class Mundo
         for (Jornada = ini; Jornada <= r; Jornada++)
         {
             if (Sair) continue;
+            bool pular = PularAntesDaJornada;
+            PularAntesDaJornada = false;
             if (!JornadaJogada)
             {
-                G.AntesDaJornada?.Invoke(this);
+                if (!pular) G.AntesDaJornada?.Invoke(this);
                 JogarJornada();
             }
             if (!Sair && Jornada % 2 == 0) JogarTaca();

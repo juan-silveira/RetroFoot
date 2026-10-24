@@ -38,8 +38,10 @@ sealed class TelaPedidoSalario : DialogoMercado
             2 => Idioma.T("Nem pensar! Exijo {0}!", sal) + "\n" + aceita,
             _ => Idioma.T("Nem pensar! Exijo {0}!", sal) + "\n\n" + obrigado,
         };
-        Rotulo(T.NomeTreinador(s.J.M.TreinadorDa(e)), 16, 24, 340, 19, W95.Arial16b, letra);
-        Por(new TextoMercado { Texto = msg, Fonte = W95.Arial13b, Cor = letra, Quebra = true }, 20, 56, 329, 113);
+        // (no Moderno a janela e do tema, sem o fundo da equipa: a letra da equipa ficava ilegivel
+        // ou sem sentido, como o vermelho no verde; o nome no destaque e o texto no do tema)
+        Rotulo(T.NomeTreinador(s.J.M.TreinadorDa(e)), 16, 24, 340, 19, W95.Arial16b, Moderno ? MM.TextoEscolhido : letra);
+        Por(new TextoMercado { Texto = msg, Fonte = W95.Arial13b, Cor = Moderno ? MM.Texto : letra, Quebra = true }, 20, 56, 329, 113);
         bool soOk = modo % 2 == 1;
         if (soOk)
         {

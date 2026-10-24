@@ -119,7 +119,11 @@ public sealed class TelaHub : UserControl
 
     List<Item> Itens()
     {
-        var l = new List<Item> { new("jogar", "jogar", T("Jogar"), T("Comece um jogo novo ou continue um jogo gravado."), Jogar) };
+        var l = new List<Item>
+        {
+            new("jogar", "jogar", T("Jogar"), T("Comece um jogo novo ou continue um jogo gravado."), Jogar),
+            new("online", "jogar", T("Jogo online"), T("Jogue com amigos em outros aparelhos (até 6 técnicos)."), () => mostrar(new TelaOnline(mostrar, () => mostrar(new TelaHub(mostrar))))),
+        };
         foreach (var f in Ferramentas.Todas)
         {
             var ff = f;
@@ -153,7 +157,7 @@ public sealed class TelaHub : UserControl
     static readonly Color VerdeEscuro = TemaVerde.Cores.MarcaVerdeEscuro, Verde = TemaVerde.Cores.MarcaVerde,
         Amarelo = TemaVerde.Cores.MarcaAmarelo, Ouro = TemaVerde.Cores.MarcaOuro;
 
-    static IBrush Cor(Color c, byte a) => new SolidColorBrush(Color.FromArgb(a, c.R, c.G, c.B));
+    static IBrush Cor(Color c, byte a) => new ImmutableSolidColorBrush(Color.FromArgb(a, c.R, c.G, c.B));
 
     // as cores das ferramentas (a barra de cima da pagina de cada uma, no visual escolhido)
     static Color CorItem(string id) => !M ? Amarelo : Color.Parse(id switch
@@ -162,12 +166,12 @@ public sealed class TelaHub : UserControl
         Ferramentas.Patches => "#81c995", Ferramentas.Arbitros => "#f28b82", _ => "#8ab4f8",
     });
 
-    static IBrush FundoChip(Color cor) => M ? new SolidColorBrush(Color.FromArgb(0x2E, cor.R, cor.G, cor.B)) : UiClassico.VerdeTopo;
+    static IBrush FundoChip(Color cor) => M ? new ImmutableSolidColorBrush(Color.FromArgb(0x2E, cor.R, cor.G, cor.B)) : UiClassico.VerdeTopo;
 
     Control Hub()
     {
         bool largo = Formato.Largo;
-        quadro.Background = new SolidColorBrush(VerdeEscuro);
+        quadro.Background = new ImmutableSolidColorBrush(VerdeEscuro);
         var raiz = new Grid();
         raiz.Children.Add(Logotipo.ImagemCapa(largo));
 
@@ -233,11 +237,11 @@ public sealed class TelaHub : UserControl
             Orientation = Orientation.Horizontal, Spacing = 12, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
             Children =
             {
-                Ui.Icone("jogar", 22, new SolidColorBrush(VerdeEscuro)),
+                Ui.Icone("jogar", 22, new ImmutableSolidColorBrush(VerdeEscuro)),
                 new TextBlock
                 {
                     Text = it.Titulo, FontFamily = Tema.Inter, FontSize = 25, FontWeight = FontWeight.ExtraBold,
-                    Foreground = new SolidColorBrush(VerdeEscuro), VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = new ImmutableSolidColorBrush(VerdeEscuro), VerticalAlignment = VerticalAlignment.Center,
                 },
             },
         };
@@ -270,7 +274,7 @@ public sealed class TelaHub : UserControl
         var chip = new Border
         {
             Width = largo ? 36 : 30, Height = largo ? 36 : 30, CornerRadius = new CornerRadius(largo ? 18 : 15), VerticalAlignment = VerticalAlignment.Center,
-            Background = Cor(Color.Parse("#062A15"), 0x99), Child = Ui.Icone(it.Icone, largo ? 19 : 16, new SolidColorBrush(Amarelo)),
+            Background = Cor(Color.Parse("#062A15"), 0x99), Child = Ui.Icone(it.Icone, largo ? 19 : 16, new ImmutableSolidColorBrush(Amarelo)),
         };
         var textos = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
         textos.Children.Add(new TextBlock
@@ -292,7 +296,7 @@ public sealed class TelaHub : UserControl
         {
             Child = g, Padding = largo ? new Thickness(12, 8, 12, 8) : new Thickness(9, 6, 8, 6), CornerRadius = new CornerRadius(12),
             Background = Cor(VerdeEscuro, 0xC4), Hover = Cor(Verde, 0xE6),
-            BorderBrush = Cor(Amarelo, 0x48), BorderThickness = new Thickness(1.5), CorFoco = new SolidColorBrush(Amarelo),
+            BorderBrush = Cor(Amarelo, 0x48), BorderThickness = new Thickness(1.5), CorFoco = new ImmutableSolidColorBrush(Amarelo),
             Solto = BoxShadows.Parse("0 4 12 0 #60000000"), Premido = BoxShadows.Parse("0 1 3 0 #60000000"),
         };
         c.BoxShadow = c.Solto.Value;
@@ -326,10 +330,10 @@ public sealed class TelaHub : UserControl
                 Child = new TextBlock
                 {
                     Text = texto, FontFamily = Tema.Inter, FontSize = 14, FontWeight = FontWeight.Bold, HorizontalAlignment = HorizontalAlignment.Center,
-                    Foreground = sim ? new SolidColorBrush(VerdeEscuro) : Brushes.White,
+                    Foreground = sim ? new ImmutableSolidColorBrush(VerdeEscuro) : Brushes.White,
                 },
                 MinWidth = 96, Padding = new Thickness(16, 8), CornerRadius = new CornerRadius(18),
-                Background = sim ? new SolidColorBrush(Amarelo) : Cor(Verde, 0x80), Hover = sim ? new SolidColorBrush(Ouro) : Cor(Verde, 0xD0),
+                Background = sim ? new ImmutableSolidColorBrush(Amarelo) : Cor(Verde, 0x80), Hover = sim ? new ImmutableSolidColorBrush(Ouro) : Cor(Verde, 0xD0),
                 BorderBrush = Cor(Colors.White, 0x40), BorderThickness = new Thickness(2), CorFoco = Brushes.White,
             };
             Premir(b);
@@ -343,7 +347,7 @@ public sealed class TelaHub : UserControl
         {
             HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, MinWidth = 320,
             Padding = new Thickness(26, 22), CornerRadius = new CornerRadius(16), Background = Cor(Color.Parse("#0A4523"), 0xF2),
-            BorderBrush = new SolidColorBrush(Amarelo), BorderThickness = new Thickness(1.5), BoxShadow = BoxShadows.Parse("0 12 36 0 #A0000000"),
+            BorderBrush = new ImmutableSolidColorBrush(Amarelo), BorderThickness = new Thickness(1.5), BoxShadow = BoxShadows.Parse("0 12 36 0 #A0000000"),
             Child = new StackPanel
             {
                 Spacing = 18,
@@ -354,7 +358,7 @@ public sealed class TelaHub : UserControl
                         Orientation = Orientation.Horizontal, Spacing = 10, HorizontalAlignment = HorizontalAlignment.Center,
                         Children =
                         {
-                            Ui.Icone("sair", 20, new SolidColorBrush(Amarelo)),
+                            Ui.Icone("sair", 20, new ImmutableSolidColorBrush(Amarelo)),
                             new TextBlock { Text = T("Sair do RetroFoot?"), FontFamily = Tema.Inter, FontSize = 18, FontWeight = FontWeight.Bold, Foreground = Brushes.White, VerticalAlignment = VerticalAlignment.Center },
                         },
                     },
@@ -500,7 +504,7 @@ public sealed class TelaHub : UserControl
         {
             // no Moderno o icone amarelo no circulo escuro, como nos botoes do hub
             Width = M ? 34 : 32, Height = M ? 34 : 32, CornerRadius = new CornerRadius(M ? 17 : 9), Background = M ? TemaVerde.CirculoIcone : UiClassico.Cartao,
-            Child = Ui.Icone(f.Icone, 18, M ? TemaVerde.Destaque : new SolidColorBrush(cor)),
+            Child = Ui.Icone(f.Icone, 18, M ? TemaVerde.Destaque : new ImmutableSolidColorBrush(cor)),
         };
         Grid.SetColumn(chip, 1);
         topo.Children.Add(chip);

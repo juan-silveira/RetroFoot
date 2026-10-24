@@ -156,32 +156,32 @@ public sealed partial class TelaEquipa
                     // a pilula ouro do Jogar do hub, com o halo amarelo (mais forte com o rato em cima)
                     double brilho = e * (0.55 + 0.75 * s) * (1 - 0.5 * p);
                     for (int i = 4; i >= 1; i--)
-                        dc.DrawRectangle(new SolidColorBrush(Alfa(TemaVerde.Cores.Destaque, 0.07 * brilho)), null, r.Inflate(i * 2.2), raio + i * 2.2, raio + i * 2.2);
+                        dc.DrawRectangle(new ImmutableSolidColorBrush(Alfa(TemaVerde.Cores.Destaque, 0.07 * brilho)), null, r.Inflate(i * 2.2), raio + i * 2.2, raio + i * 2.2);
                     var topo = Mist(Mist(TemaVerde.Cores.CartaoForte, Cor("#FCE46A"), e), Colors.White, 0.18 * s);
                     var meio = Mist(TemaVerde.Cores.Cartao, TemaVerde.Cores.Destaque, e);
                     var baixo = Mist(Mist(TemaVerde.Cores.Barra, TemaVerde.Cores.Ouro, e), Colors.Black, 0.25 * p);
-                    dc.DrawRectangle(new SolidColorBrush(Alfa(Colors.Black, 0.45)), null, r.Translate(new Vector(0, 2)), raio, raio);
+                    dc.DrawRectangle(new ImmutableSolidColorBrush(Alfa(Colors.Black, 0.45)), null, r.Translate(new Vector(0, 2)), raio, raio);
                     dc.DrawRectangle(Vertical((topo, 0), (meio, 0.45), (baixo, 1)),
-                        new Pen(new SolidColorBrush(Mist(TemaVerde.Cores.Linha, Alfa(Colors.White, 0.75), e)), 1.2), r, raio, raio);
+                        new Pen(new ImmutableSolidColorBrush(Mist(TemaVerde.Cores.Linha, Alfa(Colors.White, 0.75), e)), 1.2), r, raio, raio);
                 }
                 else
                 {
                     var topo = Mist(TemaVerde.Cores.CartaoForte, TemaVerde.Cores.Hover, s);
                     var baixo = Mist(Mist(TemaVerde.Cores.Cartao, TemaVerde.Cores.CartaoForte, s), Colors.Black, 0.3 * p);
-                    dc.DrawRectangle(new SolidColorBrush(Alfa(Colors.Black, 0.4)), null, r.Translate(new Vector(0, 2)), raio, raio);
+                    dc.DrawRectangle(new ImmutableSolidColorBrush(Alfa(Colors.Black, 0.4)), null, r.Translate(new Vector(0, 2)), raio, raio);
                     var borda = hab ? Mist(TemaVerde.Cores.Borda, TemaVerde.Cores.Destaque, 0.25 + 0.75 * s) : TemaVerde.Cores.Linha;
-                    dc.DrawRectangle(Vertical((topo, 0), (baixo, 1)), new Pen(new SolidColorBrush(borda), 1), r, raio, raio);
+                    dc.DrawRectangle(Vertical((topo, 0), (baixo, 1)), new Pen(new ImmutableSolidColorBrush(borda), 1), r, raio, raio);
                     if (s > 0.01)
                         for (int i = 3; i >= 1; i--)
-                            dc.DrawRectangle(null, new Pen(new SolidColorBrush(Alfa(TemaVerde.Cores.Destaque, 0.08 * s)), 2), r.Inflate(i * 1.6), raio + i * 1.6, raio + i * 1.6);
+                            dc.DrawRectangle(null, new Pen(new ImmutableSolidColorBrush(Alfa(TemaVerde.Cores.Destaque, 0.08 * s)), 2), r.Inflate(i * 1.6), raio + i * 1.6, raio + i * 1.6);
                 }
                 // o brilho de vidro na metade de cima e o fio claro da borda
                 var vidro = new Rect(r.X + 3, r.Y + 1.5, r.Width - 6, r.Height * 0.48);
                 dc.DrawRectangle(Vertical((Alfa(Colors.White, principal ? 0.42 * e + 0.08 : 0.16), 0), (Alfa(Colors.White, 0.02), 1)), null, vidro, raio - 2, raio - 2);
-                var cor = principal ? (hab ? (IBrush)new SolidColorBrush(TemaVerde.Cores.SobreDestaque) : MFraco) : hab ? new SolidColorBrush(Mist(TemaVerde.Cores.Destaque, TemaVerde.Cores.DestaqueClaro, s)) : MFraco;
+                var cor = principal ? (hab ? (IBrush)new ImmutableSolidColorBrush(TemaVerde.Cores.SobreDestaque) : MFraco) : hab ? new ImmutableSolidColorBrush(Mist(TemaVerde.Cores.Destaque, TemaVerde.Cores.DestaqueClaro, s)) : MFraco;
                 var t = TM(texto, tam, cor, true);
                 double tx = r.X + (w - t.WidthIncludingTrailingWhitespace) / 2, ty = yc - t.Height / 2;
-                if (principal && hab) dc.DrawText(TM(texto, tam, new SolidColorBrush(Alfa(Colors.White, 0.35)), true), new Point(tx, ty + 1));
+                if (principal && hab) dc.DrawText(TM(texto, tam, new ImmutableSolidColorBrush(Alfa(Colors.White, 0.35)), true), new Point(tx, ty + 1));
                 dc.DrawText(t, new Point(tx, ty));
             }
             if (hab && acao != null) _alvos.Add((r, acao));
@@ -256,7 +256,7 @@ public sealed partial class TelaEquipa
             double esp = 2.6 * S;
             dc.DrawGeometry(Vertical((Cor("#1b5e20"), 0), (Cor("#0b2a10"), 1)), null,
                 Poli(b0, b1, new Point(b1.X, b1.Y + esp), new Point(b0.X, b0.Y + esp)));
-            dc.DrawGeometry(new SolidColorBrush(Cor("#24662a")), null, Poli(b0, b1, P(ul, df), P(-ul, df)));
+            dc.DrawGeometry(new ImmutableSolidColorBrush(Cor("#24662a")), null, Poli(b0, b1, P(ul, df), P(-ul, df)));
 
             // as placas de publicidade la no fundo, nas cores da equipa: com patrocinador, 3
             // paineis brancos (so o master: M M M; so o pontual: P P P; os dois: M P M); sem
@@ -271,7 +271,7 @@ public sealed partial class TelaEquipa
                 double hz = (logos.Count > 0 ? 4.8 : 1.6) * S * Esc(df);
                 var placa = new Rect(a0.X, a0.Y - hz, a1.X - a0.X, hz);
                 dc.DrawRectangle(Vertical((Mist(corFundo, Colors.White, 0.15), 0), (Mist(corFundo, Colors.Black, 0.35), 1)), null, placa);
-                dc.FillRectangle(new SolidColorBrush(Alfa(Colors.White, 0.35)), new Rect(placa.X, placa.Y, placa.Width, 1));
+                dc.FillRectangle(new ImmutableSolidColorBrush(Alfa(Colors.White, 0.35)), new Rect(placa.X, placa.Y, placa.Width, 1));
                 using (dc.PushClip(placa))
                 {
                     if (logos.Count > 0)
@@ -289,7 +289,7 @@ public sealed partial class TelaEquipa
                         double tl = hz * 0.7;
                         if (tl >= 6)
                             for (int q = 0; q < 3; q++)
-                                CentroM(dc, q == 1 ? "RETROFOOT" : nome, placa.X + placa.Width * (q * 2 + 1) / 6, placa.Center.Y, tl, new SolidColorBrush(corLetra), true, placa.Width / 3 - 6);
+                                CentroM(dc, q == 1 ? "RETROFOOT" : nome, placa.X + placa.Width * (q * 2 + 1) / 6, placa.Center.Y, tl, new ImmutableSolidColorBrush(corLetra), true, placa.Width / 3 - 6);
                     }
                 }
             }
@@ -299,7 +299,7 @@ public sealed partial class TelaEquipa
             for (int i = 0; i < 14; i++)
             {
                 double da = CampoC * i / 14, db = CampoC * (i + 1) / 14;
-                var br = new SolidColorBrush(i % 2 == 0 ? rel2 : rel1);
+                var br = new ImmutableSolidColorBrush(i % 2 == 0 ? rel2 : rel1);
                 dc.DrawGeometry(br, new Pen(br, 0.6), Poli(P(-CampoL, da), P(CampoL, da), P(CampoL, db), P(-CampoL, db)));
             }
             // a sombra do fundo e a luz de perto
@@ -315,7 +315,7 @@ public sealed partial class TelaEquipa
             dc.DrawGeometry(sombra, null, campoPoli);
 
             // as linhas (perspectiva: retas continuam retas; os circulos, pontos a pontos)
-            var giz = new Pen(new SolidColorBrush(Alfa(Colors.White, 0.85)), Math.Max(1, S * 0.32), lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
+            var giz = new Pen(new ImmutableSolidColorBrush(Alfa(Colors.White, 0.85)), Math.Max(1, S * 0.32), lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
             void Ret(double u0, double da, double u1, double db) => dc.DrawGeometry(null, giz, Linha(new[] { P(u0, da), P(u1, da), P(u1, db), P(u0, db) }, true));
             void Arco(double uc, double dc0, double raio, double a0, double a1, int n = 40)
             {
@@ -398,7 +398,7 @@ public sealed partial class TelaEquipa
                     double topoT = pa.Y, baixoT = Math.Max(pb.Y + esp * 0.5, topoT + 9);
                     var rt = new Rect(pa.X, topoT, P(u1, -0.8).X - pa.X, baixoT - topoT);
                     // a sombra na relva, um pouco para tras
-                    dc.DrawRectangle(new SolidColorBrush(Alfa(Colors.Black, 0.25)), null, rt.Translate(new Vector(0, 2)), 2, 2);
+                    dc.DrawRectangle(new ImmutableSolidColorBrush(Alfa(Colors.Black, 0.25)), null, rt.Translate(new Vector(0, 2)), 2, 2);
                     PainelPlaca(dc, lado == 0 ? (master ?? pontual) : (pontual ?? master), rt, nome, corLetra);
                 }
             }
@@ -411,7 +411,7 @@ public sealed partial class TelaEquipa
             string form = porPos[1] + "-" + porPos[2] + "-" + porPos[3];
             var tf = TM(form, 12, MTexto, true);
             var rf = new Rect(r.X + 10, r.Y + 4, tf.WidthIncludingTrailingWhitespace + 18, 20);
-            dc.DrawRectangle(Vertical((Alfa(Colors.White, 0.16), 0), (Alfa(Colors.White, 0.05), 1)), new Pen(new SolidColorBrush(Alfa(Colors.White, 0.2)), 1), rf, 10, 10);
+            dc.DrawRectangle(Vertical((Alfa(Colors.White, 0.16), 0), (Alfa(Colors.White, 0.05), 1)), new Pen(new ImmutableSolidColorBrush(Alfa(Colors.White, 0.2)), 1), rf, 10, 10);
             dc.DrawText(tf, new Point(rf.X + 9, rf.Center.Y - tf.Height / 2));
             int res = _e.Jogadores.Count(p => Mem.Escalacao(p) == Mem.EscReserva);
             double xd = r.Right - 10;
@@ -428,7 +428,7 @@ public sealed partial class TelaEquipa
             var ro = new Rect(xd - to.WidthIncludingTrailingWhitespace - 18, rf.Y, to.WidthIncludingTrailingWhitespace + 18, 20);
             if (ro.X > rf.Right + 6)
             {
-                dc.DrawRectangle(new SolidColorBrush(Alfa(Cor("#062414"), 0.6)), null, ro, 10, 10);
+                dc.DrawRectangle(new ImmutableSolidColorBrush(Alfa(Cor("#062414"), 0.6)), null, ro, 10, 10);
                 dc.DrawText(to, new Point(ro.X + 9, ro.Center.Y - to.Height / 2));
             }
         }
@@ -448,7 +448,7 @@ public sealed partial class TelaEquipa
             if (logo == null)
             {
                 double tl = r.Height * 0.62;
-                if (tl >= 6) CentroM(dc, nome, r.Center.X, r.Center.Y, tl, new SolidColorBrush(corLetra), true, r.Width - 4);
+                if (tl >= 6) CentroM(dc, nome, r.Center.X, r.Center.Y, tl, new ImmutableSolidColorBrush(corLetra), true, r.Width - 4);
                 return;
             }
             dc.DrawRectangle(Brushes.White, null, r, 1.5, 1.5);
@@ -462,9 +462,9 @@ public sealed partial class TelaEquipa
         static void Baliza(DrawingContext dc, Func<double, double, double, Point> P, double d, double S, Func<double, double> esc, double op)
         {
             double fora = d == 0 ? -2 : d + 2, w = 3.66, h = 2.44;
-            var rede = new Pen(new SolidColorBrush(Color.FromArgb((byte)(130 * op), 235, 235, 235)), Math.Max(0.5, S * 0.12));
-            var poste = new Pen(new SolidColorBrush(Color.FromArgb((byte)(255 * op), 255, 255, 255)), Math.Max(1.2, S * 0.36 * esc(d)), lineCap: PenLineCap.Round);
-            var veu = new SolidColorBrush(Color.FromArgb((byte)(40 * op), 255, 255, 255));
+            var rede = new Pen(new ImmutableSolidColorBrush(Color.FromArgb((byte)(130 * op), 235, 235, 235)), Math.Max(0.5, S * 0.12));
+            var poste = new Pen(new ImmutableSolidColorBrush(Color.FromArgb((byte)(255 * op), 255, 255, 255)), Math.Max(1.2, S * 0.36 * esc(d)), lineCap: PenLineCap.Round);
+            var veu = new ImmutableSolidColorBrush(Color.FromArgb((byte)(40 * op), 255, 255, 255));
             StreamGeometry Q(params Point[] p)
             {
                 var g = new StreamGeometry();
@@ -497,10 +497,10 @@ public sealed partial class TelaEquipa
             using var _o = dc.PushOpacity(op);
 
             // a sombra no chao
-            dc.DrawEllipse(new SolidColorBrush(Alfa(Colors.Black, 0.38 - 0.1 * s)), null, new Point(pe.X + t * 0.08, pe.Y + 1), t * 0.62, t * 0.22);
+            dc.DrawEllipse(new ImmutableSolidColorBrush(Alfa(Colors.Black, 0.38 - 0.1 * s)), null, new Point(pe.X + t * 0.08, pe.Y + 1), t * 0.62, t * 0.22);
             // o anel de escolhido / do rato no chao
-            if (l > 0.01) dc.DrawEllipse(null, new Pen(new SolidColorBrush(Alfa(TemaVerde.Cores.Destaque, 0.9 * l)), 2), pe, t * 0.7, t * 0.26);
-            if (s > 0.01) dc.DrawEllipse(new SolidColorBrush(Alfa(Cor("#fdd663"), 0.18 * s)), null, pe, t * 0.78, t * 0.3);
+            if (l > 0.01) dc.DrawEllipse(null, new Pen(new ImmutableSolidColorBrush(Alfa(TemaVerde.Cores.Destaque, 0.9 * l)), 2), pe, t * 0.7, t * 0.26);
+            if (s > 0.01) dc.DrawEllipse(new ImmutableSolidColorBrush(Alfa(Cor("#fdd663"), 0.18 * s)), null, pe, t * 0.78, t * 0.3);
 
             double y = pe.Y - sobe;
             // a base (moeda): a borda escura e o tampo com brilho
@@ -542,13 +542,13 @@ public sealed partial class TelaEquipa
             var escuro = Mist(corFundo, Colors.Black, 0.35);
             // contorno: escuro nas camisolas claras, claro nas escuras (aparece na relva)
             var contorno = Lum(corFundo) > 0.45 ? Mist(corFundo, Colors.Black, 0.55) : Mist(corFundo, Colors.White, 0.55);
-            dc.DrawGeometry(Horizontal((claro, 0), (corFundo, 0.45), (escuro, 1)), new Pen(new SolidColorBrush(contorno), 0.9), cam);
+            dc.DrawGeometry(Horizontal((claro, 0), (corFundo, 0.45), (escuro, 1)), new Pen(new ImmutableSolidColorBrush(contorno), 0.9), cam);
             // a gola e as pontas das mangas na cor da letra
-            var letra = new SolidColorBrush(corLetra);
+            var letra = new ImmutableSolidColorBrush(corLetra);
             dc.DrawGeometry(null, new Pen(letra, Math.Max(1, t * 0.06)), Linha2(new Point(pe.X - w * 0.45, cy - hm), new Point(pe.X, cy - hm * 0.62), new Point(pe.X + w * 0.45, cy - hm)));
             // o brilho
             using (dc.PushClip(new Rect(pe.X - w * 0.82, cy - hm, w * 0.8, hm * 2)))
-                dc.DrawGeometry(new SolidColorBrush(Alfa(Colors.White, 0.12 + 0.1 * s)), null, cam);
+                dc.DrawGeometry(new ImmutableSolidColorBrush(Alfa(Colors.White, 0.12 + 0.1 * s)), null, cam);
             if (numero > 0) CentroM(dc, numero.ToString(), pe.X, cy + hm * 0.2, Math.Max(7, t * 0.36), letra, true);
             // lesionado ou suspenso no onze: o aviso vermelho
             if (p.JogosLesao > 0 || p.Suspensao > 0)
@@ -565,7 +565,7 @@ public sealed partial class TelaEquipa
             var tx = TM(nomeJ, tn, sel ? MEscuro : MTexto, true, maxN);
             double wn = Math.Min(tx.WidthIncludingTrailingWhitespace, maxN) + 10;
             var rn = new Rect(pe.X - wn / 2, pe.Y + 1, wn, tn + 5);
-            dc.DrawRectangle(new SolidColorBrush(sel ? Alfa(TemaVerde.Cores.Destaque, 0.95) : Alfa(Cor("#062414"), 0.72 + 0.2 * s)), null, rn, rn.Height / 2, rn.Height / 2);
+            dc.DrawRectangle(new ImmutableSolidColorBrush(sel ? Alfa(TemaVerde.Cores.Destaque, 0.95) : Alfa(Cor("#062414"), 0.72 + 0.2 * s)), null, rn, rn.Height / 2, rn.Height / 2);
             dc.DrawText(tx, new Point(rn.X + 5, rn.Center.Y - tx.Height / 2));
 
             if (op > 0.9)

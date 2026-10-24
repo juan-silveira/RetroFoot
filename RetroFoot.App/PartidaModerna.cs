@@ -25,7 +25,7 @@ static class PM
     public static readonly IBrush Escolhido = TemaVerde.Selecao, Vermelho = TemaVerde.Vermelho, Amarelo = TemaVerde.Destaque, Escuro = TemaVerde.SobreDestaque;
     public static readonly FontFamily Inter = new("fonts:Inter#Inter");
 
-    public static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    public static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
     public static FormattedText T(string s, double tam, IBrush cor, bool negrito = false) =>
         new(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,

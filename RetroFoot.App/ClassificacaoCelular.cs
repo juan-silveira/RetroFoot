@@ -101,7 +101,8 @@ sealed class TelaClassificacaoCelular : UserControl
     }
 
     // ---------------------------------------------------------------- dados
-    bool Humana(Equipa e) => _treinadores.TryGetValue(e.Treinador, out var t) && t.Humano != 0;
+    // (no jogo online, so o time deste aparelho: TelaJornada.SoTime)
+    bool Humana(Equipa e) => _treinadores.TryGetValue(e.Treinador, out var t) && t.Humano != 0 && (TelaJornada.SoTime is not ushort meu || e.ID == meu);
 
     int DivisaoDosHumanos()
     {
@@ -258,7 +259,7 @@ sealed class TelaClassificacaoCelular : UserControl
         }
         var linha = CUi.Toque(g, AbrirEquipa == null ? null : () => Abrir(e), 40);
         linha.Padding = new Thickness(8, 0);
-        if (humana) linha.Background = CUi.Retro ? new SolidColorBrush(Color.FromRgb(255, 255, 176)) : TemaVerde.Humano;
+        if (humana) linha.Background = CUi.Retro ? new ImmutableSolidColorBrush(Color.FromRgb(255, 255, 176)) : TemaVerde.Humano;
         return linha;
     }
 

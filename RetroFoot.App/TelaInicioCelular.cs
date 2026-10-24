@@ -220,6 +220,19 @@ public sealed partial class TelaInicio
     static string PassoCelular(int k) => T("Jogo novo") + " · " + (k + 1) + "/3 · " + new[] { T("Países"), T("Moeda"), T("Treinadores") }[k];
 
     // ---------------------------------------------------------------- inicio
+    // (docs/multiplayer-online.md) a entrada do jogo online: criar ou entrar numa sala
+    Control CartaoOnline()
+    {
+        var b = new CUi.Botao(T("Jogo online"), false, AbrirOnline) { HorizontalAlignment = HorizontalAlignment.Stretch };
+        return CUi.Cartao_(T("Jogo online"), new StackPanel
+        {
+            Spacing = 10,
+            Children = { CUi.Txt(T("Jogue com amigos em outros aparelhos: até 6 técnicos, um por aparelho."), 13.5, CUi.Fraco, FontWeight.Normal, true), b },
+        });
+    }
+
+    void AbrirOnline() => mostrar(new TelaOnline(mostrar, () => mostrar(new TelaInicio(mostrar))));
+
     void EscolherJogoCelular()
     {
         if (CUi.Retro) { EscolherJogoRetro(); return; }
@@ -228,6 +241,9 @@ public sealed partial class TelaInicio
         var itens = new List<CUi.Item>();
         var continuar = new CUi.Botao(T("Continuar"), true, () => { });
         var excluir = new CUi.Botao(T("Excluir"), false, () => { if (sel >= 0 && sel < jogos.Count) ExcluirJogo(jogos[sel].Nome, jogos[sel].Caminho); });
+        // (acrescimo, como no launcher) importar um .e98 de fora e exportar o escolhido
+        var importar = new CUi.Botao(T("Importar"), false, ImportarJogo);
+        var exportar = new CUi.Botao(T("Exportar"), false, () => { if (sel >= 0 && sel < jogos.Count) ExportarJogo(jogos[sel].Nome, jogos[sel].Caminho); });
         var lista = new StackPanel { Spacing = 6 };
         var nome = CUi.Caixa("", 8, T("NOME"));
         var aviso = CUi.Txt("", 13, CUi.Erro, FontWeight.Normal, true);
@@ -259,8 +275,8 @@ public sealed partial class TelaInicio
             lista.Children.Add(it);
         }
         Control jogosGravados = jogos.Count > 0
-            ? new StackPanel { Spacing = 12, Children = { lista, CUi.Botoes(excluir, continuar) } }
-            : CUi.Txt(T("Nenhum jogo gravado. Comece um jogo novo abaixo."), 14, CUi.Fraco, FontWeight.Normal, true);
+            ? new StackPanel { Spacing = 12, Children = { lista, CUi.Botoes(excluir, continuar), CUi.Botoes(importar, exportar) } }
+            : new StackPanel { Spacing = 12, Children = { CUi.Txt(T("Nenhum jogo gravado. Comece um jogo novo abaixo."), 14, CUi.Fraco, FontWeight.Normal, true), CUi.Botoes(importar) } };
 
         comecar.HorizontalAlignment = HorizontalAlignment.Stretch;
         var mudar = new CUi.Botao(T("Mudar nas Configurações"), false, AbrirConfiguracoes);
@@ -279,7 +295,7 @@ public sealed partial class TelaInicio
         var corpo = new StackPanel
         {
             Spacing = 14,
-            Children = { CUi.Cartao_(T("Continuar um jogo"), jogosGravados, jogos.Count > 0 ? CUi.Etiqueta(jogos.Count == 1 ? T("1 jogo") : T("{0} jogos", jogos.Count)) : null), CUi.Cartao_(T("Jogo novo"), novo) },
+            Children = { CUi.Cartao_(T("Continuar um jogo"), jogosGravados, jogos.Count > 0 ? CUi.Etiqueta(jogos.Count == 1 ? T("1 jogo") : T("{0} jogos", jogos.Count)) : null), CUi.Cartao_(T("Jogo novo"), novo), CartaoOnline() },
         };
         // os tres na largura da tela (o Sobre ficava cortado), o texto menor para caber
         var bAcoes = new[] { new CUi.Botao(T("Configurações"), false, AbrirConfiguracoes), new CUi.Botao(T("Ferramentas"), false, AbrirFerramentasCelular), new CUi.Botao(T("Sobre"), false, () => TelaAcerca.Abrir(new Dialogos(c => SobreporCelular(CUi.FolhaDe(c) != null ? new Panel { Background = TemaVerde.Veu, Children = { c } } : new Panel { Background = TemaVerde.Veu, Children = { new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, Child = c } } }), _ => Sobrepor(null)))) };
@@ -297,7 +313,7 @@ public sealed partial class TelaInicio
             aviso.Text = av ?? "";
             aviso.IsVisible = av != null;
             comecar.Habilitado = valido;
-            continuar.Habilitado = excluir.Habilitado = sel >= 0;
+            continuar.Habilitado = excluir.Habilitado = exportar.Habilitado = sel >= 0;
         }
         void Escolher(int k)
         {
@@ -472,7 +488,7 @@ public sealed partial class TelaInicio
                 if (e == null) continue;
                 var fundo = e.CorFundo.Length >= 3 ? Color.FromRgb(e.CorFundo[0], e.CorFundo[1], e.CorFundo[2]) : Colors.White;
                 var letra = e.CorLetra.Length >= 3 ? Color.FromRgb(e.CorLetra[0], e.CorLetra[1], e.CorLetra[2]) : Colors.Black;
-                var nomeEq = CUi.Txt(TextoSave(e.NomeCurto), 15, new SolidColorBrush(letra), FontWeight.Bold);
+                var nomeEq = CUi.Txt(TextoSave(e.NomeCurto), 15, new ImmutableSolidColorBrush(letra), FontWeight.Bold);
                 nomeEq.Tag = "fixo";
                 equipas[i].Content = new StackPanel
                 {
@@ -480,7 +496,7 @@ public sealed partial class TelaInicio
                     Children =
                     {
                         new ConfigEstilo.Escudo(e) { Width = 30, Height = 30, VerticalAlignment = VerticalAlignment.Center },
-                        new Border { Background = new SolidColorBrush(fundo), CornerRadius = new CornerRadius(CUi.Retro ? 0 : 6), Padding = new Thickness(8, 3), Child = nomeEq },
+                        new Border { Background = new ImmutableSolidColorBrush(fundo), CornerRadius = new CornerRadius(CUi.Retro ? 0 : 6), Padding = new Thickness(8, 3), Child = nomeEq },
                     },
                 };
                 equipas[i].IsVisible = true;

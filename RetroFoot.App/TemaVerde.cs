@@ -51,7 +51,7 @@ public static class TemaVerde
         public static readonly Color DiscoLogo = Color.Parse("#E6F0E9");
     }
 
-    static IBrush B(Color c) => new SolidColorBrush(c);
+    static IBrush B(Color c) => new ImmutableSolidColorBrush(c);
 
     public static readonly IBrush Fundo = B(Cores.Fundo), FundoEscuro = B(Cores.FundoEscuro);
     public static readonly IBrush Barra = B(Cores.Barra), Cartao = B(Cores.Cartao), CartaoForte = B(Cores.CartaoForte);
@@ -65,8 +65,8 @@ public static class TemaVerde
     public static readonly IBrush VerdeForte = B(Cores.VerdeForte), CinzaForte = B(Cores.CinzaForte), VermelhoForte = B(Cores.VermelhoForte);
     public static readonly IBrush DiscoLogo = B(Cores.DiscoLogo);
     // o fundo de um destaque suave (etiquetas amarelas, a aba escolhida)
-    public static readonly IBrush DestaqueFundo = new SolidColorBrush(Color.FromArgb(0x2E, 0xF8, 0xD7, 0x34));
-    public static readonly IBrush Sombra = new SolidColorBrush(Color.FromArgb(0x60, 0, 0, 0)), Veu = new SolidColorBrush(Color.FromArgb(0x99, 0, 0, 0));
+    public static readonly IBrush DestaqueFundo = new ImmutableSolidColorBrush(Color.FromArgb(0x2E, 0xF8, 0xD7, 0x34));
+    public static readonly IBrush Sombra = new ImmutableSolidColorBrush(Color.FromArgb(0x60, 0, 0, 0)), Veu = new ImmutableSolidColorBrush(Color.FromArgb(0x99, 0, 0, 0));
 
     // o quadro da capa: mais claro no meio de cima, mais escuro nas bordas
     public static readonly IBrush FundoTela = new RadialGradientBrush
@@ -75,7 +75,7 @@ public static class TemaVerde
         GradientOrigin = new RelativePoint(0.5, 0.3, RelativeUnit.Relative),
         RadiusX = new RelativeScalar(0.85, RelativeUnit.Relative), RadiusY = new RelativeScalar(0.95, RelativeUnit.Relative),
         GradientStops = { new GradientStop(Cores.FundoClaro, 0), new GradientStop(Cores.Fundo, 0.55), new GradientStop(Color.Parse("#0A4A25"), 1) },
-    };
+    }.ToImmutable();
 
     // a pilula do Jogar do hub (de cima para baixo)
     public static readonly IBrush BotaoPrimario = Vertical("#FCE46A", "#F8D734", "#DDA917");
@@ -85,7 +85,7 @@ public static class TemaVerde
     {
         StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative), EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
         GradientStops = { new GradientStop(Color.Parse(a), 0), new GradientStop(Color.Parse(b), 0.45), new GradientStop(Color.Parse(c), 1) },
-    };
+    }.ToImmutable();
 
     // o vidro do hub (TelaHub), para as paginas sobre o FundoTela (inicio, configuracoes, ferramentas):
     // CartaoHub e BarraHub meio transparentes (o quadro aparece por baixo), CirculoIcone o circulo
@@ -96,5 +96,5 @@ public static class TemaVerde
     public static readonly IBrush BotaoSecundario = Alfa(Cores.Barra, 0.55), BotaoDesligado = Alfa(Cores.Barra, 0.70);
 
     // uma cor do tema com outra opacidade (0..1)
-    public static IBrush Alfa(Color c, double a) => new SolidColorBrush(Color.FromArgb((byte)System.Math.Round(255 * System.Math.Clamp(a, 0, 1)), c.R, c.G, c.B));
+    public static IBrush Alfa(Color c, double a) => new ImmutableSolidColorBrush(Color.FromArgb((byte)System.Math.Round(255 * System.Math.Clamp(a, 0, 1)), c.R, c.G, c.B));
 }

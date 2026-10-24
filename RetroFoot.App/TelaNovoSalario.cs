@@ -67,6 +67,12 @@ sealed class TelaNovoSalario : DialogoMercado
         t.Propor += v =>
         {
             s.FecharDialogo(t);
+            if (s.Remoto is { } rm)
+            {
+                rm.Executar(new RetroFoot.Motor.Online.Renovar(p.ID, v), r =>
+                    fim?.Invoke(r.Motivo switch { "vendido" => ResultadoSalario.Vendido, "nao vendido" => ResultadoSalario.NaoVendido, "aceito" => ResultadoSalario.Aceito, _ => ResultadoSalario.Cancelado }));
+                return;
+            }
             Task.Run(() =>
             {
                 var r = ResultadoSalario.Aceito;

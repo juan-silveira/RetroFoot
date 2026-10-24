@@ -64,7 +64,7 @@ sealed class TelaArbitrosCelular : UserControl
     readonly Panel camada = new();
 
     static IBrush Texto => R ? W95.Preto : TemaVerde.Texto;
-    static IBrush Fraco => R ? new SolidColorBrush(Color.Parse("#404040")) : TemaVerde.TextoFraco;
+    static IBrush Fraco => R ? new ImmutableSolidColorBrush(Color.Parse("#404040")) : TemaVerde.TextoFraco;
     static FontFamily Fonte => CUi.Fonte;
 
     public TelaArbitrosCelular(Ferramentas.Contexto ctx)
@@ -181,7 +181,7 @@ sealed class TelaArbitrosCelular : UserControl
             conteudo.Margin = new Thickness(8, 0, 4, 0);
             var seta = new Border
             {
-                Width = 32, Background = new SolidColorBrush(Color.Parse("#C0C0C0")), BoxShadow = Solto, Margin = new Thickness(0, 2, 2, 2),
+                Width = 32, Background = new ImmutableSolidColorBrush(Color.Parse("#C0C0C0")), BoxShadow = Solto, Margin = new Thickness(0, 2, 2, 2),
                 Child = new Pintor((dc, s) =>
                 {
                     double cx = Math.Floor(s.Width / 2), cy = Math.Floor(s.Height / 2);

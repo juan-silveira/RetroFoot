@@ -5,6 +5,7 @@ Guarda-redes	Goleiro
 Defesa	Defensor
 Médio	Meia
 Avançado	Atacante
+Não marcad	Perdeu
 GOLO	GOL
 Ao poste	Na trave
 À barra	Travessão

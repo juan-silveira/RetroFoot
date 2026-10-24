@@ -373,7 +373,7 @@ static class CCfg
         readonly bool _moderno;
         public PreviaPele(bool moderno) { _moderno = moderno; Width = 44; Height = 74; IsHitTestVisible = false; }
 
-        static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
+        static IBrush H(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
         public override void Render(DrawingContext dc)
         {

@@ -19,17 +19,38 @@ public class App : Application
         Styles.Add(new Avalonia.Themes.Fluent.FluentTheme());
     }
 
+    // um erro que fecharia o jogo fica escrito em data/erros.log (com a hora e a pilha), para
+    // saber o que foi; os da interface e das tarefas esquecidas ficam so no arquivo, sem fechar
+    static void RegistrarErros()
+    {
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => Anotar("fatal", e.ExceptionObject as Exception);
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (_, e) => { Anotar("tarefa", e.Exception); e.SetObserved(); };
+        Avalonia.Threading.Dispatcher.UIThread.UnhandledException += (_, e) => Anotar("interface", e.Exception);
+    }
+
+    public static void Anotar(string onde, Exception? ex)
+    {
+        try
+        {
+            var arq = System.IO.Path.Combine(DadosJogo.Raiz, "erros.log");
+            if (System.IO.File.Exists(arq) && new System.IO.FileInfo(arq).Length > 512 * 1024) System.IO.File.Delete(arq);
+            System.IO.File.AppendAllText(arq, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{onde}] {ex}\n\n");
+        }
+        catch { }
+    }
+
     public override void OnFrameworkInitializationCompleted()
     {
         // No celular, a tela adaptada ao toque; no computador, a classica (800x600, fiel).
         // RETROFOOT_CELULAR=1 mostra a do celular no computador, para comparar.
         // o idioma das Configuracoes (e a traducao do motor) antes da 1a tela
         _ = Idioma.Atual;
+        RegistrarErros();
         bool celular = Celular.Ativo;
         if (!celular) FolgaDaBarra();
         // o texto inteiro numa dica onde ficou cortado (so com o rato)
         if (!OperatingSystem.IsAndroid()) Dicas.Ligar();
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         Raiz = raiz;
         void Mostrar(Control t) => raiz.Child = t;
         // RETROFOOT_TELA=equipa|jornada|classificacao: uma tela sozinha, com dados de teste
@@ -46,18 +67,40 @@ public class App : Application
             "dialogos" => DemoDialogos.Demo(),
             "hub" => new TelaHub(Mostrar),
             "inicio" => new TelaInicio(Mostrar),
+            "online" => new TelaOnline(Mostrar, () => Mostrar(new TelaHub(Mostrar))),
             // a prova antiga da tela da equipa no celular (so para consulta)
             "celular" => new TelaCelular(),
             _ when celular => new TelaInicio(Mostrar),
             _ => TelaInicio.ComSobre(Mostrar),
         };
         // o Voltar do Android (e o Esc da previa): primeiro a janela do celular de cima
+        // o Voltar que fecharia o app (nada mais responde a ele): antes, a pergunta se quer sair
+        var camadaSair = new Grid { IsVisible = false, Background = TemaVerde.Veu };
+        void PerguntarSair()
+        {
+            if (camadaSair.IsVisible) return;
+            void Ficar() { camadaSair.IsVisible = false; camadaSair.Children.Clear(); }
+            var f = CUi.PerguntaEmColuna(Idioma.T("Sair do RetroFoot?"), Idioma.T("O jogo em andamento que não foi salvo se perde."),
+                new (string, bool, Action)[] { (Idioma.T("Sair"), true, () => { Ficar(); Fechar(); }), (Idioma.T("Cancelar"), false, Ficar) }, Ficar);
+            f.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom;
+            camadaSair.Children.Add(f);
+            camadaSair.IsVisible = true;
+        }
+        // (o Android chama Voltar direto da atividade: o BackRequested do Avalonia nao chega)
+        Voltar = () => { if (!CUi.Folha.Voltar()) PerguntarSair(); };
         if (celular)
             raiz.AttachedToVisualTree += (_, _) =>
             {
                 if (TopLevel.GetTopLevel(raiz) is { } tl)
-                    tl.BackRequested += (_, e) => { if (!e.Handled && CUi.Folha.Voltar()) e.Handled = true; };
+                    tl.BackRequested += (_, e) =>
+                    {
+                        if (e.Handled) return;
+                        e.Handled = true;
+                        Voltar();
+                    };
             };
+        // (no celular, a camada da pergunta por cima das telas)
+        Control vista = celular ? new Grid { Children = { raiz, camadaSair } } : raiz;
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             bool retrato = Environment.GetEnvironmentVariable("RETROFOOT_RETRATO") == "1";
@@ -97,12 +140,13 @@ public class App : Application
                 // mudou nas Configuracoes: a janela passa ao outro formato (se nao estiver maximizada)
                 Formato.Mudou += () => { if (janela.WindowState == WindowState.Normal) Dimensionar(true); };
             }
+            janela.Closing += (_, _) => AvisarFechando();
             desktop.MainWindow = janela;
         }
         else if (ApplicationLifetime is IActivityApplicationLifetime atividade)
-            atividade.MainViewFactory = () => raiz;
+            atividade.MainViewFactory = () => vista;
         else if (ApplicationLifetime is ISingleViewApplicationLifetime unica)
-            unica.MainView = raiz;
+            unica.MainView = vista;
         base.OnFrameworkInitializationCompleted();
     }
 
@@ -110,6 +154,21 @@ public class App : Application
     // vertical, o conteudo ganha FolgaBarra pontos a direita (somados ao Padding que ele ja
     // tinha), para nada ficar debaixo da barra; sem barra, o Padding de antes.
     public const double FolgaBarra = 18;
+
+    // o app vai fechar (a janela do computador fechando; a atividade do Android terminando): o
+    // jogo com amigo apaga a sala, para os amigos serem desconectados
+    public static event Action? Fechando;
+    public static void AvisarFechando() { try { Fechando?.Invoke(); } catch { } }
+
+    // fecha o app (o Android liga: termina a atividade); sem ele, o fim do programa do computador
+    public static Action? FecharApp;
+    // o Voltar do celular: a folha de cima, a pagina, ou a pergunta se quer sair do app
+    public static Action? Voltar { get; private set; }
+    static void Fechar()
+    {
+        if (FecharApp != null) { FecharApp(); return; }
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime d) d.Shutdown();
+    }
 
     // a raiz das telas (o Android a redesenha ao voltar ao app)
     public static Control? Raiz { get; private set; }

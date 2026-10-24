@@ -59,6 +59,7 @@ public static class TelaEmprestimo
         pedir.Clique += () =>
         {
             if (!banco.PodePedir(e)) return;
+            if (s.Remoto is { } rmP) { rmP.Executar(new RetroFoot.Motor.Online.PedirEmprestimo()); return; }
             mc.PedirEmprestimo(e);
             Atualizar();
             TelaDinheiro.Avisar(e);
@@ -66,6 +67,7 @@ public static class TelaEmprestimo
         pagar.Clique += () =>
         {
             if (!mc.PodePagar(e)) return;
+            if (s.Remoto is { } rmG) { rmG.Executar(new RetroFoot.Motor.Online.PagarEmprestimo()); return; }
             mc.PagarEmprestimo(e);
             Atualizar();
             TelaDinheiro.Avisar(e);
@@ -168,6 +170,7 @@ public static class TelaEmprestimo
         pedir.Clique += () =>
         {
             if (!banco.PodePedir(e)) return;
+            if (s.Remoto is { } rmP) { rmP.Executar(new RetroFoot.Motor.Online.PedirEmprestimo()); return; }
             mc.PedirEmprestimo(e);
             Atualizar();
             TelaDinheiro.Avisar(e);
@@ -175,6 +178,7 @@ public static class TelaEmprestimo
         pagar.Clique += () =>
         {
             if (!mc.PodePagar(e)) return;
+            if (s.Remoto is { } rmG) { rmG.Executar(new RetroFoot.Motor.Online.PagarEmprestimo()); return; }
             mc.PagarEmprestimo(e);
             Atualizar();
             TelaDinheiro.Avisar(e);

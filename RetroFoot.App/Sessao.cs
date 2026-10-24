@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -56,10 +57,17 @@ public sealed class Sessao
     // o tempo que a tela final da jornada fica antes da classificacao (0 nos testes automaticos)
     public static int PausaFimJornadaMs = 3000;
 
-    public Sessao(Jogo98 s, Action<Control> mostrar, Opcoes? op = null, string? arquivo = null)
+    // retrato: o jogo online continuado de um retrato (Online/Retrato: a semente e o que o save
+    // nao guarda; o host novo depois de uma troca); com ele, s nao e usado (o save vem dele)
+    public Sessao(Jogo98 s, Action<Control> mostrar, Opcoes? op = null, string? arquivo = null, RetroFoot.Motor.Online.Retrato? retrato = null)
     {
         host.Children.Add(camadaTela);
         host.Children.Add(camadaDialogo);
+        host.Children.Add(relogio);
+        host.Children.Add(aviso);
+        host.Children.Add(avisosCanto);
+        MontarAvisos();
+        relogio.PointerPressed += (_, e) => { e.Handled = true; relogioAberto = !relogioAberto; TiqueRelogio(); };
         mostrarRaiz = mostrar;
         this.mostrar = c =>
         {
@@ -87,6 +95,7 @@ public sealed class Sessao
             },
             ComecoJornada = (titulo, jn) => Dispatcher.UIThread.Invoke(() =>
             {
+                EsconderRelogio();
                 msPerfil = OpcoesDoJogo.Intervalo(J.Op.Velocidade, jn);
                 jornada = new TelaJornada(this, titulo, jn);
                 this.mostrar(jornada);
@@ -94,6 +103,7 @@ public sealed class Sessao
             Minuto = jn =>
             {
                 Dispatcher.UIThread.Invoke(() => jornada?.Minuto(jn));
+                jornada?.EsperarPausa();
                 int ms = MsPorMinuto;
                 if (ms > 0) Thread.Sleep(ms);
             },
@@ -110,7 +120,7 @@ public sealed class Sessao
             // a proposta de patrocinio (Opcoes.Patrocinios): a janela de Sim/Nao do patch
             Patrocinio = p => EsperarDialogo<bool>(fim => new TelaPatrocinio(p, J.Op.Marcas, Moeda.DoSave(S), fim)),
         };
-        J = new JogoEmCurso(s, (uint)Environment.TickCount, op ?? Opcoes.Padrao, h);
+        J = retrato?.Jogo(op ?? Opcoes.Padrao, h) ?? new JogoEmCurso(s, (uint)Environment.TickCount, op ?? Opcoes.Padrao, h);
         // o banco e as substituicoes das regras deste jogo (5 e 3 = como no classico)
         RetroFoot.Motor.Rodada.Escalacao.MaxReservas = J.M.Regras.MaxReservas;
         RetroFoot.Motor.Rodada.Escalacao.MaxSubstituicoes = J.M.Regras.MaxSubstituicoes;
@@ -150,13 +160,527 @@ public sealed class Sessao
         TelaPlantel.Emprestimo = Registo.AddIn(0x13) ? (ss, eq, pronto) => TelaEmprestimo.Abrir(ss, eq, pronto) : null;
     }
 
+    // ---------------------------------------------------------------- jogo online (host)
+    // docs/multiplayer-online.md: o host roda o motor; a preparacao de cada rodada passa pelo
+    // HostOnline (todos preparam ao mesmo tempo; a tela da equipa do host abre sem travar o
+    // motor) e as perguntas dos times dos outros aparelhos ficam com o padrao do motor (sem
+    // janela no host; as perguntas remotas sao a fase 2). Chamar depois de ligar as telas
+    // (LigacaoPartida, LigacaoMercado...) e antes de Comecar.
+    public RetroFoot.Motor.Online.HostOnline? Online { get; private set; }
+    // o jogo num aparelho que nao e o host (sem motor): as acoes que mexem no dinheiro ou noutros
+    // times viram comandos para o host
+    public JogoRemoto? Remoto { get; init; }
+
+    public void LigarOnline(RetroFoot.Motor.Online.HostOnline host)
+    {
+        Online = host;
+        var h = J.H;
+        TaskCompletionSource<bool>? local = null;
+        TelaEquipa? telaLocal = null;
+        host.PrepararLocal = (e, jogo) =>
+        {
+            var tcs = local = new TaskCompletionSource<bool>();
+            var t = telaLocal = new TelaEquipa(this, e, jogo);
+            t.Terminou += sair =>
+            {
+                // (modo amigo) ao fechar: os amigos saem do save; antes, a opcao de guardar uma copia
+                // com eles como jogo online
+                if (sair && host.ModoAmigo && host.Convidados.Count > 0)
+                {
+                    Dlg.Perguntar(this, Idioma.T("Jogar com um amigo"),
+                        Idioma.T("Seu save volta a ser só seu: os amigos são demitidos e o computador assume os times deles. Quer guardar também uma cópia deste jogo como jogo online, com os amigos, para continuarem juntos outro dia (com a mesma chave)?"),
+                        () => { host.Bifurcar = true; tcs.TrySetResult(true); },
+                        () => tcs.TrySetResult(true));
+                    return;
+                }
+                tcs.TrySetResult(sair);
+                if (!sair) Dispatcher.UIThread.Post(() => { if (camadaTela.Child == t) mostrar(TelaAguardando()); });
+            };
+            mostrar(t);
+            return tcs.Task;
+        };
+        // o prazo: o relogio; acabou com a tela do host aberta, ela fecha (o time vai com a
+        // escalacao que tiver; se nao fecha, a automatica)
+        host.PrazoComecou += falta => Dispatcher.UIThread.Post(() => MostrarRelogio(falta));
+        host.SemTimeNaRodada += semClube => Dispatcher.UIThread.Post(() => mostrar(new TelaAguardandoOnline(this, semClube
+            ? Idioma.T("Você está sem clube. Os outros técnicos preparam os times; um convite de outro clube pode chegar depois de uma rodada.")
+            : Idioma.T("Seu time não joga nesta rodada."))));
+        host.PrazoAcabou += () => Dispatcher.UIThread.Post(() =>
+        {
+            FecharDialogo();
+            if (local is { Task.IsCompleted: false } l && l.TrySetResult(false) && telaLocal != null && camadaTela.Child == telaLocal)
+                mostrar(TelaAguardando());
+        });
+        h.Preparar = (_, e, jogo) => host.Preparar(e, jogo);
+        var sub = h.Substituicao;
+        Jornada? jornadaOnline = null;
+        // (fase 2) as perguntas dos times dos outros aparelhos vao para o dono (com prazo; sem
+        // resposta, o padrao do motor)
+        static System.Text.Json.Nodes.JsonObject O(params (string K, System.Text.Json.Nodes.JsonNode? V)[] c)
+        {
+            var o = new System.Text.Json.Nodes.JsonObject();
+            // (como volta do banco: um byte ou ushort vira um numero que se le como int)
+            foreach (var (k, v) in c) o[k] = v == null ? null : System.Text.Json.Nodes.JsonNode.Parse(v.ToJsonString());
+            return o;
+        }
+        string intervaloFeito = "";
+        h.Substituicao = (jg, lado, saiu, motivo) =>
+        {
+            // o intervalo no online: o de todos ao mesmo tempo, com 30 s (o primeiro gancho do
+            // intervalo faz o de todos; os seguintes, do mesmo intervalo, nada)
+            if (motivo == 4 && jornadaOnline is { } jn)
+            {
+                string chave = host.Rodada + "/" + jn.Minuto;
+                if (intervaloFeito == chave) return;
+                intervaloFeito = chave;
+                var prazo = TimeSpan.FromSeconds(30);
+                Action? local = null;
+                foreach (var g in jn.Jogos)
+                    for (int l = 0; l < 2; l++)
+                        if (g.Equipa[l] is { } me && me.ID == host.MeuTime && Memoria.Humano(g.Treinador[l]))
+                        {
+                            var (mg, ml) = (g, l);
+                            local = () =>
+                            {
+                                PrazoDialogo = prazo;
+                                try
+                                {
+                                    Jornada.OrdenarPorPosicaoNome(me);
+                                    if (mg == jg && ml == lado) sub?.Invoke(mg, ml, null, 4);
+                                    else jn.ObservarTrocas(mg, ml, null, true, () => sub?.Invoke(mg, ml, null, 4));
+                                }
+                                finally { PrazoDialogo = null; }
+                            };
+                        }
+                Dispatcher.UIThread.Post(() => MostrarRelogio(prazo));
+                // (o intervalo com o minuto certo nos outros: o tique vai mesmo com a rede atrasada)
+                host.TransmitirMinuto(jn, true);
+                host.IntervaloColetivo(jn, jg, lado, local, prazo);
+                Dispatcher.UIThread.Post(EsconderRelogio);
+                return;
+            }
+            // a lesao sem ninguem no banco (ou sem substituicoes): nao ha o que escolher; sem a
+            // janela, o jogo nao para todos por 30 s
+            if (motivo == 2 && jg.Equipa[lado] is { } el
+                && (Memoria.Substituicoes(el) <= 0 || !el.Jogadores.Any(p => Memoria.Escalacao(p) == Memoria.EscReserva)))
+                return;
+            if (!host.Remota(jg.Equipa[lado]))
+            {
+                // (a janela do proprio host tambem para todos: o mesmo prazo; acabou, a lesao tem a
+                // troca automatica)
+                EsperaDoHost(host, motivo == 2 ? "lesao" : null, () => ComPrazo(() => sub?.Invoke(jg, lado, saiu, motivo)));
+                if (motivo == 2 && saiu != null && jg.Equipa[lado] is { } eh && Memoria.Escalacao(saiu) == Memoria.EscTitular && Memoria.Substituicoes(eh) > 0)
+                    JogoEmCurso.SubstituicaoForcada(eh, saiu, 0);
+                return;
+            }
+            var e = jg.Equipa[lado]!;
+            // o intervalo e o goleiro expulso: a paralisacao para todos, com as trocas feitas la
+            if (motivo is 3 or 4) { host.SubstituicaoRemota(jornadaOnline, jg, lado, motivo); return; }
+            if (saiu == null) return;
+            // a lesao: quem entra, escolhido la (sem resposta, o primeiro possivel)
+            int k = 0;
+            if (Memoria.Substituicoes(e) > 0
+                && host.Perguntar(e.ID, "lesao", O(("equipa", e.ID), ("saiu", saiu.ID)), RetroFoot.Motor.Online.HostOnline.PrazoPergunta) is { } r
+                && (int?)r["entra"] is int entra)
+            {
+                int goleiros = e.Jogadores.Count(p => Memoria.Escalacao(p) == Memoria.EscReserva && p.Posicao == 0), i = 0;
+                foreach (var p in e.Jogadores)
+                {
+                    if (Memoria.Escalacao(p) != Memoria.EscReserva || (goleiros > 0 && (p.Posicao == 0) != (saiu.Posicao == 0))) continue;
+                    if (p.ID == entra) { k = i; break; }
+                    i++;
+                }
+            }
+            JogoEmCurso.SubstituicaoForcada(e, saiu, k);
+        };
+        host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null
+            : nome == "*" ? Idioma.T("⏸ Intervalo: os técnicos fazem as substituições") : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
+        // o penalti contra um time humano (a janela de quem defende, com o batedor e o resultado):
+        // a do host aqui; a de outro aparelho la (com o prazo; os outros veem o aviso)
+        // a classificacao depois da rodada: nos outros aparelhos ao mesmo tempo
+        var classif = J.M.G.Classificacao;
+        J.M.G.Classificacao = (m, x) => { host.PublicarClassificacao(); classif?.Invoke(m, x); };
+        var pen = h.Penalti;
+        h.Penalti = (atacante, defensor, batedor, res) =>
+        {
+            if (Memoria.Humano(TreinadorDa(atacante))) return;
+            if (!host.Remota(defensor)) { if (pen != null) EsperaDoHost(host, "penalti", () => ComPrazo(() => pen(atacante, defensor, batedor, res))); return; }
+            host.Perguntar(defensor.ID, "penalti", O(("atacante", atacante.ID), ("defensor", defensor.ID), ("batedor", batedor.ID), ("resultado", res)));
+        };
+        var bat = h.Batedor;
+        h.Batedor = (e, titulares, sugerido) =>
+        {
+            if (!host.Remota(e)) return bat != null ? EsperaDoHost(host, "batedor", () => ComPrazo(() => bat(e, titulares, sugerido))) ?? sugerido : sugerido;
+            // o resultado de cada batedor possivel (a cobranca vem logo depois deste gancho, com o
+            // Random do jogo neste ponto: o mesmo calculo da janela do jogo sozinho), para a janela
+            // de la mostrar o gol ou o que aconteceu
+            var previstos = new System.Text.Json.Nodes.JsonObject();
+            var def = jornadaOnline?.Jogos.Select(g => g.Equipa[Lado.Casa] == e ? g.Equipa[Lado.Visit] : g.Equipa[Lado.Visit] == e ? g.Equipa[Lado.Casa] : null).FirstOrDefault(x => x != null);
+            if (def != null && RetroFoot.Motor.Partida.Penaltis.Goleiro(def) is { } gk)
+                foreach (var t in titulares)
+                    previstos[t.ID.ToString()] = RetroFoot.Motor.Partida.Penaltis.CobrarPenalti(new RetroFoot.Motor.Base.Aleatorio(J.R.Semente), gk, t);
+            var r = host.Perguntar(e.ID, "batedor", O(("equipa", e.ID), ("titulares", new System.Text.Json.Nodes.JsonArray(titulares.Select(x => (System.Text.Json.Nodes.JsonNode)(int)x.ID).ToArray())),
+                ("sugerido", (int)(sugerido?.ID ?? 0)), ("previstos", previstos)), RetroFoot.Motor.Online.HostOnline.PrazoPergunta);
+            return (int?)r?["jogador"] is int id ? titulares.FirstOrDefault(x => x.ID == id) ?? sugerido : sugerido;
+        };
+        var aum = h.PedirAumento;
+        h.PedirAumento = (e, p, novo, modo) =>
+        {
+            FundoVerdeDepoisDaRodada();
+            // (acabou o prazo sem resposta: o padrao do motor, aceito)
+            if (!host.Remota(e)) return aum == null || EsperaDoHost(host, "aumento", () => ComPrazo(() => aum(e, p, novo, modo))) || PrazoEsgotou;
+            var r = host.Perguntar(e.ID, "aumento", O(("equipa", e.ID), ("jogador", p.ID), ("novo", novo), ("modo", modo)));
+            return (bool?)r?["ok"] ?? true;
+        };
+        var lance = h.Lance;
+        h.Lance = (c, v, p) =>
+        {
+            if (!host.Remota(c)) return lance == null ? (0, false) : lance(c, v, p);
+            var r = host.Perguntar(c.ID, "lance", O(("comprador", c.ID), ("vendedor", v.ID), ("jogador", p.ID)));
+            return r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
+        };
+        // o leilao da CPU para todos os tecnicos ao mesmo tempo: a janela de cada um (a do host
+        // aqui, a dos outros nos aparelhos deles) fica ate todos darem o lance ou pularem (ou o
+        // prazo); so entao o leilao decide
+        // o motor esperando a resposta de outro tecnico (o pedido de aumento, o convite, a lesao...):
+        // o fundo escurecido com o aviso, em vez da tela parada sem explicacao
+        Control? aguardando = null;
+        host.AguardandoResposta += (nome, tipo) => Dispatcher.UIThread.Post(() =>
+        {
+            if (aguardando != null) { FecharDialogo(aguardando); aguardando = null; }
+            if (nome == null) return;
+            if (tipo is "aumento" or "convite" or "patrocinio") FundoVerdeDepoisDaRodada();
+            string oque = RetroFoot.App.Online.TextoEspera(nome, tipo);
+            aguardando = Espera(oque);
+            AbrirDialogo(aguardando);
+        });
+        TelaLeilao.DeTodos? leilaoAberto = null;
+        h.LanceDeTodos = (quem, v, p, preco) =>
+        {
+            FundoVerdeDepoisDaRodada();
+            var prazo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
+            var meu = quem.FirstOrDefault(c => !host.Remota(c));
+            var remotos = quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList();
+            // (os outros aparelhos que nao licitam: a espera ate o resultado)
+            host.AvisarLeilaoAberto(p.ID, v.ID, preco, quem.Select(c => c.ID));
+            (int, bool)? local = null;
+            // a janela do host (se ele licita): o lance; depois, a espera pelos outros sobre ela
+            var dt = leilaoAberto = meu == null ? null : TelaLeilao.DeTodos.Abrir(this, v, p, preco);
+            Task? t = dt == null ? null : Task.Run(() =>
+            {
+                PrazoDialogo = prazo;
+                try { local = dt.Lance(meu!); }
+                finally { PrazoDialogo = null; }
+                if (remotos.Count > 0) dt.Aguardar();
+            });
+            // (o host nao licita e espera os outros: o aviso, em vez da tela parada sem explicacao)
+            Control? esperaHost = null;
+            if (dt == null && remotos.Count > 0)
+                Dispatcher.UIThread.Post(() =>
+                {
+                    var nomes = string.Join(", ", jogadoresOnline.Where(j => remotos.Contains(j.Equipa)).Select(j => j.Nome));
+                    // (o motivo de o host ficar de fora: quase sempre o dinheiro abaixo do preco base)
+                    string motivo = "";
+                    if (host.MeuTime is ushort mt && Equipa(mt) is { } meuTime && meuTime.ID != v.ID)
+                        motivo = "\n" + ((int)meuTime.Dinheiro < preco
+                            ? Idioma.T("Seu time não pode licitar: o preço base é {0} e você tem {1} em caixa.", FormatoDinheiro.Valor(S, preco), FormatoDinheiro.Valor(S, (int)meuTime.Dinheiro))
+                            : Idioma.T("Seu time não entra neste leilão."));
+                    esperaHost = Espera(Idioma.T("Leilão de {0}: aguardando {1} dar o lance…", P98.NomeJogador(p), nomes) + motivo);
+                    AbrirDialogo(esperaHost);
+                });
+            var rs = host.PerguntarTodos(remotos, "lance", c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID), ("preco", preco)), t, prazo);
+            t?.Wait(prazo);
+            Dispatcher.UIThread.Post(() => { if (esperaHost != null) FecharDialogo(esperaHost); });
+            var d = new Dictionary<ushort, (int Milhares, bool Ok)>();
+            foreach (var (eq, r) in rs) d[eq] = r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
+            if (meu != null && local is { } l) d[meu.ID] = l;
+            return d;
+        };
+        // o resultado do leilao de todos: na janela do leilao de quem licitou (aqui e nos outros
+        // aparelhos), 2 s; quem nao licitou ve o aviso no canto
+        h.ResultadoLeilao = (l, vendido) =>
+        {
+            ushort comprador = vendido ? l.Vencedor : (ushort)0;
+            host.AvisarLeilao(l.Jogador, l.Vendedor, comprador, l.Melhor);
+            if (leilaoAberto is { } dt && dt.Jogador == l.Jogador)
+            {
+                leilaoAberto = null;
+                dt.Resultado(TelaLeilao.DeTodos.Texto(this, comprador == 0 ? null : Equipa(comprador), l.Melhor), comprador == 0 ? null : Equipa(comprador));
+            }
+            else
+            {
+                var txt = global::RetroFoot.App.Online.TextoLeilao(S, l.Jogador, l.Vendedor, comprador, l.Melhor);
+                Dispatcher.UIThread.Post(() => Notificar(txt));
+            }
+        };
+        var conv = h.Convite;
+        h.Convite = (t, e) =>
+        {
+            var dele = J.M.EquipaDoTreinador(t.ID);
+            if (!host.Remota(dele)) return conv != null && EsperaDoHost(host, "convite", () => ComPrazo(() => conv(t, e)));
+            var r = host.Perguntar(dele!.ID, "convite", O(("treinador", t.ID), ("equipa", e.ID)));
+            return (bool?)r?["ok"] ?? false;
+        };
+        var pat = h.Patrocinio;
+        h.Patrocinio = p =>
+        {
+            var quem = PrimeiroHumano();
+            if (!host.Remota(quem)) return pat != null && EsperaDoHost(host, "patrocinio", () => ComPrazo(() => pat(p)));
+            var r = host.Perguntar(quem!.ID, "patrocinio", O(("nome", Convert.ToBase64String(p.NomeBruto)), ("quantidade", p.Quantidade), ("valor", p.Valor),
+                ("tipoP", p.Tipo), ("marca", p.Marca), ("multa", p.Multa), ("registro", p.Registro == null ? null : Convert.ToBase64String(p.Registro.Registro))));
+            return (bool?)r?["ok"] ?? false;
+        };
+        // (sem janela de leilao no jogo online: um aviso no canto de cada transferencia)
+        Mercado.Janela = null;
+        host.Transferiu += (t, vendedor) => Dispatcher.UIThread.Post(() => Notificar(global::RetroFoot.App.Online.TextoTransferencia(S, t.W06, t.W0A, vendedor, t.D0C, t.B04)));
+        host.ConvidadoMudou += (nome, entrou) => Dispatcher.UIThread.Post(() => Notificar(entrou
+            ? Idioma.T("👋 {0} entrou no jogo e assumiu um time da 4ª divisão", nome)
+            : Idioma.T("👋 {0} saiu do jogo (o técnico dele foi demitido)", nome)));
+        host.TimeMudou += (nome, eq) => Dispatcher.UIThread.Post(() => Notificar(eq == 0
+            ? Idioma.T("🔁 {0} ficou sem clube", nome)
+            : Idioma.T("🔁 {0} agora treina o {1}", nome, Equipa(eq) is { } novo ? Dlg.Texto(novo.NomeCurto) : "?")));
+        // alguem quer entrar com o jogo comecado: o host permite (ele assiste e recebe um time na
+        // proxima preparacao) ou recusa
+        host.PedidoDeEntrada += j => Dispatcher.UIThread.Post(() =>
+        {
+            Action fechar = () => { };
+            fechar = global::RetroFoot.App.Online.Janela(this, Idioma.T("Pedido para entrar"), null,
+                global::RetroFoot.App.Online.Texto(Idioma.T("{0} quer entrar no jogo. Se você permitir, ele assiste às rodadas como espectador e recebe um time da 4ª divisão na próxima preparação dos times.", j.Nome)),
+                new (string, bool, Action)[]
+                {
+                    (Idioma.T("Permitir"), true, () => { fechar(); _ = host.ResponderEntrada(j.Uid, true); }),
+                    (Idioma.T("Recusar"), false, () => { fechar(); _ = host.ResponderEntrada(j.Uid, false); }),
+                }, () => { }, emColuna: true);
+        });
+        // os times de quem entrou agora: o sorteio para todos (aqui por cima da tela)
+        host.NovosTimes += l => Dispatcher.UIThread.Post(() => TelaSorteioTimes.EmJanela(this, S, l));
+        // (o destaque so do time deste aparelho, na jornada e na classificacao)
+        TelaJornada.SoTime = host.MeuTime;
+        host.JogadoresMudaram += l => TelaJornada.SoTime = host.MeuTime;
+        host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => { jogadoresOnline = l; JogadoresOnline?.Invoke(l); });
+        // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
+        host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });
+        // a disputa de penaltis: a mesma janela nos outros aparelhos
+        var desempate = h.Desempate;
+        h.Desempate = (jg, d) => { host.TransmitirPenaltis(jg, d); desempate?.Invoke(jg, d); };
+        bool velocidadeDaSala = false;
+        // o fim da jornada: o ultimo minuto vai sempre (os outros podem ter pulado os de antes)
+        var fimJ = h.FimJornada;
+        h.FimJornada = jn => { host.TransmitirMinuto(jn, true); fimJ?.Invoke(jn); };
+        var comeco = h.ComecoJornada;
+        h.ComecoJornada = (titulo, jn) =>
+        {
+            Dispatcher.UIThread.Post(EsconderRelogio);
+            // a velocidade da partida das regras da sala; a jornada vai ao vivo para os outros
+            // (a da sala so na 1a jornada; depois, a que o host escolher nas Opcoes)
+            if (!velocidadeDaSala) { velocidadeDaSala = true; J.Op = J.Op with { Velocidade = (short)host.Velocidade }; }
+            jornadaOnline = jn;
+            TelaJornada.SoTime = host.MeuTime;
+            host.TransmitirInicio(titulo, jn);
+            comeco?.Invoke(titulo, jn);
+        };
+        var minuto = h.Minuto;
+        h.Minuto = jn =>
+        {
+            host.NoMinuto(jn); host.TransmitirMinuto(jn);
+            // (o destaque so do time deste aparelho)
+            if (host.MeuTime is ushort meu) TelaJornada.SoTime = meu;
+            minuto?.Invoke(jn);
+        };
+    }
+
+    // ---------------------------------------------------------------- o relogio do prazo
+    // (jogo online) depois do primeiro PRONTO da rodada, o tempo que falta para todos ficarem
+    // prontos: por cima de tudo, no alto, em quem espera e em quem ainda mexe no time
+    // (compacto por padrao, no canto: so "⏱ 0:55"; um toque mostra a frase inteira e outro esconde)
+    readonly Border relogio = new()
+    {
+        IsVisible = false, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 4, 6, 0),
+        Padding = new Avalonia.Thickness(8, 2), CornerRadius = new Avalonia.CornerRadius(10),
+        Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xD0, 0x10, 0x10, 0x10)),
+        BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1),
+        Child = new TextBlock { FontSize = 12, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White },
+        Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
+    };
+    DispatcherTimer? relogioTimer;
+    DateTime relogioFim;
+    bool relogioAberto;
+    public event Action? RelogioAcabou;
+
+    public void MostrarRelogio(TimeSpan falta)
+    {
+        relogioFim = DateTime.UtcNow + falta;
+        relogioTimer?.Stop();
+        relogioTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        relogioTimer.Tick += (_, _) => TiqueRelogio();
+        relogioTimer.Start();
+        relogio.IsVisible = true;
+        TiqueRelogio();
+    }
+
+    void TiqueRelogio()
+    {
+        var r = relogioFim - DateTime.UtcNow;
+        if (r <= TimeSpan.Zero) { EsconderRelogio(); RelogioAcabou?.Invoke(); return; }
+        string t = $"{(int)r.TotalMinutes}:{r.Seconds:00}";
+        ((TextBlock)relogio.Child!).Text = relogioAberto ? Idioma.T("⏱ {0} para todos ficarem prontos", t) : "⏱ " + t;
+    }
+
+    // (jogo online) o aviso no alto, no meio: "fulano esta fazendo substituicoes"; null esconde
+    readonly Border aviso = new()
+    {
+        IsVisible = false, IsHitTestVisible = false, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 40, 0, 0),
+        Padding = new Avalonia.Thickness(14, 6), CornerRadius = new Avalonia.CornerRadius(12),
+        Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xE6, 0x10, 0x10, 0x10)),
+        BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1.5),
+        Child = new TextBlock { FontSize = 15, FontWeight = Avalonia.Media.FontWeight.Bold, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+    };
+
+    // (jogo online) os avisos rapidos (uma transferencia...): somem sozinhos em 6 s, sem parar
+    // nada; arrastar para o lado (ou clicar) tira. No celular, no alto, como uma notificacao do
+    // sistema; no computador, no canto de baixo
+    readonly StackPanel avisosCanto = new() { Spacing = 6 };
+
+    void MontarAvisos()
+    {
+        if (Celular.Ativo)
+        {
+            avisosCanto.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch;
+            avisosCanto.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
+            avisosCanto.Margin = new Avalonia.Thickness(8, 8, 8, 0);
+        }
+        else
+        {
+            avisosCanto.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right;
+            avisosCanto.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom;
+            avisosCanto.Margin = new Avalonia.Thickness(0, 0, 10, 70);
+            avisosCanto.MaxWidth = 380;
+        }
+    }
+
+    // (jogo online) as janelas de depois da rodada (leilao, salario...) sobre o fundo verde, nao sobre
+    // a tela da partida que acabou. Em qualquer thread
+    public void FundoVerdeDepoisDaRodada() => Dispatcher.UIThread.Invoke(() =>
+    {
+        if (camadaTela.Child is TelaJornada or TelaClassificacao)
+            mostrar(new Border { Background = new ImmutableSolidColorBrush(Avalonia.Media.Color.FromRgb(0, 128, 0)) });
+    });
+
+    // o aviso de espera do jogo online sobre a tela (o fundo da camada escurece o resto)
+    public static Control Espera(string texto) => new Border
+    {
+        Background = new ImmutableSolidColorBrush(Avalonia.Media.Color.FromArgb(0xD0, 0x0A, 0x2A, 0x16)), CornerRadius = new Avalonia.CornerRadius(12),
+        BorderBrush = TemaVerde.Destaque, BorderThickness = new Avalonia.Thickness(1), Padding = new Avalonia.Thickness(22, 14),
+        Child = new TextBlock
+        {
+            Text = texto, FontSize = 16, FontWeight = Avalonia.Media.FontWeight.SemiBold, Foreground = Avalonia.Media.Brushes.White,
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap, MaxWidth = 420, TextAlignment = Avalonia.Media.TextAlignment.Center,
+        },
+    };
+
+    // (para os testes) cada aviso mostrado
+    public event Action<string>? Notificou;
+
+    public void Notificar(string texto)
+    {
+        Notificou?.Invoke(texto);
+        bool cel = Celular.Ativo;
+        var b = new Border
+        {
+            Padding = new Avalonia.Thickness(cel ? 14 : 12, cel ? 10 : 7), CornerRadius = new Avalonia.CornerRadius(cel ? 16 : 10),
+            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xF0, 0x1C, 0x1C, 0x1C)),
+            BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xF2, 0xC2, 0x1B)), BorderThickness = new Avalonia.Thickness(1),
+            BoxShadow = Avalonia.Media.BoxShadows.Parse("0 4 14 0 #80000000"),
+            Child = new TextBlock { Text = texto, FontSize = cel ? 14 : 13, Foreground = Avalonia.Media.Brushes.White, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+            RenderTransform = new Avalonia.Media.TranslateTransform(),
+            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
+        };
+        var tr = (Avalonia.Media.TranslateTransform)b.RenderTransform!;
+        Avalonia.Point? inicio = null;
+        double arrasto = 0;
+        void Tirar() => avisosCanto.Children.Remove(b);
+        b.PointerPressed += (_, e) => { inicio = e.GetPosition(host); arrasto = 0; e.Pointer.Capture(b); e.Handled = true; };
+        b.PointerMoved += (_, e) =>
+        {
+            if (inicio is not { } p0) return;
+            arrasto = e.GetPosition(host).X - p0.X;
+            tr.X = arrasto;
+            b.Opacity = Math.Max(0.2, 1 - Math.Abs(arrasto) / 250);
+        };
+        b.PointerReleased += (_, e) =>
+        {
+            e.Pointer.Capture(null);
+            if (inicio == null) return;
+            inicio = null;
+            // arrastou para o lado: sai; um toque (sem arrastar): sai tambem; pouco: volta
+            if (Math.Abs(arrasto) > 70 || Math.Abs(arrasto) < 4) Tirar();
+            else { tr.X = 0; b.Opacity = 1; }
+        };
+        if (cel) avisosCanto.Children.Insert(0, b); else avisosCanto.Children.Add(b);
+        while (avisosCanto.Children.Count > 4) avisosCanto.Children.RemoveAt(cel ? avisosCanto.Children.Count - 1 : 0);
+        DispatcherTimer.RunOnce(Tirar, TimeSpan.FromSeconds(6));
+    }
+
+    public void MostrarAviso(string? texto)
+    {
+        aviso.IsVisible = texto != null;
+        ((TextBlock)aviso.Child!).Text = texto ?? "";
+    }
+
+    public void EsconderRelogio()
+    {
+        relogioTimer?.Stop();
+        relogioTimer = null;
+        relogio.IsVisible = false;
+    }
+
+    IReadOnlyList<RetroFoot.Motor.Online.JogadorSala> jogadoresOnline = Array.Empty<RetroFoot.Motor.Online.JogadorSala>();
+
+    // "Passar o host...": a lista dos outros tecnicos conectados; o escolhido continua o jogo
+    public void EscolherNovoHost()
+    {
+        if (Online is not { } host) return;
+        var outros = jogadoresOnline.Where(x => x.Equipa != 0 && x.Estado != RetroFoot.Motor.Online.Estados.Saiu && Equipa(x.Equipa) is { } e && host.Remota(e)).ToList();
+        Action fechar = () => { };
+        var bs = new List<(string, bool, Action)>();
+        foreach (var j in outros) { var jj = j; bs.Add((jj.Nome, true, () => { fechar(); host.PassarHost(jj.Uid); })); }
+        bs.Add((Idioma.T("Cancelar"), false, () => fechar()));
+        fechar = global::RetroFoot.App.Online.Janela(this, Idioma.T("Passar o host"), null, global::RetroFoot.App.Online.Texto(host.ModoAmigo
+            ? Idioma.T("No jogo com amigos o save é seu: o host não passa para outro técnico.")
+            : outros.Count == 0
+            ? Idioma.T("Não há outro técnico conectado para receber o host.")
+            : Idioma.T("Quem continua o jogo no aparelho dele? Você continua na sala como os outros (ou pode sair).")),
+            host.ModoAmigo ? new (string, bool, Action)[] { (Idioma.T("OK"), true, () => fechar()) } : bs, emColuna: true);
+    }
+
+    // os jogadores da sala mudaram (quem esta pronto): a tela de espera do host
+    public event Action<IReadOnlyList<RetroFoot.Motor.Online.JogadorSala>>? JogadoresOnline;
+
+    // o time que recebe as propostas de patrocinio (Patrocinios.TimeHumano: o 1o humano nas
+    // divisoes 1 a 5)
+    Equipa? PrimeiroHumano()
+    {
+        for (int d = 0; d < 5 && d < S.Divisoes.Count; d++)
+            foreach (var id in S.Divisoes[d].Equipas)
+                if (J.M.Equipa(id) is { } e && RetroFoot.Motor.Mercado.MercadoJogo.HumanoAtivo(J.M.TreinadorDa(e))) return e;
+        return null;
+    }
+
+    Control TelaAguardando() => new TelaAguardandoOnline(this);
+
     // comeca (ou continua) o jogo na thread do motor
+    // na thread do motor, antes do ciclo (o modo amigo: os amigos da sala recebem o time)
+    public Action? NoComecoDoMotor;
+
     public void Comecar()
     {
         motor = new Thread(() =>
         {
             try
             {
+                NoComecoDoMotor?.Invoke();
                 J.Ciclo(Campeonato.AoFim(this));
                 if (J.Gravado != null && Arquivo != null && !SemGravar) File.WriteAllBytes(Arquivo, J.Gravado);
                 Dispatcher.UIThread.Post(() => Saiu?.Invoke());
@@ -294,8 +818,42 @@ public sealed class Sessao
             }
             catch (Exception ex) { tcs.TrySetException(ex); }
         });
+        // (jogo online: o intervalo coletivo) com prazo, a janela fecha sozinha e vale o padrao
+        if (PrazoDialogo is { } prazo && !tcs.Task.Wait(prazo))
+        {
+            PrazoEsgotou = true;
+            Dispatcher.UIThread.Post(() => { if (d != null) FecharDialogo(d); });
+            return default!;
+        }
         return tcs.Task.GetAwaiter().GetResult();
     }
+
+    // o prazo das janelas do motor (null = sem prazo): o intervalo do jogo online
+    [ThreadStatic] public static TimeSpan? PrazoDialogo;
+    // a ultima janela com prazo fechou por ele (sem resposta)
+    [ThreadStatic] public static bool PrazoEsgotou;
+
+    // (jogo online, no host) uma janela do motor com o prazo das perguntas: ela para o jogo de todos
+    static T ComPrazo<T>(Func<T> f)
+    {
+        var antes = PrazoDialogo;
+        PrazoDialogo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
+        PrazoEsgotou = false;
+        try { return f(); }
+        finally { PrazoDialogo = antes; }
+    }
+    static void ComPrazo(Action f) => ComPrazo(() => { f(); return 0; });
+
+    // (online) a janela do proprio host que para o jogo de todos: os outros aparelhos veem
+    // "aguardando fulano..." enquanto ela esta aberta
+    static T EsperaDoHost<T>(RetroFoot.Motor.Online.HostOnline host, string? tipo, Func<T> f)
+    {
+        if (tipo != null) host.AvisarEspera(tipo);
+        try { return f(); }
+        finally { if (tipo != null) host.AvisarEspera(null); }
+    }
+    static void EsperaDoHost(RetroFoot.Motor.Online.HostOnline host, string? tipo, Action f) => EsperaDoHost(host, tipo, () => { f(); return 0; });
+
     // troca a tela mostrada (ex.: as Configuracoes por cima da tela da equipa e a volta)
     public void Mostrar(Control tela) => mostrar(tela);
 

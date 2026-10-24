@@ -32,7 +32,7 @@ public sealed partial class TelaJornada
     static readonly IBrush MFundo = TemaVerde.FundoTela, MBarra = TemaVerde.Barra, MCartao = TemaVerde.Cartao;
     static readonly IBrush MLinha = TemaVerde.Linha, MTexto = TemaVerde.Texto, MFraco = TemaVerde.TextoFraco;
     static readonly IBrush MVivo = TemaVerde.Destaque, MProrrog = TemaVerde.Roxo, MBotao = TemaVerde.CartaoForte;
-    static readonly IPen MBorda = new Pen(TemaVerde.Borda, 1);
+    static readonly IPen MBorda = new Pen(TemaVerde.Borda, 1).ToImmutable();
     static readonly FontFamily Inter = new("fonts:Inter#Inter");
 
     double passoM = 27, passoBase = 27;
@@ -40,7 +40,7 @@ public sealed partial class TelaJornada
 
     static readonly IBrush FundoLogo = TemaVerde.DiscoLogo;
 
-    static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
     static FormattedText TxtM(string t, double tam, IBrush cor, bool negrito = false) =>
         new(t, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
@@ -231,8 +231,8 @@ public sealed partial class TelaJornada
         for (int k = 0; k < Math.Min(l.VermCasa, 3); k++) Cartao(dc, Vermelho, mc - meia + 3 + 3 * k, yv);
         for (int k = 0; k < Math.Min(l.VermFora, 3); k++) Cartao(dc, Vermelho, mc + meia - 9 - 3 * k, yv);
         // os nomes, a casa encostada ao logo dela
-        bool humCasa = l.Jogo?.Treinador[Lado.Casa] is { Humano: not 0 };
-        bool humFora = l.Jogo?.Treinador[Lado.Visit] is { Humano: not 0 };
+        bool humCasa = l.Jogo is { } jc && EDestaque(jc, Lado.Casa);
+        bool humFora = l.Jogo is { } jf && EDestaque(jf, Lado.Visit);
         var nc = TxtM(l.Casa, 13, MTexto, humCasa);
         var nf = TxtM(l.Fora, 13, MTexto, humFora);
         using (dc.PushClip(new Rect(cx + 8, ry, Math.Max(0, xc - 8 - cx - 8), passoM)))
@@ -284,7 +284,7 @@ public sealed partial class TelaJornada
         if (b != null) { Imagem(dc, b, r); return; }
         var c = r.Center;
         double raio = r.Width / 2 - 1;
-        dc.DrawEllipse(new SolidColorBrush(fundo), new Pen(new SolidColorBrush(letra), 2), c, raio, raio);
+        dc.DrawEllipse(new ImmutableSolidColorBrush(fundo), new Pen(new ImmutableSolidColorBrush(letra), 2), c, raio, raio);
     }
 
     // a barra do topo: titulo, pausa, paginas, o minuto e o progresso do relogio
@@ -342,7 +342,7 @@ public sealed partial class TelaJornada
     {
         if (BotoesVisiveis && proximaM.Contains(p)) { MudarPagina(1); return; }
         if (BotoesVisiveis && anteriorM.Contains(p)) { MudarPagina(-1); return; }
-        if (!acabou && EquipaModerna(p) is var (jg, lado)) { LigacaoPartida.PedirDetalhes(s, jg, lado); return; }
+        if (!acabou && EquipaModerna(p) is var (jg, lado)) { Clicou(jg, lado); return; }
         if (acabou) Seguir();
     }
 
@@ -374,10 +374,10 @@ public sealed partial class TelaJornada
 // amarelo, vermelho (com o amarelo atras quando veio do 2o amarelo) e a cruz da lesao.
 static class Icones
 {
-    static readonly IBrush Amarelo = new SolidColorBrush(Color.FromRgb(0xfb, 0xc0, 0x2d));
-    static readonly IBrush Vermelho = new SolidColorBrush(Color.FromRgb(0xe5, 0x39, 0x35));
-    static readonly IBrush Escuro = new SolidColorBrush(Color.FromRgb(0x20, 0x21, 0x24));
-    static readonly IBrush Cinza = new SolidColorBrush(Color.FromRgb(0x9a, 0xa0, 0xa6));
+    static readonly IBrush Amarelo = new ImmutableSolidColorBrush(Color.FromRgb(0xfb, 0xc0, 0x2d));
+    static readonly IBrush Vermelho = new ImmutableSolidColorBrush(Color.FromRgb(0xe5, 0x39, 0x35));
+    static readonly IBrush Escuro = new ImmutableSolidColorBrush(Color.FromRgb(0x20, 0x21, 0x24));
+    static readonly IBrush Cinza = new ImmutableSolidColorBrush(Color.FromRgb(0x9a, 0xa0, 0xa6));
 
     public static void Desenhar(DrawingContext dc, int tipo, bool segundoAmarelo, Rect r)
     {

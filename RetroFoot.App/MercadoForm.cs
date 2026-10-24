@@ -125,7 +125,7 @@ internal abstract class MercadoForm : Control
         return _branco;
     }
 
-    protected static IBrush Pincel(byte r, byte g, byte b) => new SolidColorBrush(Color.FromRgb(r, g, b));
+    protected static IBrush Pincel(byte r, byte g, byte b) => new ImmutableSolidColorBrush(Color.FromRgb(r, g, b));
 
     // ------------------------------------------------------------ dados comuns
     protected static string Texto(byte[] b) => MercadoJogo.Texto(b);
@@ -141,7 +141,7 @@ internal abstract class MercadoForm : Control
 
     // TColor: $00BBGGRR; as cores do sistema (bit de cima) nao aparecem nas equipas
     protected static IBrush CorDelphi(byte[] b, IBrush padrao) =>
-        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
 
     protected static (IBrush Letra, IBrush Fundo) Cores(SEquipa? e) =>
         Moderno ? (MM.Texto, MM.Cartao) :
@@ -1189,7 +1189,7 @@ internal abstract class MercadoForm : Control
     // ela na tela (motor parado), abrir(sessao, equipa humana) abre o dialogo
     internal static Control Demo(Action<Sessao, SEquipa> abrir)
     {
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         var arq = AcharSaveDemo();
         if (arq == null)
             return new TextBlock { Text = "Demo: não achei RetroFoot.Motor.Testes/Oraculo/j3-entrada.e98 (ou RETROFOOT_SAVE)", Foreground = Brushes.White };

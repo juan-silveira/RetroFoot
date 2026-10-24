@@ -97,10 +97,18 @@ public sealed partial class TelaInicio
         caixa.MinHeight = 92;
         var desc = CR95.Txt("", 14, W95.Amarelo);
         var quando = CR95.Txt("", 12, W95.Amarelo);
+        // (acrescimo, como no launcher) importar um .e98 de fora e exportar o escolhido
+        var importar = new CUi.Botao(T("Importar"), false, ImportarJogo) { Padding = new Thickness(10, 2), MinHeight = 36, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var exportar = new CUi.Botao(T("Exportar"), false, () => { if (!novo && sel >= 0 && sel < jogos.Count) ExportarJogo(jogos[sel].Nome, jogos[sel].Caminho); })
+            { Padding = new Thickness(10, 2), MinHeight = 36, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var arquivos = new Grid { ColumnDefinitions = new ColumnDefinitions("*,8,*") };
+        arquivos.Children.Add(importar);
+        Grid.SetColumn(exportar, 2);
+        arquivos.Children.Add(exportar);
         var contP = new StackPanel
         {
             Spacing = 8,
-            Children = { rCont, CR95.Txt(T("Jogos salvos:"), 14, W95.Amarelo, true), caixa, desc, quando },
+            Children = { rCont, CR95.Txt(T("Jogos salvos:"), 14, W95.Amarelo, true), caixa, arquivos, desc, quando },
         };
 
         // os botoes do computador, com os glifos (o Cancelar volta ao hub, que o celular nao tem)
@@ -131,7 +139,7 @@ public sealed partial class TelaInicio
             avisoT.Text = av ?? "";
             aviso.IsVisible = av != null;
             ok.Habilitado = okHab;
-            excluir.Habilitado = !novo && sel >= 0 && sel < jogos.Count;
+            excluir.Habilitado = exportar.Habilitado = !novo && sel >= 0 && sel < jogos.Count;
             // a lista desligada (jogo novo) fica sem o realce
             for (int i = 0; i < linhas.Count; i++)
             {
@@ -194,7 +202,7 @@ public sealed partial class TelaInicio
         var corpo = new StackPanel
         {
             Spacing = 10,
-            Children = { CR95.Bevel(novoP), CR95.Bevel(contP) },
+            Children = { CR95.Bevel(novoP), CR95.Bevel(contP), new CUi.Botao(T("Jogo online"), false, AbrirOnline) { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 40 } },
         };
         // as ferramentas do hub do computador (Scout, Patches, editores) ao lado do Sobre
         var ferramentas = new CUi.Botao(T("Ferramentas"), false, AbrirFerramentasCelular) { Padding = new Thickness(12, 2), MinHeight = 34 };

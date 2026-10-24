@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <!-- a versao do RetroFoot (mostrada no Sobre) -->
-    <Version>0.1.8</Version>
+    <Version>0.2.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -19,6 +19,7 @@
   <ItemGroup>
     <!-- o soak da interface (ferramentas/SoakUI) mexe nas esperas do leilao -->
     <InternalsVisibleTo Include="SoakUI" />
+    <InternalsVisibleTo Include="SoakOnline" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RetroFoot.Motor\RetroFoot.Motor.csproj" />

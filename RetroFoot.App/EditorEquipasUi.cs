@@ -141,7 +141,7 @@ sealed class TemaEditor
 
     // ---------------------------------------------------------------- cores
     public static Color Cor(uint c) => Color.FromRgb((byte)(c >> 16), (byte)(c >> 8), (byte)c);
-    public static IBrush Pincel(uint c) => new SolidColorBrush(Cor(c));
+    public static IBrush Pincel(uint c) => new ImmutableSolidColorBrush(Cor(c));
 
     // as 16 cores do Windows (as do Editor de Equipas do original)
     public static readonly uint[] Paleta =

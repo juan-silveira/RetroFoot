@@ -37,15 +37,67 @@ public sealed class TelaDetalhesModerna : UserControl
     public event Action? Fechou;
     bool _fechou;
 
+    readonly JogoAtual _jg;
+    readonly Func<Control>? _escalacao;
+    bool _naEscalacao;
+    ScrollViewer? _rolagem;
+
     // acrescimo: o n de "45'+n'" do jogo agora; noIntervalo: o relogio parado no intervalo
     public TelaDetalhesModerna(JogoAtual jg, int minuto, int acrescimo, bool noIntervalo, Func<Control>? escalacao)
     {
         Focusable = true;
+        _jg = jg; _escalacao = escalacao;
+        Montar(minuto, acrescimo, noIntervalo);
+        // aberta durante o jogo: a linha do tempo mostra os ultimos lances
+        AttachedToVisualTree += (_, _) =>
+        {
+            Focus();
+            if (_rolagem is { } r) Avalonia.Threading.Dispatcher.UIThread.Post(r.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
+        };
+    }
+
+    // (jogo online, o jogo de outro time aberto so para ver) a janela refeita a cada minuto, com o
+    // relogio correndo; na escalacao, fica como esta
+    public void Atualizar(int minuto, int acrescimo, bool noIntervalo)
+    {
+        if (_naEscalacao) return;
+        // (no computador so o relogio, o placar e a linha do tempo mudam: refazer a janela inteira
+        // a cada minuto a fazia piscar)
+        if (!Celular.Ativo && _minutoTxt != null && _placarTxt != null && _rolagem != null)
+        {
+            _minutoTxt.Text = TextoMinuto(minuto, acrescimo, noIntervalo);
+            _placarTxt.Text = Placar(_jg);
+            var itens = Itens(_jg, minuto, noIntervalo);
+            if (itens.Count != _nItens)
+            {
+                _nItens = itens.Count;
+                _rolagem.Content = new LinhaDoTempo(itens);
+                Avalonia.Threading.Dispatcher.UIThread.Post(_rolagem.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
+            }
+            return;
+        }
+        Montar(minuto, acrescimo, noIntervalo);
+        if (_rolagem is { } r) Avalonia.Threading.Dispatcher.UIThread.Post(r.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
+    }
+
+    TextBlock? _minutoTxt, _placarTxt;
+    int _nItens;
+    static string TextoMinuto(int minuto, int acrescimo, bool noIntervalo) =>
+        noIntervalo ? Idioma.T("Intervalo") : minuto <= 0 ? "0'" : MinutoTexto.Texto(minuto, acrescimo);
+    static string Placar(JogoAtual jg)
+    {
+        var casa = jg.Equipa[Lado.Casa]; var fora = jg.Equipa[Lado.Visit];
+        return $"{(casa == null ? 0 : Mem.Golos(casa))} - {(fora == null ? 0 : Mem.Golos(fora))}";
+    }
+
+    void Montar(int minuto, int acrescimo, bool noIntervalo)
+    {
+        var jg = _jg; var escalacao = _escalacao;
         if (Celular.Ativo)
         {
             // o celular (PartidaCelularJanelas.cs): a tela toda; Escalacao troca para a substituicao
             Content = DetalhesCelular.Folha(jg, minuto, acrescimo, noIntervalo, Itens(jg, minuto, noIntervalo),
-                escalacao == null ? null : () => { var t = escalacao(); Content = t; t.Focus(); }, Fechar);
+                escalacao == null ? null : () => { _naEscalacao = true; var t = escalacao(); Content = t; t.Focus(); }, Fechar);
             return;
         }
         Width = 580;
@@ -58,12 +110,12 @@ public sealed class TelaDetalhesModerna : UserControl
         var topo = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,*"), Margin = new Thickness(16, 18, 16, 12) };
         topo.Children.Add(Equipa(casa));
         var placar = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0) };
-        placar.Children.Add(new TextBlock
+        placar.Children.Add(_minutoTxt = new TextBlock
         {
-            Text = noIntervalo ? Idioma.T("Intervalo") : minuto <= 0 ? "0'" : MinutoTexto.Texto(minuto, acrescimo), FontSize = 13, FontWeight = FontWeight.Bold,
+            Text = TextoMinuto(minuto, acrescimo, noIntervalo), FontSize = 13, FontWeight = FontWeight.Bold,
             Foreground = Azul, HorizontalAlignment = HorizontalAlignment.Center,
         });
-        placar.Children.Add(new TextBlock
+        placar.Children.Add(_placarTxt = new TextBlock
         {
             Text = $"{gc} - {gf}", FontSize = 34, FontWeight = FontWeight.Bold, Foreground = Texto,
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -82,8 +134,10 @@ public sealed class TelaDetalhesModerna : UserControl
                 HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 0, 0, 12),
             });
 
-        var linha = new LinhaDoTempo(Itens(jg, minuto, noIntervalo));
-        var rolagem = new ScrollViewer
+        var itens0 = Itens(jg, minuto, noIntervalo);
+        _nItens = itens0.Count;
+        var linha = new LinhaDoTempo(itens0);
+        var rolagem = _rolagem = new ScrollViewer
         {
             Content = linha, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
@@ -94,6 +148,7 @@ public sealed class TelaDetalhesModerna : UserControl
         if (escalacao != null)
             botoes.Children.Add(Botao(Idioma.T("Escalação"), false, () =>
             {
+                _naEscalacao = true;
                 var t = escalacao();
                 Content = t;
                 Width = double.NaN; Height = double.NaN;
@@ -113,12 +168,6 @@ public sealed class TelaDetalhesModerna : UserControl
             Background = Fundo, CornerRadius = new CornerRadius(14), ClipToBounds = true, BorderBrush = TemaVerde.Borda, BorderThickness = new Thickness(1),
             BoxShadow = BoxShadows.Parse("0 8 28 0 #80000000"),
             Child = new ThemeVariantScope { RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark, Child = corpo },
-        };
-        // aberta durante o jogo: a linha do tempo mostra os ultimos lances
-        AttachedToVisualTree += (_, _) =>
-        {
-            Focus();
-            Avalonia.Threading.Dispatcher.UIThread.Post(rolagem.ScrollToEnd, Avalonia.Threading.DispatcherPriority.Loaded);
         };
     }
 
@@ -342,5 +391,5 @@ public sealed class TelaDetalhesModerna : UserControl
         if (e.Key is Key.Enter or Key.Escape) { Fechar(); e.Handled = true; }
     }
 
-    static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 }

@@ -53,7 +53,7 @@ static class TextosMercado
 
     // TColor $00BBGGRR; as cores do sistema (bit de cima) nao aparecem nas equipas
     public static IBrush CorDelphi(byte[] b, IBrush padrao) =>
-        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+        b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
 
     // CorLetra (+0x42) e CorFundo (+0x46) da equipa
     public static (IBrush Letra, IBrush Fundo) Cores(SEquipa? e) =>

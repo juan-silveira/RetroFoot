@@ -17,7 +17,7 @@ namespace RetroFoot.App;
 // (as telas do jogo no Classico continuam com as cores do jogo classico)
 public static class UiClassico
 {
-    static IBrush C(int rgb) => new SolidColorBrush(Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
+    static IBrush C(int rgb) => new ImmutableSolidColorBrush(Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
 
     // a paleta da marca: Fundo (o hub), Verde (as ferramentas), VerdeTopo (a barra), Cartao,
     // LinhaPar (a zebra), Amarelo, Cinza (rotulos), Alerta, Ouro, Ok

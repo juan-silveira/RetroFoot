@@ -12,6 +12,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using RetroFoot.Motor.Base;
@@ -40,7 +41,71 @@ public sealed partial class TelaInicio : UserControl
     readonly string pastaJogos;    // os .e98 (saves/ da pasta de dados)
     Configuracoes cfg = Configuracoes.Ler();
 
-    public TelaInicio(Action<Control> mostrar)
+    // o jogo novo de uma sala online (TelaSala): os tecnicos sao os da sala, um time cada
+    // Arquivo: o jogo online gravado que o host continua (null: um jogo novo)
+    // Retrato: o host passado para este aparelho (ou assumido): o jogo continua do retrato
+    // ModoAmigo: um save single player do host com amigos, por uma sessao (cada amigo assume um
+    // time da 4a divisao; quem cai fica de ferias; quem desiste, e todos quando o host fecha o
+    // jogo, saem do save)
+    public sealed record OnlineNovo(RetroFoot.Motor.Online.Sala Sala, List<RetroFoot.Motor.Online.JogadorSala> Jogadores, string? Arquivo = null,
+        RetroFoot.Motor.Online.Retrato? Retrato = null, bool ModoAmigo = false);
+    readonly OnlineNovo? online;
+
+    public TelaInicio(Action<Control> mostrar, OnlineNovo online) : this(mostrar, false)
+    {
+        this.online = online;
+        if (online.Retrato is { } r)
+        {
+            // o host veio para este aparelho: o jogo do retrato, gravado na pasta da sala
+            var arq = online.Arquivo ?? Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98");
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(arq)!);
+                File.WriteAllBytes(arq, r.Save);
+                Comecar(Jogo98.Ler(r.Save), arq, false, r);
+            }
+            catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(Inicial())); }
+        }
+        else if (online.Arquivo != null) ContinuarOnline(online.Arquivo);
+        else NovoJogo(Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98"));
+    }
+
+    // o jogo online gravado: quem esta na sala sem time recebe o do tecnico com o nome dele
+    async void ContinuarOnline(string arquivo)
+    {
+        var o = online!;
+        Jogo98 s;
+        try
+        {
+            s = Jogo98.Ler(File.ReadAllBytes(arquivo));
+            if (o.ModoAmigo)
+            {
+                // o host fica com o (primeiro) time humano do save; os amigos recebem um time da
+                // 4a divisao quando o jogo chega na rodada
+                var meu = s.Equipas.FirstOrDefault(e => RetroFoot.Motor.Mercado.MercadoJogo.HumanoAtivo(s.Treinadores.FirstOrDefault(t => t.ID == e.Treinador)));
+                if (meu != null) await o.Sala.DarEquipa(o.Sala.Uid, meu.ID);
+                Comecar(s, arquivo, false);
+                return;
+            }
+            var usados = o.Jogadores.Where(x => x.Equipa != 0).Select(x => x.Equipa).ToHashSet();
+            foreach (var j in o.Jogadores.Where(x => x.Equipa == 0))
+            {
+                var t = s.Treinadores.FirstOrDefault(t => t.Humano != 0 && TextoSave(t.Nome).Trim().Equals(j.Nome.Trim(), StringComparison.OrdinalIgnoreCase)
+                    && s.Equipas.Any(e => e.Treinador == t.ID && !usados.Contains(e.ID)));
+                if (t != null && s.Equipas.FirstOrDefault(e => e.Treinador == t.ID) is { } e)
+                {
+                    await o.Sala.DarEquipa(j.Uid, e.ID);
+                    usados.Add(e.ID);
+                }
+            }
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(Inicial())); return; }
+        Comecar(s, arquivo, false);
+    }
+
+    public TelaInicio(Action<Control> mostrar) : this(mostrar, true) { }
+
+    TelaInicio(Action<Control> mostrar, bool escolher)
     {
         this.mostrar = mostrar;
         Focusable = true;
@@ -60,7 +125,7 @@ public sealed partial class TelaInicio : UserControl
             AttachedToVisualTree += (_, _) => { Formato.Mudou -= mudou; Formato.Mudou += mudou; };
             DetachedFromVisualTree += (_, _) => Formato.Mudou -= mudou;
         }
-        EscolherJogo();
+        if (escolher) EscolherJogo();
     }
 
     // Ao abrir o jogo: o Sobre primeiro (como a TaboutDlg do original) e, ao fechar, o inicio
@@ -117,6 +182,8 @@ public sealed partial class TelaInicio : UserControl
     // RETROFOOT_JOGO (uma pasta do jogo classico ou de dados, para testes) ou a pasta de dados do
     // RetroFoot (DadosJogo: preparada aqui, com os arquivos soltos convertidos); se ela nao
     // tiver os dados, a do launcher instalado ou (desenvolvimento) game/ subindo do executavel
+    internal static string? PastaDoJogo() => AcharPastaJogo();
+
     static string? AcharPastaJogo()
     {
         var c = new List<string>();
@@ -221,19 +288,112 @@ public sealed partial class TelaInicio : UserControl
         });
     }
 
+    // (acrescimo, como o "Importar save" do launcher) traz um jogo gravado (.e98) de fora para a
+    // pasta dos jogos: so o que o RetroFoot le como save; o nome vira um nome de 8 letras; com o
+    // nome de um jogo que ja existe, pergunta antes e guarda o atual como .bak. No celular e o
+    // unico caminho (a pasta dos jogos e privada do app)
+    async void ImportarJogo()
+    {
+        var sp = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (sp is not { CanOpen: true }) { Mensagem(T("Importar jogo"), T("Copie o arquivo .e98 para a pasta dos jogos:\n{0}", pastaJogos)); return; }
+        IReadOnlyList<IStorageFile> arqs;
+        try
+        {
+            arqs = await sp.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = T("Importar jogo (.e98)"),
+                AllowMultiple = false,
+                // (o Android filtra pelos tipos MIME e nao conhece o .e98: todos os arquivos)
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType(T("Jogo gravado (.e98)")) { Patterns = new[] { "*.e98", "*.E98" }, MimeTypes = new[] { "application/octet-stream", "*/*" } },
+                    FilePickerFileTypes.All,
+                },
+            });
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message); return; }
+        if (arqs.Count == 0) return;
+        byte[] dados;
+        try
+        {
+            await using var st = await arqs[0].OpenReadAsync();
+            using var ms = new MemoryStream();
+            await st.CopyToAsync(ms);
+            dados = ms.ToArray();
+            if (Jogo98.Ler(dados).Equipas.Count == 0) throw new InvalidDataException();
+        }
+        catch { Mensagem(T("Importar jogo"), T("\"{0}\" não é um jogo gravado que o RetroFoot consiga ler.", arqs[0].Name)); return; }
+        var nome = NomeDeArquivo(Path.GetFileNameWithoutExtension(arqs[0].Name));
+        var atual = Achar(pastaJogos, nome + ".e98");
+        void Gravar()
+        {
+            try
+            {
+                Directory.CreateDirectory(pastaJogos);
+                if (atual != null) File.Copy(atual, Path.ChangeExtension(atual, ".bak"), true);
+                File.WriteAllBytes(atual ?? Path.Combine(pastaJogos, nome + ".e98"), dados);
+                Mensagem(T("Importar jogo"), T("Jogo \"{0}\" importado.", nome), () => mostrar(new TelaInicio(mostrar)));
+            }
+            catch (Exception ex) { Mensagem(T("Erro"), ex.Message); }
+        }
+        if (atual != null) Confirmar(T("Importar jogo"), T("Já existe um jogo \"{0}\". Substituir? O atual fica guardado como {0}.bak.", nome), Gravar);
+        else Gravar();
+    }
+
+    // (acrescimo, como o "Exportar save" do launcher) uma copia do .e98 onde o jogador quiser
+    // (para o launcher, outro aparelho ou backup)
+    async void ExportarJogo(string nome, string caminho)
+    {
+        byte[] dados;
+        try { dados = File.ReadAllBytes(caminho); }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message); return; }
+        var sp = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (sp is not { CanSave: true }) { Mensagem(T("Exportar jogo"), T("O jogo gravado está em:\n{0}", caminho)); return; }
+        try
+        {
+            var f = await sp.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                // (o Android poe a extensao padrao no nome sugerido: la, sem o .e98)
+                Title = T("Exportar jogo"), SuggestedFileName = OperatingSystem.IsAndroid() ? nome : nome + ".e98", DefaultExtension = "e98",
+                FileTypeChoices = new[] { new FilePickerFileType(T("Jogo gravado (.e98)")) { Patterns = new[] { "*.e98" }, MimeTypes = new[] { "application/octet-stream" } } },
+            });
+            if (f == null) return;
+            await using (var st = await f.OpenWriteAsync())
+            {
+                if (st.CanSeek) st.SetLength(0);   // (o do Android nao deixa; o arquivo e novo)
+                await st.WriteAsync(dados);
+            }
+            Mensagem(T("Exportar jogo"), T("Jogo \"{0}\" exportado.", nome));
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message); }
+    }
+
+    // um nome de arquivo do DOS (NomeValido) a partir de outro: sem acentos, em maiusculas, so
+    // letras, algarismos, _ e -, ate 8; vazio: IMPORT
+    static string NomeDeArquivo(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (var c in s.Normalize(NormalizationForm.FormD).ToUpperInvariant())
+            if (c is >= 'A' and <= 'Z' or >= '0' and <= '9' or '_' or '-') { sb.Append(c); if (sb.Length == 8) break; }
+        return sb.Length > 0 ? sb.ToString() : "IMPORT";
+    }
+
     // o Cancelar/Esc do comeco volta ao hub (antes fechava o programa)
-    void SairDoPrograma() => mostrar(new TelaHub(mostrar));
+    void SairDoPrograma() => mostrar(Inicial());
+
+    // a tela de partida: o hub no computador; no celular, o inicio (o hub e so do computador)
+    Control Inicial() => Celular.Ativo ? new TelaInicio(mostrar) : new TelaHub(mostrar);
 
     // ---------------------------------------------------------------- TselectGameDlg
     // um treinador humano do jogo gravado: o nome, a equipa e a divisao dela ("" fora delas)
-    sealed record HumanoGravado(string Treinador, string Equipa, string Divisao)
+    internal sealed record HumanoGravado(string Treinador, string Equipa, string Divisao)
     {
         public override string ToString() => Divisao.Length > 0 ? $"{Treinador} — {Equipa} ({Divisao})" : $"{Treinador} — {Equipa}";
     }
 
     // Descricao: o texto do cabecalho (humanos e data); Humanos, Ano e Equipa (o logo) lidos do
     // save. Save ilegivel: so o nome (Humanos vazio, Ano 0).
-    sealed record JogoGravado(string Nome, string Caminho, string Descricao, IReadOnlyList<HumanoGravado> Humanos, int Ano,
+    internal sealed record JogoGravado(string Nome, string Caminho, string Descricao, IReadOnlyList<HumanoGravado> Humanos, int Ano,
         RetroFoot.Motor.Save.Equipa? Equipa)
     {
         // as linhas do cabecalho depois dos nomes: a data e a hora
@@ -270,7 +430,7 @@ public sealed partial class TelaInicio : UserControl
         return r;
     }
 
-    static JogoGravado LerJogo(string p)
+    internal static JogoGravado LerJogo(string p)
     {
         var nome = Path.GetFileNameWithoutExtension(p).ToUpperInvariant();
         Jogo98 s;
@@ -317,7 +477,8 @@ public sealed partial class TelaInicio : UserControl
         if (Visual.Moderno) { EscolherJogoModerno(); return; }
         var jogos = ListarJogos();
         bool novo = jogos.Count == 0;
-        var j = new Janela(TelaAcerca.Nome, 469, 343, W95.Verde);
+        // (acrescimo) a janela cresce 34 pontos para o Importar e o Exportar, embaixo da lista
+        var j = new Janela(TelaAcerca.Nome, 469, 377, W95.Verde);
         j.Por(new Bevel(), 8, 8, 361, 325);
         j.Por(new Rotulo { Texto = T("Nome do arquivo (8 letras):"), Fonte = W95.Arial11b, Cor = W95.Amarelo, Auto = true }, 68, 76, 160, 14);
         j.Por(new Rotulo { Texto = T("Jogos salvos:"), Fonte = W95.Arial11b, Cor = W95.Amarelo, Auto = true }, 68, 164, 100, 14);
@@ -329,6 +490,8 @@ public sealed partial class TelaInicio : UserControl
         // (acrescimo) as Configuracoes do launcher, abaixo do Cancelar
         var configurar = j.Por(new Botao { Texto = T("Configurar"), Fonte = W95.Arial11b, Glifo = W95.Imagem("Botoes/CONFIGURAR.png"), NumGlifos = 2, GlifoEmCima = true }, 392, 164, 64, 64);
         var excluir = j.Por(new Botao { Texto = T("Excluir"), Fonte = W95.Arial11b, Glifo = W95.Imagem("Botoes/EXCLUIR.png"), NumGlifos = 2, GlifoEmCima = true }, 392, 240, 64, 64);
+        var importar = j.Por(new Botao { Texto = T("Importar"), Fonte = W95.MsSans11b }, 172, 341, 84, 27);
+        var exportar = j.Por(new Botao { Texto = T("Exportar"), Fonte = W95.MsSans11b }, 261, 341, 84, 27);
         var rNovo = j.Por(new Radio { Texto = T("Quero começar um jogo do início"), Fonte = W95.Arial16b }, 24, 36, 329, 17);
         var nome = j.Por(new Edit { MaxLen = 8, Maiusculas = true, Fonte = W95.Arial13b, Cor = W95.Azul }, 236, 72, 109, 21);
         var rCont = j.Por(new Radio { Texto = T("Quero continuar um jogo"), Fonte = W95.Arial16b }, 24, 132, 257, 17);
@@ -359,7 +522,7 @@ public sealed partial class TelaInicio : UserControl
             aviso.IsVisible = av != null;
             aviso.Texto = av ?? "";
             ok.Habilitado = okHab;
-            excluir.Habilitado = !novo && lista.Sel >= 0 && lista.Sel < jogos.Count;
+            excluir.Habilitado = exportar.Habilitado = !novo && lista.Sel >= 0 && lista.Sel < jogos.Count;
             var g = !novo && lista.Sel >= 0 && lista.Sel < jogos.Count ? jogos[lista.Sel] : null;
             // os humanos com a equipa e a divisao, a temporada; a data embaixo, menor
             desc.Texto = g == null ? "" : g.Humanos.Count == 0 ? g.Descricao
@@ -403,6 +566,8 @@ public sealed partial class TelaInicio : UserControl
         cancelar.Clique += SairDoPrograma;
         configurar.Clique += AbrirConfiguracoes;
         excluir.Clique += () => { if (excluir.Habilitado) ExcluirJogo(jogos[lista.Sel].Nome, jogos[lista.Sel].Caminho); };
+        importar.Clique += ImportarJogo;
+        exportar.Clique += () => { if (exportar.Habilitado) ExportarJogo(jogos[lista.Sel].Nome, jogos[lista.Sel].Caminho); };
         j.AoEnter = Ok;
         j.AoFechar = SairDoPrograma;
         j.Foco = novo ? nome : lista;
@@ -579,6 +744,7 @@ public sealed partial class TelaInicio : UserControl
     // cada um; o botao vira "Continuar" e comeca
     void EscolherTreinadores(Dados d, int moeda, string arquivo)
     {
+        if (online != null) { CriarOnline(d, moeda, arquivo); return; }
         if (Celular.Ativo) { EscolherTreinadoresCelular(d, moeda, arquivo); return; }
         if (Visual.Moderno) { EscolherTreinadoresModerno(d, moeda, arquivo); return; }
         var j = new Janela(T("Jogadores"), 411, 295, W95.Face);
@@ -641,6 +807,35 @@ public sealed partial class TelaInicio : UserControl
         Abrir(j);
     }
 
+    // o jogo novo online: um tecnico humano por jogador da sala (na ordem das vagas), sem a
+    // janela dos nomes; cada um recebe o time sorteado para ele
+    async void CriarOnline(Dados d, int moeda, string arquivo)
+    {
+        var o = online!;
+        var nomes = o.Jogadores.OrderBy(x => x.Vaga).Select(x => x.Nome).ToList();
+        Jogo98 s;
+        try
+        {
+            s = CriarJogo(d, moeda, nomes, cfg.RegrasDoJogoNovo);
+            var hs = s.Treinadores.Where(t => t.Humano != 0).ToList();
+            var js = o.Jogadores.OrderBy(x => x.Vaga).ToList();
+            var sorteio = new List<(string, ushort)>();
+            for (int k = 0; k < js.Count && k < hs.Count; k++)
+                if (s.Equipas.FirstOrDefault(q => q.Treinador == hs[k].ID) is { } e)
+                {
+                    await o.Sala.DarEquipa(js[k].Uid, e.ID);
+                    sorteio.Add((js[k].Nome, e.ID));
+                }
+            Directory.CreateDirectory(Path.GetDirectoryName(arquivo)!);
+            File.WriteAllBytes(arquivo, s.Gravar());
+            // o sorteio dos times (os outros veem o mesmo ao mesmo tempo) e entao o jogo
+            var sala = online!.Sala;
+            _ = Task.Run(() => RetroFoot.Motor.Online.HostOnline.PublicarSorteio(sala, s, sorteio));
+            mostrar(new TelaSorteioTimes(s, sorteio, () => Comecar(s, arquivo, true)));
+        }
+        catch (Exception ex) { Mensagem(T("Erro"), ex.Message, () => mostrar(Inicial())); }
+    }
+
     // Motor.NovoJogo: o estado do inicio da 1a jornada, o save e a leitura dele (como
     // ui/jogo/novojogo.go). As regras vem das Configuracoes (padrao = jogo original: 8
     // equipas por divisao, regras do 98.003).
@@ -700,7 +895,7 @@ public sealed partial class TelaInicio : UserControl
     }
 
     // ---------------------------------------------------------------- a sessao
-    void Comecar(Jogo98 s, string arquivo, bool novo)
+    void Comecar(Jogo98 s, string arquivo, bool novo, RetroFoot.Motor.Online.Retrato? retrato = null)
     {
         // N do save; versao, amarelos, patrocinios e estrangeiros das Configuracoes
         // (um save com N != 8 abre sempre como Modificada)
@@ -717,7 +912,7 @@ public sealed partial class TelaInicio : UserControl
         Sessao sessao;
         try
         {
-            sessao = new Sessao(s, mostrar, op, arquivo);
+            sessao = new Sessao(s, mostrar, op, arquivo, retrato);
         }
         catch (Exception ex) { Mensagem(T("Erro"), ex.Message, EscolherJogo); return; }
         sessao.J.Treinador = NomesHumanos(s);
@@ -725,7 +920,85 @@ public sealed partial class TelaInicio : UserControl
         // os jogos ja existem, mas ninguem foi preparado. Retomar < 0 prepara todas sem
         // criar os jogos de novo (como IniciarMotor do Go).
         if (novo) sessao.J.M.Retomar = -1;
-        sessao.Saiu += () => mostrar(new TelaInicio(mostrar));
+        RetroFoot.Motor.Online.HostOnline? hostOnline = null;
+        // (o jogo sozinho: o destaque de todos os times humanos; o online liga o deste aparelho)
+        if (online == null) TelaJornada.SoTime = null;
+        if (online != null)
+        {
+            var host = hostOnline = new RetroFoot.Motor.Online.HostOnline(online.Sala, sessao.J, a => Dispatcher.UIThread.Invoke(a)) { ModoAmigo = online.ModoAmigo };
+            sessao.LigarOnline(host);
+            // (modo amigo: os amigos que ja estao na sala recebem o time antes de o motor comecar)
+            if (online.ModoAmigo)
+                sessao.NoComecoDoMotor = () =>
+                {
+                    host.ComecarModoAmigo();
+                    // o sorteio dos times (o do host e os dos amigos), como no jogo online novo; o
+                    // motor espera o Continuar (os amigos veem o mesmo ao receber o jogo)
+                    var times = host.TimesDaSala();
+                    if (times.Count < 2) return;
+                    RetroFoot.Motor.Online.HostOnline.PublicarSorteio(online.Sala, sessao.S, times);
+                    using var seguir = new System.Threading.ManualResetEventSlim();
+                    Dispatcher.UIThread.Invoke(() => sessao.Mostrar(new TelaSorteioTimes(sessao.S, times, () => seguir.Set())));
+                    seguir.Wait();
+                };
+            Online.Sinal(null);   // (o HostOnline manda o sinal de vida daqui em diante)
+            Online.ManterVivo?.Invoke(true);
+            // (modo amigo: o app fechado no meio do jogo apaga a sala; os amigos sao desconectados)
+            Action? aoFechar = null;
+            if (online.ModoAmigo)
+            {
+                var salaAmigo = online.Sala;
+                aoFechar = () => { try { Task.Run(() => salaAmigo.Apagar()).Wait(3000); } catch { } };
+                App.Fechando += aoFechar;
+            }
+            sessao.Saiu += () => { if (aoFechar != null) App.Fechando -= aoFechar; host.Dispose(); Online.ManterVivo?.Invoke(false); };
+            sessao.Erro += _ => { host.Dispose(); Online.ManterVivo?.Invoke(false); };
+        }
+        sessao.Saiu += () =>
+        {
+            if (online == null) { mostrar(new TelaInicio(mostrar)); return; }
+            // passou o host: o jogo deste aparelho deixa de ser o oficial (fica de lado) e ele
+            // continua na sala como os outros
+            if (hostOnline?.Passou == true)
+            {
+                try { File.Move(arquivo, arquivo + ".passado", true); } catch { }
+                mostrar(new TelaSala(mostrar, () => mostrar(Inicial()), online.Sala, false));
+                return;
+            }
+            // o modo amigo acabou: o save (ja sem os amigos) volta a ser single player e a sala some.
+            // Com a bifurcacao: o jogo com os amigos vira um jogo online (data/online/<chave>, a sala
+            // fica, agora sala normal) e o save do host, sem eles, volta a ser single player
+            if (online.ModoAmigo)
+            {
+                if (hostOnline is { Bifurcar: true } h && sessao.J.Gravado is { } comAmigos && !sessao.SemGravar)
+                {
+                    try
+                    {
+                        var copia = Path.Combine(Online.Pasta(online.Sala.Codigo), "JOGO.e98");
+                        Directory.CreateDirectory(Path.GetDirectoryName(copia)!);
+                        File.WriteAllBytes(copia, comAmigos);
+                        // o save do host: o mesmo jogo gravado (com o ponto em que ele parou), sem os
+                        // amigos. (Gravar de novo depois de o motor parar perdia esse ponto: o fim do
+                        // ciclo zera a retomada, e o save ficava com os jogos da Taca pendentes e sem
+                        // escalacao: os penaltis paravam o jogo)
+                        var sozinho = Jogo98.Ler(comAmigos);
+                        var mc = new RetroFoot.Motor.Mercado.MercadoJogo(sozinho, new RetroFoot.Motor.Base.Aleatorio(0));
+                        foreach (var tid in h.Convidados.Values) mc.RemoverTreinador(tid);
+                        File.WriteAllBytes(arquivo, sozinho.Gravar());
+                        _ = online.Sala.DefinirModo("");
+                        _ = online.Sala.Pausar();
+                        Online.Lembrar(online.Sala);
+                        mostrar(Inicial());
+                        return;
+                    }
+                    catch (Exception ex) { Console.Error.WriteLine("bifurcacao: " + ex.Message); }
+                }
+                _ = online.Sala.Apagar(); mostrar(Inicial()); return;
+            }
+            // o host saiu do jogo: quem esta na sala espera ele continuar
+            _ = online.Sala.Pausar();
+            mostrar(Inicial());
+        };
         // o motor parou com erro (na thread dele): volta ao inicio com o aviso, sem travar;
         // o detalhe vai para a saida de erro
         sessao.Erro += ex =>
@@ -756,7 +1029,7 @@ static class W95
         Arial13b = new(Arial, 13, true), Arial16 = new(Arial, 16, false), Arial16b = new(Arial, 16, true),
         Arial19 = new(Arial, 19, false);
 
-    public static IBrush Cor(byte r, byte g, byte b) => new SolidColorBrush(Color.FromRgb(r, g, b));
+    public static IBrush Cor(byte r, byte g, byte b) => new ImmutableSolidColorBrush(Color.FromRgb(r, g, b));
     static IBrush Cinza(byte v) => Cor(v, v, v);
 
     public static readonly IBrush Verde = Cor(0, 128, 0), Amarelo = Cor(255, 255, 0), Marinho = Cor(0, 0, 128),

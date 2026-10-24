@@ -855,6 +855,6 @@ public sealed class TelaCelular : UserControl
     }
 
     static Color Escurecer(Color c, double f) => Color.FromRgb((byte)(c.R * f), (byte)(c.G * f), (byte)(c.B * f));
-    static IBrush Cor(int rgb) => new SolidColorBrush(Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
-    static IBrush Hex(int rgb, byte alfa = 255) => new SolidColorBrush(Color.FromArgb(alfa, (byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
+    static IBrush Cor(int rgb) => new ImmutableSolidColorBrush(Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
+    static IBrush Hex(int rgb, byte alfa = 255) => new ImmutableSolidColorBrush(Color.FromArgb(alfa, (byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb));
 }

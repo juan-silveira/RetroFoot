@@ -29,7 +29,7 @@ public static class Ui
 {
     static bool M => Visual.Moderno;
 
-    public static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    public static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
     // ---------------------------------------------------------------- cores do texto na pagina
     public static IBrush Fundo => Tema.Fundo;

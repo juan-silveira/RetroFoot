@@ -58,7 +58,7 @@ static class MercadoCelular
     public static int? Valor(TextBox t) => TM.Val(t.Text ?? "", out int v) ? v : null;
 
     // ------------------------------------------------------------ jogadores
-    static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 
     // um selo pequeno ao lado do nome (suspenso, lesionado, o preco...)
     public static Control Selo(string t, IBrush fundo, IBrush letra) => new Border

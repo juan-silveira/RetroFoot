@@ -418,8 +418,8 @@ public sealed class TelaEditorSave : UserControl
         previaDiv.Text = e == null ? "" : string.Join(" · ", new[] { e.Pais, e.Divisao, e.Treinador?.Nome ?? "" }.Where(s => s.Length > 0));
         if (e != null)
         {
-            previa.Background = new SolidColorBrush(Color.FromRgb((byte)(e.CorFundo >> 16), (byte)(e.CorFundo >> 8), (byte)e.CorFundo));
-            previaNome.Foreground = previaDiv.Foreground = new SolidColorBrush(Color.FromRgb((byte)(e.CorLetra >> 16), (byte)(e.CorLetra >> 8), (byte)e.CorLetra));
+            previa.Background = new ImmutableSolidColorBrush(Color.FromRgb((byte)(e.CorFundo >> 16), (byte)(e.CorFundo >> 8), (byte)e.CorFundo));
+            previaNome.Foreground = previaDiv.Foreground = new ImmutableSolidColorBrush(Color.FromRgb((byte)(e.CorLetra >> 16), (byte)(e.CorLetra >> 8), (byte)e.CorLetra));
         }
         else previa.Background = Brushes.Transparent;
         MostrarEstadio();

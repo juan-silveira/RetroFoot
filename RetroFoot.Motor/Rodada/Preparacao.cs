@@ -22,8 +22,67 @@ public sealed partial class Mundo
     // equipas (seg03:a67f)
     public void PrepararJogos()
     {
+        if (Online) { PrepararOnline(); return; }
         foreach (var j in S.Jogos.ToArray())
             if (!Sair) PrepararJogo(j);
+        if (!Sair) SemTitulares();
+    }
+
+    // (fora do original) um time sem nenhum titular nao entra em campo vazio: a escalacao
+    // automatica. Num save gravado no ponto errado, ou com o tecnico trocado no meio da preparacao,
+    // a disputa de penaltis sem titulares parava o jogo (o original ficava em laco infinito)
+    void SemTitulares()
+    {
+        foreach (var j in S.Jogos.ToArray())
+            foreach (var e in new[] { Equipa(j.Casa), Equipa(j.Fora) })
+                if (e != null && !e.Jogadores.Any(p => RetroFoot.Motor.Partida.Memoria.Escalacao(p) == RetroFoot.Motor.Partida.Memoria.EscTitular))
+                { Escalacao.Automatico(R, e); ForcaDosSetores(e); }
+    }
+
+    // Jogo online: logo depois da rodada, a preparacao dos times da CPU (os leiloes deles) e a
+    // revisao de salarios dos humanos (o pedido de aumento); so depois os humanos preparam (a
+    // barreira: cada um na sua tela, ate o PRONTO). No original tudo vem na ordem dos jogos: online,
+    // as perguntas chegavam a quem ja tinha dado PRONTO. A ordem nao muda ao retomar (outro host).
+    void PrepararOnline()
+    {
+        // (o save de um jogo sozinho retomado no meio da preparacao, o modo amigo: as equipas
+        // depois da que parou ainda nao prepararam, na ordem dos jogos; esta rodada termina nela)
+        if (Retomar > 0 && RetomarNaOrdemDosJogos)
+        {
+            // no jogo sozinho, as equipas antes da que parou ja prepararam (na ordem dos jogos); das
+            // que faltam, as da CPU primeiro (os leiloes antes do PRONTO) e depois as humanas
+            RetomarNaOrdemDosJogos = false;
+            var ordem = new List<(Equipa E, Jogo J)>();
+            foreach (var j in S.Jogos.ToArray())
+                if (Equipa(j.Casa) is { } c && Equipa(j.Fora) is { } f) { ordem.Add((c, j)); ordem.Add((f, j)); }
+            int k = ordem.FindIndex(x => x.E.ID == Retomar);
+            var faltam = k < 0 ? ordem : ordem.Skip(k).ToList();
+            bool hum((Equipa E, Jogo J) x) => TreinadorDa(x.E) is { } t && HumanoAtivo(t);
+            Retomar = 0;
+            foreach (var x in faltam.Where(x => !hum(x)).Concat(faltam.Where(hum)).ToList())
+                if (!Sair) PrepararEquipa(x.E, x.J);
+            if (!Sair) SemTitulares();
+            return;
+        }
+        RetomarNaOrdemDosJogos = false;
+        bool rever = Retomar == 0;
+        var times = new List<(Equipa E, Jogo J)>();
+        foreach (var j in S.Jogos.ToArray())
+            if (Equipa(j.Casa) is { } c && Equipa(j.Fora) is { } f) { times.Add((c, j)); times.Add((f, j)); }
+        bool humano((Equipa E, Jogo J) x) => TreinadorDa(x.E) is { } t && HumanoAtivo(t);
+        var cpu = times.Where(x => !humano(x)).ToList();
+        var humanos = times.Where(humano).ToList();
+        // primeiro os times da CPU (os leiloes deles), depois o pedido de aumento dos humanos e so
+        // entao a preparacao deles
+        foreach (var x in cpu)
+            if (!Sair) PrepararEquipa(x.E, x.J);
+        if (rever && !Sair) ReverSalariosHumanos();
+        foreach (var x in humanos)
+            if (!Sair) PrepararEquipa(x.E, x.J);
+        // (online o tecnico de um time pode mudar no meio da preparacao: quem desistiu ou foi
+        // expulso, quem entrou agora. Um time sem escalacao que feche nao entra em campo vazio
+        // (a disputa de penaltis sem titulares parava o jogo): a automatica)
+        if (!Sair) SemTitulares();
     }
 
     // seg03:a67f: com as duas equipas, prepara o mandante e, se ninguem pediu para sair, o
@@ -55,13 +114,35 @@ public sealed partial class Mundo
         // endereco de retorno do StackCheck (nao nulo): a CPU nao vende nem chama o Random(20).
         bool vendeu = true;
         var t = TreinadorDa(e);
-        if (Retomar == 0 && t != null && (short)t.W0C > 1) vendeu = ReverSalarios(e, t) != null;
+        if (_revistas.Remove(e.ID, out var v)) vendeu = v;
+        else if (Online && t != null && HumanoAtivo(t)) { }
+        else if (Retomar == 0 && t != null && (short)t.W0C > 1) vendeu = ReverSalarios(e, t) != null;
         Retomar = 0;
         System.Array.Clear(e.B4D);
         if (t != null && HumanoAtivo(t)) G.PrepararHumano?.Invoke(this, e, j);
         else GestaoCPU(e, vendeu);   // sem treinador o original mostra "coach is nil" e segue como CPU
         if (!Sair) ForcaDosSetores(e);
         Traco?.Invoke(e, "fim");
+    }
+
+    // Jogo online (PrepararOnline): a parte 1 dos times humanos (o pedido de aumento) antes de
+    // todos prepararem. Ao retomar no meio da preparacao (outro host), os humanos nao revem de novo.
+    public bool Online;
+    // o save veio de um jogo sozinho (o modo amigo): retomado no meio da preparacao, a rodada
+    // termina na ordem dos jogos (no jogo sozinho, as equipas depois da que parou nao prepararam)
+    public bool RetomarNaOrdemDosJogos;
+    readonly Dictionary<ushort, bool> _revistas = new();
+
+    void ReverSalariosHumanos()
+    {
+        _revistas.Clear();
+        foreach (var j in S.Jogos.ToArray())
+            foreach (var e in Equipa(j.Casa) is { } c && Equipa(j.Fora) is { } f ? new[] { c, f } : [])
+            {
+                if (Sair) return;
+                if (_revistas.ContainsKey(e.ID) || TreinadorDa(e) is not { } t || !HumanoAtivo(t)) continue;
+                _revistas[e.ID] = (short)t.W0C > 1 ? ReverSalarios(e, t) != null : true;
+            }
     }
 
     // a parte 1 de seg03:3e9c (seg03:3edf-42d7)

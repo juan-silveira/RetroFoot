@@ -58,6 +58,9 @@ public sealed class Humano
     // a janela de substituicao (seg03:a5ad)
     public Action<JogoAtual, int, Jogador?, int>? Substituicao;
     public LanceHumano? Lance;
+    // (jogo online) o leilao da CPU para todos os humanos de uma vez (MercadoJogo.LanceDeTodos)
+    public Func<IReadOnlyList<Equipa>, Equipa, Jogador, int, Dictionary<ushort, (int Milhares, bool Ok)>?>? LanceDeTodos;
+    public Action<MercadoJogo.Leilao, bool>? ResultadoLeilao;
     public Func<Equipa, Jogador, int, int, bool>? PedirAumento;
     public Func<Treinador, Equipa, bool>? Convite;
     // depois de cada tique do relogio da jornada (MinutePassed, seg10:069b): a interface
@@ -106,7 +109,7 @@ public sealed class JogoEmCurso
         M = new Mundo(s, semente);
         M.Regras = TRegras.DoSave(s, op.Regras);
         Op = op; H = h;
-        Mc = new MercadoJogo(s, M.R) { Regras = M.Regras, Bosman = op.Bosman, PLOP = op.PLOP };
+        Mc = new MercadoJogo(s, M.R) { Regras = M.Regras, Bosman = op.Bosman, PLOP = op.PLOP, LanceDeTodos = LanceDeTodos, ResultadoDeTodos = (l, v) => H.ResultadoLeilao?.Invoke(l, v) };
         M.Bosman = op.Bosman; M.PLOP = op.PLOP;
         M.OpcaoGestaoCPU = op.AddIn13;
         M.MostrarChicotadas = op.MostrarChicotadas;
@@ -241,7 +244,7 @@ public sealed class JogoEmCurso
         Regras = M.Regras,
         MostrarSorteio = Op.VerSorteio,
         Interacao = Interacao(),
-        Mc = { Bosman = Op.Bosman, PLOP = Op.PLOP },
+        Mc = { Bosman = Op.Bosman, PLOP = Op.PLOP, LanceDeTodos = LanceDeTodos, ResultadoDeTodos = (l, v) => H.ResultadoLeilao?.Invoke(l, v) },
     };
 
     // o save (seg05:124d): o texto do cabecalho e o nome do treinador humano e a data e
@@ -259,6 +262,40 @@ public sealed class JogoEmCurso
         c.G271A = (byte)(M.JornadaJogada || (M.Retomar != 0 && tacaEmPreparacao) ? 1 : 0);
         return s.Gravar();
     }
+
+    // o retrato do jogo online (Online/Retrato) parado na preparacao da equipa e (dentro do
+    // gancho Preparar, antes de qualquer mudanca do humano): o save com a retomada nela, como o
+    // Sair grava, e o que o save nao guarda
+    public Online.Retrato Fotografar(Equipa e, Jogo? jogo)
+    {
+        var c = M.S.Cabecalho;
+        short retomar = M.Retomar;
+        bool taca = tacaEmPreparacao;
+        var (texto, g271e, g271a) = (c.Texto, c.G271E, c.G271A);
+        M.Retomar = (short)e.ID;
+        tacaEmPreparacao = jogo != null && jogo.Taca != 0;
+        try
+        {
+            return new Online.Retrato
+            {
+                Save = Gravar(),
+                Semente = M.R.Semente,
+                OrdemJogadores = new List<ushort>(M.OrdemJogadores),
+                ForcaMedia = new Dictionary<ushort, short>(M.ForcasMedias),
+                Demanda = M.DemandaPorPosicao(),
+                Chicotadas = new List<Chicotada>(M.Chicotadas),
+            };
+        }
+        finally
+        {
+            M.Retomar = retomar;
+            tacaEmPreparacao = taca;
+            (c.Texto, c.G271E, c.G271A) = (texto, g271e, g271a);
+        }
+    }
+
+    // (o gancho do Humano lido na hora: o jogo online o liga depois de criar o jogo)
+    Dictionary<ushort, (int Milhares, bool Ok)>? LanceDeTodos(IReadOnlyList<Equipa> quem, Equipa v, Jogador p, int preco) => H.LanceDeTodos?.Invoke(quem, v, p, preco);
 
     Interacao Interacao() => new()
     {

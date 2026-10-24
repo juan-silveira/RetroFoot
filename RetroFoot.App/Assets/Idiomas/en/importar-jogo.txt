@@ -1,0 +1,12 @@
+Importar	Import
+Exportar	Export
+Importar jogo	Import game
+Exportar jogo	Export game
+Importar jogo (.e98)	Import game (.e98)
+Jogo gravado (.e98)	Saved game (.e98)
+Copie o arquivo .e98 para a pasta dos jogos:\n{0}	Copy the .e98 file to the saves folder:\n{0}
+"{0}" não é um jogo gravado que o RetroFoot consiga ler.	"{0}" is not a saved game RetroFoot can read.
+Jogo "{0}" importado.	Game "{0}" imported.
+Já existe um jogo "{0}". Substituir? O atual fica guardado como {0}.bak.	A game "{0}" already exists. Replace it? The current one is kept as {0}.bak.
+O jogo gravado está em:\n{0}	The saved game is in:\n{0}
+Jogo "{0}" exportado.	Game "{0}" exported.

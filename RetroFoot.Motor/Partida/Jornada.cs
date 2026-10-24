@@ -43,6 +43,8 @@ public sealed partial class Jornada
     public int Acrescimo;      // o n de "45'+n'"; 0 fora dos acrescimos
     public int AcrescimoMax;   // o maior acrescimo deste tempo entre os jogos
     bool emAcrescimos;
+    // (o jogo online, Online/AoVivo: a jornada mostrada nos outros aparelhos copia o do host)
+    public bool EmAcrescimos { get => emAcrescimos; set => emAcrescimos = value; }
 
     // o relogio parado no intervalo: o 45 ja jogado (e os acrescimos dele)
     public bool NoIntervalo => Minuto == 45 && !emAcrescimos;

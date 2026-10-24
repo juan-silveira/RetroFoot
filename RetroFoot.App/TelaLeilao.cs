@@ -122,7 +122,8 @@ sealed class TelaLeilao : DialogoMercado
         var t = s.J.M.TreinadorDa(c);
         var (letra, fundo) = T.Cores(c);
         if (!Moderno) painel.Background = fundo;
-        foreach (var x in new[] { coachName, label7, cash }) { x.Cor = letra; x.InvalidateVisual(); }
+        // (no Moderno o painel e do tema: as cores dele, nao a letra da equipa)
+        foreach (var x in new[] { coachName, label7, cash }) { x.Cor = Moderno ? (x == coachName ? MM.TextoEscolhido : MM.Texto) : letra; x.InvalidateVisual(); }
         coachName.Texto = T.NomeTreinador(t);
         cash.Texto = Idioma.T("Dinheiro em caixa: ") + FormatoDinheiro.Valor(s.S, (int)c.Dinheiro);
         // +0x1E do treinador (B1A[4]): esconder as ofertas -> PasswordChar 'X'
@@ -165,6 +166,8 @@ sealed class TelaLeilao : DialogoMercado
     {
         var tcs = new TaskCompletionSource<(int, bool)>();
         Dispatcher.UIThread.Invoke(() => MostrarPainel(c, x => tcs.TrySetResult(x)));
+        // (jogo online: o leilao de todos tem prazo; acabou, sem lance)
+        if (Sessao.PrazoDialogo is { } prazo && !tcs.Task.Wait(prazo)) return (0, false);
         return tcs.Task.GetAwaiter().GetResult();
     }
 
@@ -176,6 +179,62 @@ sealed class TelaLeilao : DialogoMercado
         cel?.MostrarResultado(r.Texto, r.Comprador);
         // o jogador foi para um time humano: o som da compra
         if (r.Comprador != null && Mem.Humano(s.TreinadorDa(r.Comprador))) Som.Tocar(Som.Efeito.Compra);
+    }
+
+    // ------------------------------------------------------------ o leilao de todos (online)
+    // A janela de sempre, aberta em cada aparelho que licita: o lance (com o prazo do host); depois
+    // o fundo escurecido com "aguardando os outros tecnicos" por cima dela; quando todos deram o
+    // lance (ou pularam), o resultado nela, como no jogo sozinho, por 2 s; e fecha. Nos metodos,
+    // a thread nao e a da interface (a do motor no host; uma tarefa nos outros).
+    internal sealed class DeTodos
+    {
+        readonly Sessao _s;
+        readonly TelaLeilao _t;
+        Control? _veu;
+        bool _fechada;
+        public readonly ushort Jogador;
+
+        DeTodos(Sessao s, TelaLeilao t, ushort jogador) { _s = s; _t = t; Jogador = jogador; }
+
+        public static DeTodos Abrir(Sessao s, SEquipa v, SJogador p, int preco)
+        {
+            int salario = s.Mercado.Salario(p, Ext.Bytes(v.B79));
+            TelaLeilao t = null!;
+            Dispatcher.UIThread.Invoke(() => { t = new TelaLeilao(s, v, p, preco / 1000 * 1000, salario); s.AbrirDialogo(t); });
+            return new DeTodos(s, t, p.ID);
+        }
+
+        // o painel do lance (Sessao.PrazoDialogo nesta thread: o prazo)
+        public (int, bool) Lance(SEquipa c) => _t.PedirLance(c);
+
+        public void Aguardar() => Dispatcher.UIThread.Post(() =>
+        {
+            if (_fechada || _veu != null) return;
+            _veu = Sessao.Espera(Idioma.T("Lance registrado. Aguardando os outros técnicos…"));
+            _s.AbrirDialogo(_veu);
+        });
+
+        public void Resultado(string texto, SEquipa? comprador)
+        {
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                if (_veu != null) { _s.FecharDialogo(_veu); _veu = null; }
+                if (!_fechada) _t.MostrarResultado((texto, comprador));
+            });
+            Thread.Sleep(2000);
+            Fechar();
+        }
+
+        public void Fechar() => Dispatcher.UIThread.Invoke(() =>
+        {
+            if (_veu != null) { _s.FecharDialogo(_veu); _veu = null; }
+            if (!_fechada) { _fechada = true; _s.FecharDialogo(_t); }
+        });
+
+        // o texto do resultado, como o da janela do jogo sozinho
+        public static string Texto(Sessao s, SEquipa? comprador, long preco) => comprador == null
+            ? Idioma.T("Não houve ofertas")
+            : Idioma.T("Vendido ao {0} por {1}", T.NomeEquipa(comprador), FormatoDinheiro.Valor(s.S, preco));
     }
 
     // ------------------------------------------------------------ o ciclo do leilao
@@ -288,6 +347,13 @@ sealed class TelaLeilao : DialogoMercado
         pag.Vender += preco =>
         {
             s.FecharDialogo(pag);
+            // (jogo online, sem o host: o host faz o leilao e manda o jogo novo)
+            if (s.Remoto is { } rm)
+            {
+                rm.Executar(new RetroFoot.Motor.Online.Vender(p.ID, preco * 1000), r =>
+                    fim?.Invoke(r.Motivo == "vendido" ? ResultadoVenda.Vendido : r.Ok ? ResultadoVenda.NaoVendido : ResultadoVenda.Cancelado));
+                return;
+            }
             Task.Run(() =>
             {
                 bool vendido = false;
@@ -577,7 +643,7 @@ sealed class TelaLeilao : DialogoMercado
     //   impedimento: Vender num jogador que nao pode ser vendido
     public static Control Demo()
     {
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         var arq = Environment.GetEnvironmentVariable("RETROFOOT_SAVE");
         if (string.IsNullOrEmpty(arq) || !System.IO.File.Exists(arq)) arq = AcharSave();
         if (arq == null) return new TextBlock { Text = "Demo: sem save do oráculo", Foreground = Brushes.White };

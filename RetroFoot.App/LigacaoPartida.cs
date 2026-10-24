@@ -94,7 +94,17 @@ public static class LigacaoPartida
             (JogoAtual, int)? p;
             lock (st.Trava) { p = st.Pedido; st.Pedido = null; }
             // as trocas feitas pela janela de detalhes (add-in 0x12) vao para a linha do tempo
-            if (p is var (jg, lado)) jn.ObservarTrocas(jg, lado, null, false, () => Detalhes(s, jg, lado, jn));
+            if (p is var (jg, lado))
+            {
+                // (jogo online: o host parou o jogo de todos; os outros veem o aviso)
+                s.Online?.AvisarPausa(jg.Equipa[lado]?.ID ?? 0, true);
+                // (jogo online: o host parou o jogo de todos; a janela dele tem o prazo)
+                var antes = Sessao.PrazoDialogo;
+                if (s.Online != null) Sessao.PrazoDialogo = RetroFoot.Motor.Online.HostOnline.PrazoPausa;
+                try { jn.ObservarTrocas(jg, lado, null, false, () => Detalhes(s, jg, lado, jn)); }
+                finally { Sessao.PrazoDialogo = antes; }
+                s.Online?.AvisarPausa(0, false);
+            }
         };
         var fimJornada = h.FimJornada;
         h.FimJornada = jn =>
@@ -118,6 +128,8 @@ public static class LigacaoPartida
     // dois minutos, parado como o relogio do original. Fora de uma jornada, nada.
     public static void PedirDetalhes(Sessao s, JogoAtual jg, int lado)
     {
+        // (jogo online, noutro aparelho: o pedido de parar vai para o host)
+        if (s.Remoto is { } r) { r.PedirPausa(jg, lado); return; }
         if (!Estados.TryGetValue(s, out var st)) return;
         lock (st.Trava)
             if (st.Jornada != null && jg.Equipa[lado] != null) st.Pedido = (jg, lado);
@@ -154,6 +166,16 @@ public static class LigacaoPartida
         Janela(s, jg, lado, motivo);
     }
 
+    // (jogo online, noutro aparelho, fora da thread da interface) a janela da paralisacao: a de
+    // detalhes (motivo 1) ou a do intervalo/goleiro expulso (4/3), sobre a copia ao vivo
+    internal static void JanelaOnline(Sessao s, JogoAtual jg, int lado, int motivo, Jornada jn)
+    {
+        if (jg.Equipa[lado] is not { } e) return;
+        if (motivo == 1) { Detalhes(s, jg, lado, jn); return; }
+        Jornada.OrdenarPorPosicaoNome(e);
+        Janela(s, jg, lado, motivo);
+    }
+
     // o motor ja reordenou o elenco nos motivos 3 e 4 (Jornada.JanelaSubstituicao)
     static void Janela(Sessao s, JogoAtual jg, int lado, int motivo) => s.EsperarDialogo<bool>(fim =>
     {
@@ -183,12 +205,26 @@ public static class LigacaoPartida
         if (jn != null) s.AtualizarJornada(jn);
     }
 
-    internal static Control DetalhesModernos(Sessao s, JogoAtual jg, int lado, int minuto, int acrescimo, bool noIntervalo, Action fim)
+    // (jogo online) o jogo de outro time aberto so para ver, na thread da interface, sem parar a
+    // partida (o relogio segue; a tela da jornada fecha a janela no intervalo e no fim): sem trocas
+    // e sem reordenar o elenco (o motor do host pode estar mexendo nele)
+    internal static Control DetalhesSoVer(Sessao s, JogoAtual jg, int lado, Jornada jn, Action fim)
+    {
+        if (!Visual.Moderno)
+        {
+            var t = new TelaSubstituicao(jg, lado, 1, s.J.Op, s.J.M.Regras.CartoesAmarelos, false, VerEscalacaoDosOutros);
+            t.Fechou += fim;
+            return t;
+        }
+        return DetalhesModernos(s, jg, lado, jn.Minuto, Math.Min(jn.Acrescimo, jn.AcrescimosDoJogo(jg)), jn.NoIntervalo, fim, false);
+    }
+
+    internal static Control DetalhesModernos(Sessao s, JogoAtual jg, int lado, int minuto, int acrescimo, bool noIntervalo, Action fim, bool trocas = true)
     {
         bool completa = P98.Humano(jg, lado) || VerEscalacaoDosOutros;
         Func<Control>? escalacao = completa ? () =>
         {
-            var c = new TelaSubstituicao(jg, lado, 1, s.J.Op, s.J.M.Regras.CartoesAmarelos, SubstituicoesDuranteJogo, VerEscalacaoDosOutros);
+            var c = new TelaSubstituicao(jg, lado, 1, s.J.Op, s.J.M.Regras.CartoesAmarelos, trocas && SubstituicoesDuranteJogo, VerEscalacaoDosOutros);
             c.Fechou += fim;
             return c;
         } : null;
@@ -197,10 +233,15 @@ public static class LigacaoPartida
         return t;
     }
 
+    // (jogo online, noutro aparelho, fora da thread da interface) a escolha do batedor
+    // (o convidado) previsto: o resultado de cada batedor, calculado no host (-1 sem ele)
+    internal static SJogador? BatedorOnline(Sessao s, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido, Func<SJogador, int>? previsto = null) =>
+        Batedor(s, Estados.GetValue(s, _ => new Estado()), atacante, titulares, sugerido, previsto);
+
     // seg08:328b com o humano cobrando. A cobranca e do motor (Jornada.Penalti, logo depois
     // deste gancho: Goleiro(defensor) e CobrarPenalti com o Random do jogo); a janela mostra o
     // mesmo resultado, calculado com uma copia do Random.
-    static SJogador? Batedor(Sessao s, Estado st, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido)
+    static SJogador? Batedor(Sessao s, Estado st, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido, Func<SJogador, int>? previsto = null)
     {
         if (titulares.Count == 0) return sugerido;
         SEquipa? defensor = null;
@@ -212,7 +253,7 @@ public static class LigacaoPartida
         string treinador = s.TreinadorDa(atacante) is { } tr ? P98.Texto(tr.Nome) : "";
         return s.EsperarDialogo<SJogador>(fim =>
         {
-            var t = new TelaPenalti(atacante, treinador, titulares, null, b => Previsto(s, defensor, b));
+            var t = new TelaPenalti(atacante, treinador, titulares, null, b => previsto?.Invoke(b) ?? Previsto(s, defensor, b));
             t.Terminou += fim;
             return t;
         });
@@ -220,6 +261,9 @@ public static class LigacaoPartida
 
     static int Previsto(Sessao s, SEquipa? defensor, SJogador batedor)
     {
+        // (no aparelho de um convidado o penalti e cobrado no host: o resultado nao e conhecido
+        // aqui; -1 = sem resultado na janela, ele aparece na partida)
+        if (s.Remoto != null) return -1;
         var gk = defensor == null ? null : Penaltis.Goleiro(defensor);
         if (gk == null) return 0;
         return Penaltis.CobrarPenalti(new Aleatorio(s.J.R.Semente), gk, batedor);
@@ -233,7 +277,7 @@ public static class LigacaoPartida
     // (Sessao + Ligar), com a escalacao automatica no lugar da tela da equipa.
     public static Control Demo()
     {
-        var raiz = new Border { Background = new SolidColorBrush(Color.FromRgb(0, 128, 0)) };
+        var raiz = new Border { Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0)) };
         try
         {
             var bytes = SaveDemo();

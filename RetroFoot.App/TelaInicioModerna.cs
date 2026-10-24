@@ -230,6 +230,8 @@ public sealed partial class TelaInicio
         var bordas = new List<Border>();
         var continuar = Botao(T("Continuar"), true, () => { });
         var excluir = Botao(T("Excluir"), false, () => { if (sel >= 0 && sel < jogos.Count) ExcluirJogo(jogos[sel].Nome, jogos[sel].Caminho); });
+        var importar = Botao(T("Importar"), false, ImportarJogo);
+        var exportar = Botao(T("Exportar"), false, () => { if (sel >= 0 && sel < jogos.Count) ExportarJogo(jogos[sel].Nome, jogos[sel].Caminho); });
         for (int i = 0; i < jogos.Count; i++)
         {
             int k = i;
@@ -284,7 +286,12 @@ public sealed partial class TelaInicio
         cabCont.Children.Add(n);
         DockPanel.SetDock(cabCont, Dock.Top);
         cont.Children.Add(cabCont);
-        var rodCont = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 12, 0, 0), Spacing = 10, Children = { excluir, continuar } };
+        // (o Importar a esquerda, o Exportar, o Excluir e o Continuar a direita)
+        var rodCont = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), Margin = new Thickness(0, 12, 0, 0) };
+        rodCont.Children.Add(importar);
+        var dirCont = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Children = { exportar, excluir, continuar } };
+        Grid.SetColumn(dirCont, 2);
+        rodCont.Children.Add(dirCont);
         DockPanel.SetDock(rodCont, Dock.Bottom);
         cont.Children.Add(rodCont);
         cont.Children.Add(lista);
@@ -328,7 +335,7 @@ public sealed partial class TelaInicio
             aviso.Text = av ?? "";
             comecar.Habilitado = valido;
             continuar.Habilitado = sel >= 0;
-            excluir.Habilitado = sel >= 0;
+            excluir.Habilitado = exportar.Habilitado = sel >= 0;
         }
         void Escolher(int k)
         {
@@ -378,10 +385,16 @@ public sealed partial class TelaInicio
     static Control Preparando(string texto)
     {
         var c = new CaixaModerna(T("Jogo novo"), 380);
+        // o texto em cima (quebra a linha: os textos traduzidos sao compridos) e a barra embaixo,
+        // na largura da caixa
         c.Corpo.Children.Add(new StackPanel
         {
-            Orientation = Orientation.Horizontal, Spacing = 12,
-            Children = { new ProgressBar { IsIndeterminate = true, Width = 80, VerticalAlignment = VerticalAlignment.Center }, new TextBlock { Text = texto, FontSize = 14, Foreground = Texto, VerticalAlignment = VerticalAlignment.Center } },
+            Spacing = 12,
+            Children =
+            {
+                new TextBlock { Text = texto, FontSize = 14, Foreground = Texto, TextWrapping = TextWrapping.Wrap },
+                new ProgressBar { IsIndeterminate = true, HorizontalAlignment = HorizontalAlignment.Stretch },
+            },
         });
         return c;
     }
@@ -589,8 +602,8 @@ public sealed partial class TelaInicio
                         new Escudo(e) { Width = 30, Height = 30, VerticalAlignment = VerticalAlignment.Center },
                         new Border
                         {
-                            Background = new SolidColorBrush(fundo), CornerRadius = new CornerRadius(6), Padding = new Thickness(8, 3), VerticalAlignment = VerticalAlignment.Center,
-                            Child = new TextBlock { Text = TextoSave(e.NomeCurto), FontSize = 14, FontWeight = FontWeight.Bold, Foreground = new SolidColorBrush(letra) },
+                            Background = new ImmutableSolidColorBrush(fundo), CornerRadius = new CornerRadius(6), Padding = new Thickness(8, 3), VerticalAlignment = VerticalAlignment.Center,
+                            Child = new TextBlock { Text = TextoSave(e.NomeCurto), FontSize = 14, FontWeight = FontWeight.Bold, Foreground = new ImmutableSolidColorBrush(letra) },
                         },
                     },
                 };

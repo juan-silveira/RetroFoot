@@ -50,7 +50,7 @@ public sealed class TelaClassificacao : UserControl
             var o = new TelaClassificacaoRetro(s, rodada, relogio, regras);
             o.Fechou += () => Fechou?.Invoke();
             _tela = o;
-            Background = new SolidColorBrush(Color.FromRgb(0, 128, 0));
+            Background = new ImmutableSolidColorBrush(Color.FromRgb(0, 128, 0));
             Content = new Viewbox { Stretch = Stretch.Uniform, Child = o };
         }
         AttachedToVisualTree += (_, _) => _tela.Focus();

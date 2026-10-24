@@ -19,7 +19,7 @@ public static class CUi
     public static bool Retro => !Visual.Moderno;
 
     // ---------------------------------------------------------------- as cores
-    static IBrush H(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush H(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
     static readonly IBrush RFundo = W95.Verde, RBarra = W95.TituloCor, RCartao = W95.Face, RTexto = W95.Preto,
         RFraco = H("#404040"), RLinha = H("#808080"), RSelecao = W95.Marinho, RSobreSelecao = W95.Branco,
         RTitulo = W95.Amarelo, RCampo = W95.Branco;
@@ -527,7 +527,7 @@ public static class CUi
     public static Control Escudo(RetroFoot.Motor.Save.Equipa? e, double tam)
     {
         if (e != null && !Retro && Escudos.Controle(e, tam) is { } c) return c;
-        IBrush C(byte[]? b, IBrush padrao) => b == null || b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+        IBrush C(byte[]? b, IBrush padrao) => b == null || b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
         var fundo = C(e?.CorFundo, Brushes.White);
         var letra = C(e?.CorLetra, Brushes.Black);
         double t = tam * 0.85;
@@ -541,7 +541,7 @@ public static class CUi
     // a caixa com o nome da equipa nas cores dela (o Retro, como nas listas do classico)
     public static Control NomeEquipa(RetroFoot.Motor.Save.Equipa e, string nome, double tam = 14, bool negrito = false)
     {
-        IBrush C(byte[]? b, IBrush padrao) => b == null || b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new SolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
+        IBrush C(byte[]? b, IBrush padrao) => b == null || b.Length < 4 || (b[3] & 0x80) != 0 ? padrao : new ImmutableSolidColorBrush(Color.FromRgb(b[0], b[1], b[2]));
         if (Retro)
             return new Border
             {
@@ -670,6 +670,15 @@ public static class CUi
     }
 
     // uma pergunta ou aviso como folha (Sim/Nao, OK): para as janelas que so perguntam
+    // a mesma pergunta com um botao por linha (o principal em cima): para textos de botao compridos
+    public static Folha PerguntaEmColuna(string titulo, string texto, IReadOnlyList<(string Texto, bool Principal, Action Acao)> botoes, Action? voltar = null)
+    {
+        var col = new StackPanel { Spacing = 8 };
+        foreach (var (t, pr, a) in System.Linq.Enumerable.OrderByDescending(botoes, x => x.Principal))
+            col.Children.Add(new Botao(t, pr, a) { HorizontalAlignment = HorizontalAlignment.Stretch });
+        return new Folha(titulo, Txt(texto, 15.5, null, FontWeight.Normal, true), col, fechar: null) { AoVoltar = voltar };
+    }
+
     public static Folha Pergunta(string titulo, string texto, IReadOnlyList<(string Texto, bool Principal, Action Acao)> botoes, Action? voltar = null)
     {
         var bs = new List<Control>();

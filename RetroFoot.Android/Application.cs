@@ -22,6 +22,7 @@ public class Application : AvaloniaAndroidApplication<RetroFoot.App.App>
         RetroFoot.App.Atualizacao.PastaApk = System.IO.Path.Combine(CacheDir!.AbsolutePath, "atualizacao");
         RetroFoot.App.Atualizacao.InstalarApk = InstalarApk;
         RetroFoot.App.Som.TocarAndroid = Tocar;
+        RetroFoot.App.Online.ManterVivo = ligado => ServicoOnline.Manter(this, ligado);
         builder = base.CustomizeAppBuilder(builder).WithInterFont();
         string modo = "";
         try

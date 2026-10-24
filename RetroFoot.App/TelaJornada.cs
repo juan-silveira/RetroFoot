@@ -44,6 +44,12 @@ namespace RetroFoot.App;
 // a velocidade (Sessao.MsPorMinuto); setas e PageUp/PageDown mudam de pagina.
 public sealed partial class TelaJornada : UserControl
 {
+    // (jogo online) o time deste aparelho: so o jogo dele fica destacado; null = todos os humanos
+    public static ushort? SoTime;
+
+    internal static bool EDestaque(JogoAtual jg, int lado) =>
+        jg.Treinador[lado] is { Humano: not 0 } && (SoTime is not ushort t || jg.Equipa[lado]?.ID == t);
+
     // o original fecha sozinho depois de Fim + 5 minutos (seg10:08DB: CanClose = 1 e
     // TCustomForm.Close); aqui, por padrao, a tela espera o jogador
     public bool FecharSozinha { get; set; }
@@ -60,7 +66,6 @@ public sealed partial class TelaJornada : UserControl
     int pagina;                             // DS:2B38
     Action? continuar;
     bool pausado;
-    DispatcherFrame? pausa;
 
     // relogio (TGauge "clock", gkPie): cor da frente, minimo, maximo e progresso
     Color corRelogio = Rgb(0xFF0000);       // clBlue
@@ -72,7 +77,7 @@ public sealed partial class TelaJornada : UserControl
         this.titulo = TituloNoIdioma(System.Text.Encoding.Latin1.GetString(titulo));
         sup = new Superficie(this);
         Content = sup;
-        Background = new SolidColorBrush(Verde);
+        Background = new ImmutableSolidColorBrush(Verde);
         Focusable = true;
         Fotografar(jn);
         // no celular: a coluna de partidas em pe (TelaJornadaCelular.cs)
@@ -83,7 +88,8 @@ public sealed partial class TelaJornada : UserControl
         // jeito de tirar de ferias um tecnico que esta sozinho); o relogio para enquanto ela esta aberta
         AddHandler(PointerPressedEvent, (_, e) =>
         {
-            if (!e.GetCurrentPoint(this).Properties.IsRightButtonPressed || acabou || gestaoAberta) return;
+            // (no jogo online nao ha Gestao de Tecnicos: os tecnicos sao os da sala)
+            if (!e.GetCurrentPoint(this).Properties.IsRightButtonPressed || acabou || gestaoAberta || s.Online != null || s.Remoto != null) return;
             e.Handled = true;
             gestaoAberta = true;
             bool estava = pausado;
@@ -129,22 +135,52 @@ public sealed partial class TelaJornada : UserControl
     }
 
     // um tique do relogio (MinutePassed, seg10:069b), com o motor parado
-    public void Minuto(Jornada jn)
+    public void Minuto(Jornada jn) => Atualizar(jn);
+
+    // ---------------------------------------------------------------- o jogo de outro time (online)
+    // No jogo online a partida e de todos: o clique no jogo de outro time (ou no adversario) so
+    // abre a janela para ver, sem parar o relogio; ela fecha sozinha no intervalo (vem a das
+    // trocas do seu time) e no fim. O clique no seu time e o de sempre (para todos, para trocar).
+    Control? espiando;
+    JogoAtual? espiandoJogo;
+    Jornada? ultima;
+
+    void Clicou(JogoAtual jg, int lado)
     {
-        Atualizar(jn);
-        if (pausado)
-        {
-            // o motor espera aqui (o Invoke da Sessao so volta quando a pausa acaba)
-            pausa = new DispatcherFrame();
-            Dispatcher.UIThread.PushFrame(pausa);
-            pausa = null;
-        }
+        bool online = s.Online != null || s.Remoto != null;
+        if (!online || ultima == null || (SoTime is ushort meu && jg.Equipa[lado]?.ID == meu)) { LigacaoPartida.PedirDetalhes(s, jg, lado); return; }
+        if (jg.Equipa[lado] == null) return;
+        PararDeEspiar();
+        Control? c = null;
+        c = LigacaoPartida.DetalhesSoVer(s, jg, lado, ultima, () => { if (espiando == c) espiando = null; if (c != null) s.FecharDialogo(c); });
+        espiando = c;
+        espiandoJogo = jg;
+        s.AbrirDialogo(c);
     }
+
+    public void PararDeEspiar()
+    {
+        if (espiando is not { } c) return;
+        espiando = null;
+        s.FecharDialogo(c);
+    }
+
+    // na thread do MOTOR, depois do Minuto: com a pausa ligada, o motor espera aqui ate ela
+    // acabar. (Antes o motor esperava num laco aninhado da interface, o PushFrame, que o Android
+    // nao tem: a pausa derrubava o jogo no celular.)
+    readonly System.Threading.ManualResetEventSlim liberado = new(true);
+    public void EsperarPausa() => liberado.Wait();
 
     // o instantaneo e o relogio, sem a pausa: tambem antes de uma janela que o motor abre no
     // meio de um tique (o intervalo e as lesoes vem antes do Minuto desse tique)
     public void Atualizar(Jornada jn)
     {
+        ultima = jn;
+        // (o jogo de outro time aberto: fecha no intervalo, que abre a janela das trocas; senao o
+        // minuto a minuto nela tambem)
+        if (espiando != null && jn.NoIntervalo) PararDeEspiar();
+        else if (espiando is TelaDetalhesModerna dm && espiandoJogo is { } ej)
+            dm.Atualizar(jn.Minuto, Math.Min(jn.Acrescimo, jn.AcrescimosDoJogo(ej)), jn.NoIntervalo);
         Fotografar(jn);
         int m = jn.Minuto;
         if (m > 0 && m <= jn.Fim)
@@ -161,6 +197,7 @@ public sealed partial class TelaJornada : UserControl
     // o relogio acabou: a tela espera o jogador e chama "continuar"
     public void Fim(Jornada jn, Action continuar)
     {
+        PararDeEspiar();
         Fotografar(jn);
         acabou = true;
         this.continuar = continuar;
@@ -201,14 +238,19 @@ public sealed partial class TelaJornada : UserControl
 
     void Pausar(bool p)
     {
+        // (jogo online) no aparelho de um convidado a partida roda no host: nao ha o que pausar
+        // aqui; no host, a pausa para a partida de todos e os outros veem o aviso
+        if (s.Remoto != null) return;
+        if (p != pausado) s.Online?.AvisarPausaSimples(p);
         pausado = p;
-        if (!p && pausa != null) pausa.Continue = false;
+        if (p) liberado.Reset(); else liberado.Set();
         Redesenhar();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        PararDeEspiar();
         Pausar(false);
         SoltarTeclaFim();
     }
@@ -265,8 +307,9 @@ public sealed partial class TelaJornada : UserControl
             (l.LetraFora, l.FundoFora) = (Cor(fora.CorLetra), Cor(fora.CorFundo));
             l.GC = Memoria.Golos(casa);
             l.GF = Memoria.Golos(fora);
-            // jornada.asm: humano quando o treinador tem +7 != 0
-            l.Humanos = (jg.Treinador[0] is { Humano: not 0 } ? 1 : 0) + (jg.Treinador[1] is { Humano: not 0 } ? 1 : 0);
+            // jornada.asm: humano quando o treinador tem +7 != 0 (no jogo online, so o time deste
+            // aparelho: o jogo dos outros tecnicos nao fica destacado aqui)
+            l.Humanos = (EDestaque(jg, 0) ? 1 : 0) + (EDestaque(jg, 1) ? 1 : 0);
             foreach (var ln in jg.Lances)
                 if (ln.Tipo == TipoLance.Expulsao)
                 {
@@ -508,14 +551,14 @@ public sealed partial class TelaJornada : UserControl
     // ---------------------------------------------------------------- desenho
 
     static readonly Color Verde = Color.FromRgb(0, 128, 0);           // clGreen, o fundo
-    static readonly IBrush VerdeB = new SolidColorBrush(Verde);
-    static readonly IBrush Amarelo = new SolidColorBrush(Color.FromRgb(255, 255, 0));
-    static readonly IBrush Marinho = new SolidColorBrush(Color.FromRgb(0, 0, 128));   // a moldura
-    static readonly IBrush Vermelho = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+    static readonly IBrush VerdeB = new ImmutableSolidColorBrush(Verde);
+    static readonly IBrush Amarelo = new ImmutableSolidColorBrush(Color.FromRgb(255, 255, 0));
+    static readonly IBrush Marinho = new ImmutableSolidColorBrush(Color.FromRgb(0, 0, 128));   // a moldura
+    static readonly IBrush Vermelho = new ImmutableSolidColorBrush(Color.FromRgb(255, 0, 0));
     static readonly IBrush Branco = Brushes.White, Preto = Brushes.Black;
-    static readonly IBrush Face = new SolidColorBrush(Color.FromRgb(192, 192, 192));
-    static readonly IBrush Sombra = new SolidColorBrush(Color.FromRgb(128, 128, 128));
-    static readonly IBrush Luz = new SolidColorBrush(Color.FromRgb(223, 223, 223));
+    static readonly IBrush Face = new ImmutableSolidColorBrush(Color.FromRgb(192, 192, 192));
+    static readonly IBrush Sombra = new ImmutableSolidColorBrush(Color.FromRgb(128, 128, 128));
+    static readonly IBrush Luz = new ImmutableSolidColorBrush(Color.FromRgb(223, 223, 223));
     static readonly FontFamily Arial = new("avares://RetroFoot.App/Assets/Fontes#Liberation Sans");
     static readonly FontFamily Sans = new("avares://RetroFoot.App/Assets/Fontes#MS Sans Serif");
 
@@ -650,8 +693,8 @@ public sealed partial class TelaJornada : UserControl
     static void Caixa(DrawingContext dc, double x, double y, string nome, Color letra, Color fundo, Bitmap? logo = null)
     {
         var r = new Rect(x, y, 180, H);
-        dc.FillRectangle(new SolidColorBrush(fundo), r);
-        var bl = new SolidColorBrush(letra);
+        dc.FillRectangle(new ImmutableSolidColorBrush(fundo), r);
+        var bl = new ImmutableSolidColorBrush(letra);
         using (dc.PushClip(r))
         {
             if (logo != null) Logo(dc, logo, x + 2, y);
@@ -709,7 +752,7 @@ public sealed partial class TelaJornada : UserControl
     void DesenharRelogio(DrawingContext dc)
     {
         var r = Relogio;
-        var frente = new SolidColorBrush(corRelogio);
+        var frente = new ImmutableSolidColorBrush(corRelogio);
         var c = r.Center;
         double rx = r.Width / 2 - 0.5, ry = r.Height / 2 - 0.5;
         dc.DrawEllipse(Branco, new Pen(frente, 1), c, rx, ry);
@@ -764,7 +807,7 @@ public sealed partial class TelaJornada : UserControl
         if (BotoesVisiveis && Anterior.Contains(c)) { MudarPagina(-1); return; }
         // o clique na caixa de uma equipa: os detalhes do jogo (TsubstitutionDlg, motivo 1),
         // que o motor abre entre dois minutos
-        if (!acabou && EquipaEm(c) is var (jg, lado)) { LigacaoPartida.PedirDetalhes(s, jg, lado); return; }
+        if (!acabou && EquipaEm(c) is var (jg, lado)) { Clicou(jg, lado); return; }
         if (acabou) Seguir();
     }
 
@@ -848,7 +891,7 @@ public sealed partial class TelaJornada : UserControl
     // dos humanos e automatica; depois de cada jornada vem a seguinte.
     public static Control Demo()
     {
-        var host = new ContentControl { Background = new SolidColorBrush(Verde) };
+        var host = new ContentControl { Background = new ImmutableSolidColorBrush(Verde) };
         host.AttachedToVisualTree += (_, _) =>
         {
             if (TopLevel.GetTopLevel(host) is Window w) w.Title = TelaAcerca.Nome + " - jornada (demo)";

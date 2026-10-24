@@ -108,7 +108,8 @@ sealed class TelaClassificacaoModerna : UserControl
     }
 
     // ---------------------------------------------------------------- dados
-    bool Humana(Equipa e) => _treinadores.TryGetValue(e.Treinador, out var t) && t.Humano != 0;
+    // (no jogo online, so o time deste aparelho: TelaJornada.SoTime)
+    bool Humana(Equipa e) => _treinadores.TryGetValue(e.Treinador, out var t) && t.Humano != 0 && (TelaJornada.SoTime is not ushort meu || e.ID == meu);
 
     // a divisao com mais equipas de treinadores humanos (empate: a de cima; nenhum: a 1a)
     int DivisaoDosHumanos()
@@ -400,10 +401,10 @@ sealed class TelaClassificacaoModerna : UserControl
         var forma = Geometry.Parse("M1,1 L17,1 L17,9 C17,14 13,17.5 9,19 C5,17.5 1,14 1,9 Z");
         var faixa = Geometry.Parse("M1,7 L17,7 L17,11 L1,11 Z");
         var c = new Canvas { Width = 18, Height = 20, VerticalAlignment = VerticalAlignment.Center };
-        c.Children.Add(new Path { Data = forma, Fill = new SolidColorBrush(fundo) });
-        c.Children.Add(new Path { Data = faixa, Fill = new SolidColorBrush(letra), Clip = forma });
+        c.Children.Add(new Path { Data = forma, Fill = new ImmutableSolidColorBrush(fundo) });
+        c.Children.Add(new Path { Data = faixa, Fill = new ImmutableSolidColorBrush(letra), Clip = forma });
         // contorno: na cor da letra, e um aro claro por fora para nao sumir no fundo escuro
-        c.Children.Add(new Path { Data = forma, Stroke = new SolidColorBrush(letra), StrokeThickness = 1.2 });
+        c.Children.Add(new Path { Data = forma, Stroke = new ImmutableSolidColorBrush(letra), StrokeThickness = 1.2 });
         c.Children.Add(new Path { Data = Geometry.Parse("M0.2,0.2 L17.8,0.2 L17.8,9 C17.8,14.5 13.5,18.3 9,19.9 C4.5,18.3 0.2,14.5 0.2,9 Z"), Stroke = TemaVerde.TextoFraco, StrokeThickness = 0.6 });
         return c;
     }
@@ -499,5 +500,5 @@ sealed class TelaClassificacaoModerna : UserControl
         Fechou?.Invoke();
     }
 
-    static IBrush Hex(string s) => new SolidColorBrush(Color.Parse(s));
+    static IBrush Hex(string s) => new ImmutableSolidColorBrush(Color.Parse(s));
 }

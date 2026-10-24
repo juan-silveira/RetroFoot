@@ -235,6 +235,7 @@ public static partial class TelaPlantel
             var e = Mostrada();
             var c = Compradora();
             if (p == null || e == null || c == null || _preco <= 0) return;
+            if (S.Remoto is { } rm) { rm.Executar(new RetroFoot.Motor.Online.Comprar(e.ID, p.ID, _preco)); return; }
             S.Mercado.Comprar(c, e, k, _preco, registado: S.J.Op.Registrado);
             // (as janelas que mostram o dinheiro em caixa se refazem: a Lista de Jogadores
             // aberta por baixo, a tela da equipa)
