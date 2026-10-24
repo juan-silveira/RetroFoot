@@ -126,6 +126,8 @@ public sealed class JogoRemoto
         sala.B.Observar($"{sala.Raiz}/info/modo", (caminho, v) =>
         {
             if (caminho != "/") return;
+            // (a sala apagada tambem tira o modo: so o modo trocado, com a sala ainda la, e a copia)
+            if (v == null) return;
             string modo = (string?)v ?? "";
             if (modo == Sala.ModoAmigo) _modoAmigo = true;
             else if (_modoAmigo) { _modoAmigo = false; Online.Lembrar(sala); }
@@ -204,13 +206,32 @@ public sealed class JogoRemoto
         });
         sala.B.Observar($"{sala.Raiz}/rodada/prazo", (caminho, v) =>
         {
-            if (v is not JsonObject o || (string?)o["rodada"] != _rodada || (int?)o["segundos"] is not int seg) return;
-            Dispatcher.UIThread.Post(() =>
-            {
-                if (_sessao is not { } ss) return;
-                ss.MostrarRelogio(TimeSpan.FromSeconds(seg));
-                ss.RelogioAcabou += () => { if (!_pronto && _time is { } e && _sessao == ss) _ = Pronto(ss, e); };
-            });
+            if (caminho != "/" || v is not JsonObject o) return;
+            _prazo = o;
+            _ = MostrarPrazo();
+        });
+    }
+
+    // o prazo da rodada (rodada/prazo): o relogio com o tempo que falta (pela hora do servidor);
+    // tambem quando o time chega depois de o prazo comecar
+    JsonObject? _prazo;
+    long? _difRelogio;
+    async Task MostrarPrazo()
+    {
+        if (_prazo is not { } o || (string?)o["rodada"] != _rodada || (int?)o["segundos"] is not int seg) return;
+        double falta = seg;
+        if ((long?)o["inicio"] is long ini)
+        {
+            try { _difRelogio ??= await _sala.DiferencaDoRelogio(); } catch { }
+            long agoraServidor = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + (_difRelogio ?? 0);
+            falta = seg - (agoraServidor - ini) / 1000.0;
+        }
+        if (falta <= 0) return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_sessao is not { } ss || _pronto) return;
+            ss.MostrarRelogio(TimeSpan.FromSeconds(falta));
+            ss.RelogioAcabou += () => { if (!_pronto && _time is { } e && _sessao == ss) _ = Pronto(ss, e); };
         });
     }
 
@@ -607,6 +628,8 @@ public sealed class JogoRemoto
                     _ = Pronto(sessao, e);
                 };
                 sessao.Mostrar(t);
+                // (o prazo ja corria antes de o time chegar: o relogio com o que falta)
+                _ = MostrarPrazo();
             }
             // o jogo novo (a 1a rodada, o primeiro jogo que chega): o sorteio dos times
             // (no jogar com um amigo, o save do host esta a meio da temporada: o sorteio no 1o jogo)

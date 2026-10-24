@@ -231,7 +231,8 @@ public sealed class HostOnline : IDisposable
         {
             if (!AlguemPronto() || TodosProntos()) return;
             _limite = DateTime.UtcNow + _prazo;
-            try { _sala.B.Gravar($"{_sala.Raiz}/rodada/prazo", new JsonObject { ["rodada"] = Rodada, ["segundos"] = (int)_prazo.TotalSeconds }).GetAwaiter().GetResult(); } catch { }
+            // (com a hora do servidor: quem chega depois ve o tempo que falta, nao o prazo inteiro)
+            try { _sala.B.Gravar($"{_sala.Raiz}/rodada/prazo", new JsonObject { ["rodada"] = Rodada, ["segundos"] = (int)_prazo.TotalSeconds, ["inicio"] = new JsonObject { [".sv"] = "timestamp" } }).GetAwaiter().GetResult(); } catch { }
             PrazoComecou?.Invoke(_prazo);
             return;
         }

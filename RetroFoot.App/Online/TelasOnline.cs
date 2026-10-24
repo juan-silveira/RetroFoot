@@ -360,6 +360,7 @@ public sealed class TelaOnline : UserControl
         var codigos = doHost.Keys.Concat(lembradas.Select(x => x.Codigo)).Distinct()
             .OrderByDescending(c => doHost.TryGetValue(c, out var f) ? File.GetLastWriteTime(f) : lembradas.FirstOrDefault(x => x.Codigo == c)?.Quando ?? DateTime.MinValue)
             .ToList();
+        Control? cartaoSalas = null;
         foreach (var codigoJogo in codigos)
         {
             string? arq = doHost.GetValueOrDefault(codigoJogo);
@@ -410,7 +411,8 @@ public sealed class TelaOnline : UserControl
             botoes.Children.Add(b);
             botoes.Children.Add(excluir);
             var confirmar = new StackPanel { Spacing = 6, IsVisible = false };
-            var item = new StackPanel { Spacing = 4, Children = { cab, detalhe, botoes, confirmar } };
+            // (so aparece depois de confirmada no banco: a sala que acabou nao pisca na lista)
+            var item = new StackPanel { Spacing = 4, Children = { cab, detalhe, botoes, confirmar }, IsVisible = arq != null };
             excluir.Clique += () =>
             {
                 confirmar.Children.Clear();
@@ -474,6 +476,8 @@ public sealed class TelaOnline : UserControl
                             meus.Children.Remove(item);
                             return;
                         }
+                        item.IsVisible = true;
+                        if (cartaoSalas != null) cartaoSalas.IsVisible = true;
                         if (r.Nome.Length > 0) titulo.Text = $"{r.Nome} · {codigoJogo}";
                         var partes = new List<string>();
                         if (r.Ano > 0) partes.Add(r.Rodada.Length > 0 ? $"{r.Ano} · {r.Rodada}" : r.Ano.ToString());
@@ -495,7 +499,13 @@ public sealed class TelaOnline : UserControl
                 aviso,
             },
         };
-        if (meus.Children.Count > 0) corpo.Children.Insert(1, CUi.Cartao_(T("Suas salas"), meus));
+        if (meus.Children.Count > 0)
+        {
+            cartaoSalas = CUi.Cartao_(T("Suas salas"), meus);
+            // (so com alguma sala confirmada no banco, ou um jogo deste aparelho como host)
+            cartaoSalas.IsVisible = doHost.Count > 0;
+            corpo.Children.Insert(1, cartaoSalas);
+        }
         // jogar um save seu com um amigo (o amigo assume um time da 4a divisao; depois o save
         // volta a ser so seu)
         var amigo = new StackPanel { Spacing = 8 };

@@ -119,7 +119,10 @@ static class Programa
 
         // os convidados: cada um com o seu banco, a sua janela e o seu JogoRemoto
         var clientes = new List<(string Nome, string Uid, Sala Sala, ClienteOnline Cli, JogoRemoto Rem, Window W, Border F, ConcurrentDictionary<string, int> Janelas)>();
-        for (int i = 0; i < nCli; i++)
+        // SOAK_ENTRAR_DEPOIS=1: os convidados entram com o jogo ja comecado (na 1a preparacao do
+        // host), pedem para entrar e o host permite
+        bool depois = Environment.GetEnvironmentVariable("SOAK_ENTRAR_DEPOIS") == "1";
+        void CriarCliente(int i)
         {
             string nome = "Cliente" + (i + 1);
             var (bc, uid) = Banco("cli" + (i + 1));
@@ -133,6 +136,7 @@ static class Programa
             var cli = new ClienteOnline(sc);
             var rem = new JogoRemoto(c => f.Child = c, () => { Console.WriteLine($"o {nome} saiu do jogo"); codigo = 1; cts.Cancel(); }, sc, cli);
             clientes.Add((nome, uid, sc, cli, rem, w, f, new ConcurrentDictionary<string, int>()));
+            Console.WriteLine($"  == {nome} entrou na sala");
             banco.Observar($"{sh.Raiz}/perguntas/{uid}", (c, v) =>
             {
                 if (c == "/" && v is JsonObject q && (string?)q["tipo"] is { } tipo && (string?)q["id"] is { } id && tipoDe.TryAdd(uid + id, tipo))
@@ -152,6 +156,7 @@ static class Programa
                 }
             });
         }
+        if (!depois) for (int i = 0; i < nCli; i++) CriarCliente(i);
         // as paralisacoes: o intervalo de todos, e as dos convidados (1 parou, 3 goleiro expulso, 4 intervalo)
         banco.Observar($"{sh.Raiz}/rodada/aoVivo/pausa", (c, v) =>
         {
@@ -172,6 +177,7 @@ static class Programa
         });
 
         var host = new HostOnline(sh, sessao.J, x => Dispatcher.UIThread.Invoke(x)) { ModoAmigo = amigo };
+        host.PedidoDeEntrada += j => { Console.WriteLine($"  == pedido para entrar: {j.Nome} (permitido)"); _ = host.ResponderEntrada(j.Uid, true); };
         sessao.LigarOnline(host);
         if (amigo) sessao.NoComecoDoMotor = host.ComecarModoAmigo;
         sessao.Erro += ex => { Console.WriteLine("EXCECAO no motor: " + ex); codigo = 1; cts.Cancel(); };
@@ -220,8 +226,8 @@ static class Programa
 
         (int, int) progresso = (-1, -1);
         string eh = "";
-        var ec = clientes.Select(_ => "").ToArray();
-        var desdeC = clientes.Select(_ => DateTime.UtcNow).ToArray();
+        var ec = new List<string>();
+        var desdeC = new List<DateTime>();
         var desde = DateTime.UtcNow; var desdeH = DateTime.UtcNow;
         var ultimoLog = DateTime.UtcNow;
         long teclas = 0;
@@ -235,6 +241,9 @@ static class Programa
             var e1 = Estado(sessao, fh.Child, janelasHost);
             if (p != progresso) { progresso = p; desde = DateTime.UtcNow; }
             if (e1 != eh) { eh = e1; desdeH = DateTime.UtcNow; desde = DateTime.UtcNow; }
+            if (depois && clientes.Count == 0 && m.Jornada >= 1 && e1.StartsWith("tela=TelaEquipa"))
+                for (int i = 0; i < nCli; i++) CriarCliente(i);
+            while (ec.Count < clientes.Count) { ec.Add(""); desdeC.Add(DateTime.UtcNow); }
             var es = new string[clientes.Count];
             for (int i = 0; i < clientes.Count; i++)
             {
@@ -267,7 +276,7 @@ static class Programa
             }
             // SOAK_CONVITE=1: um convite de outro clube ao tecnico do 1o convidado (raro de verdade: um
             // clube 11 a 19 mais forte demitindo), pelo gancho do motor, numa thread como a do motor
-            if (!convidou && Environment.GetEnvironmentVariable("SOAK_CONVITE") == "1" && m.Jornada >= 3 && e1.StartsWith("tela=TelaEquipa"))
+            if (!convidou && clientes.Count > 0 && Environment.GetEnvironmentVariable("SOAK_CONVITE") == "1" && m.Jornada >= 3 && e1.StartsWith("tela=TelaEquipa"))
             {
                 var eq = Esperar(() => sh.Jogadores()).FirstOrDefault(x => x.Uid == clientes[0].Uid)?.Equipa ?? 0;
                 if (eq != 0 && m.Equipa(eq) is { } dele && m.TreinadorDa(dele) is { } tc)
