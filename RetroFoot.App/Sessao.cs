@@ -311,8 +311,16 @@ public sealed class Sessao
         h.Batedor = (e, titulares, sugerido) =>
         {
             if (!host.Remota(e)) return bat != null ? EsperaDoHost(host, "batedor", () => ComPrazo(() => bat(e, titulares, sugerido))) ?? sugerido : sugerido;
+            // o resultado de cada batedor possivel (a cobranca vem logo depois deste gancho, com o
+            // Random do jogo neste ponto: o mesmo calculo da janela do jogo sozinho), para a janela
+            // de la mostrar o gol ou o que aconteceu
+            var previstos = new System.Text.Json.Nodes.JsonObject();
+            var def = jornadaOnline?.Jogos.Select(g => g.Equipa[Lado.Casa] == e ? g.Equipa[Lado.Visit] : g.Equipa[Lado.Visit] == e ? g.Equipa[Lado.Casa] : null).FirstOrDefault(x => x != null);
+            if (def != null && RetroFoot.Motor.Partida.Penaltis.Goleiro(def) is { } gk)
+                foreach (var t in titulares)
+                    previstos[t.ID.ToString()] = RetroFoot.Motor.Partida.Penaltis.CobrarPenalti(new RetroFoot.Motor.Base.Aleatorio(J.R.Semente), gk, t);
             var r = host.Perguntar(e.ID, "batedor", O(("equipa", e.ID), ("titulares", new System.Text.Json.Nodes.JsonArray(titulares.Select(x => (System.Text.Json.Nodes.JsonNode)(int)x.ID).ToArray())),
-                ("sugerido", (int)(sugerido?.ID ?? 0))), RetroFoot.Motor.Online.HostOnline.PrazoPergunta);
+                ("sugerido", (int)(sugerido?.ID ?? 0)), ("previstos", previstos)), RetroFoot.Motor.Online.HostOnline.PrazoPergunta);
             return (int?)r?["jogador"] is int id ? titulares.FirstOrDefault(x => x.ID == id) ?? sugerido : sugerido;
         };
         var aum = h.PedirAumento;

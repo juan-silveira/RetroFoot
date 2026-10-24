@@ -478,7 +478,8 @@ public sealed class JogoRemoto
                 var tit = ts.Select(x => e.Jogadores.FirstOrDefault(p => p.ID == (int?)x)).OfType<Jogador>()
                     .OrderBy(p => p.Posicao).ThenBy(p => P98.NomeJogador(p), StringComparer.Ordinal).ToList();
                 var sug = e.Jogadores.FirstOrDefault(p => p.ID == (int?)q["sugerido"]);
-                var b = LigacaoPartida.BatedorOnline(s, e, tit, sug);
+                var prev = q["previstos"] as JsonObject;
+                var b = LigacaoPartida.BatedorOnline(s, e, tit, sug, prev == null ? null : p => (int?)prev[p.ID.ToString()] ?? -1);
                 return new JsonObject { ["jogador"] = (int)(b?.ID ?? 0) };
             }
             case "lesao":

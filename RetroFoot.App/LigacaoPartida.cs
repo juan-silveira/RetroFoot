@@ -234,13 +234,14 @@ public static class LigacaoPartida
     }
 
     // (jogo online, noutro aparelho, fora da thread da interface) a escolha do batedor
-    internal static SJogador? BatedorOnline(Sessao s, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido) =>
-        Batedor(s, Estados.GetValue(s, _ => new Estado()), atacante, titulares, sugerido);
+    // (o convidado) previsto: o resultado de cada batedor, calculado no host (-1 sem ele)
+    internal static SJogador? BatedorOnline(Sessao s, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido, Func<SJogador, int>? previsto = null) =>
+        Batedor(s, Estados.GetValue(s, _ => new Estado()), atacante, titulares, sugerido, previsto);
 
     // seg08:328b com o humano cobrando. A cobranca e do motor (Jornada.Penalti, logo depois
     // deste gancho: Goleiro(defensor) e CobrarPenalti com o Random do jogo); a janela mostra o
     // mesmo resultado, calculado com uma copia do Random.
-    static SJogador? Batedor(Sessao s, Estado st, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido)
+    static SJogador? Batedor(Sessao s, Estado st, SEquipa atacante, List<SJogador> titulares, SJogador? sugerido, Func<SJogador, int>? previsto = null)
     {
         if (titulares.Count == 0) return sugerido;
         SEquipa? defensor = null;
@@ -252,7 +253,7 @@ public static class LigacaoPartida
         string treinador = s.TreinadorDa(atacante) is { } tr ? P98.Texto(tr.Nome) : "";
         return s.EsperarDialogo<SJogador>(fim =>
         {
-            var t = new TelaPenalti(atacante, treinador, titulares, null, b => Previsto(s, defensor, b));
+            var t = new TelaPenalti(atacante, treinador, titulares, null, b => previsto?.Invoke(b) ?? Previsto(s, defensor, b));
             t.Terminou += fim;
             return t;
         });
