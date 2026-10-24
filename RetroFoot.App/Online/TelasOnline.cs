@@ -829,7 +829,21 @@ public sealed class TelaSorteioTimes : UserControl
             Som.Tocar(Som.Efeito.Sorteio);
         };
         t.Start();
+        // (a tela que sai da arvore e volta, como a do convidado quando o jogo chega: o sorteio
+        // continua de onde parou, senao o Continuar nunca era liberado)
         DetachedFromVisualTree += (_, _) => t.Stop();
+        AttachedToVisualTree += (_, _) => { if (k < tecnicos.Count || !botao.IsEnabled) t.Start(); };
+        // o Enter: o Continuar (liberado depois do sorteio)
+        if (!emJanela)
+        {
+            EventHandler<Avalonia.Input.KeyEventArgs> tecla = (_, e) =>
+            {
+                if (e.Key == Avalonia.Input.Key.Enter && botao.IsEnabled && IsVisible) { e.Handled = true; botao.IsEnabled = false; continuar(); }
+            };
+            TopLevel? ligado = null;
+            AttachedToVisualTree += (_, _) => { ligado = TopLevel.GetTopLevel(this); if (ligado != null) ligado.KeyDown += tecla; };
+            DetachedFromVisualTree += (_, _) => { if (ligado != null) ligado.KeyDown -= tecla; ligado = null; };
+        }
         Content = emJanela ? lista : Online.Pagina(T("Sorteio dos times"), T("O time de cada técnico da sala"), null, lista, botao);
     }
 

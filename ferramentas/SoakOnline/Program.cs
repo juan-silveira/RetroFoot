@@ -245,6 +245,18 @@ static class Programa
         long teclas = 0;
         bool convidou = false, demitiu = false;
         string ultimoHost = "";
+        // SOAK_VIDEO=arquivo.mp4: o video do host e do 1o convidado lado a lado, com a legenda (Video.cs);
+        // as partidas numa velocidade que se acompanha e as teclas com um tempo para ver cada tela
+        Video? video = null;
+        var videoArq = Environment.GetEnvironmentVariable("SOAK_VIDEO");
+        if (videoArq != null && clientes.Count > 0)
+        {
+            sessao.MsPorMinuto = 110;
+            var c0 = clientes[0];
+            video = new Video(videoArq, amigo ? "Jogar com um amigo" : "Online", jh, c0.W,
+                () => (Estado(sessao, fh.Child, janelasHost), Estado(SessaoCli(c0.Rem), c0.F.Child, c0.Janelas)));
+        }
+        double calma = video != null ? 4.0 : 0;
         var t = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(25) };
         t.Tick += (_, _) =>
         {
@@ -316,17 +328,18 @@ static class Programa
             if (demitiu && e1 != ultimoHost) { ultimoHost = e1; Console.WriteLine($"  .. host: {e1}"); }
             // (as janelas do online no host, como o pedido ja permitido e o sorteio: fechadas)
             if (e1.Contains("JanelaModerna")) sessao.FecharDialogo();
-            Jogar(jh, e1, (DateTime.UtcNow - desdeH).TotalSeconds, teclas);
+            if ((DateTime.UtcNow - desdeH).TotalSeconds >= calma) Jogar(jh, e1, (DateTime.UtcNow - desdeH).TotalSeconds, teclas);
             // SOAK_CLIENTE_DEMORA=s: o convidado so mexe na tela da equipa depois de s segundos (o host
             // fica PRONTO antes: o prazo e o relogio no convidado)
             int demora = int.TryParse(Environment.GetEnvironmentVariable("SOAK_CLIENTE_DEMORA"), out var dm) ? dm : 0;
             for (int i = 0; i < clientes.Count; i++)
-                if (!(es[i].StartsWith("tela=TelaEquipa") && (DateTime.UtcNow - desdeC[i]).TotalSeconds < demora))
+                if (!(es[i].StartsWith("tela=TelaEquipa") && (DateTime.UtcNow - desdeC[i]).TotalSeconds < demora) && (DateTime.UtcNow - desdeC[i]).TotalSeconds >= calma)
                     Jogar(clientes[i].W, es[i], (DateTime.UtcNow - desdeC[i]).TotalSeconds, teclas);
             teclas++;
         };
         t.Start();
         Dispatcher.UIThread.MainLoop(cts.Token);
+        video?.Fechar();
         Console.WriteLine("perguntas aos convidados: " + string.Join(", ", perguntas.OrderBy(x => x.Key).Select(x => $"{x.Key}={x.Value}")));
         Console.WriteLine("respostas dos convidados: " + string.Join(", ", respostas.OrderBy(x => x.Key).Select(x => $"{x.Key}={x.Value}")));
         Console.WriteLine($"avisos de transferencia: {noticias}");
