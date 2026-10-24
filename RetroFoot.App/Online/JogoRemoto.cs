@@ -422,6 +422,20 @@ public sealed class JogoRemoto
                 bool ok = s.EsperarDialogo<bool>(fim => new TelaPatrocinio(p, s.J.Op.Marcas, Moeda.DoSave(s.S), fim));
                 return new JsonObject { ["ok"] = ok };
             }
+            case "penalti":
+            {
+                // o penalti contra o meu time: a janela com o batedor e o resultado que o host sorteou
+                var a = Eq("atacante"); var b = Jg(a, "batedor");
+                if (a == null || b == null) return null;
+                int res = (int?)q["resultado"] ?? 0;
+                s.EsperarDialogo<Jogador>(fim =>
+                {
+                    var t = new TelaPenalti(a, "", new List<Jogador>(), b, _ => res);
+                    t.Terminou += fim;
+                    return t;
+                });
+                return new JsonObject { ["ok"] = true };
+            }
             case "batedor":
             {
                 var e = Eq("equipa");

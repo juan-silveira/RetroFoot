@@ -281,6 +281,7 @@ public static class Online
         "convite" => T("Aguardando {0} responder ao convite de outro clube…", nome),
         "patrocinio" => T("Aguardando {0} responder à proposta de patrocínio…", nome),
         "batedor" => T("Aguardando {0} escolher o batedor do pênalti…", nome),
+        "penalti" => T("Pênalti contra o time de {0}…", nome),
         "lesao" => T("Aguardando {0} escolher quem entra no lugar do lesionado…", nome),
         _ => T("Aguardando {0} responder…", nome),
     };

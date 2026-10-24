@@ -295,6 +295,15 @@ public sealed class Sessao
         };
         host.PausaMudou += nome => Dispatcher.UIThread.Post(() => MostrarAviso(nome == null ? null
             : nome == "*" ? Idioma.T("⏸ Intervalo: os técnicos fazem as substituições") : Idioma.T("⏸ {0} está fazendo substituições…", nome)));
+        // o penalti contra um time humano (a janela de quem defende, com o batedor e o resultado):
+        // a do host aqui; a de outro aparelho la (com o prazo; os outros veem o aviso)
+        var pen = h.Penalti;
+        h.Penalti = (atacante, defensor, batedor, res) =>
+        {
+            if (Memoria.Humano(TreinadorDa(atacante))) return;
+            if (!host.Remota(defensor)) { if (pen != null) EsperaDoHost(host, "penalti", () => ComPrazo(() => pen(atacante, defensor, batedor, res))); return; }
+            host.Perguntar(defensor.ID, "penalti", O(("atacante", atacante.ID), ("defensor", defensor.ID), ("batedor", batedor.ID), ("resultado", res)));
+        };
         var bat = h.Batedor;
         h.Batedor = (e, titulares, sugerido) =>
         {
