@@ -54,6 +54,22 @@ public sealed class JogoRemoto
                 if (av.Aplicar(t)) _jornada.Minuto(av.Jornada);
             });
         });
+        // a disputa de penaltis da Taca que o host mostrou: a mesma janela aqui
+        sala.B.Observar($"{sala.Raiz}/rodada/aoVivo/penaltis", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject o || (int?)o["n"] is not int n) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (n <= _penaltisVistos || _aoVivo is not { } av || _sessaoAoVivo is not { } sv) return;
+                _penaltisVistos = n;
+                if (av.Penaltis(o) is not var (jg, d)) return;
+                Control? t = null;
+                var tp = new TelaPenaltis(jg, d);
+                tp.Fechou += () => { if (t != null) sv.FecharDialogo(t); };
+                t = tp;
+                sv.AbrirDialogo(t);
+            });
+        });
         // a paralisacao (fase 3): quem parou (este aparelho: a janela das trocas; os outros: o
         // aviso), ou o fim dela
         sala.B.Observar($"{sala.Raiz}/rodada/aoVivo/pausa", (caminho, v) =>
@@ -354,8 +370,9 @@ public sealed class JogoRemoto
 
     bool _pausaMinha;
     bool _viuSorteio;
+    bool _anteriorTaca;   // a rodada que passou foi da Taca (sem a classificacao depois dela)
     volatile bool _modoAmigo;   // a sala do jogar com um amigo (o save do host, a meio da temporada)
-    int _noticia, _leilaoVisto;
+    int _noticia, _leilaoVisto, _penaltisVistos;
 
     void Pausa(JsonObject? p)
     {
@@ -538,6 +555,7 @@ public sealed class JogoRemoto
         _esperandoRetrato = false;
         if (!nova && _pronto) return;   // (ja mandou o Preparo desta rodada)
         if (_rodada.Length == 0) Comecou?.Invoke();
+        if (nova) _anteriorTaca = _rodada.EndsWith("-T");
         _rodada = rodada;
         _pronto = false;
         var s = Jogo98.Ler(r.Save);
@@ -598,8 +616,9 @@ public sealed class JogoRemoto
                 var tecnicos = js.Where(x => x.Equipa != 0).OrderBy(x => x.Vaga).Select(x => (x.Nome, x.Equipa)).ToList();
                 sessao.Mostrar(new TelaSorteioTimes(sessao.S, tecnicos, Time));
             }
-            // a cada rodada nova, a classificacao primeiro (o resultado da rodada que passou)
-            else if (nova && sessao.J.M.Jornada > 1)
+            // a cada rodada nova do campeonato, a classificacao primeiro (o resultado da rodada que
+            // passou); na Taca e logo depois dela, direto ao time
+            else if (nova && sessao.J.M.Jornada > 1 && !_rodada.EndsWith("-T") && !_anteriorTaca)
             {
                 var c = new TelaClassificacao(sessao, sessao.J.M.Jornada - 1, false);
                 c.Fechou += Time;

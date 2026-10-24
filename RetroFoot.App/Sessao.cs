@@ -420,6 +420,9 @@ public sealed class Sessao
         host.JogadoresMudaram += l => Dispatcher.UIThread.Post(() => { jogadoresOnline = l; JogadoresOnline?.Invoke(l); });
         // passou o host: a tela do time fecha (o motor sai e a TelaInicio leva para a sala)
         host.HostPassado += _ => Dispatcher.UIThread.Post(() => { FecharDialogo(); EsconderRelogio(); local?.TrySetResult(true); });
+        // a disputa de penaltis: a mesma janela nos outros aparelhos
+        var desempate = h.Desempate;
+        h.Desempate = (jg, d) => { host.TransmitirPenaltis(jg, d); desempate?.Invoke(jg, d); };
         var comeco = h.ComecoJornada;
         h.ComecoJornada = (titulo, jn) =>
         {

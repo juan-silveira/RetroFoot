@@ -619,7 +619,25 @@ public sealed class HostOnline : IDisposable
         Enviar($"{_sala.Raiz}/rodada/aoVivo", new JsonObject { ["rodada"] = Rodada, ["inicio"] = _emissor.Inicio(_j, titulo, jn) });
     }
 
-    public void TransmitirMinuto(Jornada jn) => Enviar($"{_sala.Raiz}/rodada/aoVivo/tique", _emissor.Tique(jn));
+    public void TransmitirMinuto(Jornada jn)
+    {
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/tique", _emissor.Tique(jn));
+        // (a velocidade de todos e a da rede: com o host mais rapido do que os envios, a fila crescia
+        // e os outros ficavam minutos atras; o motor espera a fila andar, ate 3 s por minuto)
+        var limite = DateTime.UtcNow.AddSeconds(3);
+        while (_envios.Count > 1 && DateTime.UtcNow < limite) Thread.Sleep(15);
+    }
+
+    // a disputa de penaltis da Taca (a janela do host): a mesma para os outros, com as cobrancas
+    int _penaltis;
+    public void TransmitirPenaltis(JogoAtual jg, Desempate d) =>
+        Enviar($"{_sala.Raiz}/rodada/aoVivo/penaltis", new JsonObject
+        {
+            ["n"] = ++_penaltis, ["c"] = (int)jg.Dados.Casa, ["v"] = (int)jg.Dados.Fora, ["pv"] = d.PassaVisitante, ["rapido"] = d.Rapido,
+            ["somas"] = new JsonArray(d.Somas.Select(x => (JsonNode)(int)x).ToArray()),
+            ["golos"] = new JsonArray(d.Golos.Select(x => (JsonNode)(int)x).ToArray()),
+            ["cobrancas"] = new JsonArray(d.Cobrancas.Select(c => (JsonNode)new JsonArray(c.Lado, (int)c.Batedor.ID, c.Resultado)).ToArray()),
+        });
 
     // a velocidade da partida das regras da sala (Opcoes.Velocidade, 1 a 6)
     public int Velocidade { get; private set; } = Sala.VelocidadePadrao;

@@ -234,5 +234,19 @@ public static class AoVivo
         }
 
         Jogador? J(int id) => id == 0 ? null : _jogadores.GetValueOrDefault((ushort)id);
+
+        // a disputa de penaltis que o host mostrou (HostOnline.TransmitirPenaltis): o jogo e as cobrancas
+        public (JogoAtual Jogo, Desempate D)? Penaltis(JsonObject o)
+        {
+            int c = (int?)o["c"] ?? -1, v = (int?)o["v"] ?? -1;
+            if (_todos.FirstOrDefault(x => x.Dados.Casa == c && x.Dados.Fora == v) is not { } jg) return null;
+            var d = new Desempate { PassaVisitante = (bool?)o["pv"] ?? false, Rapido = (bool?)o["rapido"] ?? false };
+            if (o["somas"] is JsonArray sm) for (int i = 0; i < 2 && i < sm.Count; i++) d.Somas[i] = (short)((int?)sm[i] ?? 0);
+            if (o["golos"] is JsonArray gl) for (int i = 0; i < 2 && i < gl.Count; i++) d.Golos[i] = (short)((int?)gl[i] ?? 0);
+            if (o["cobrancas"] is JsonArray cs)
+                foreach (var a in cs.OfType<JsonArray>())
+                    if (J((int?)a[1] ?? 0) is { } b) d.Cobrancas.Add(new Cobranca((int?)a[0] ?? 0, b, (int?)a[2] ?? 0));
+            return (jg, d);
+        }
     }
 }
