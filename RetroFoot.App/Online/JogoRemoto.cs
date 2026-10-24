@@ -679,7 +679,8 @@ public sealed class JogoRemoto
         }
         if (parado > TimeSpan.FromSeconds(60)) _ = TalvezAssumir(parado);
         bool sumiu = parado > TimeSpan.FromSeconds(35);
-        if (sumiu && _avisoHost == null && _sessao is { } ss)
+        // (na sessao que esta na tela: durante a partida, a do ao vivo; a do time fica escondida)
+        if (sumiu && _avisoHost == null && ((_jornada != null ? _sessaoAoVivo : _sessao) ?? _sessao) is { } ss)
         {
             // (no jogar com um amigo o jogo e o save do host: ninguem assume; sem ele, nao ha jogo)
             ss.EsconderRelogio();
