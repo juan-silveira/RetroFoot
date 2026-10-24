@@ -271,10 +271,27 @@ public sealed class Soak
     }
 
     // ---------------------------------------------------------------- invariantes
+    // cada transferencia nova (leilao ou compra): o preco pago e o valor de mercado do jogador
+    // (MercadoJogo.ValorDeMercado), para ver se o valor bate com o que os times pagam
+    public readonly List<(int Valor, int Preco, int Tipo, int Forca)> Precos = new();
+    readonly HashSet<Transferencia> _transfVistas = new(ReferenceEqualityComparer.Instance);
+
+    void AnotarPrecos(Jogo98 s)
+    {
+        foreach (var t in s.Transferencias)
+        {
+            if (!_transfVistas.Add(t) || t.D0C == 0) continue;
+            var p = s.Equipas.SelectMany(e => e.Jogadores).FirstOrDefault(x => x.ID == t.W06);
+            if (p == null) continue;
+            Precos.Add((J.Mc.ValorDeMercado(p), (int)t.D0C, t.B04, p.Forca));
+        }
+    }
+
     void Verificar(bool depoisDaJornada, string quando)
     {
         var m = J.M;
         var s = m.S;
+        AnotarPrecos(s);
         int n = m.Regras.N;
         string Q(string t) => $"{quando}: {t}";
         if (s.Divisoes.Count != 5) { Problema(Q($"{s.Divisoes.Count} divisoes")); return; }

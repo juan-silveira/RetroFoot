@@ -61,6 +61,28 @@ public class SoakTestes(ITestOutputHelper saida)
     [Fact]
     public void Curto() => Rodar(Config("orig8-1h", 1, 1));
 
+    // RETROFOOT_PRECOS=1: o valor de mercado (MercadoJogo.ValorDeMercado) contra o que os times
+    // pagaram de verdade em cada transferencia (leilao e compra), em temporadas inteiras
+    [Theory]
+    [InlineData("orig8-1h")]
+    [InlineData("mod16-1h")]
+    public void PrecosDeMercado(string nome)
+    {
+        if (Environment.GetEnvironmentVariable("RETROFOOT_PRECOS") != "1") return;
+        var raiz = Arquivos.Raiz();
+        if (raiz == null) return;
+        var s = new Soak(Config(nome, 3, Temporadas), raiz);
+        s.Jogar();
+        foreach (var tipo in s.Precos.Select(x => x.Tipo).Distinct().OrderBy(x => x))
+        {
+            var r = s.Precos.Where(x => x.Tipo == tipo && x.Valor > 0).Select(x => (double)x.Preco / x.Valor).OrderBy(x => x).ToList();
+            if (r.Count == 0) continue;
+            double Q(double q) => r[(int)Math.Min(r.Count - 1, Math.Round(q * (r.Count - 1)))];
+            saida.WriteLine($"{nome} tipo {tipo}: {r.Count} transferencias; preco/valor de mercado: min {r[0]:F2} q1 {Q(0.25):F2} mediana {Q(0.5):F2} q3 {Q(0.75):F2} max {r[^1]:F2}");
+        }
+        foreach (var x in s.Precos.Take(15)) saida.WriteLine($"  forca {x.Forca} tipo {x.Tipo}: valor {x.Valor:N0} preco {x.Preco:N0}");
+    }
+
     // uma temporada da Modificada com os acrescimos (Regras.Acrescimos)
     [Fact]
     public void CurtoAcrescimos() => Rodar(new("mod8-acr", Mod(8) with { Acrescimos = true }, 1, true, true, false, 1, 1));

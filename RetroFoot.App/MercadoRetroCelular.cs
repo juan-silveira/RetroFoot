@@ -243,9 +243,10 @@ static class MercadoRetro
     // ------------------------------------------------------------ a ficha do jogador
     // Panel1 da janela do leilao e a ficha do plantel: o Comportamento (a Nota e o Risco no
     // launcher), os gols da temporada e o Historico na moldura de grupo, na cor da janela
-    public static Control Ficha(SJogador p, bool launcher, IBrush fundo, IBrush cor)
+    public static Control Ficha(SJogador p, bool launcher, IBrush fundo, IBrush cor, string? valorMercado = null)
     {
         var s = new StackPanel { Spacing = 0 };
+        if (valorMercado != null) s.Children.Add(Linha(T("Valor de mercado"), valorMercado, cor, 170, 14, false));
         s.Children.Add(Linha(T("Comportamento"), TM.Comportamento(p), cor, 170, 14, false));
         if (launcher)
         {
@@ -253,9 +254,12 @@ static class MercadoRetro
             s.Children.Add(Linha(T("Risco de lesão"), p.Lesao.ToString(), cor, 170, 14, false));
         }
         s.Children.Add(Linha(T("Gols na Temporada"), Mem.Golos14(p).ToString(), cor, 170, 14, false));
+        s.Children.Add(Linha(T("Jogos na Temporada"), TM.JogosTemporada(p).ToString(), cor, 170, 14, false));
+        s.Children.Add(Linha(T("Média na Temporada"), TM.MediaGols(p, true), cor, 170, 14, false));
         var h = new StackPanel { Spacing = 0 };
         h.Children.Add(Linha(T("Jogos"), TM.Hist(p, Mem.HistJogos).ToString(), cor, 0, 14, false));
         h.Children.Add(Linha(T("Gols"), TM.Hist(p, Mem.HistGolos).ToString(), cor, 0, 14, false));
+        h.Children.Add(Linha(T("Média de gols"), TM.MediaGols(p, false), cor, 0, 14, false));
         if (launcher) h.Children.Add(Linha(T("Cartões amarelos"), TM.Amarelos(p).ToString(), cor, 0, 14, false));
         h.Children.Add(Linha(T("Cartões vermelhos"), TM.Hist(p, Mem.HistVermelhos).ToString(), cor, 0, 14, false));
         h.Children.Add(Linha(T("Lesões"), TM.Hist(p, Mem.HistLesoes).ToString(), cor, 0, 14, false));

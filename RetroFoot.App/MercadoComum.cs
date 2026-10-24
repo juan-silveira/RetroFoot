@@ -90,6 +90,24 @@ static class TextosMercado
 
     // o historial de 4 bytes; os 2 de cima das lesoes e das expulsoes guardam os amarelos do
     // launcher (cartoes.asm): so os 2 de baixo
+    // (RetroFoot) o valor de mercado: o preco de venda da CPU sem a permanencia, com o
+    // comprador (MercadoJogo.ValorDeMercado: o valor do jogo x 3,5 x 1,6)
+    public static int ValorMercado(Sessao s, SJogador p) => s.Mercado.ValorDeMercado(p);
+    public static string TextoValorMercado(Sessao s, SJogador p) => FormatoDinheiro.Valor(s.S, ValorMercado(s, p));
+
+    // a media de gols por jogo, com 2 casas ("–" sem jogos)
+    public static string Media(double? m) =>
+        m is double v ? v.ToString("0.00", Idioma.Atual.StartsWith("en") ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo("pt-BR")) : "–";
+    public static string MediaGols(SJogador p, bool temporada) => Media(Mem.MediaGols(p, temporada));
+    public static int JogosTemporada(SJogador p) => Mem.JogosNaTemporada(p);
+    // os gols com a media entre parenteses ("12 (0,40)"; so os gols sem jogos), nas janelas do
+    // jogo classico, sem espaco para outra linha
+    public static string GolsComMedia(SJogador p, bool temporada)
+    {
+        int g = temporada ? Mem.Golos14(p) : Hist(p, Mem.HistGolos);
+        return Mem.MediaGols(p, temporada) is double m ? $"{g} ({Media(m)})" : g.ToString();
+    }
+
     public static int Hist(SJogador p, int qual)
     {
         int v = Mem.Historial(p, qual);

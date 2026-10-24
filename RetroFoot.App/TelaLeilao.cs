@@ -385,7 +385,7 @@ sealed class TelaLeilao : DialogoMercado
         public SEquipa? Comprador;
         readonly SEquipa v;
         readonly SJogador p;
-        readonly string basePreco, salario;
+        readonly string basePreco, salario, valorMercado;
         readonly bool launcher;
         readonly IBrush letraV, fundoV;
 
@@ -394,6 +394,7 @@ sealed class TelaLeilao : DialogoMercado
             this.v = v; this.p = p; this.launcher = launcher;
             basePreco = preco is int b ? FormatoDinheiro.Valor(m, b) : "";
             salario = FormatoDinheiro.Valor(m, sal);
+            valorMercado = T.TextoValorMercado(s, p);
             (letraV, fundoV) = T.Cores(v);
             IsHitTestVisible = false;
         }
@@ -436,6 +437,9 @@ sealed class TelaLeilao : DialogoMercado
             Caixa(dc, salario, new Rect(128, 144, 200, 16), a13b, W95.Preto);
             E(dc, Idioma.T("Preço base"), 16, 172, a13);
             E(dc, basePreco, 128, 172, a13b);
+            // (RetroFoot) o valor de mercado; o suspenso e o lesionado descem uma linha
+            E(dc, Idioma.T("Valor de mercado"), 16, 200, a13);
+            E(dc, valorMercado, 128, 200, a13b);
             E(dc, Idioma.T("Nacionalidade"), 328, 8, a13);
             string pais = T.PaisDe(p.Pais);
             Caixa(dc, T.NomePais(pais), new Rect(328, 24, 144, 33), a13b, W95.Preto, quebra: true);
@@ -443,9 +447,9 @@ sealed class TelaLeilao : DialogoMercado
 
             // suspenso / lesionado (2:3363-348e): so com o jogo registado
             if (p.Suspensao > 0)
-                Caixa(dc, p.Suspensao == 1 ? Idioma.T("Suspenso por 1 jogo") : Idioma.T("Suspenso por {0} jogos", p.Suspensao), new Rect(16, 200, 297, 16), a13b, W95.Vermelho);
+                Caixa(dc, p.Suspensao == 1 ? Idioma.T("Suspenso por 1 jogo") : Idioma.T("Suspenso por {0} jogos", p.Suspensao), new Rect(16, 224, 297, 16), a13b, W95.Vermelho);
             if (p.JogosLesao > 0)
-                Caixa(dc, p.JogosLesao == 1 ? Idioma.T("Lesionado por 1 jogo") : Idioma.T("Lesionado por {0} jogos", p.JogosLesao), new Rect(16, 224, 297, 16), a13b, W95.Vermelho);
+                Caixa(dc, p.JogosLesao == 1 ? Idioma.T("Lesionado por 1 jogo") : Idioma.T("Lesionado por {0} jogos", p.JogosLesao), new Rect(16, 242, 297, 16), a13b, W95.Vermelho);
 
             // Panel1 (328, 72): Comportamento, golos e o Historial; no launcher, Nota e Risco de
             // lesao a 15 pontos (tools/divisoes/ficha.py) e os amarelos no Historial (historial.py)
@@ -457,14 +461,14 @@ sealed class TelaLeilao : DialogoMercado
                     E(dc, Idioma.T("Comportamento"), 0, 8, a11); E(dc, T.Comportamento(p), 104, 8, a11);
                     E(dc, Idioma.T("Nota"), 0, 23, a11); E(dc, p.Nota.ToString(), 104, 23, a11);
                     E(dc, Idioma.T("Risco de lesão"), 0, 38, a11); E(dc, p.Lesao.ToString(), 104, 38, a11);
-                    E(dc, Idioma.T("Gols na Temporada"), 0, 53, a11); E(dc, Mem.Golos14(p).ToString(), 104, 53, a11);
+                    E(dc, Idioma.T("Gols na Temporada"), 0, 53, a11); E(dc, T.GolsComMedia(p, true), 104, 53, a11);
                     gy = 68;
                 }
                 else
                 {
                     E(dc, Idioma.T("Comportamento"), 0, 8, a11); E(dc, T.Comportamento(p), 88, 8, a11);
                     // "Gols na Temporada" (pt-BR) nao cabe antes de 96: o valor em 104, como no launcher
-                    E(dc, Idioma.T("Gols na Temporada"), 0, 40, a11); E(dc, Mem.Golos14(p).ToString(), 104, 40, a11);
+                    E(dc, Idioma.T("Gols na Temporada"), 0, 40, a11); E(dc, T.GolsComMedia(p, true), 104, 40, a11);
                     gy = 56;
                 }
                 // GroupBox2 (185x97): a moldura gravada e o titulo por cima
@@ -474,22 +478,23 @@ sealed class TelaLeilao : DialogoMercado
                 var tit = W95.Txt(Idioma.T("Histórico"), a11, W95.Preto);
                 dc.FillRectangle(Amarelo, new Rect(6, gy, tit.WidthIncludingTrailingWhitespace + 4, 14));
                 dc.DrawText(tit, new Point(8, gy));
-                (string, int, double)[] linhas = launcher
+                // (os gols com a media por jogo, do RetroFoot)
+                (string, string, double)[] linhas = launcher
                     ? new[]
                     {
-                        (Idioma.T("Jogos"), T.Hist(p, Mem.HistJogos), 16.0), (Idioma.T("Gols"), T.Hist(p, Mem.HistGolos), 32),
-                        (Idioma.T("Cartões amarelos"), T.Amarelos(p), 48), (Idioma.T("Cartões vermelhos"), T.Hist(p, Mem.HistVermelhos), 64),
-                        (Idioma.T("Lesões"), T.Hist(p, Mem.HistLesoes), 80),
+                        (Idioma.T("Jogos"), T.Hist(p, Mem.HistJogos).ToString(), 16.0), (Idioma.T("Gols"), T.GolsComMedia(p, false), 32),
+                        (Idioma.T("Cartões amarelos"), T.Amarelos(p).ToString(), 48), (Idioma.T("Cartões vermelhos"), T.Hist(p, Mem.HistVermelhos).ToString(), 64),
+                        (Idioma.T("Lesões"), T.Hist(p, Mem.HistLesoes).ToString(), 80),
                     }
                     : new[]
                     {
-                        (Idioma.T("Jogos"), T.Hist(p, Mem.HistJogos), 24.0), (Idioma.T("Gols"), T.Hist(p, Mem.HistGolos), 40),
-                        (Idioma.T("Cartões vermelhos"), T.Hist(p, Mem.HistVermelhos), 56), (Idioma.T("Lesões"), T.Hist(p, Mem.HistLesoes), 72),
+                        (Idioma.T("Jogos"), T.Hist(p, Mem.HistJogos).ToString(), 24.0), (Idioma.T("Gols"), T.GolsComMedia(p, false), 40),
+                        (Idioma.T("Cartões vermelhos"), T.Hist(p, Mem.HistVermelhos).ToString(), 56), (Idioma.T("Lesões"), T.Hist(p, Mem.HistLesoes).ToString(), 72),
                     };
                 foreach (var (rot, val, y) in linhas)
                 {
                     E(dc, rot, 8, gy + y, a11);
-                    Caixa(dc, val.ToString(), new Rect(124, gy + y, 50, 14), a11, W95.Preto, direita: true);
+                    Caixa(dc, val, new Rect(94, gy + y, 80, 14), a11, W95.Preto, direita: true);
                 }
             }
 
@@ -555,11 +560,14 @@ sealed class TelaLeilao : DialogoMercado
             T_(dc, salario, 136, 143, 13.5, MM.Texto, FontWeight.SemiBold, 178, linhas: 1);
             Linha(Idioma.T("Preço base"), 172);
             T_(dc, basePreco.Length > 0 ? basePreco : "–", 136, 171, 13.5, MM.Texto, FontWeight.SemiBold, 178, linhas: 1);
+            // (RetroFoot) o valor de mercado; o suspenso e o lesionado descem uma linha
+            Linha(Idioma.T("Valor de mercado"), 200);
+            T_(dc, valorMercado, 136, 199, 13.5, MM.Texto, FontWeight.SemiBold, 178, linhas: 1);
             // suspenso / lesionado (2:3363-348e)
             if (p.Suspensao > 0)
-                T_(dc, p.Suspensao == 1 ? Idioma.T("Suspenso por 1 jogo") : Idioma.T("Suspenso por {0} jogos", p.Suspensao), 18, 200, 12.5, MM.Vermelho, FontWeight.SemiBold, 296, linhas: 1);
+                T_(dc, p.Suspensao == 1 ? Idioma.T("Suspenso por 1 jogo") : Idioma.T("Suspenso por {0} jogos", p.Suspensao), 18, 226, 12.5, MM.Vermelho, FontWeight.SemiBold, 296, linhas: 1);
             if (p.JogosLesao > 0)
-                T_(dc, p.JogosLesao == 1 ? Idioma.T("Lesionado por 1 jogo") : Idioma.T("Lesionado por {0} jogos", p.JogosLesao), 18, 222, 12.5, MM.Vermelho, FontWeight.SemiBold, 296, linhas: 1);
+                T_(dc, p.JogosLesao == 1 ? Idioma.T("Lesionado por 1 jogo") : Idioma.T("Lesionado por {0} jogos", p.JogosLesao), 18, 246, 12.5, MM.Vermelho, FontWeight.SemiBold, 296, linhas: 1);
 
             // a direita: a Nacionalidade (o nome e a bandeira)
             var cn = new Rect(330, 8, 238, 62);
@@ -574,11 +582,11 @@ sealed class TelaLeilao : DialogoMercado
             MM.Cartao_(dc, cp, MM.Barra, 10, MM.Linha);
             var itens = new List<(string, string)> { (Idioma.T("Comportamento"), T.Comportamento(p)) };
             if (launcher) { itens.Add((Idioma.T("Nota"), p.Nota.ToString())); itens.Add((Idioma.T("Risco de lesão"), p.Lesao.ToString())); }
-            itens.Add((Idioma.T("Gols na Temporada"), Mem.Golos14(p).ToString()));
-            var hist = new List<(string, int)> { (Idioma.T("Jogos"), T.Hist(p, Mem.HistJogos)), (Idioma.T("Gols"), T.Hist(p, Mem.HistGolos)) };
-            if (launcher) hist.Add((Idioma.T("Cartões amarelos"), T.Amarelos(p)));
-            hist.Add((Idioma.T("Cartões vermelhos"), T.Hist(p, Mem.HistVermelhos)));
-            hist.Add((Idioma.T("Lesões"), T.Hist(p, Mem.HistLesoes)));
+            itens.Add((Idioma.T("Gols na Temporada"), T.GolsComMedia(p, true)));
+            var hist = new List<(string, string)> { (Idioma.T("Jogos"), T.Hist(p, Mem.HistJogos).ToString()), (Idioma.T("Gols"), T.GolsComMedia(p, false)) };
+            if (launcher) hist.Add((Idioma.T("Cartões amarelos"), T.Amarelos(p).ToString()));
+            hist.Add((Idioma.T("Cartões vermelhos"), T.Hist(p, Mem.HistVermelhos).ToString()));
+            hist.Add((Idioma.T("Lesões"), T.Hist(p, Mem.HistLesoes).ToString()));
             double passo = launcher ? 14.5 : 16, y = cp.Y + 8;
             foreach (var (r, val) in itens)
             {

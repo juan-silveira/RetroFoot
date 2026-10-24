@@ -1,0 +1,11 @@
+# Valor de mercado e media de golos (0.2.1)
+Valor de mercado	Valor de mercado
+Valor de mercado:	Valor de mercado:
+Jogos na Temporada	Jogos esta época
+Média na Temporada	Média esta época
+Jogos na temporada	Jogos esta época
+Média na temporada	Média esta época
+Jogos na temp.	Jogos época
+Média na temp.	Média época
+Média de gols	Média de golos
+Média	Média

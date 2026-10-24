@@ -1379,6 +1379,8 @@ public sealed partial class TelaEquipa : UserControl
             Escreve(dc, NomePais(pais), 56, 32, 13, _letra);
             if (p.B35 == 1)
                 Escreve(dc, T("Não é considerado jogador estrangeiro, ao abrigo da Lei Bosman"), 8, 56, 13, _letra, largura: 233);
+            // (RetroFoot) o valor de mercado, abaixo do pais (ou do aviso da Lei Bosman)
+            Escreve(dc, T("Valor de mercado") + ": " + TextosMercado.TextoValorMercado(_s, p), 8, p.B35 == 1 ? 84 : 62, 11, _letra);
 
             // PanelPlayer (32, 96); no launcher, Nota e Risco de lesao abaixo do Comportamento
             // (tools/divisoes/ficha.py) e a linha dos amarelos no Historial (historial.py)
@@ -1392,14 +1394,14 @@ public sealed partial class TelaEquipa : UserControl
                     Escreve(dc, T("Comportamento"), 0, 0, t, _letra); Escreve(dc, comp, 104, 0, t, _letra);
                     Escreve(dc, T("Nota"), 0, 15, t, _letra); Escreve(dc, p.Nota.ToString(), 104, 15, t, _letra);
                     Escreve(dc, T("Risco de lesão"), 0, 30, t, _letra); Escreve(dc, p.Lesao.ToString(), 104, 30, t, _letra);
-                    Escreve(dc, T("Gols na Temporada"), 0, 45, t, _letra); Escreve(dc, Mem.Golos14(p).ToString(), 104, 45, t, _letra);
+                    Escreve(dc, T("Gols na Temporada"), 0, 45, t, _letra); Escreve(dc, TextosMercado.GolsComMedia(p, true), 104, 45, t, _letra);
                     gy = 60;
                 }
                 else
                 {
                     Escreve(dc, T("Comportamento"), 0, 8, t, _letra); Escreve(dc, comp, 88, 8, t, _letra);
                     // o valor em 104 como no launcher: "Gols na Temporada" (pt-BR) nao cabe antes de 96
-                    Escreve(dc, T("Gols na Temporada"), 0, 32, t, _letra); Escreve(dc, Mem.Golos14(p).ToString(), 104, 32, t, _letra);
+                    Escreve(dc, T("Gols na Temporada"), 0, 32, t, _letra); Escreve(dc, TextosMercado.GolsComMedia(p, true), 104, 32, t, _letra);
                     gy = 48;
                 }
                 // o GroupBox do Historial
@@ -1409,26 +1411,27 @@ public sealed partial class TelaEquipa : UserControl
                 double lt = Largura(T("Histórico"), t);
                 dc.FillRectangle(_fundo, new Rect(6, gy, lt + 4, 14));
                 Escreve(dc, T("Histórico"), 8, gy, t, _letra);
-                var linhas = new List<(string, int, double)>();
+                // (os gols com a media por jogo entre parenteses, do RetroFoot)
+                var linhas = new List<(string, string, double)>();
                 if (_launcher)
                 {
-                    linhas.Add(("Jogos", Hist(p, Mem.HistJogos), 16));
-                    linhas.Add(("Gols", Hist(p, Mem.HistGolos), 32));
-                    linhas.Add(("Cartões amarelos", Amarelos(p), 48));
-                    linhas.Add(("Cartões vermelhos", Hist(p, Mem.HistVermelhos), 64));
-                    linhas.Add(("Lesões", Hist(p, Mem.HistLesoes), 80));
+                    linhas.Add(("Jogos", Hist(p, Mem.HistJogos).ToString(), 16));
+                    linhas.Add(("Gols", TextosMercado.GolsComMedia(p, false), 32));
+                    linhas.Add(("Cartões amarelos", Amarelos(p).ToString(), 48));
+                    linhas.Add(("Cartões vermelhos", Hist(p, Mem.HistVermelhos).ToString(), 64));
+                    linhas.Add(("Lesões", Hist(p, Mem.HistLesoes).ToString(), 80));
                 }
                 else
                 {
-                    linhas.Add(("Jogos", Hist(p, Mem.HistJogos), 16));
-                    linhas.Add(("Gols", Hist(p, Mem.HistGolos), 35));
-                    linhas.Add(("Cartões vermelhos", Hist(p, Mem.HistVermelhos), 53));
-                    linhas.Add(("Lesões", Hist(p, Mem.HistLesoes), 72));
+                    linhas.Add(("Jogos", Hist(p, Mem.HistJogos).ToString(), 16));
+                    linhas.Add(("Gols", TextosMercado.GolsComMedia(p, false), 35));
+                    linhas.Add(("Cartões vermelhos", Hist(p, Mem.HistVermelhos).ToString(), 53));
+                    linhas.Add(("Lesões", Hist(p, Mem.HistLesoes).ToString(), 72));
                 }
                 foreach (var (rot, v, y) in linhas)
                 {
                     Escreve(dc, T(rot), 8, gy + y, t, _letra);
-                    Direita(dc, v.ToString(), 174, gy + y, t, _letra);
+                    Direita(dc, v, 174, gy + y, t, _letra);
                 }
             }
             // suspenso / lesionado (4:2251...); no launcher, sem suspensao, os amarelos

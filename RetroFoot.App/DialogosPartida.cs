@@ -149,6 +149,7 @@ static class P98
     {
         uint v = BitConverter.ToUInt32(p.Historial, 0) + 1;
         BitConverter.GetBytes(v).CopyTo(p.Historial, 0);
+        RetroFoot.Motor.Partida.Memoria.SomaJogoNaTemporada(p);
     }
 
     public static bool Humano(JogoAtual jg, int lado) => Mem.Humano(jg.Treinador[lado]);

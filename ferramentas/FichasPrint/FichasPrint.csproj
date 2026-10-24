@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- As janelas com a ficha do jogador (plantel, leilao) desenhadas sem tela, em PNG, para conferir o layout -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Headless" VersionOverride="12.1.3" />
+    <PackageReference Include="Avalonia.Skia" VersionOverride="12.1.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RetroFoot.App\RetroFoot.App.csproj" />
+  </ItemGroup>
+</Project>

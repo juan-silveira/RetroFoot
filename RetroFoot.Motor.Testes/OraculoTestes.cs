@@ -45,6 +45,8 @@ public class OraculoTestes(ITestOutputHelper saida)
     [MemberData(nameof(Casos))]
     public void Oraculo(string nome)
     {
+        // (o save igual ao do jogo classico: sem os jogos da temporada do RetroFoot)
+        RetroFoot.Motor.Partida.Memoria.SemJogosDaTemporada = true;
         var p = Pasta()!;
         var orig = File.ReadAllBytes(Path.Combine(p, nome + "-original.e98"));
         var ent = Jogo98.Ler(File.ReadAllBytes(Path.Combine(p, nome + "-entrada.e98")));

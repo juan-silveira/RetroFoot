@@ -217,7 +217,8 @@ public sealed class JogadorEditavel
 
     // Historial (+0x17): jogos, golos (4 bytes cada), lesoes e amarelos na carreira, vermelhos,
     // amarelos acumulados e a marca do jogo do ultimo amarelo (Partida/Cartoes.cs)
-    public int Jogos => BitConverter.ToInt32(J.Historial, 0);
+    // (os 16 bits de cima sao os jogos da temporada do RetroFoot)
+    public int Jogos => BitConverter.ToUInt16(J.Historial, 0);
     public int Golos => BitConverter.ToInt32(J.Historial, 4);
     public int AmarelosAcumulados
     {

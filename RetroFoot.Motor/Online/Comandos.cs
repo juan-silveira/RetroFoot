@@ -184,6 +184,7 @@ public sealed class ExecutorComandos(JogoEmCurso j)
         Memoria.MudarEscalacao(s, Memoria.EscFora);
         Memoria.MudarEscalacao(n, Memoria.EscTitular);
         Memoria.SomaHistorial(n, Memoria.HistJogos, 1);
+        Memoria.SomaJogoNaTemporada(n);
         Memoria.MudarSubstituicoes(e, (short)(Memoria.Substituicoes(e) - 1));
         Sorteio.ForcaDosSetores(e);
         return Resposta.Feito;

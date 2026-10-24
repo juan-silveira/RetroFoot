@@ -352,7 +352,8 @@ static class ListasCelular
 
     // os artilheiros (TelaListas.MelhoresMarcadores): o lugar, a bandeira, o nome, a equipa e
     // os golos
-    internal static void Marcadores(Dialogos d, string titulo, List<(Jogador P, Equipa E, int Golos)> ms, Action<int>? toque = null)
+    // (media: a media de gols por jogo de cada linha, do RetroFoot)
+    internal static void Marcadores(Dialogos d, string titulo, List<(Jogador P, Equipa E, int Golos)> ms, Action<int>? toque = null, Func<int, string>? media = null)
     {
         // o toque (a compra directa) fecha a lista e abre o plantel, como o duplo clique
         Action Tirar = () => { };
@@ -368,11 +369,11 @@ static class ListasCelular
                 var eq = R(Dlg.Texto(e.NomeCurto));
                 eq.Margin = new Thickness(12, 0, 0, 0);
                 eq.MaxWidth = 140;
-                return Grade("24,*,30,Auto", RD((i + 1).ToString()), nome, RD(g.ToString(), true), eq);
+                return Grade("24,*,30,44,Auto", RD((i + 1).ToString()), nome, RD(g.ToString(), true), RD(media?.Invoke(i) ?? ""), eq);
             }, tq), null);
             return;
         }
-        var corpo = Pilha(Cabecalho("26,*,Auto,40", "#", T("Jogador"), T("Time"), T("Gols")),
+        var corpo = Pilha(Cabecalho("26,*,Auto,40,46", "#", T("Jogador"), T("Time"), T("Gols"), T("Média")),
             Grupo(ms.Count, i =>
             {
                 var (p, e, g) = ms[i];
@@ -384,7 +385,8 @@ static class ListasCelular
                 var eq = Eq(e, 12.5);
                 eq.MaxWidth = 130;
                 eq.Margin = new Thickness(8, 0, 0, 0);
-                return Grade("26,*,Auto,40", Num((i + 1).ToString(), 13, CUi.Fraco, true), Margem(nome, 8), eq, Num(g.ToString(), 16, Forte, true));
+                return Grade("26,*,Auto,40,46", Num((i + 1).ToString(), 13, CUi.Fraco, true), Margem(nome, 8), eq, Num(g.ToString(), 16, Forte, true),
+                    Num(media?.Invoke(i) ?? "", 12.5, CUi.Fraco, true));
             }, tq));
         (_, _, Tirar) = Abrir(d, titulo, null, corpo, null);
     }

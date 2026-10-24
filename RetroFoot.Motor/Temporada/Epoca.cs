@@ -69,7 +69,7 @@ public sealed class Epoca
                 if (MercadoJogo.Equipa(S, lista[idx]) is { } e) NovaTemporadaEquipa(Regras, e, d < Distrital, idx, lista);
         }
         foreach (var e in S.Equipas)
-            foreach (var p in e.Jogadores) Array.Clear(p.B14);
+            foreach (var p in e.Jogadores) { Array.Clear(p.B14); Partida.Memoria.ZerarJogosNaTemporada(p); }
         S.Cabecalho.G271E = 0;
         S.Cabecalho.G271C = 1;
         S.Cabecalho.G271A = 0;
