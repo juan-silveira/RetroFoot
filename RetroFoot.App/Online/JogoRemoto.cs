@@ -164,7 +164,8 @@ public sealed class JogoRemoto
                 if (n <= _leilaoVisto) return;
                 _leilaoVisto = n;
                 FecharEsperaLeilao();
-                var s = _jornada != null ? _sessaoAoVivo : _sessao;
+                // (antes da 1a rodada: a copia do jogo que veio com a pergunta)
+                var s = (_jornada != null ? _sessaoAoVivo : _sessao) ?? _sessaoPergunta;
                 if (s == null) return;
                 int jogador = (int?)o["jogador"] ?? 0, comprador = (int?)o["comprador"] ?? 0;
                 long preco = (long?)o["preco"] ?? 0;
@@ -174,7 +175,7 @@ public sealed class JogoRemoto
                     _leilaoTodos = null;
                     var c = comprador == 0 ? null : s.Equipa((ushort)comprador);
                     var txt = TelaLeilao.DeTodos.Texto(s, c, preco);
-                    _ = Task.Run(() => dt.Resultado(txt, c));
+                    _ = Task.Run(() => { dt.Resultado(txt, c); DepoisDoLeilao(); });
                     return;
                 }
                 s.Notificar(Online.TextoLeilao(s.S, jogador, (int?)o["vendedor"] ?? 0, comprador, preco));
@@ -268,6 +269,8 @@ public sealed class JogoRemoto
     Sessao? _perguntaEm;
     string? _respondida;
     TelaLeilao.DeTodos? _leilaoTodos;   // a janela do leilao de todos, ate o resultado
+    Action? _depoisDoLeilao;
+    void DepoisDoLeilao() => Dispatcher.UIThread.Post(() => { var d = _depoisDoLeilao; _depoisDoLeilao = null; d?.Invoke(); });
 
     void Pergunta(JsonObject? q)
     {
@@ -278,7 +281,7 @@ public sealed class JogoRemoto
             if (_leilaoTodos is { } dt)
             {
                 _perguntaAberta = null;
-                _ = Task.Run(async () => { await Task.Delay(10_000); if (_leilaoTodos == dt) { _leilaoTodos = null; dt.Fechar(); } });
+                _ = Task.Run(async () => { await Task.Delay(10_000); if (_leilaoTodos == dt) { _leilaoTodos = null; dt.Fechar(); DepoisDoLeilao(); } });
                 return;
             }
             // (o prazo acabou com a janela aberta: fecha)
@@ -328,7 +331,14 @@ public sealed class JogoRemoto
             {
                 if (todos && _perguntaAberta == id)
                 {
-                    // (a espera pelos outros sobre a janela do leilao, ate o resultado)
+                    // (a espera pelos outros sobre a janela do leilao, ate o resultado; a copia do
+                    // jogo de antes da 1a rodada volta a tela de antes quando a janela fechar)
+                    if (copia) _depoisDoLeilao = () =>
+                    {
+                        if (_sessaoPergunta == s) _sessaoPergunta = null;
+                        if (_sessao == null && _jornada == null && _sessaoPergunta == null)
+                            _mostrar(antes ?? Mensagem(T("Jogo online"), T("O jogo está começando…")));
+                    };
                     _leilaoTodos?.Aguardar();
                     return;
                 }
@@ -656,7 +666,16 @@ public sealed class JogoRemoto
                 // (com o time na tela, o sorteio do comeco ja passou: nao volta nas rodadas seguintes)
                 _viuSorteio = true;
                 // o time nao joga nesta rodada (fora da Taca): so a espera
-                if (jogo == null) { sessao.Mostrar(new TelaEsperaRemota(_sala, _rodada, sessao)); return; }
+                // (na Taca, o time que nao esta na rodada: o aviso e o elenco so para ver)
+                if (jogo == null)
+                {
+                    sessao.Mostrar(_rodada.EndsWith("-T")
+                        ? new TelaEsperaRemota(_sala, _rodada, sessao,
+                            T("Seu time não está nesta rodada da Copa. Aguarde os outros técnicos; na próxima rodada do campeonato você prepara o time normalmente."),
+                            T("Rodada da Copa"), (T("Ver meu time"), () => TelaPlantel.Abrir(sessao, e, null)))
+                        : new TelaEsperaRemota(_sala, _rodada, sessao));
+                    return;
+                }
                 var t = new TelaEquipa(sessao, e, jogo);
                 t.Terminou += sair =>
                 {
@@ -862,7 +881,7 @@ public sealed class JogoRemoto
 // a espera do cliente depois do Jogar: quem ja esta pronto (ao vivo)
 sealed class TelaEsperaRemota : UserControl
 {
-    public TelaEsperaRemota(Sala sala, string rodada, Sessao sessao, string? aviso = null)
+    public TelaEsperaRemota(Sala sala, string rodada, Sessao sessao, string? aviso = null, string? titulo = null, (string Texto, Action Acao)? botao = null)
     {
         FontFamily = CUi.Fonte;
         var lista = new StackPanel { Spacing = 6 };
@@ -883,8 +902,12 @@ sealed class TelaEsperaRemota : UserControl
         DetachedFromVisualTree += (_, _) => obs.Dispose();
         Control corpo = CUi.Cartao_(null, lista);
         if (aviso != null)
-            corpo = new StackPanel { Spacing = 12, Children = { CUi.Cartao_(null, CUi.Txt(aviso, 14, CUi.Texto, FontWeight.Normal, true)), corpo } };
-        Content = Online.Pagina(aviso != null ? T("Rodada em andamento") : T("Aguardando os técnicos"),
-            Online.Titulo(sala) + (aviso != null ? "" : " · " + T("A rodada começa quando todos estiverem prontos")), null, corpo);
+        {
+            var cartao = new StackPanel { Spacing = 12, Children = { CUi.Txt(aviso, 14, CUi.Texto, FontWeight.Normal, true) } };
+            if (botao is { } b) cartao.Children.Add(CUi.Botoes(new CUi.Botao(b.Texto, true, b.Acao)));
+            corpo = new StackPanel { Spacing = 12, Children = { CUi.Cartao_(null, cartao), corpo } };
+        }
+        Content = Online.Pagina(titulo ?? (aviso != null ? T("Rodada em andamento") : T("Aguardando os técnicos")),
+            Online.Titulo(sala) + (aviso != null && titulo == null ? "" : " · " + T("A rodada começa quando todos estiverem prontos")), null, corpo);
     }
 }

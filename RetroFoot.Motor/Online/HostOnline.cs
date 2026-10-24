@@ -752,6 +752,8 @@ public sealed class HostOnline : IDisposable
         AtualizarJogadores();
         var abertas = new List<(ushort Equipa, string Uid, string Id)>();
         var r = new Dictionary<ushort, JsonNode?>();
+        // (antes do primeiro retrato os outros aparelhos ainda nao tem o jogo: vai junto)
+        string? save = null;
         foreach (var eq in equipas)
         {
             r[eq] = null;
@@ -760,6 +762,7 @@ public sealed class HostOnline : IDisposable
             string id = Interlocked.Increment(ref _pergunta).ToString("D6");
             d["id"] = id; d["tipo"] = tipo; d["todos"] = true;
             d["segundos"] = (int)(prazo ?? PrazoPergunta).TotalSeconds;
+            if (_versao == 0) d["save"] = save ??= AoVivo.Comprimir(_j.M.S.Gravar());
             try { _sala.B.Gravar($"{_sala.Raiz}/perguntas/{j.Uid}", d).GetAwaiter().GetResult(); } catch { continue; }
             abertas.Add((eq, j.Uid, id));
         }

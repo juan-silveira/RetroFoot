@@ -67,7 +67,10 @@ static class Programa
         int nCli = Math.Clamp(int.TryParse(Environment.GetEnvironmentVariable("SOAK_CLIENTES"), out var nc) ? nc : 1, 1, 5);
         bool amigo = Environment.GetEnvironmentVariable("SOAK_AMIGO") == "1";
         bool firebase = Environment.GetEnvironmentVariable("SOAK_FIREBASE") == "1";
-        var s = JogoNovo(raiz, cfg, semente, amigo ? 1 : 1 + nCli);
+        // SOAK_SAVE=arquivo: um save ja comecado (o jogar com um amigo de um save single player)
+        var saveSoak = Environment.GetEnvironmentVariable("SOAK_SAVE");
+        if (saveSoak != null) amigo = true;
+        var s = saveSoak != null ? Jogo98.Ler(File.ReadAllBytes(saveSoak)) : JogoNovo(raiz, cfg, semente, amigo ? 1 : 1 + nCli);
         var hs = s.Treinadores.Where(t => t.Humano != 0).ToList();
         var timeHost = s.Equipas.First(q => q.Treinador == hs[0].ID);
         var op = cfg.OpcoesDoJogo(s, raiz) with
@@ -115,7 +118,7 @@ static class Programa
         var arq = Path.Combine(pasta, "JOGO.e98");
         var sessao = new Sessao(s, c => fh.Child = c, op, arq) { MsPorMinuto = 0 };
         sessao.J.Treinador = "Soak";
-        sessao.J.M.Retomar = -1;
+        if (saveSoak == null) sessao.J.M.Retomar = -1;
 
         // os convidados: cada um com o seu banco, a sua janela e o seu JogoRemoto
         var clientes = new List<(string Nome, string Uid, Sala Sala, ClienteOnline Cli, JogoRemoto Rem, Window W, Border F, ConcurrentDictionary<string, int> Janelas)>();
@@ -179,7 +182,13 @@ static class Programa
         var host = new HostOnline(sh, sessao.J, x => Dispatcher.UIThread.Invoke(x)) { ModoAmigo = amigo };
         host.PedidoDeEntrada += j => { Console.WriteLine($"  == pedido para entrar: {j.Nome} (permitido)"); _ = host.ResponderEntrada(j.Uid, true); };
         sessao.LigarOnline(host);
-        if (amigo) sessao.NoComecoDoMotor = host.ComecarModoAmigo;
+        if (amigo) sessao.NoComecoDoMotor = () =>
+        {
+            host.ComecarModoAmigo();
+            var times = host.TimesDaSala();
+            Console.WriteLine($"  == sorteio do comeco: {times.Count} times");
+            if (times.Count >= 2) HostOnline.PublicarSorteio(sh, sessao.S, times);
+        };
         sessao.Erro += ex => { Console.WriteLine("EXCECAO no motor: " + ex); codigo = 1; cts.Cancel(); };
         sessao.Saiu += () => { Console.WriteLine("o motor saiu"); cts.Cancel(); };
         sessao.Notificou += txt => Console.WriteLine("  [aviso no host] " + txt);
