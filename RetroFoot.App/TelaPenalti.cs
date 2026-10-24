@@ -164,6 +164,9 @@ public sealed class TelaPenalti : UserControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        // (a janela que saiu da arvore e voltou, como a do celular com a tela da partida
+        // atualizada por baixo: o relogio continua de onde parou, senao ficava sem o resultado)
+        if (_parou) { _parou = false; _relogio.Start(); }
         // (a lista so entra na arvore depois do pai: o foco vai depois, como na substituicao forcada)
         if (_m == null && _c == null) Dispatcher.UIThread.Post(() => { if (_lista is { IsVisible: true }) _lista.Focus(); else Focus(); }, DispatcherPriority.Loaded);
     }
@@ -171,6 +174,8 @@ public sealed class TelaPenalti : UserControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        _parou = _relogio.IsEnabled && !_fim;
         _relogio.Stop();
     }
+    bool _parou;
 }

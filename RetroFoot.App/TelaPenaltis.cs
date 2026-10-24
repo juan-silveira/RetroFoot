@@ -151,7 +151,17 @@ public sealed class TelaPenaltis : UserControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        // (a janela que sai da arvore e volta: os relogios continuam de onde pararam)
+        _parou1 = _timer1.IsEnabled; _parou2 = _timer2.IsEnabled && !_fechou;
         _timer1.Stop();
         _timer2.Stop();
+    }
+    bool _parou1, _parou2;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        if (_parou1) { _parou1 = false; _timer1.Start(); }
+        if (_parou2) { _parou2 = false; _timer2.Start(); }
     }
 }
