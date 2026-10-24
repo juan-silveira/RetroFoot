@@ -98,7 +98,11 @@ public static class LigacaoPartida
             {
                 // (jogo online: o host parou o jogo de todos; os outros veem o aviso)
                 s.Online?.AvisarPausa(jg.Equipa[lado]?.ID ?? 0, true);
-                jn.ObservarTrocas(jg, lado, null, false, () => Detalhes(s, jg, lado, jn));
+                // (jogo online: o host parou o jogo de todos; a janela dele tem o prazo)
+                var antes = Sessao.PrazoDialogo;
+                if (s.Online != null) Sessao.PrazoDialogo = RetroFoot.Motor.Online.HostOnline.PrazoPausa;
+                try { jn.ObservarTrocas(jg, lado, null, false, () => Detalhes(s, jg, lado, jn)); }
+                finally { Sessao.PrazoDialogo = antes; }
                 s.Online?.AvisarPausa(0, false);
             }
         };

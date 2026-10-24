@@ -257,7 +257,15 @@ public sealed class Sessao
                 Dispatcher.UIThread.Post(EsconderRelogio);
                 return;
             }
-            if (!host.Remota(jg.Equipa[lado])) { sub?.Invoke(jg, lado, saiu, motivo); return; }
+            if (!host.Remota(jg.Equipa[lado]))
+            {
+                // (a janela do proprio host tambem para todos: o mesmo prazo; acabou, a lesao tem a
+                // troca automatica)
+                ComPrazo(() => sub?.Invoke(jg, lado, saiu, motivo));
+                if (motivo == 2 && saiu != null && jg.Equipa[lado] is { } eh && Memoria.Escalacao(saiu) == Memoria.EscTitular && Memoria.Substituicoes(eh) > 0)
+                    JogoEmCurso.SubstituicaoForcada(eh, saiu, 0);
+                return;
+            }
             var e = jg.Equipa[lado]!;
             // o intervalo e o goleiro expulso: a paralisacao para todos, com as trocas feitas la
             if (motivo is 3 or 4) { host.SubstituicaoRemota(jornadaOnline, jg, lado, motivo); return; }
@@ -265,7 +273,7 @@ public sealed class Sessao
             // a lesao: quem entra, escolhido la (sem resposta, o primeiro possivel)
             int k = 0;
             if (Memoria.Substituicoes(e) > 0
-                && host.Perguntar(e.ID, "lesao", O(("equipa", e.ID), ("saiu", saiu.ID)), TimeSpan.FromSeconds(20)) is { } r
+                && host.Perguntar(e.ID, "lesao", O(("equipa", e.ID), ("saiu", saiu.ID)), RetroFoot.Motor.Online.HostOnline.PrazoPergunta) is { } r
                 && (int?)r["entra"] is int entra)
             {
                 int goleiros = e.Jogadores.Count(p => Memoria.Escalacao(p) == Memoria.EscReserva && p.Posicao == 0), i = 0;
@@ -283,15 +291,16 @@ public sealed class Sessao
         var bat = h.Batedor;
         h.Batedor = (e, titulares, sugerido) =>
         {
-            if (!host.Remota(e)) return bat != null ? bat(e, titulares, sugerido) : sugerido;
+            if (!host.Remota(e)) return bat != null ? ComPrazo(() => bat(e, titulares, sugerido)) ?? sugerido : sugerido;
             var r = host.Perguntar(e.ID, "batedor", O(("equipa", e.ID), ("titulares", new System.Text.Json.Nodes.JsonArray(titulares.Select(x => (System.Text.Json.Nodes.JsonNode)(int)x.ID).ToArray())),
-                ("sugerido", (int)(sugerido?.ID ?? 0))), TimeSpan.FromSeconds(20));
+                ("sugerido", (int)(sugerido?.ID ?? 0))), RetroFoot.Motor.Online.HostOnline.PrazoPergunta);
             return (int?)r?["jogador"] is int id ? titulares.FirstOrDefault(x => x.ID == id) ?? sugerido : sugerido;
         };
         var aum = h.PedirAumento;
         h.PedirAumento = (e, p, novo, modo) =>
         {
-            if (!host.Remota(e)) return aum == null || aum(e, p, novo, modo);
+            // (acabou o prazo sem resposta: o padrao do motor, aceito)
+            if (!host.Remota(e)) return aum == null || ComPrazo(() => aum(e, p, novo, modo)) || PrazoEsgotou;
             var r = host.Perguntar(e.ID, "aumento", O(("equipa", e.ID), ("jogador", p.ID), ("novo", novo), ("modo", modo)));
             return (bool?)r?["ok"] ?? true;
         };
@@ -368,7 +377,7 @@ public sealed class Sessao
         h.Convite = (t, e) =>
         {
             var dele = J.M.EquipaDoTreinador(t.ID);
-            if (!host.Remota(dele)) return conv != null && conv(t, e);
+            if (!host.Remota(dele)) return conv != null && ComPrazo(() => conv(t, e));
             var r = host.Perguntar(dele!.ID, "convite", O(("treinador", t.ID), ("equipa", e.ID)));
             return (bool?)r?["ok"] ?? false;
         };
@@ -376,7 +385,7 @@ public sealed class Sessao
         h.Patrocinio = p =>
         {
             var quem = PrimeiroHumano();
-            if (!host.Remota(quem)) return pat != null && pat(p);
+            if (!host.Remota(quem)) return pat != null && ComPrazo(() => pat(p));
             var r = host.Perguntar(quem!.ID, "patrocinio", O(("nome", Convert.ToBase64String(p.NomeBruto)), ("quantidade", p.Quantidade), ("valor", p.Valor),
                 ("tipoP", p.Tipo), ("marca", p.Marca), ("multa", p.Multa), ("registro", p.Registro == null ? null : Convert.ToBase64String(p.Registro.Registro))));
             return (bool?)r?["ok"] ?? false;
@@ -756,6 +765,7 @@ public sealed class Sessao
         // (jogo online: o intervalo coletivo) com prazo, a janela fecha sozinha e vale o padrao
         if (PrazoDialogo is { } prazo && !tcs.Task.Wait(prazo))
         {
+            PrazoEsgotou = true;
             Dispatcher.UIThread.Post(() => { if (d != null) FecharDialogo(d); });
             return default!;
         }
@@ -764,6 +774,19 @@ public sealed class Sessao
 
     // o prazo das janelas do motor (null = sem prazo): o intervalo do jogo online
     [ThreadStatic] public static TimeSpan? PrazoDialogo;
+    // a ultima janela com prazo fechou por ele (sem resposta)
+    [ThreadStatic] public static bool PrazoEsgotou;
+
+    // (jogo online, no host) uma janela do motor com o prazo das perguntas: ela para o jogo de todos
+    static T ComPrazo<T>(Func<T> f)
+    {
+        var antes = PrazoDialogo;
+        PrazoDialogo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
+        PrazoEsgotou = false;
+        try { return f(); }
+        finally { PrazoDialogo = antes; }
+    }
+    static void ComPrazo(Action f) => ComPrazo(() => { f(); return 0; });
 
     // troca a tela mostrada (ex.: as Configuracoes por cima da tela da equipa e a volta)
     public void Mostrar(Control tela) => mostrar(tela);

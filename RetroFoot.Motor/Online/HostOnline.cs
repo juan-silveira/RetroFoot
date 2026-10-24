@@ -667,7 +667,8 @@ public sealed class HostOnline : IDisposable
     // convite, patrocinio, batedor do penalti, substituicao por lesao): a pergunta vai para o
     // dono (perguntas/<uid>), o motor espera a resposta (respostas/<uid>/<id>) ate o prazo; sem
     // resposta (ou ele ausente), o padrao do motor.
-    public static TimeSpan PrazoPergunta = TimeSpan.FromSeconds(45);
+    // (tudo que para o jogo para todos tem 30 s: as perguntas, a paralisacao, o intervalo)
+    public static TimeSpan PrazoPergunta = TimeSpan.FromSeconds(30);
     // o motor espera a resposta de outro tecnico (nome, tipo); null: acabou
     public event Action<string?, string>? AguardandoResposta;
     readonly ConcurrentDictionary<string, JsonNode?> _respostas = new();
@@ -798,7 +799,7 @@ public sealed class HostOnline : IDisposable
     // pausa vai para o banco (rodada/aoVivo/pausa: quem e o time), os outros veem "fulano esta
     // fazendo substituicoes" e o motor espera as trocas (Trocar) e o Retomar dele, ou o prazo.
     // O intervalo dos times dos outros aparelhos usa o mesmo caminho (as trocas do intervalo).
-    public static TimeSpan PrazoPausa = TimeSpan.FromSeconds(60);
+    public static TimeSpan PrazoPausa = TimeSpan.FromSeconds(30);
     volatile bool _naRodada;
     readonly BlockingCollection<(string Uid, string Chave, Comando C)> _filaAoVivo = new();
 
