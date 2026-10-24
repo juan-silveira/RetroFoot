@@ -620,13 +620,13 @@ public sealed class HostOnline : IDisposable
         Enviar($"{_sala.Raiz}/rodada/aoVivo", new JsonObject { ["rodada"] = Rodada, ["inicio"] = _emissor.Inicio(_j, titulo, jn) });
     }
 
-    public void TransmitirMinuto(Jornada jn)
+    // (o host na velocidade dele: com a rede atrasada, o minuto nao vai e o proximo leva tudo o que
+    // mudou desde o ultimo enviado (o Emissor manda as diferencas para o que ja foi); os outros pulam
+    // minutos mas ficam em dia. forcar: o ultimo minuto da jornada vai sempre)
+    public void TransmitirMinuto(Jornada jn, bool forcar = false)
     {
+        if (!forcar && _envios.Count > 0) return;
         Enviar($"{_sala.Raiz}/rodada/aoVivo/tique", _emissor.Tique(jn));
-        // (a velocidade de todos e a da rede: com o host mais rapido do que os envios, a fila crescia
-        // e os outros ficavam minutos atras; o motor espera a fila andar, ate 3 s por minuto)
-        var limite = DateTime.UtcNow.AddSeconds(3);
-        while (_envios.Count > 1 && DateTime.UtcNow < limite) Thread.Sleep(15);
     }
 
     // a disputa de penaltis da Taca (a janela do host): a mesma para os outros, com as cobrancas
@@ -787,6 +787,17 @@ public sealed class HostOnline : IDisposable
             }
             catch { }
         return r;
+    }
+
+    // o leilao de todos comecou (rodada/leilaoAberto): quem nao licita ve a espera ate o resultado
+    public void AvisarLeilaoAberto(ushort jogador, ushort vendedor, IEnumerable<ushort> licitantes)
+    {
+        var uids = licitantes.Select(e => DonoDe(e)?.Uid).OfType<string>().ToList();
+        Enviar($"{_sala.Raiz}/rodada/leilaoAberto", new JsonObject
+        {
+            ["n"] = _leilao + 1, ["jogador"] = (int)jogador, ["vendedor"] = (int)vendedor,
+            ["licitam"] = new JsonArray(uids.Select(u => (JsonNode)u).ToArray()),
+        });
     }
 
     // o resultado do leilao de todos (rodada/leilao): o aviso em cada aparelho (vendido: para quem

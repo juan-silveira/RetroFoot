@@ -132,6 +132,29 @@ public sealed class JogoRemoto
             if (modo == Sala.ModoAmigo) _modoAmigo = true;
             else if (_modoAmigo) { _modoAmigo = false; Online.Lembrar(sala); }
         });
+        // um leilao de todos em que este aparelho nao licita: o fundo verde e a espera ate o resultado
+        sala.B.Observar($"{sala.Raiz}/rodada/leilaoAberto", (caminho, v) =>
+        {
+            if (caminho != "/" || v is not JsonObject o || (int?)o["n"] is not int n) return;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (n <= _leilaoVisto || n <= _leilaoAbertoVisto) return;
+                _leilaoAbertoVisto = n;
+                if ((o["licitam"] as JsonArray)?.Any(x => (string?)x == _sala.Uid) == true) return;
+                var s = _jornada != null ? _sessaoAoVivo : _sessao;
+                if (s == null) return;
+                FecharEsperaLeilao();
+                s.FundoVerdeDepoisDaRodada();
+                var p = s.S.Equipas.SelectMany(e => e.Jogadores).FirstOrDefault(x => x.ID == (int?)o["jogador"]);
+                _esperaLeilao = Sessao.Espera(p == null ? T("Leilão: aguardando os outros técnicos…")
+                    : T("Leilão de {0}: aguardando os outros técnicos…", P98.NomeJogador(p)));
+                _esperaLeilaoEm = s;
+                s.AbrirDialogo(_esperaLeilao);
+                // (sem resultado em 40 s, fecha)
+                var esta = _esperaLeilao;
+                _ = Task.Run(async () => { await Task.Delay(40_000); Dispatcher.UIThread.Post(() => { if (_esperaLeilao == esta) FecharEsperaLeilao(); }); });
+            });
+        });
         // o resultado do leilao de todos: o aviso no canto
         sala.B.Observar($"{sala.Raiz}/rodada/leilao", (caminho, v) =>
         {
@@ -140,6 +163,7 @@ public sealed class JogoRemoto
             {
                 if (n <= _leilaoVisto) return;
                 _leilaoVisto = n;
+                FecharEsperaLeilao();
                 var s = _jornada != null ? _sessaoAoVivo : _sessao;
                 if (s == null) return;
                 int jogador = (int?)o["jogador"] ?? 0, comprador = (int?)o["comprador"] ?? 0;
@@ -298,7 +322,6 @@ public sealed class JogoRemoto
             catch (Exception ex) { Console.Error.WriteLine("pergunta: " + ex.Message); }
             finally { Sessao.PrazoDialogo = null; }
             if (todos) r ??= new JsonObject { ["milhares"] = 0, ["ok"] = false };
-            if (todos) App.Anotar($"diag leilao convidado: pergunta {id} resposta {r?.ToJsonString()} esgotou {Sessao.PrazoEsgotou}", null);
             if (r != null && _perguntaAberta == id)
                 try { _sala.B.Gravar($"{_sala.Raiz}/respostas/{_sala.Uid}/{id}", r).GetAwaiter().GetResult(); _respondida = id; } catch { }
             Dispatcher.UIThread.Post(() =>
@@ -396,7 +419,14 @@ public sealed class JogoRemoto
     bool _viuSorteio;
     bool _anteriorTaca;   // a rodada que passou foi da Taca (sem a classificacao depois dela)
     volatile bool _modoAmigo;   // a sala do jogar com um amigo (o save do host, a meio da temporada)
-    int _noticia, _leilaoVisto, _penaltisVistos;
+    int _noticia, _leilaoVisto, _penaltisVistos, _leilaoAbertoVisto;
+    Control? _esperaLeilao;
+    Sessao? _esperaLeilaoEm;
+    void FecharEsperaLeilao()
+    {
+        if (_esperaLeilao != null) _esperaLeilaoEm?.FecharDialogo(_esperaLeilao);
+        _esperaLeilao = null;
+    }
 
     void Pausa(JsonObject? p)
     {

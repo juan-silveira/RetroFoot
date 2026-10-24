@@ -253,6 +253,8 @@ public sealed class Sessao
                             };
                         }
                 Dispatcher.UIThread.Post(() => MostrarRelogio(prazo));
+                // (o intervalo com o minuto certo nos outros: o tique vai mesmo com a rede atrasada)
+                host.TransmitirMinuto(jn, true);
                 host.IntervaloColetivo(jn, jg, lado, local, prazo);
                 Dispatcher.UIThread.Post(EsconderRelogio);
                 return;
@@ -339,19 +341,11 @@ public sealed class Sessao
         h.LanceDeTodos = (quem, v, p, preco) =>
         {
             FundoVerdeDepoisDaRodada();
-            // (diagnostico temporario: por que cada tecnico humano entra ou fica de fora do leilao)
-            try
-            {
-                foreach (var eq in S.Equipas.Where(x => x.ID != v.ID && J.M.TreinadorDa(x) is { Humano: not 0 }))
-                {
-                    var td = J.M.TreinadorDa(eq)!;
-                    App.Anotar($"diag leilao: jogador {p.ID} base {preco} -> {Dlg.Texto(eq.NomeCurto)} caixa {(int)eq.Dinheiro} ferias {td.B06} opcao {td.B1A[3]} chamado {quem.Any(x => x.ID == eq.ID)}", null);
-                }
-            }
-            catch { }
             var prazo = RetroFoot.Motor.Online.HostOnline.PrazoPergunta;
             var meu = quem.FirstOrDefault(c => !host.Remota(c));
             var remotos = quem.Where(c => host.Remota(c)).Select(c => c.ID).ToList();
+            // (os outros aparelhos que nao licitam: a espera ate o resultado)
+            host.AvisarLeilaoAberto(p.ID, v.ID, quem.Select(c => c.ID));
             (int, bool)? local = null;
             // a janela do host (se ele licita): o lance; depois, a espera pelos outros sobre ela
             var dt = leilaoAberto = meu == null ? null : TelaLeilao.DeTodos.Abrir(this, v, p, preco);
@@ -371,11 +365,9 @@ public sealed class Sessao
                     esperaHost = Espera(Idioma.T("Leilão de {0}: aguardando {1} dar o lance…", P98.NomeJogador(p), nomes));
                     AbrirDialogo(esperaHost);
                 });
-            var inicioDiag = DateTime.UtcNow;
             var rs = host.PerguntarTodos(remotos, "lance", c => O(("comprador", c), ("vendedor", v.ID), ("jogador", p.ID), ("preco", preco)), t, prazo);
             t?.Wait(prazo);
             Dispatcher.UIThread.Post(() => { if (esperaHost != null) FecharDialogo(esperaHost); });
-            App.Anotar($"diag leilao: jogador {p.ID} respostas {string.Join(", ", rs.Select(x => $"{x.Key}={x.Value?.ToJsonString() ?? "nada"}"))} em {(DateTime.UtcNow - inicioDiag).TotalSeconds:0.0}s", null);
             var d = new Dictionary<ushort, (int Milhares, bool Ok)>();
             foreach (var (eq, r) in rs) d[eq] = r == null ? (0, false) : ((int?)r["milhares"] ?? 0, (bool?)r["ok"] ?? false);
             if (meu != null && local is { } l) d[meu.ID] = l;
@@ -448,12 +440,17 @@ public sealed class Sessao
         // a disputa de penaltis: a mesma janela nos outros aparelhos
         var desempate = h.Desempate;
         h.Desempate = (jg, d) => { host.TransmitirPenaltis(jg, d); desempate?.Invoke(jg, d); };
+        bool velocidadeDaSala = false;
+        // o fim da jornada: o ultimo minuto vai sempre (os outros podem ter pulado os de antes)
+        var fimJ = h.FimJornada;
+        h.FimJornada = jn => { host.TransmitirMinuto(jn, true); fimJ?.Invoke(jn); };
         var comeco = h.ComecoJornada;
         h.ComecoJornada = (titulo, jn) =>
         {
             Dispatcher.UIThread.Post(EsconderRelogio);
             // a velocidade da partida das regras da sala; a jornada vai ao vivo para os outros
-            J.Op = J.Op with { Velocidade = (short)host.Velocidade };
+            // (a da sala so na 1a jornada; depois, a que o host escolher nas Opcoes)
+            if (!velocidadeDaSala) { velocidadeDaSala = true; J.Op = J.Op with { Velocidade = (short)host.Velocidade }; }
             jornadaOnline = jn;
             TelaJornada.SoTime = host.MeuTime;
             host.TransmitirInicio(titulo, jn);
