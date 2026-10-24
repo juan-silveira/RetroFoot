@@ -269,6 +269,13 @@ static class Programa
                 }
             }
             string todos = $"H {e1} | " + string.Join(" | ", es.Select((x, i) => $"C{i + 1} {x}"));
+            // SOAK_JORNADAS=k: para depois de k rodadas do campeonato jogadas
+            if (int.TryParse(Environment.GetEnvironmentVariable("SOAK_JORNADAS"), out var kj) && m.Ano == ano0 && m.Jornada > kj)
+            {
+                Console.WriteLine($"OK: {kj} rodadas ({m.Ano}), {teclas} teclas");
+                cts.Cancel();
+                return;
+            }
             if (m.Ano - ano0 >= temporadas && m.Jornada >= 2 && m.Jornada <= 4)
             {
                 Console.WriteLine($"OK: {temporadas} temporadas ({m.Ano}), {teclas} teclas");
