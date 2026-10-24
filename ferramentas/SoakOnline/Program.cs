@@ -48,6 +48,7 @@ static class Programa
         if (raiz == null) { Console.Error.WriteLine("pasta do jogo nao encontrada"); return 3; }
 
         Sessao.PausaFimJornadaMs = 0;
+        Som.Ligado = false;   // (o teste nao apita no computador de quem esta jogando)
         AppBuilder.Configure<SoakApp>().UseSkia().UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false }).WithInterFont().SetupWithoutStarting();
         int codigo = 0;
         var cts = new CancellationTokenSource();
@@ -171,6 +172,7 @@ static class Programa
             if ((int?)o["motivo"] == 3) goleiroDe = uid;
             if (!k.StartsWith("intervalo")) Console.WriteLine($"  .. pausa {o.ToJsonString()}");
         });
+        banco.Observar($"{sh.Raiz}/rodada/classificacao", (c, v) => { if (c == "/" && v is JsonObject o) Console.WriteLine($"  == classificacao publicada: ano {o["ano"]} jornada {o["jornada"]}"); });
         banco.Observar($"{sh.Raiz}/rodada/noticia", (c, v) => { if (c == "/" && v != null) Interlocked.Increment(ref noticias); });
         // (modo amigo) quem entrou e com que time; quem mudou de time
         banco.Observar($"{sh.Raiz}/jogadores", (c, v) =>

@@ -134,16 +134,13 @@ public sealed class JogoRemoto
         });
         // a classificacao depois da rodada, ao mesmo tempo que a do host (sobre a partida que
         // acabou); fechada, o fundo verde ate o jogo novo. Depois ela nao volta (_classificacaoVista)
-        bool primeiraClassificacao = true;
+        // (so com a partida que acabou na tela: a que ja estava no banco ao entrar nao aparece)
         sala.B.Observar($"{sala.Raiz}/rodada/classificacao", (caminho, v) =>
         {
             if (caminho != "/" || v is not JsonObject o) return;
-            bool velha = primeiraClassificacao;   // (a que ja estava no banco ao entrar)
-            primeiraClassificacao = false;
-            if (velha) return;
             Dispatcher.UIThread.Post(() =>
             {
-                var s = _jornada != null ? _sessaoAoVivo : _sessao;
+                var s = _jornada != null ? _sessaoAoVivo : null;
                 if (s == null || (string?)o["save"] is not { } sv) return;
                 var chave = ((int?)o["ano"] ?? 0, (int?)o["jornada"] ?? 0);
                 if (_classificacaoVista == chave) return;
