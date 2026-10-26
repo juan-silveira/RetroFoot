@@ -59,7 +59,24 @@ public class MainActivity : AvaloniaMainActivity
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             if (RetroFoot.App.App.Raiz is { } v) Redesenhar(v);
+            IconesClaros();
         }, Avalonia.Threading.DispatcherPriority.Background);
+    }
+
+    // os icones da barra de status e dos botoes claros, sobre as faixas no verde escuro da area
+    // segura (App.AreaSegura); de novo a cada foco, se o sistema ou o Avalonia os trocarem
+    public override void OnWindowFocusChanged(bool temFoco)
+    {
+        base.OnWindowFocusChanged(temFoco);
+        if (temFoco) IconesClaros();
+    }
+
+    void IconesClaros()
+    {
+        if (Window is not { } w) return;
+        var c = AndroidX.Core.View.WindowCompat.GetInsetsController(w, w.DecorView);
+        c.AppearanceLightStatusBars = false;
+        c.AppearanceLightNavigationBars = false;
     }
 
     static void Redesenhar(Avalonia.Visual v)

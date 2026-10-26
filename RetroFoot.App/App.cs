@@ -101,6 +101,9 @@ public class App : Application
             };
         // (no celular, a camada da pergunta por cima das telas)
         Control vista = celular ? new Grid { Children = { raiz, camadaSair } } : raiz;
+        // no Android o app ocupa a tela toda (de ponta a ponta): a area segura vira margem, para
+        // nada ficar debaixo da barra de status nem dos botoes do sistema; as faixas no verde escuro
+        if (OperatingSystem.IsAndroid()) vista = AreaSegura(vista);
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             bool retrato = Environment.GetEnvironmentVariable("RETROFOOT_RETRATO") == "1";
@@ -148,6 +151,26 @@ public class App : Application
         else if (ApplicationLifetime is ISingleViewApplicationLifetime unica)
             unica.MainView = vista;
         base.OnFrameworkInitializationCompleted();
+    }
+
+    // a area segura do Android: o app de ponta a ponta em todo aparelho (o Android 15 ja forca; sem
+    // o Avalonia saber, o jogo ficava debaixo da barra de status e dos botoes do sistema). Sabendo,
+    // o Avalonia poe sozinho a margem que o aparelho informa (TopLevel.AutoSafeAreaPadding): a
+    // barra de status, os botoes ou o traco dos gestos (ou nada), o recorte da camera. As faixas
+    // no verde escuro, com os icones da barra claros
+    static Control AreaSegura(Control vista)
+    {
+        var moldura = new Border { Background = TemaVerde.FundoEscuro, Child = vista };
+        bool feito = false;
+        moldura.AttachedToVisualTree += (_, _) =>
+        {
+            if (feito || TopLevel.GetTopLevel(moldura) is not { } tl || tl.InsetsManager is not { } im) return;
+            feito = true;
+            tl.Background = TemaVerde.FundoEscuro;
+            im.DisplayEdgeToEdgePreference = true;
+            im.SystemBarColor = Color.FromRgb(0x0B, 0x2A, 0x16);
+        };
+        return moldura;
     }
 
     // A barra de rolagem do Fluent fica por cima do conteudo: quando um ScrollViewer rola na
